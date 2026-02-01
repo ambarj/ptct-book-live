@@ -1,0 +1,1000 @@
+<!--
+    Section 1.4: Streamlines and Flow Visualization
+    Source: Module 3 - Visualization and functions.nb, Lecture8_1.nb, Lecture8_2.nb
+    Core Concept: Visualizing complete flow patterns and classifying fixed points
+    Estimated Time: 20 minutes
+    Prerequisites: Section 1.3 (Vector Fields)
+-->
+
+<h1>Streamlines and Flow Visualization</h1>
+
+<p>
+    In Section 1.3, we learned to read vector fields through arrows and trace individual field lines.
+    Now we'll see the <strong>complete picture</strong>: streamlines reveal the global flow pattern,
+    showing how an entire fluid or field behaves across space. This is how physicists visualize
+    everything from air flow around airplane wings to electric fields around circuits.
+</p>
+
+<div class="info-box">
+    <div class="info-box-title">Learning Objectives</div>
+    <ul>
+        <li>Visualize complete flow patterns using streamlines</li>
+        <li>Identify and classify fixed points: nodes, saddles, centers, and spirals</li>
+        <li>Understand the physical meaning of stable vs unstable equilibria</li>
+        <li>Combine multiple flow sources to create complex patterns</li>
+        <li>Connect flow visualization to physical systems (oscillators, fluid dynamics)</li>
+    </ul>
+</div>
+
+<hr>
+
+<h2>From Arrows to Streamlines</h2>
+
+<p>
+    A <strong>streamline</strong> is a curve that is everywhere tangent to the velocity field.
+    If you dropped a leaf into a steady flow, it would follow a streamline exactly. While arrows
+    show the field at discrete points, streamlines show the continuous paths particles would take.
+</p>
+
+<div class="equation-display">
+    <p><strong>Streamline Definition:</strong></p>
+    $$ \frac{dx}{F_x} = \frac{dy}{F_y} $$
+    <p style="font-size: 0.9rem; margin-top: var(--spacing-sm); color: var(--text-muted);">
+        At every point on a streamline, the tangent direction equals the field direction.
+    </p>
+</div>
+
+<div class="interactive-container">
+    <div class="interactive-title">Interactive: Streamline Visualizer</div>
+
+    <p style="margin-bottom: var(--spacing-md); color: var(--text-secondary);">
+        Compare streamline patterns for different flow types. Notice how the global structure emerges.
+    </p>
+
+    <div class="plot-container">
+        <div id="streamlines-main-plot" style="width: 100%; height: 400px;"></div>
+    </div>
+
+    <div class="control-panel">
+        <div class="control-group">
+            <label class="control-label">Flow Type:</label>
+            <select id="streamlines-flow-select" class="control-select">
+                <option value="uniform">Uniform Flow</option>
+                <option value="source">Source (Outward)</option>
+                <option value="sink">Sink (Inward)</option>
+                <option value="vortex">Vortex (Rotation)</option>
+                <option value="saddle">Saddle Point</option>
+                <option value="spiral-in">Spiral Inward (Stable)</option>
+                <option value="spiral-out">Spiral Outward (Unstable)</option>
+            </select>
+        </div>
+
+        <div class="control-group">
+            <label class="control-label">
+                Number of Streamlines:
+                <span class="control-label-value" id="streamlines-count-value">12</span>
+            </label>
+            <input type="range" class="slider" id="streamlines-count-slider" min="4" max="24" step="2" value="12">
+        </div>
+
+        <div class="control-group">
+            <label class="control-label">
+                <input type="checkbox" id="streamlines-show-arrows" checked style="margin-right: 8px;">
+                Show direction arrows
+            </label>
+        </div>
+
+        <div class="btn-group">
+            <button class="btn" onclick="resetStreamlineViz()">Reset</button>
+        </div>
+    </div>
+</div>
+
+<div class="info-box">
+    <div class="info-box-title">Key Patterns to Notice</div>
+    <ul>
+        <li><strong>Uniform:</strong> Parallel lines - constant flow in one direction</li>
+        <li><strong>Source/Sink:</strong> Radial lines diverging from or converging to a point</li>
+        <li><strong>Vortex:</strong> Closed circles - pure rotation with no radial motion</li>
+        <li><strong>Saddle:</strong> Hyperbolic curves - stable in one direction, unstable in another</li>
+        <li><strong>Spirals:</strong> Combination of rotation and radial motion</li>
+    </ul>
+</div>
+
+<div class="interactive-container question-section">
+    <div class="interactive-title">Test Your Understanding</div>
+
+    <p style="margin-bottom: var(--spacing-md); color: var(--text-secondary);">
+        Use the Streamline Visualizer to answer these questions.
+    </p>
+
+    <div class="tabs">
+        <div class="tab-buttons">
+            <button class="tab-button active">Question 1</button>
+            <button class="tab-button">Question 2</button>
+            <button class="tab-button">Question 3</button>
+            <button class="tab-button">Question 4</button>
+        </div>
+
+        <div class="tab-content active">
+            <div class="question-container" data-type="mcq" data-answer="2">
+                <div class="question-text">
+                    Select "Vortex" flow. What shape do the streamlines form?
+                </div>
+                <div class="question-options">
+                    <label class="option">
+                        <input type="radio" name="q4-1-1" value="0">
+                        <span>Straight lines through the origin</span>
+                    </label>
+                    <label class="option">
+                        <input type="radio" name="q4-1-1" value="1">
+                        <span>Spirals converging to the center</span>
+                    </label>
+                    <label class="option">
+                        <input type="radio" name="q4-1-1" value="2">
+                        <span>Concentric circles around the origin</span>
+                    </label>
+                    <label class="option">
+                        <input type="radio" name="q4-1-1" value="3">
+                        <span>Hyperbolic curves</span>
+                    </label>
+                </div>
+                <div class="question-explanation" style="display: none;">
+                    <div class="question-explanation-title">Explanation</div>
+                    <div class="question-explanation-text">
+                        A pure vortex has only tangential (rotational) velocity with no radial component.
+                        Particles orbit at constant radius, forming perfect circles. This is called a
+                        <strong>center</strong> in dynamical systems - neutrally stable with periodic orbits.
+                    </div>
+                </div>
+                <div class="question-actions">
+                    <button class="btn-verify">Verify</button>
+                </div>
+            </div>
+        </div>
+
+        <div class="tab-content">
+            <div class="question-container" data-type="mcq" data-answer="1">
+                <div class="question-text">
+                    Compare "Spiral Inward" and "Spiral Outward". What's the key difference?
+                </div>
+                <div class="question-options">
+                    <label class="option">
+                        <input type="radio" name="q4-1-2" value="0">
+                        <span>They rotate in opposite directions</span>
+                    </label>
+                    <label class="option">
+                        <input type="radio" name="q4-1-2" value="1">
+                        <span>Particles approach vs escape from the origin</span>
+                    </label>
+                    <label class="option">
+                        <input type="radio" name="q4-1-2" value="2">
+                        <span>One has faster flow than the other</span>
+                    </label>
+                    <label class="option">
+                        <input type="radio" name="q4-1-2" value="3">
+                        <span>They are mirror images</span>
+                    </label>
+                </div>
+                <div class="question-explanation" style="display: none;">
+                    <div class="question-explanation-title">Explanation</div>
+                    <div class="question-explanation-text">
+                        <strong>Spiral Inward</strong> = vortex + sink. Particles rotate AND move toward the origin.
+                        This represents a <strong>stable spiral</strong> (like a damped pendulum).<br><br>
+                        <strong>Spiral Outward</strong> = vortex + source. Particles rotate AND escape from the origin.
+                        This is an <strong>unstable spiral</strong> - any small perturbation grows exponentially.
+                    </div>
+                </div>
+                <div class="question-actions">
+                    <button class="btn-verify">Verify</button>
+                </div>
+            </div>
+        </div>
+
+        <div class="tab-content">
+            <div class="question-container" data-type="fill" data-answer="saddle">
+                <div class="question-text">
+                    Select "Saddle Point". Notice that streamlines approach along one axis but
+                    escape along the perpendicular axis.<br><br>
+                    This type of fixed point is called a:
+                    <input type="text" class="fill-blank" placeholder="type name" style="width: 120px;">
+                    <br><br>
+                    <em>Hint: Think of the shape of a horse saddle - stable in one direction, unstable in another.</em>
+                </div>
+                <div class="question-explanation" style="display: none;">
+                    <div class="question-explanation-title">Explanation</div>
+                    <div class="question-explanation-text">
+                        A <strong>saddle point</strong> is a unique type of equilibrium that is simultaneously
+                        stable (attracting) along one axis and unstable (repelling) along another. In physics,
+                        saddle points appear at mountain passes, in magnetic field configurations, and at
+                        unstable equilibria of mechanical systems.
+                    </div>
+                </div>
+                <div class="question-actions">
+                    <button class="btn-verify">Verify</button>
+                </div>
+            </div>
+        </div>
+
+        <div class="tab-content">
+            <div class="question-container" data-type="msq" data-answer="0,2,3">
+                <div class="question-text">
+                    Explore all flow types. Which statements are TRUE? (Select all that apply)
+                </div>
+                <div class="question-options">
+                    <label class="option">
+                        <input type="checkbox" name="q4-1-4" value="0">
+                        <span>In a source, all streamlines point away from the origin</span>
+                    </label>
+                    <label class="option">
+                        <input type="checkbox" name="q4-1-4" value="1">
+                        <span>Spiral and vortex streamlines look identical</span>
+                    </label>
+                    <label class="option">
+                        <input type="checkbox" name="q4-1-4" value="2">
+                        <span>Uniform flow has parallel streamlines</span>
+                    </label>
+                    <label class="option">
+                        <input type="checkbox" name="q4-1-4" value="3">
+                        <span>Saddle point has exactly four special streamlines (separatrices)</span>
+                    </label>
+                </div>
+                <div class="question-explanation" style="display: none;">
+                    <div class="question-explanation-title">Explanation</div>
+                    <div class="question-explanation-text">
+                        <strong>Statement 1 (TRUE):</strong> Source = radially outward flow.<br>
+                        <strong>Statement 2 (FALSE):</strong> Vortex has closed circles; spirals curve inward/outward.<br>
+                        <strong>Statement 3 (TRUE):</strong> Uniform flow is constant everywhere = parallel lines.<br>
+                        <strong>Statement 4 (TRUE):</strong> Saddle has 4 separatrices: 2 approaching (stable manifold), 2 escaping (unstable manifold).
+                    </div>
+                </div>
+                <div class="question-actions">
+                    <button class="btn-verify">Verify</button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<hr>
+
+<h2>Fixed Points and Stability</h2>
+
+<p>
+    A <strong>fixed point</strong> (or equilibrium) is where the flow velocity is zero - a particle
+    placed there would stay forever. But not all fixed points are equal! Some attract nearby particles
+    (stable), some repel them (unstable), and some do both depending on direction.
+</p>
+
+<p>
+    The behavior near a fixed point is determined by the <strong>eigenvalues</strong> of the system.
+    Don't worry about the math yet - let's build visual intuition first.
+</p>
+
+<div class="interactive-container">
+    <div class="interactive-title">Interactive: Fixed Point Classifier</div>
+
+    <p style="margin-bottom: var(--spacing-md); color: var(--text-secondary);">
+        Explore how different combinations of growth/decay and rotation create different fixed point types.
+    </p>
+
+    <div class="plot-container">
+        <div id="streamlines-fixedpoint-plot" style="width: 100%; height: 400px;"></div>
+    </div>
+
+    <div class="control-panel">
+        <div class="control-group">
+            <label class="control-label">
+                Radial Component (growth/decay):
+                <span class="control-label-value" id="streamlines-radial-value">0.0</span>
+            </label>
+            <input type="range" class="slider" id="streamlines-radial-slider" min="-1.5" max="1.5" step="0.1" value="0">
+            <div style="display: flex; justify-content: space-between; font-size: 0.75rem; color: var(--text-muted); margin-top: 4px;">
+                <span>Stable (decay)</span>
+                <span>Unstable (growth)</span>
+            </div>
+        </div>
+
+        <div class="control-group">
+            <label class="control-label">
+                Rotational Component:
+                <span class="control-label-value" id="streamlines-rotation-value">1.0</span>
+            </label>
+            <input type="range" class="slider" id="streamlines-rotation-slider" min="-2" max="2" step="0.1" value="1">
+            <div style="display: flex; justify-content: space-between; font-size: 0.75rem; color: var(--text-muted); margin-top: 4px;">
+                <span>Clockwise</span>
+                <span>Counterclockwise</span>
+            </div>
+        </div>
+
+        <div class="btn-group" style="justify-content: space-between;">
+            <div>
+                <button class="btn" onclick="presetCenter()">Center</button>
+                <button class="btn btn-secondary" onclick="presetStableSpiral()">Stable Spiral</button>
+                <button class="btn btn-magenta" onclick="presetUnstableNode()">Unstable Node</button>
+            </div>
+            <div id="streamlines-classification" style="font-family: var(--font-mono); color: var(--neon-cyan); font-size: 1rem; padding: 8px;">
+                Classification: Center
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="warning-box">
+    <div class="info-box-title">Physical Interpretation</div>
+    <p>
+        <strong>Radial component</strong> = energy gain/loss (friction, damping, driving force)<br>
+        <strong>Rotational component</strong> = oscillatory tendency (springs, pendulums, LC circuits)<br><br>
+        A damped pendulum has negative radial (energy loss) and positive rotation (oscillation) = <strong>stable spiral</strong>
+    </p>
+</div>
+
+<div class="interactive-container question-section">
+    <div class="interactive-title">Test Your Understanding</div>
+
+    <p style="margin-bottom: var(--spacing-md); color: var(--text-secondary);">
+        Use the Fixed Point Classifier to answer these questions.
+    </p>
+
+    <div class="tabs">
+        <div class="tab-buttons">
+            <button class="tab-button active">Question 1</button>
+            <button class="tab-button">Question 2</button>
+            <button class="tab-button">Question 3</button>
+            <button class="tab-button">Question 4</button>
+        </div>
+
+        <div class="tab-content active">
+            <div class="question-container" data-type="mcq" data-answer="0">
+                <div class="question-text">
+                    Set Radial = 0 and Rotation = 1. What type of fixed point is this?
+                </div>
+                <div class="question-options">
+                    <label class="option">
+                        <input type="radio" name="q4-2-1" value="0">
+                        <span>Center (closed orbits, neutrally stable)</span>
+                    </label>
+                    <label class="option">
+                        <input type="radio" name="q4-2-1" value="1">
+                        <span>Stable spiral</span>
+                    </label>
+                    <label class="option">
+                        <input type="radio" name="q4-2-1" value="2">
+                        <span>Stable node</span>
+                    </label>
+                    <label class="option">
+                        <input type="radio" name="q4-2-1" value="3">
+                        <span>Saddle point</span>
+                    </label>
+                </div>
+                <div class="question-explanation" style="display: none;">
+                    <div class="question-explanation-title">Explanation</div>
+                    <div class="question-explanation-text">
+                        With zero radial component (no growth or decay) and nonzero rotation, particles
+                        orbit forever at constant radius. This is a <strong>center</strong> - the fixed point
+                        of an undamped harmonic oscillator. It's "neutrally stable": perturbations neither
+                        grow nor shrink, they just orbit.
+                    </div>
+                </div>
+                <div class="question-actions">
+                    <button class="btn-verify">Verify</button>
+                </div>
+            </div>
+        </div>
+
+        <div class="tab-content">
+            <div class="question-container" data-type="fill" data-answer="stable spiral|stable|spiral">
+                <div class="question-text">
+                    A damped pendulum loses energy over time while oscillating. Set Radial = -0.5
+                    (decay) and Rotation = 1 (oscillation).<br><br>
+                    The classification shown is:
+                    <input type="text" class="fill-blank" placeholder="fixed point type" style="width: 150px;">
+                </div>
+                <div class="question-explanation" style="display: none;">
+                    <div class="question-explanation-title">Explanation</div>
+                    <div class="question-explanation-text">
+                        Negative radial (decay) + rotation = <strong>stable spiral</strong>. Particles
+                        spiral inward toward the origin. This is the phase portrait of any underdamped
+                        oscillator: the amplitude decreases while the system continues to oscillate.
+                        Eventually, it settles at the equilibrium point.
+                    </div>
+                </div>
+                <div class="question-actions">
+                    <button class="btn-verify">Verify</button>
+                </div>
+            </div>
+        </div>
+
+        <div class="tab-content">
+            <div class="question-container" data-type="mcq" data-answer="2">
+                <div class="question-text">
+                    Set Radial = -1.5 (strong decay) and Rotation = 0 (no oscillation).
+                    What happens to the streamlines?
+                </div>
+                <div class="question-options">
+                    <label class="option">
+                        <input type="radio" name="q4-2-3" value="0">
+                        <span>They form circles</span>
+                    </label>
+                    <label class="option">
+                        <input type="radio" name="q4-2-3" value="1">
+                        <span>They spiral inward</span>
+                    </label>
+                    <label class="option">
+                        <input type="radio" name="q4-2-3" value="2">
+                        <span>They go straight to the origin (radial lines)</span>
+                    </label>
+                    <label class="option">
+                        <input type="radio" name="q4-2-3" value="3">
+                        <span>They escape to infinity</span>
+                    </label>
+                </div>
+                <div class="question-explanation" style="display: none;">
+                    <div class="question-explanation-title">Explanation</div>
+                    <div class="question-explanation-text">
+                        With no rotation (zero imaginary eigenvalue), there's no oscillation. Pure decay
+                        creates straight-line trajectories toward the origin. This is a <strong>stable node</strong>,
+                        representing an overdamped system - it returns to equilibrium without oscillating,
+                        like a door with a very strong damper.
+                    </div>
+                </div>
+                <div class="question-actions">
+                    <button class="btn-verify">Verify</button>
+                </div>
+            </div>
+        </div>
+
+        <div class="tab-content">
+            <div class="question-container" data-type="msq" data-answer="1,2">
+                <div class="question-text">
+                    Experiment with positive radial values (growth). Which are TRUE?
+                </div>
+                <div class="question-options">
+                    <label class="option">
+                        <input type="checkbox" name="q4-2-4" value="0">
+                        <span>Positive radial creates stable fixed points</span>
+                    </label>
+                    <label class="option">
+                        <input type="checkbox" name="q4-2-4" value="1">
+                        <span>Positive radial + rotation = unstable spiral (particles escape while rotating)</span>
+                    </label>
+                    <label class="option">
+                        <input type="checkbox" name="q4-2-4" value="2">
+                        <span>Positive radial alone = unstable node (particles escape radially)</span>
+                    </label>
+                    <label class="option">
+                        <input type="checkbox" name="q4-2-4" value="3">
+                        <span>High positive radial creates a saddle point</span>
+                    </label>
+                </div>
+                <div class="question-explanation" style="display: none;">
+                    <div class="question-explanation-title">Explanation</div>
+                    <div class="question-explanation-text">
+                        <strong>Statement 1 (FALSE):</strong> Positive radial means growth/instability, not stability.<br>
+                        <strong>Statement 2 (TRUE):</strong> Growth + rotation = unstable spiral. Particles spiral outward.<br>
+                        <strong>Statement 3 (TRUE):</strong> Growth without rotation = unstable node. Radial escape.<br>
+                        <strong>Statement 4 (FALSE):</strong> Saddle points require opposite-sign eigenvalues, not just positive radial.
+                    </div>
+                </div>
+                <div class="question-actions">
+                    <button class="btn-verify">Verify</button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<hr>
+
+<h2>Combining Flow Patterns</h2>
+
+<p>
+    Real physical situations often involve multiple sources or sinks. What happens when flows interact?
+    <strong>Stagnation points</strong> emerge where opposing flows cancel out - places where the velocity
+    is zero even though there's active flow all around.
+</p>
+
+<div class="interactive-container">
+    <div class="interactive-title">Interactive: Flow Pattern Builder</div>
+
+    <p style="margin-bottom: var(--spacing-md); color: var(--text-secondary);">
+        Place sources (outward flow) and sinks (inward flow) to see how their streamlines interact.
+    </p>
+
+    <div class="plot-container">
+        <div id="streamlines-combined-plot" style="width: 100%; height: 400px;"></div>
+    </div>
+
+    <div class="control-panel">
+        <div class="control-group">
+            <label class="control-label">Configuration:</label>
+            <select id="streamlines-config-select" class="control-select">
+                <option value="dipole">Dipole (Source + Sink)</option>
+                <option value="two-sources">Two Sources</option>
+                <option value="two-sinks">Two Sinks</option>
+                <option value="quadrupole">Quadrupole (4 alternating)</option>
+                <option value="source-vortex">Source + Vortex (Spiral)</option>
+            </select>
+        </div>
+
+        <div class="control-group">
+            <label class="control-label">
+                Separation Distance:
+                <span class="control-label-value" id="streamlines-separation-value">2.0</span>
+            </label>
+            <input type="range" class="slider" id="streamlines-separation-slider" min="0.5" max="4" step="0.25" value="2">
+        </div>
+
+        <div class="control-group">
+            <label class="control-label">
+                <input type="checkbox" id="streamlines-show-stagnation" checked style="margin-right: 8px;">
+                Highlight stagnation points
+            </label>
+        </div>
+
+        <div class="btn-group">
+            <button class="btn" onclick="resetCombinedFlow()">Reset</button>
+        </div>
+    </div>
+</div>
+
+<div class="info-box">
+    <div class="info-box-title">Stagnation Points</div>
+    <p>
+        Where streamlines meet or diverge, the flow velocity is zero. These <strong>stagnation points</strong>
+        are critical in aerodynamics (where air splits around a wing), fluid mixing, and many other applications.
+        In the dipole configuration, notice the stagnation point exactly between the source and sink!
+    </p>
+</div>
+
+<div class="interactive-container question-section">
+    <div class="interactive-title">Test Your Understanding</div>
+
+    <p style="margin-bottom: var(--spacing-md); color: var(--text-secondary);">
+        Use the Flow Pattern Builder to answer these questions.
+    </p>
+
+    <div class="tabs">
+        <div class="tab-buttons">
+            <button class="tab-button active">Question 1</button>
+            <button class="tab-button">Question 2</button>
+            <button class="tab-button">Question 3</button>
+            <button class="tab-button">Question 4</button>
+        </div>
+
+        <div class="tab-content active">
+            <div class="question-container" data-type="mcq" data-answer="1">
+                <div class="question-text">
+                    Select "Dipole" configuration. Where is the stagnation point located?
+                </div>
+                <div class="question-options">
+                    <label class="option">
+                        <input type="radio" name="q4-3-1" value="0">
+                        <span>At the source location</span>
+                    </label>
+                    <label class="option">
+                        <input type="radio" name="q4-3-1" value="1">
+                        <span>Exactly midway between source and sink</span>
+                    </label>
+                    <label class="option">
+                        <input type="radio" name="q4-3-1" value="2">
+                        <span>At the sink location</span>
+                    </label>
+                    <label class="option">
+                        <input type="radio" name="q4-3-1" value="3">
+                        <span>There is no stagnation point</span>
+                    </label>
+                </div>
+                <div class="question-explanation" style="display: none;">
+                    <div class="question-explanation-title">Explanation</div>
+                    <div class="question-explanation-text">
+                        In a dipole with equal-strength source and sink, the outward flow from the source
+                        exactly cancels the inward flow to the sink at the midpoint. This creates a
+                        stagnation point where \( \vec{F} = 0 \). It's actually a saddle point - stable
+                        along the line connecting source and sink, unstable perpendicular to it.
+                    </div>
+                </div>
+                <div class="question-actions">
+                    <button class="btn-verify">Verify</button>
+                </div>
+            </div>
+        </div>
+
+        <div class="tab-content">
+            <div class="question-container" data-type="mcq" data-answer="2">
+                <div class="question-text">
+                    Select "Two Sources". How do the streamlines behave between them?
+                </div>
+                <div class="question-options">
+                    <label class="option">
+                        <input type="radio" name="q4-3-2" value="0">
+                        <span>They connect the two sources</span>
+                    </label>
+                    <label class="option">
+                        <input type="radio" name="q4-3-2" value="1">
+                        <span>They spiral around both sources</span>
+                    </label>
+                    <label class="option">
+                        <input type="radio" name="q4-3-2" value="2">
+                        <span>They are pushed apart - a "wall" forms between them</span>
+                    </label>
+                    <label class="option">
+                        <input type="radio" name="q4-3-2" value="3">
+                        <span>They pass through both sources</span>
+                    </label>
+                </div>
+                <div class="question-explanation" style="display: none;">
+                    <div class="question-explanation-title">Explanation</div>
+                    <div class="question-explanation-text">
+                        Two sources both push fluid outward. Between them, the opposing flows create a
+                        stagnation line (or point in 2D) where fluid is forced perpendicular to the line
+                        connecting them. This "dividing streamline" acts like a wall - fluid from one
+                        source never crosses to the other side.
+                    </div>
+                </div>
+                <div class="question-actions">
+                    <button class="btn-verify">Verify</button>
+                </div>
+            </div>
+        </div>
+
+        <div class="tab-content">
+            <div class="question-container" data-type="fill" data-answer="spiral|spiraling">
+                <div class="question-text">
+                    Select "Source + Vortex". This combines radial outflow with rotation.<br><br>
+                    The streamlines form a
+                    <input type="text" class="fill-blank" placeholder="shape" style="width: 100px;">
+                    pattern moving outward.
+                </div>
+                <div class="question-explanation" style="display: none;">
+                    <div class="question-explanation-title">Explanation</div>
+                    <div class="question-explanation-text">
+                        Source (radial outward) + Vortex (rotational) = outward <strong>spiral</strong>.
+                        This is exactly what we explored in Section 1.3 with the "Build Your Own Field"
+                        explorer. It represents an unstable spiral in dynamical systems terms - a system
+                        that oscillates with growing amplitude.
+                    </div>
+                </div>
+                <div class="question-actions">
+                    <button class="btn-verify">Verify</button>
+                </div>
+            </div>
+        </div>
+
+        <div class="tab-content">
+            <div class="question-container" data-type="msq" data-answer="0,1,3">
+                <div class="question-text">
+                    Explore different configurations. Which statements are TRUE?
+                </div>
+                <div class="question-options">
+                    <label class="option">
+                        <input type="checkbox" name="q4-3-4" value="0">
+                        <span>Quadrupole has multiple stagnation points</span>
+                    </label>
+                    <label class="option">
+                        <input type="checkbox" name="q4-3-4" value="1">
+                        <span>Decreasing separation moves stagnation points closer together</span>
+                    </label>
+                    <label class="option">
+                        <input type="checkbox" name="q4-3-4" value="2">
+                        <span>Two sinks create the same pattern as two sources</span>
+                    </label>
+                    <label class="option">
+                        <input type="checkbox" name="q4-3-4" value="3">
+                        <span>Far from any configuration, streamlines become nearly parallel (like uniform flow)</span>
+                    </label>
+                </div>
+                <div class="question-explanation" style="display: none;">
+                    <div class="question-explanation-title">Explanation</div>
+                    <div class="question-explanation-text">
+                        <strong>Statement 1 (TRUE):</strong> Quadrupole (alternating +/-/+/-) has a central stagnation point plus others.<br>
+                        <strong>Statement 2 (TRUE):</strong> As sources/sinks get closer, their stagnation points merge toward the center.<br>
+                        <strong>Statement 3 (FALSE):</strong> Two sinks pull inward; two sources push outward. Flow directions are reversed!<br>
+                        <strong>Statement 4 (TRUE):</strong> Far away, any finite configuration looks like a point source or uniform - local details average out.
+                    </div>
+                </div>
+                <div class="question-actions">
+                    <button class="btn-verify">Verify</button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<hr>
+
+<h2>Python Code Examples</h2>
+
+<p>
+    Streamline plots in Python use the same field line tracing approach from Section 1.3, but we
+    trace many lines to show the global pattern.
+</p>
+
+<div class="tabs">
+    <div class="tab-buttons">
+        <button class="tab-button active">Basic Streamlines</button>
+        <button class="tab-button">Fixed Point Types</button>
+        <button class="tab-button">Combined Sources</button>
+        <button class="tab-button">Prompt</button>
+    </div>
+
+    <div class="tab-content active">
+        <div class="code-block-container">
+            <div class="code-header">
+                <span class="code-lang">Python</span>
+                <button class="copy-btn">Copy</button>
+            </div>
+            <pre><code class="language-python">import numpy as np
+import plotly.graph_objects as go
+
+def trace_streamline(x0, y0, field_func, dt=0.02, steps=500):
+    """Trace a single streamline using Euler integration."""
+    x, y = [x0], [y0]
+
+    for _ in range(steps):
+        fx, fy = field_func(x[-1], y[-1])
+        mag = np.sqrt(fx**2 + fy**2)
+        if mag < 0.01:
+            break
+        x.append(x[-1] + dt * fx / mag)
+        y.append(y[-1] + dt * fy / mag)
+        if abs(x[-1]) > 5 or abs(y[-1]) > 5:
+            break
+
+    return x, y
+
+# Vortex field
+def vortex(x, y):
+    r = np.sqrt(x**2 + y**2) or 0.01
+    return -y/r, x/r
+
+# Trace streamlines from circle of starting points
+fig = go.Figure()
+for angle in np.linspace(0, 2*np.pi, 12, endpoint=False):
+    x0, y0 = 2*np.cos(angle), 2*np.sin(angle)
+    x, y = trace_streamline(x0, y0, vortex)
+    fig.add_trace(go.Scatter(x=x, y=y, mode='lines',
+                             line=dict(color='#00f3ff', width=1.5),
+                             showlegend=False))
+
+fig.update_layout(
+    template='plotly_dark',
+    title='Vortex Streamlines',
+    xaxis=dict(range=[-4, 4], scaleanchor='x', gridcolor='#2a2f4a', zerolinecolor='#808080'),
+    yaxis=dict(range=[-4, 4], gridcolor='#2a2f4a', zerolinecolor='#808080')
+)
+fig.show()</code></pre>
+        </div>
+    </div>
+
+    <div class="tab-content">
+        <div class="code-block-container">
+            <div class="code-header">
+                <span class="code-lang">Python</span>
+                <button class="copy-btn">Copy</button>
+            </div>
+            <pre><code class="language-python">import numpy as np
+import plotly.graph_objects as go
+
+def make_linear_field(radial, rotation):
+    """Create a linear field with given radial and rotational components."""
+    def field(x, y):
+        # Radial: (x, y) for growth, (-x, -y) for decay
+        # Rotation: (-y, x) for CCW
+        fx = radial * x - rotation * y
+        fy = radial * y + rotation * x
+        return fx, fy
+    return field
+
+def classify_fixed_point(radial, rotation):
+    """Classify based on eigenvalue structure."""
+    if abs(rotation) < 0.01:
+        return "Stable Node" if radial < 0 else "Unstable Node"
+    elif abs(radial) < 0.01:
+        return "Center"
+    elif radial < 0:
+        return "Stable Spiral"
+    else:
+        return "Unstable Spiral"
+
+# Example: Stable spiral (damped oscillator)
+radial, rotation = -0.3, 1.0
+field = make_linear_field(radial, rotation)
+print(f"Classification: {classify_fixed_point(radial, rotation)}")
+
+# Plot streamlines
+fig = go.Figure()
+for angle in np.linspace(0, 2*np.pi, 8, endpoint=False):
+    x0, y0 = 3*np.cos(angle), 3*np.sin(angle)
+    x, y = trace_streamline(x0, y0, field, steps=1000)
+    fig.add_trace(go.Scatter(x=x, y=y, mode='lines',
+                             line=dict(color='#ff00ff', width=1.5),
+                             showlegend=False))
+
+fig.update_layout(
+    template='plotly_dark',
+    title=f'{classify_fixed_point(radial, rotation)}: radial={radial}, rotation={rotation}',
+    xaxis=dict(range=[-4, 4], scaleanchor='x'),
+    yaxis=dict(range=[-4, 4])
+)
+fig.show()</code></pre>
+        </div>
+    </div>
+
+    <div class="tab-content">
+        <div class="code-block-container">
+            <div class="code-header">
+                <span class="code-lang">Python</span>
+                <button class="copy-btn">Copy</button>
+            </div>
+            <pre><code class="language-python">import numpy as np
+import plotly.graph_objects as go
+
+def dipole_field(x, y, separation=2):
+    """Dipole: source at (-d/2, 0), sink at (+d/2, 0)."""
+    d = separation / 2
+
+    # Source contribution
+    r1 = np.sqrt((x + d)**2 + y**2) or 0.01
+    fx1, fy1 = (x + d) / r1, y / r1
+
+    # Sink contribution (negative)
+    r2 = np.sqrt((x - d)**2 + y**2) or 0.01
+    fx2, fy2 = -(x - d) / r2, -y / r2
+
+    return fx1 + fx2, fy1 + fy2
+
+# Plot dipole streamlines
+fig = go.Figure()
+
+# Starting points: grid around the configuration
+starts = []
+for xi in np.linspace(-3, 3, 7):
+    starts.append((xi, 3))
+    starts.append((xi, -3))
+for yi in np.linspace(-2, 2, 5):
+    starts.append((-3, yi))
+    starts.append((3, yi))
+
+for x0, y0 in starts:
+    x, y = trace_streamline(x0, y0, lambda x, y: dipole_field(x, y, 2), steps=800)
+    fig.add_trace(go.Scatter(x=x, y=y, mode='lines',
+                             line=dict(color='#00f3ff', width=1.5),
+                             showlegend=False))
+
+# Mark source and sink
+fig.add_trace(go.Scatter(x=[-1, 1], y=[0, 0], mode='markers+text',
+                         marker=dict(size=12, color=['#00ff9f', '#ff6b6b']),
+                         text=['Source', 'Sink'], textposition='top center'))
+
+fig.update_layout(
+    template='plotly_dark',
+    title='Dipole Flow (Source + Sink)',
+    xaxis=dict(range=[-4, 4], scaleanchor='x'),
+    yaxis=dict(range=[-4, 4])
+)
+fig.show()</code></pre>
+        </div>
+    </div>
+
+    <div class="tab-content">
+        <div class="info-box">
+            <div class="info-box-title">How to Prompt an LLM</div>
+            <p>
+                Use these prompts to generate streamline visualizations with AI assistants.
+            </p>
+        </div>
+
+        <div class="code-block-container">
+            <div class="code-header">
+                <span class="code-lang">Prompt for Streamlines</span>
+                <button class="copy-btn">Copy</button>
+            </div>
+            <pre><code class="language-text">Create a Python script using Plotly to visualize streamlines of a 2D vector field.
+
+Requirements:
+- Use Euler integration to trace streamlines (normalize velocity, step in direction)
+- Start from 12 evenly-spaced points on a circle of radius 2
+- Field function: vortex F = (-y, x) / r
+- Stop tracing when: magnitude < 0.01, or out of bounds [-5, 5]
+- Use dark theme with cyan streamlines
+- Equal aspect ratio (scaleanchor)</code></pre>
+        </div>
+
+        <div class="code-block-container">
+            <div class="code-header">
+                <span class="code-lang">Prompt for Phase Portrait</span>
+                <button class="copy-btn">Copy</button>
+            </div>
+            <pre><code class="language-text">Write Python code to create a phase portrait for a damped harmonic oscillator.
+
+The system: dx/dt = y, dy/dt = -x - 0.3*y (underdamped with damping ratio 0.15)
+This creates a stable spiral pattern.
+
+Requirements:
+- Trace 8 streamlines from starting radius 3
+- Use Euler integration with dt=0.02
+- Color: magenta for stable spiral
+- Show fixed point at origin with a marker
+- Use Plotly dark theme</code></pre>
+        </div>
+
+        <div class="warning-box">
+            <div class="info-box-title">Tips for Good Prompts</div>
+            <ul>
+                <li><strong>Specify the field</strong>: Give explicit formulas for F_x and F_y</li>
+                <li><strong>Mention integration method</strong>: Euler with normalized velocity</li>
+                <li><strong>Define stopping conditions</strong>: Bounds, fixed points, max steps</li>
+                <li><strong>Request equal aspect</strong>: Critical for circles to look circular!</li>
+            </ul>
+        </div>
+    </div>
+</div>
+
+<hr>
+
+<h2>Exercises for Practice</h2>
+
+<div class="exercise-cards">
+    <div class="exercise-card">
+        <div class="exercise-card-header">
+            <span class="exercise-card-number">1.</span>
+            <span class="exercise-card-badge explore">Explore</span>
+        </div>
+        <div class="exercise-card-content">
+            Use the Fixed Point Classifier to find the exact radial value where a spiral becomes
+            a node (hint: it's when rotation effects become negligible compared to radial).
+        </div>
+    </div>
+
+    <div class="exercise-card">
+        <div class="exercise-card-header">
+            <span class="exercise-card-number">2.</span>
+            <span class="exercise-card-badge coding">Coding</span>
+        </div>
+        <div class="exercise-card-content">
+            Modify the dipole code to create a "tripole" with two sources at \((\pm 1, 1)\) and
+            one sink at \((0, -1)\). Where are the stagnation points?
+        </div>
+    </div>
+
+    <div class="exercise-card">
+        <div class="exercise-card-header">
+            <span class="exercise-card-number">3.</span>
+            <span class="exercise-card-badge think">Think</span>
+        </div>
+        <div class="exercise-card-content">
+            Why can't streamlines cross each other? What would it mean physically if they did?
+            <em>Hint: Think about what direction a particle would move at the crossing point.</em>
+        </div>
+    </div>
+
+    <div class="exercise-card">
+        <div class="exercise-card-header">
+            <span class="exercise-card-number">4.</span>
+            <span class="exercise-card-badge think">Think</span>
+        </div>
+        <div class="exercise-card-content">
+            A real pendulum with friction is a stable spiral. What would an "anti-friction"
+            pendulum (energy added each swing) look like? Which fixed point type?
+        </div>
+    </div>
+</div>
+
+<hr>
+
+<h2>What's Next?</h2>
+
+<p>
+    You've mastered streamlines and learned to classify fixed points. Next, we'll explore
+    <strong>contour plots and equipotentials</strong> - visualizing scalar fields and their
+    connection to vector fields through gradients.
+</p>
+
+<div class="btn-group mt-lg">
+    <button class="btn btn-magenta" onclick="navigateToSection('03-vector-fields')">← Previous: Vector Fields</button>
+    <button class="btn" onclick="scrollToTop()">↑ Back to Top</button>
+    <button class="btn btn-secondary" onclick="navigateToSection('05-contour-plots')">Next: Contour Plots →</button>
+</div>
+
+<!-- Section-specific JavaScript loaded dynamically from js/sections/04-streamlines.js -->

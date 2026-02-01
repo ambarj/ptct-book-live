@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Physics Through Computational Thinking</title>
+
+    <!-- Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&family=Orbitron:wght@500;700;900&family=Fira+Code:wght@400;500&display=swap" rel="stylesheet">
+
+    <!-- Styles -->
+    <link rel="stylesheet" href="css/base.css">
+    <link rel="stylesheet" href="css/sidebar.css">
+    <link rel="stylesheet" href="css/components.css">
+    <link rel="stylesheet" href="css/questions.css">
+
+    <!-- MathJax for equation rendering -->
+    <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+
+    <!-- Plotly for interactive plots -->
+    <script src="https://cdn.plot.ly/plotly-2.27.0.min.js"></script>
+
+    <!-- Highlight.js for code syntax highlighting -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/tokyo-night-dark.min.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/languages/python.min.js"></script>
+</head>
+<body>
+    <!-- Mobile Menu Toggle -->
+    <button class="menu-toggle" id="menuToggle">☰ MENU</button>
+
+    <!-- Sidebar Overlay for Mobile -->
+    <div class="sidebar-overlay" id="sidebarOverlay"></div>
+
+    <div class="app-container">
+        <!-- Sidebar Navigation -->
+        <aside class="sidebar" id="sidebar">
+            <div class="sidebar-header">
+                <h1 class="sidebar-title">PTCT</h1>
+                <p class="sidebar-subtitle">Physics Through Computational Thinking</p>
+            </div>
+
+            <nav class="nav-menu">
+                <!-- Chapter 1 -->
+                <div class="nav-chapter expanded">
+                    <div class="nav-chapter-title">Chapter 1: Visual Thinking</div>
+                    <div class="nav-sections">
+                        <a class="nav-section active" data-section="01-visual-thinking-intro">1.1 Introduction to Visual Thinking</a>
+                        <a class="nav-section" data-section="02-visually-understanding-functions">1.2 Visually Understanding Functions</a>
+                        <a class="nav-section" data-section="03-vector-fields">1.3 Vector Fields</a>
+                        <a class="nav-section" data-section="04-streamlines">1.4 Streamlines</a>
+                        <a class="nav-section" data-section="05-contour-plots">1.5 Contour Plots</a>
+                        <a class="nav-section" data-section="06-nondimensionalization">1.6 Non-Dimensionalization</a>
+                    </div>
+                </div>
+
+                <!-- Chapter 2 -->
+                <div class="nav-chapter">
+                    <div class="nav-chapter-title">Chapter 2: Data Analysis</div>
+                    <div class="nav-sections">
+                        <a class="nav-section" data-section="04-data-statistics">2.1 Statistics Fundamentals</a>
+                        <a class="nav-section" data-section="05-curve-fitting">2.2 Curve Fitting</a>
+                        <a class="nav-section" data-section="06-superposition">2.3 Superposition</a>
+                    </div>
+                </div>
+
+                <!-- Chapter 3 -->
+                <div class="nav-chapter">
+                    <div class="nav-chapter-title">Chapter 3: Oscillations</div>
+                    <div class="nav-sections">
+                        <a class="nav-section" data-section="07-sho-review">3.1 SHO Review</a>
+                        <a class="nav-section" data-section="08-damped-oscillations">3.2 Damped Oscillations</a>
+                        <a class="nav-section" data-section="09-driven-oscillations">3.3 Driven & Resonance</a>
+                        <a class="nav-section" data-section="10-driven-variations">3.4 Driven Variations</a>
+                    </div>
+                </div>
+
+                <!-- Chapter 4 -->
+                <div class="nav-chapter">
+                    <div class="nav-chapter-title">Chapter 4: Numerical Methods</div>
+                    <div class="nav-sections">
+                        <a class="nav-section" data-section="11-euler-method-intro">4.1 Euler's Method</a>
+                        <a class="nav-section" data-section="12-euler-2nd-order">4.2 Second-Order ODEs</a>
+                        <a class="nav-section" data-section="13-rk-methods">4.3 Runge-Kutta Methods</a>
+                        <a class="nav-section" data-section="14-escape-velocity">4.4 Escape Velocity</a>
+                    </div>
+                </div>
+
+                <!-- More chapters can be added here -->
+            </nav>
+
+            <div class="sidebar-footer">
+                Built with 💙 by <a href="#">PTCT Team</a>
+                <br>
+                <span style="font-size: 0.7rem;">© 2026 • Open Source</span>
+            </div>
+        </aside>
+
+        <!-- Main Content Area -->
+        <main class="main-content" id="mainContent">
+            <div class="content-wrapper" id="contentWrapper">
+                <div class="loading">Loading...</div>
+            </div>
+        </main>
+    </div>
+
+    <!-- Base JavaScript -->
+    <script src="js/base.js"></script>
+    <script src="js/components.js"></script>
+    <script src="js/questions.js"></script>
+</body>
+</html>

@@ -1,0 +1,430 @@
+<h1>Introduction to Visual Thinking</h1>
+
+<p>
+    Before diving into equations and algorithms, let's develop our intuition through <strong>visual thinking</strong>.
+    The human brain processes images 60,000 times faster than text. By visualizing mathematical relationships,
+    we can understand complex physics intuitively before formalizing our understanding.
+</p>
+
+<div class="info-box">
+    <div class="info-box-title">Learning Objectives</div>
+    <ul>
+        <li>Learn to represent data and functions visually</li>
+        <li>Understand function behavior through interactive exploration</li>
+        <li>Build intuition before diving into mathematics</li>
+        <li>Master basic plotting with Python</li>
+    </ul>
+</div>
+
+<hr>
+
+<h2>What is Visual Thinking?</h2>
+
+<p>
+    Visual thinking is the practice of using visual representations—graphs, charts, diagrams, and animations—to
+    understand and communicate ideas. In computational physics, we use it to:
+</p>
+
+<ul>
+    <li><strong>Explore</strong> - See patterns before proving them mathematically</li>
+    <li><strong>Verify</strong> - Check if our calculations make sense</li>
+    <li><strong>Communicate</strong> - Share insights with others effectively</li>
+    <li><strong>Discover</strong> - Find unexpected behaviors in systems</li>
+</ul>
+
+<hr>
+
+<h2>Plotting Basics: Your First Graphs</h2>
+
+<p>
+    Let's start with simple functions and build up. Every function tells a story—our job is to visualize that story.
+</p>
+
+<h3>Linear Functions</h3>
+
+<p>
+    The simplest non-trivial function: \( f(x) = 2x - 5 \)
+</p>
+
+<div class="interactive-container">
+    <div class="interactive-title">Interactive: Linear Function Explorer</div>
+
+    <div class="plot-container">
+        <div id="linear-plot" style="width: 100%; height: 400px;"></div>
+    </div>
+
+    <div class="control-panel">
+        <div class="control-group">
+            <label class="control-label">
+                Slope (m):
+                <span class="control-label-value">2.00</span>
+            </label>
+            <input type="range" class="slider" id="slope-slider" min="-5" max="5" step="0.1" value="2">
+        </div>
+
+        <div class="control-group">
+            <label class="control-label">
+                Intercept (b):
+                <span class="control-label-value">-5.00</span>
+            </label>
+            <input type="range" class="slider" id="intercept-slider" min="-10" max="10" step="0.5" value="-5">
+        </div>
+
+        <div class="btn-group">
+            <button class="btn" onclick="resetLinear()">Reset</button>
+        </div>
+    </div>
+</div>
+
+<div class="info-box">
+    <div class="info-box-title">Key Insight</div>
+    <p>
+        The slope <code>m</code> controls how steep the line is. Positive slopes go up, negative slopes go down.
+        The intercept <code>b</code> shifts the line up or down. Together, they completely determine the line!
+    </p>
+</div>
+
+<h3>Quadratic Functions: The Power of Parabolas</h3>
+
+<p>
+    Quadratic functions appear everywhere in physics: projectile motion, springs, potential energy.
+    The general form is \( f(x) = ax^2 + bx + c \).
+</p>
+
+<div class="interactive-container">
+    <div class="interactive-title">Interactive: Quadratic Function Explorer</div>
+
+    <div class="plot-container">
+        <div id="quadratic-plot" style="width: 100%; height: 400px;"></div>
+    </div>
+
+    <div class="control-panel">
+        <div class="control-group">
+            <label class="control-label">
+                a (opens up/down):
+                <span class="control-label-value">1.00</span>
+            </label>
+            <input type="range" class="slider" id="a-slider" min="-3" max="3" step="0.1" value="1">
+        </div>
+
+        <div class="control-group">
+            <label class="control-label">
+                b (shifts left/right):
+                <span class="control-label-value">0.00</span>
+            </label>
+            <input type="range" class="slider" id="b-slider" min="-5" max="5" step="0.5" value="0">
+        </div>
+
+        <div class="control-group">
+            <label class="control-label">
+                c (shifts up/down):
+                <span class="control-label-value">0.00</span>
+            </label>
+            <input type="range" class="slider" id="c-slider" min="-10" max="10" step="0.5" value="0">
+        </div>
+
+        <div class="btn-group" style="display: flex; justify-content: space-between; align-items: center;">
+            <button class="btn" onclick="resetQuadratic()">Reset</button>
+            <div id="vertex-display" style="font-family: var(--font-mono); color: var(--neon-magenta); font-size: 0.9rem;">
+                Vertex: (0.00, 0.00)
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="equation-display">
+    <p><strong>Vertex Formula:</strong></p>
+    $$ x_{vertex} = -\frac{b}{2a}, \quad y_{vertex} = f(x_{vertex}) $$
+</div>
+
+<hr>
+
+<h2>Comparing Function Growth</h2>
+
+<p>
+    Different functions grow at different rates. Let's compare how \( \sqrt{x} \), \( x \), \( x^2 \), and \( x^3 \)
+    behave near the origin and far away.
+</p>
+
+<div class="interactive-container">
+    <div class="interactive-title">Interactive: Function Growth Comparison</div>
+
+    <div class="plot-container">
+        <div id="growth-plot" style="width: 100%; height: 400px;"></div>
+    </div>
+
+    <div class="control-panel">
+        <div class="control-group">
+            <label class="control-label">
+                X Range (0 to):
+                <span class="control-label-value">5.00</span>
+            </label>
+            <input type="range" class="slider" id="range-slider" min="1" max="10" step="0.1" value="5">
+        </div>
+
+        <div class="btn-group">
+            <button class="btn" onclick="updateGrowthPlot()">Update Plot</button>
+        </div>
+    </div>
+</div>
+
+<div class="warning-box">
+    <div class="info-box-title">Important Observation</div>
+    <p>
+        Near \( x = 0 \), higher powers grow <em>slower</em> (they're flatter).
+        Far from the origin, higher powers completely dominate. This asymptotic behavior is crucial in physics!
+    </p>
+</div>
+
+<hr>
+
+<h2>Python Code Examples</h2>
+
+<p>
+    Let's see how to create these plots in Python using <strong>Plotly</strong> — the same library powering
+    the interactive plots you see on this page. Learning one plotting approach works everywhere!
+</p>
+
+<div class="info-box">
+    <div class="info-box-title">One Library, Less Confusion</div>
+    <p>
+        Throughout this book, we use <strong>only Plotly</strong> for all visualizations. The same code patterns
+        you see on this webpage work in your Python scripts. No need to learn multiple plotting libraries —
+        focus on physics and problem-solving instead!
+    </p>
+</div>
+
+<div class="tabs">
+    <div class="tab-buttons">
+        <button class="tab-button active">Linear Function</button>
+        <button class="tab-button">Quadratic Function</button>
+        <button class="tab-button">Multiple Functions</button>
+        <button class="tab-button">Prompt</button>
+    </div>
+
+    <div class="tab-content">
+        <div class="info-box">
+            <div class="info-box-title">How to Prompt an LLM</div>
+            <p>
+                Instead of memorizing syntax, learn to <strong>describe what you want</strong>.
+                Here are effective prompts you could use with ChatGPT, Claude, or other AI assistants
+                to generate the code shown in the other tabs.
+            </p>
+        </div>
+
+        <div class="code-block-container">
+            <div class="code-header">
+                <span class="code-lang">Prompt for Linear Function</span>
+                <button class="copy-btn">Copy</button>
+            </div>
+            <pre><code class="language-text">Create a Python script using Plotly to plot the linear function f(x) = 2x - 5
+from x = -10 to 10. Use a dark theme with cyan-colored line. Set fixed axis
+ranges: x from -10 to 10, y from -35 to 35. Make axes gray (#808080) to
+differentiate from the data curve.</code></pre>
+        </div>
+
+        <div class="code-block-container">
+            <div class="code-header">
+                <span class="code-lang">Prompt for Quadratic Function</span>
+                <button class="copy-btn">Copy</button>
+            </div>
+            <pre><code class="language-text">Write a Python function using Plotly that plots a quadratic function
+f(x) = ax² + bx + c. The function should calculate and highlight the
+minimum or maximum point with a magenta marker. Use dark theme, cyan line
+for the parabola, gray axes. Set x range to [-10, 10] and y range to
+[-25, 50].</code></pre>
+        </div>
+
+        <div class="code-block-container">
+            <div class="code-header">
+                <span class="code-lang">Prompt for Multiple Functions</span>
+                <button class="copy-btn">Copy</button>
+            </div>
+            <pre><code class="language-text">Create a Plotly visualization comparing four functions: √x, x, x², and x³
+on the same plot from x = 0.1 to 5. Use different neon colors (cyan, magenta,
+yellow, lime) for each function. Apply dark theme and show a legend. This
+should demonstrate how different power functions grow at different rates.</code></pre>
+        </div>
+
+        <div class="warning-box">
+            <div class="info-box-title">Pro Tips for Effective Prompts</div>
+            <ul>
+                <li><strong>Be specific</strong>: Mention the library (Plotly), colors, ranges</li>
+                <li><strong>Describe the goal</strong>: What should the visualization show?</li>
+                <li><strong>Include constraints</strong>: Fixed ranges, specific styling</li>
+                <li><strong>Iterate</strong>: If the first result isn't perfect, ask for adjustments</li>
+                <li><strong>Learn from output</strong>: Study the generated code to understand patterns</li>
+            </ul>
+        </div>
+    </div>
+
+    <div class="tab-content active">
+        <div class="code-block-container">
+            <div class="code-header">
+                <span class="code-lang">Python</span>
+                <button class="copy-btn">Copy</button>
+            </div>
+            <pre><code class="language-python">import numpy as np
+import plotly.graph_objects as go
+
+# Generate x values
+x = np.linspace(-10, 10, 200)
+
+# Define the function
+y = 2*x - 5
+
+# Create the plot
+fig = go.Figure()
+fig.add_trace(go.Scatter(
+    x=x, y=y,
+    mode='lines',
+    name='f(x) = 2x - 5',
+    line=dict(color='cyan', width=2)
+))
+
+# Styling
+fig.update_layout(
+    template='plotly_dark',
+    title='Linear Function',
+    xaxis_title='x',
+    yaxis_title='f(x)',
+    xaxis=dict(range=[-10, 10], zeroline=True),
+    yaxis=dict(range=[-35, 35], zeroline=True)
+)
+
+fig.show()</code></pre>
+        </div>
+    </div>
+
+    <div class="tab-content">
+        <div class="code-block-container">
+            <div class="code-header">
+                <span class="code-lang">Python</span>
+                <button class="copy-btn">Copy</button>
+            </div>
+            <pre><code class="language-python">import numpy as np
+import plotly.graph_objects as go
+
+# Quadratic function plotter
+def plot_quadratic(a=1, b=0, c=0):
+    x = np.linspace(-10, 10, 200)
+    y = a*x**2 + b*x + c
+
+    fig = go.Figure()
+
+    # Plot the parabola
+    fig.add_trace(go.Scatter(
+        x=x, y=y,
+        mode='lines',
+        name=f'f(x) = {a}x² + {b}x + {c}',
+        line=dict(color='cyan', width=2)
+    ))
+
+    # Calculate and plot the minimum/maximum
+    if a != 0:
+        x_vertex = -b / (2*a)
+        y_vertex = a*x_vertex**2 + b*x_vertex + c
+
+        fig.add_trace(go.Scatter(
+            x=[x_vertex], y=[y_vertex],
+            mode='markers',
+            name='Minimum' if a > 0 else 'Maximum',
+            marker=dict(color='magenta', size=10)
+        ))
+
+    # Styling
+    fig.update_layout(
+        template='plotly_dark',
+        title='Quadratic Function',
+        xaxis_title='x',
+        yaxis_title='f(x)',
+        xaxis=dict(range=[-10, 10]),
+        yaxis=dict(range=[-25, 50])
+    )
+
+    return fig
+
+# Try different values
+fig = plot_quadratic(a=1, b=0, c=0)
+fig.show()</code></pre>
+        </div>
+    </div>
+
+    <div class="tab-content">
+        <div class="code-block-container">
+            <div class="code-header">
+                <span class="code-lang">Python</span>
+                <button class="copy-btn">Copy</button>
+            </div>
+            <pre><code class="language-python">import numpy as np
+import plotly.graph_objects as go
+
+# Generate x values
+x = np.linspace(0.1, 5, 200)
+
+# Create figure
+fig = go.Figure()
+
+# Add multiple functions
+functions = [
+    {'name': '√x', 'y': np.sqrt(x), 'color': 'cyan'},
+    {'name': 'x', 'y': x, 'color': 'magenta'},
+    {'name': 'x²', 'y': x**2, 'color': 'yellow'},
+    {'name': 'x³', 'y': x**3, 'color': 'lime'}
+]
+
+for func in functions:
+    fig.add_trace(go.Scatter(
+        x=x, y=func['y'],
+        mode='lines',
+        name=func['name'],
+        line=dict(color=func['color'], width=2)
+    ))
+
+# Styling
+fig.update_layout(
+    template='plotly_dark',
+    title='Function Growth Comparison',
+    xaxis_title='x',
+    yaxis_title='f(x)',
+    showlegend=True
+)
+
+fig.show()</code></pre>
+        </div>
+    </div>
+</div>
+
+<hr>
+
+<h2>Exercises for Practice</h2>
+
+<ol>
+    <li>
+        <strong>Explore</strong>: Use the quadratic explorer above. Set \( a = -1 \), \( b = 0 \), \( c = 4 \).
+        Where is the vertex? Is it a maximum or minimum?
+    </li>
+    <li>
+        <strong>Coding</strong>: Modify the Python code to plot \( f(x) = e^{-x} \sin(x) \) from 0 to 10.
+        What do you observe about the amplitude?
+    </li>
+    <li>
+        <strong>Think</strong>: Why does \( x^3 \) grow faster than \( x^2 \) far from the origin, but slower near \( x = 0 \)?
+    </li>
+</ol>
+
+<hr>
+
+<h2>What's Next?</h2>
+
+<p>
+    Now that you can visualize basic functions, we'll move to more advanced visualization techniques:
+    vector fields, contour plots, and 3D surfaces. These tools will let us understand complex physical systems intuitively.
+</p>
+
+<div class="btn-group mt-lg">
+    <button class="btn" onclick="window.scrollTo(0, 0)">↑ Back to Top</button>
+    <button class="btn btn-secondary" onclick="navigateToSection('02-advanced-visualization')">Next: Advanced Visualization →</button>
+</div>
+
+<!-- Section-specific JavaScript loaded dynamically from js/sections/01-visual-thinking-intro.js -->

@@ -1,0 +1,1462 @@
+<!-- Section 1.2: Visually Understanding Functions -->
+<!-- Source: Module 3 - Visualization and functions.nb (Part 1) -->
+<!-- Core concept: Four key properties - zeros, divergences, extrema, asymptotes -->
+<!-- Estimated time: 20-25 minutes -->
+<!-- Prerequisites: Section 1.1 (basic plotting) -->
+
+<h1>Visually Understanding Functions</h1>
+
+<p>
+    Here's a challenge: look at the function \( f(x) = \frac{x^2 - 4}{x - 3} \).
+    Can you sketch its graph without plotting hundreds of points?
+    By the end of this section, you'll be able to do exactly that — and you'll wonder why you ever
+    plotted functions the hard way!
+</p>
+
+<p>
+    The secret? Every function's shape is determined by just a few <strong>special points</strong>.
+    Find these points, and you understand the entire function. It's like knowing the plot twists
+    of a movie — suddenly the whole story makes sense.
+</p>
+
+<div class="info-box">
+    <div class="info-box-title">Learning Objectives</div>
+    <ul>
+        <li>Find where functions equal zero (<strong>zeros</strong> or roots)</li>
+        <li>Identify where functions blow up to infinity (<strong>divergences</strong> or poles)</li>
+        <li>Locate turning points (<strong>extrema</strong>: minima and maxima)</li>
+        <li>Understand long-range behavior (<strong>asymptotes</strong>)</li>
+        <li>Use these four properties to sketch any function systematically</li>
+    </ul>
+</div>
+
+<hr>
+
+<h2>The Four Properties That Define Any Function</h2>
+
+<p>
+    Think of these four properties as the "vital signs" of a function. Just like a doctor checks
+    your heart rate, blood pressure, and temperature to understand your health, we check these
+    four properties to understand a function's behavior:
+</p>
+
+<ol>
+    <li><strong>Zeros</strong> — Where does the function cross the x-axis?</li>
+    <li><strong>Divergences</strong> — Where does the function explode to infinity?</li>
+    <li><strong>Extrema</strong> — Where are the peaks and valleys?</li>
+    <li><strong>Asymptotes</strong> — What happens when x gets really big (or really small)?</li>
+</ol>
+
+<p>
+    Let's explore each one with interactive tools. Get ready to play!
+</p>
+
+<hr>
+
+<h2>1. Zeros: Where Functions Cross Zero</h2>
+
+<p>
+    <strong>Zeros</strong> (also called <em>roots</em>) are the x-values where the function equals zero:
+    \( f(x^*) = 0 \). On a graph, these are the points where the curve crosses the x-axis.
+</p>
+
+<p>
+    Why do we care? In physics, zeros often represent <em>equilibrium points</em>,
+    <em>nodes in standing waves</em>, or <em>times when something returns to its starting position</em>.
+    Finding zeros is one of the most common tasks in science!
+</p>
+
+<h3>Example: The Quadratic \( f(x) = x^2 - 3x + 2 \)</h3>
+
+<p>
+    This function can be <strong>factored</strong> as \( f(x) = (x - 1)(x - 2) \).
+    The factored form immediately tells us the zeros: \( x = 1 \) and \( x = 2 \).
+    Why? Because when \( x = 1 \), the first factor becomes zero, making the whole product zero.
+    Same logic for \( x = 2 \).
+</p>
+
+<div class="interactive-container">
+    <div class="interactive-title">Interactive: Zero Finder</div>
+
+    <div class="plot-container">
+        <div id="zeros-plot" style="width: 100%; height: 400px;"></div>
+    </div>
+
+    <div class="control-panel">
+        <div class="control-group">
+            <label class="control-label">
+                a (stretches the parabola):
+                <span class="control-label-value" id="zeros-a-value">1.00</span>
+            </label>
+            <input type="range" class="slider" id="zeros-a-slider" min="-3" max="3" step="0.1" value="1">
+        </div>
+
+        <div class="control-group">
+            <label class="control-label">
+                b (shifts horizontally):
+                <span class="control-label-value" id="zeros-b-value">-3.00</span>
+            </label>
+            <input type="range" class="slider" id="zeros-b-slider" min="-6" max="6" step="0.5" value="-3">
+        </div>
+
+        <div class="control-group">
+            <label class="control-label">
+                c (shifts vertically):
+                <span class="control-label-value" id="zeros-c-value">2.00</span>
+            </label>
+            <input type="range" class="slider" id="zeros-c-slider" min="-10" max="10" step="0.5" value="2">
+        </div>
+
+        <div class="btn-group" style="display: flex; justify-content: space-between; align-items: center;">
+            <button class="btn" onclick="resetZeros()">Reset</button>
+            <div id="zeros-info" style="font-family: var(--font-mono); color: var(--neon-cyan); font-size: 0.85rem;">
+                Discriminant: 1.00 | Two real zeros
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="info-box">
+    <div class="info-box-title">The Discriminant Tells All</div>
+    <p>
+        For a quadratic \( ax^2 + bx + c \), the <strong>discriminant</strong> is \( \Delta = b^2 - 4ac \).
+        It tells you how many zeros exist:
+    </p>
+    <ul>
+        <li>\( \Delta > 0 \): <strong>Two</strong> real zeros (parabola crosses x-axis twice)</li>
+        <li>\( \Delta = 0 \): <strong>One</strong> real zero (parabola just touches x-axis)</li>
+        <li>\( \Delta < 0 \): <strong>No</strong> real zeros (parabola never crosses x-axis)</li>
+    </ul>
+    <p>
+        Try adjusting the sliders to see each case! Watch how the discriminant value changes.
+    </p>
+</div>
+
+<div class="interactive-container question-section">
+    <div class="interactive-title">Test Your Understanding: Zeros</div>
+
+    <p style="margin-bottom: var(--spacing-md); color: var(--text-secondary);">
+        Use the Zero Finder above to answer these questions. Experiment with the sliders!
+    </p>
+
+    <div class="tabs">
+        <div class="tab-buttons">
+            <button class="tab-button active">Question 1</button>
+            <button class="tab-button">Question 2</button>
+            <button class="tab-button">Question 3</button>
+            <button class="tab-button">Question 4</button>
+        </div>
+
+        <div class="tab-content active">
+            <div class="question-container" data-type="mcq" data-answer="1">
+                <div class="question-text">
+                    Reset to defaults (a=1, b=-3, c=2). How many times does the parabola cross the x-axis?
+                </div>
+                <div class="question-options">
+                    <label class="option">
+                        <input type="radio" name="q-zeros-1" value="0">
+                        <span>Never — it stays above or below the x-axis</span>
+                    </label>
+                    <label class="option">
+                        <input type="radio" name="q-zeros-1" value="1">
+                        <span>Twice — at two different x-values</span>
+                    </label>
+                    <label class="option">
+                        <input type="radio" name="q-zeros-1" value="2">
+                        <span>Once — it just touches the x-axis</span>
+                    </label>
+                    <label class="option">
+                        <input type="radio" name="q-zeros-1" value="3">
+                        <span>Three times</span>
+                    </label>
+                </div>
+                <div class="question-explanation" style="display: none;">
+                    <div class="question-explanation-title">Explanation</div>
+                    <div class="question-explanation-text">
+                        With a=1, b=-3, c=2, the discriminant is \( (-3)^2 - 4(1)(2) = 9 - 8 = 1 > 0 \).
+                        A positive discriminant means <strong>two real zeros</strong>.
+                        The parabola crosses the x-axis at \( x = 1 \) and \( x = 2 \)
+                        (you can verify: \( f(1) = 1 - 3 + 2 = 0 \) and \( f(2) = 4 - 6 + 2 = 0 \)).
+                    </div>
+                </div>
+                <div class="question-actions">
+                    <button class="btn-verify">Verify</button>
+                </div>
+            </div>
+        </div>
+
+        <div class="tab-content">
+            <div class="question-container" data-type="fill" data-answer="1[0.9,1.1]|2[1.9,2.1]">
+                <div class="question-text">
+                    With the default settings, read the zeros from the graph.
+                    The function crosses zero at:<br><br>
+                    x = <input type="text" class="fill-blank" placeholder="smaller" style="width: 80px;">
+                    and x = <input type="text" class="fill-blank" placeholder="larger" style="width: 80px;">
+                </div>
+                <div class="question-explanation" style="display: none;">
+                    <div class="question-explanation-title">Explanation</div>
+                    <div class="question-explanation-text">
+                        The zeros are at \( x = 1 \) and \( x = 2 \). You can find these by:
+                        <ul>
+                            <li>Reading from the graph where the curve crosses y = 0</li>
+                            <li>Factoring: \( x^2 - 3x + 2 = (x-1)(x-2) \)</li>
+                            <li>Using the quadratic formula: \( x = \frac{3 \pm \sqrt{1}}{2} = \frac{3 \pm 1}{2} \)</li>
+                        </ul>
+                    </div>
+                </div>
+                <div class="question-actions">
+                    <button class="btn-verify">Verify</button>
+                </div>
+            </div>
+        </div>
+
+        <div class="tab-content">
+            <div class="question-container" data-type="mcq" data-answer="2">
+                <div class="question-text">
+                    Keep a=1 and b=-3, but change c to 5. What happens to the zeros?
+                </div>
+                <div class="question-options">
+                    <label class="option">
+                        <input type="radio" name="q-zeros-3" value="0">
+                        <span>The zeros move closer together</span>
+                    </label>
+                    <label class="option">
+                        <input type="radio" name="q-zeros-3" value="1">
+                        <span>The zeros move farther apart</span>
+                    </label>
+                    <label class="option">
+                        <input type="radio" name="q-zeros-3" value="2">
+                        <span>The zeros disappear — the parabola no longer crosses the x-axis</span>
+                    </label>
+                    <label class="option">
+                        <input type="radio" name="q-zeros-3" value="3">
+                        <span>A third zero appears</span>
+                    </label>
+                </div>
+                <div class="question-explanation" style="display: none;">
+                    <div class="question-explanation-title">Explanation</div>
+                    <div class="question-explanation-text">
+                        When c = 5, the discriminant becomes \( (-3)^2 - 4(1)(5) = 9 - 20 = -11 < 0 \).
+                        A <strong>negative discriminant</strong> means no real zeros exist!
+                        The parabola has shifted up so much that it never crosses the x-axis.
+                        Increasing c shifts the entire curve upward.
+                    </div>
+                </div>
+                <div class="question-actions">
+                    <button class="btn-verify">Verify</button>
+                </div>
+            </div>
+        </div>
+
+        <div class="tab-content">
+            <div class="question-container" data-type="msq" data-answer="0,2,3">
+                <div class="question-text">
+                    Which statements about zeros are TRUE? (Select all that apply)
+                </div>
+                <div class="question-options">
+                    <label class="option">
+                        <input type="checkbox" name="q-zeros-4" value="0">
+                        <span>Zeros are where the graph crosses the x-axis</span>
+                    </label>
+                    <label class="option">
+                        <input type="checkbox" name="q-zeros-4" value="1">
+                        <span>Every quadratic has two real zeros</span>
+                    </label>
+                    <label class="option">
+                        <input type="checkbox" name="q-zeros-4" value="2">
+                        <span>If you can factor \( f(x) = (x-a)(x-b) \), then the zeros are \( x = a \) and \( x = b \)</span>
+                    </label>
+                    <label class="option">
+                        <input type="checkbox" name="q-zeros-4" value="3">
+                        <span>The discriminant \( b^2 - 4ac \) tells you how many real zeros exist</span>
+                    </label>
+                </div>
+                <div class="question-explanation" style="display: none;">
+                    <div class="question-explanation-title">Explanation</div>
+                    <div class="question-explanation-text">
+                        <strong>Statement 1 (TRUE):</strong> By definition, zeros are x-values where f(x) = 0, which is where the graph meets y = 0 (the x-axis).<br><br>
+                        <strong>Statement 2 (FALSE):</strong> A quadratic can have 0, 1, or 2 <em>real</em> zeros depending on the discriminant. When Δ < 0, there are no real zeros!<br><br>
+                        <strong>Statement 3 (TRUE):</strong> Each factor (x-a) equals zero when x = a, so the zeros are exactly the values that make factors zero.<br><br>
+                        <strong>Statement 4 (TRUE):</strong> \( \Delta > 0 \): two zeros, \( \Delta = 0 \): one zero, \( \Delta < 0 \): no real zeros.
+                    </div>
+                </div>
+                <div class="question-actions">
+                    <button class="btn-verify">Verify</button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<hr>
+
+<h2>2. Divergences: Where Functions Blow Up</h2>
+
+<p>
+    Sometimes functions don't just get big — they <strong>explode to infinity</strong>.
+    These points are called <strong>divergences</strong> (or <em>singularities</em> or <em>poles</em>).
+    They happen when you try to divide by zero.
+</p>
+
+<p>
+    Here's the key insight: <strong>divergences occur where the denominator equals zero</strong>.
+    If \( f(x) = \frac{1}{g(x)} \), then f(x) blows up wherever g(x) = 0.
+</p>
+
+<h3>Example: The Reciprocal Function \( f(x) = \frac{1}{(x-1)(x-2)} \)</h3>
+
+<p>
+    Notice something cool? The denominator is the <em>same polynomial</em> we just studied!
+    It has zeros at x = 1 and x = 2. So our new function has <strong>divergences</strong> at exactly those points.
+</p>
+
+<p>
+    The zeros of the denominator become the poles of the function. It's like flipping a function
+    upside down — what was zero becomes infinity!
+</p>
+
+<div class="interactive-container">
+    <div class="interactive-title">Interactive: Divergence Visualizer</div>
+
+    <div class="plot-container">
+        <div id="divergence-plot" style="width: 100%; height: 400px;"></div>
+    </div>
+
+    <div class="control-panel">
+        <div class="control-group">
+            <label class="control-label">
+                First pole position (a):
+                <span class="control-label-value" id="div-a-value">1.00</span>
+            </label>
+            <input type="range" class="slider" id="div-a-slider" min="-2" max="4" step="0.1" value="1">
+        </div>
+
+        <div class="control-group">
+            <label class="control-label">
+                Second pole position (b):
+                <span class="control-label-value" id="div-b-value">2.00</span>
+            </label>
+            <input type="range" class="slider" id="div-b-slider" min="-1" max="5" step="0.1" value="2">
+        </div>
+
+        <div class="btn-group">
+            <button class="btn" onclick="resetDivergence()">Reset</button>
+        </div>
+    </div>
+</div>
+
+<div class="warning-box">
+    <div class="info-box-title">Common Pitfall: Division by Zero</div>
+    <p>
+        In mathematics, we say the function "diverges" or "goes to infinity."
+        But on a computer, dividing by zero gives an <strong>error</strong>, not infinity!
+        That's why in the plot above, we carefully avoid plotting exactly at the poles.
+        Always check your denominators before computing!
+    </p>
+</div>
+
+<div class="info-box">
+    <div class="info-box-title">Which Way Does It Blow Up?</div>
+    <p>
+        Near a pole, the function can go to \( +\infty \) or \( -\infty \) depending on which side you approach from.
+        Watch the graph as you move the poles — notice how the curve shoots up on one side and down on the other!
+    </p>
+    <p>
+        The vertical dashed lines mark the <strong>vertical asymptotes</strong> — the function gets
+        infinitely close to these lines but never crosses them.
+    </p>
+</div>
+
+<div class="interactive-container question-section">
+    <div class="interactive-title">Test Your Understanding: Divergences</div>
+
+    <p style="margin-bottom: var(--spacing-md); color: var(--text-secondary);">
+        Use the Divergence Visualizer above to explore these questions.
+    </p>
+
+    <div class="tabs">
+        <div class="tab-buttons">
+            <button class="tab-button active">Question 1</button>
+            <button class="tab-button">Question 2</button>
+            <button class="tab-button">Question 3</button>
+            <button class="tab-button">Question 4</button>
+        </div>
+
+        <div class="tab-content active">
+            <div class="question-container" data-type="mcq" data-answer="2">
+                <div class="question-text">
+                    For \( f(x) = \frac{1}{x - 3} \), what happens at x = 3?
+                </div>
+                <div class="question-options">
+                    <label class="option">
+                        <input type="radio" name="q-div-1" value="0">
+                        <span>The function equals zero</span>
+                    </label>
+                    <label class="option">
+                        <input type="radio" name="q-div-1" value="1">
+                        <span>The function equals 3</span>
+                    </label>
+                    <label class="option">
+                        <input type="radio" name="q-div-1" value="2">
+                        <span>The function diverges (blows up to infinity)</span>
+                    </label>
+                    <label class="option">
+                        <input type="radio" name="q-div-1" value="3">
+                        <span>The function equals 1/3</span>
+                    </label>
+                </div>
+                <div class="question-explanation" style="display: none;">
+                    <div class="question-explanation-title">Explanation</div>
+                    <div class="question-explanation-text">
+                        At x = 3, the denominator (x - 3) equals zero. Dividing by zero is undefined,
+                        and as x approaches 3, the function value grows without bound.
+                        We say the function <strong>diverges</strong> at x = 3.
+                    </div>
+                </div>
+                <div class="question-actions">
+                    <button class="btn-verify">Verify</button>
+                </div>
+            </div>
+        </div>
+
+        <div class="tab-content">
+            <div class="question-container" data-type="fill" data-answer="1[0.9,1.1]|4[3.9,4.1]">
+                <div class="question-text">
+                    Set a = 1 and b = 4 using the sliders. The function diverges at:<br><br>
+                    x = <input type="text" class="fill-blank" placeholder="first" style="width: 80px;">
+                    and x = <input type="text" class="fill-blank" placeholder="second" style="width: 80px;">
+                </div>
+                <div class="question-explanation" style="display: none;">
+                    <div class="question-explanation-title">Explanation</div>
+                    <div class="question-explanation-text">
+                        When a = 1 and b = 4, the function is \( f(x) = \frac{1}{(x-1)(x-4)} \).
+                        The denominator is zero when x = 1 or x = 4, so those are the divergence points.
+                        You can see the vertical asymptotes (dashed lines) at these x-values.
+                    </div>
+                </div>
+                <div class="question-actions">
+                    <button class="btn-verify">Verify</button>
+                </div>
+            </div>
+        </div>
+
+        <div class="tab-content">
+            <div class="question-container" data-type="mcq" data-answer="0">
+                <div class="question-text">
+                    Reset to defaults (a=1, b=2). As x approaches 2 from the RIGHT (like x = 2.1, 2.01, 2.001...),
+                    does f(x) go to +∞ or -∞?
+                </div>
+                <div class="question-options">
+                    <label class="option">
+                        <input type="radio" name="q-div-3" value="0">
+                        <span>\( +\infty \) (the curve shoots upward)</span>
+                    </label>
+                    <label class="option">
+                        <input type="radio" name="q-div-3" value="1">
+                        <span>\( -\infty \) (the curve shoots downward)</span>
+                    </label>
+                    <label class="option">
+                        <input type="radio" name="q-div-3" value="2">
+                        <span>It approaches zero</span>
+                    </label>
+                    <label class="option">
+                        <input type="radio" name="q-div-3" value="3">
+                        <span>It oscillates between positive and negative</span>
+                    </label>
+                </div>
+                <div class="question-explanation" style="display: none;">
+                    <div class="question-explanation-title">Explanation</div>
+                    <div class="question-explanation-text">
+                        Let's check the sign when x is slightly greater than 2, say x = 2.1:<br>
+                        \( f(2.1) = \frac{1}{(2.1-1)(2.1-2)} = \frac{1}{(1.1)(0.1)} = \frac{1}{0.11} > 0 \)<br><br>
+                        Both factors in the denominator are positive, so the function is positive.
+                        As x gets closer to 2 from the right, the function grows toward \( +\infty \).
+                        Look at the graph to confirm!
+                    </div>
+                </div>
+                <div class="question-actions">
+                    <button class="btn-verify">Verify</button>
+                </div>
+            </div>
+        </div>
+
+        <div class="tab-content">
+            <div class="question-container" data-type="msq" data-answer="0,1,3">
+                <div class="question-text">
+                    Which statements about divergences are TRUE? (Select all that apply)
+                </div>
+                <div class="question-options">
+                    <label class="option">
+                        <input type="checkbox" name="q-div-4" value="0">
+                        <span>Divergences occur where the denominator of a fraction equals zero</span>
+                    </label>
+                    <label class="option">
+                        <input type="checkbox" name="q-div-4" value="1">
+                        <span>Vertical asymptotes appear at divergence points</span>
+                    </label>
+                    <label class="option">
+                        <input type="checkbox" name="q-div-4" value="2">
+                        <span>Every function has at least one divergence</span>
+                    </label>
+                    <label class="option">
+                        <input type="checkbox" name="q-div-4" value="3">
+                        <span>The function is undefined at a divergence point</span>
+                    </label>
+                </div>
+                <div class="question-explanation" style="display: none;">
+                    <div class="question-explanation-title">Explanation</div>
+                    <div class="question-explanation-text">
+                        <strong>Statement 1 (TRUE):</strong> Divergences happen when you divide by zero.<br><br>
+                        <strong>Statement 2 (TRUE):</strong> The graph approaches but never touches these vertical lines.<br><br>
+                        <strong>Statement 3 (FALSE):</strong> Polynomials like \( f(x) = x^2 \) have no divergences at all!<br><br>
+                        <strong>Statement 4 (TRUE):</strong> You can't compute f(x) at a point where the denominator is zero.
+                    </div>
+                </div>
+                <div class="question-actions">
+                    <button class="btn-verify">Verify</button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<hr>
+
+<h2>3. Extrema: The Peaks and Valleys</h2>
+
+<p>
+    <strong>Extrema</strong> are the turning points of a function — the places where it switches
+    from going up to going down (a <em>maximum</em>) or from going down to going up (a <em>minimum</em>).
+</p>
+
+<p>
+    Here's the mathematical key: at an extremum, <strong>the slope is zero</strong>.
+    The function is momentarily "flat" before changing direction.
+    In calculus language: \( f'(x^*) = 0 \).
+</p>
+
+<h3>Same Function, New Perspective</h3>
+
+<p>
+    Let's look at \( f(x) = x^2 - 3x + 2 \) again — but now we want its minimum, not its zeros.
+</p>
+
+<p>
+    Here's a neat trick called <strong>completing the square</strong>:
+</p>
+
+<div class="equation-display">
+    $$ f(x) = x^2 - 3x + 2 = \left(x - \frac{3}{2}\right)^2 - \frac{1}{4} $$
+</div>
+
+<p>
+    This form tells us the minimum is at \( x = \frac{3}{2} = 1.5 \), with value \( f(1.5) = -0.25 \).
+</p>
+
+<div class="info-box">
+    <div class="info-box-title">One Function, Multiple Lenses</div>
+    <p>
+        The <strong>same function</strong> reveals different secrets through different techniques:
+    </p>
+    <ul>
+        <li><strong>Factoring</strong> \( (x-1)(x-2) \) → reveals the <em>zeros</em></li>
+        <li><strong>Completing the square</strong> \( (x-1.5)^2 - 0.25 \) → reveals the <em>extremum</em></li>
+    </ul>
+    <p>
+        This is a powerful lesson: when solving problems, try different approaches to uncover different insights!
+    </p>
+</div>
+
+<div class="interactive-container">
+    <div class="interactive-title">Interactive: Extrema Explorer</div>
+
+    <div class="plot-container">
+        <div id="extrema-plot" style="width: 100%; height: 400px;"></div>
+    </div>
+
+    <div class="control-panel">
+        <div class="control-group">
+            <label class="control-label">
+                a (opens up if positive, down if negative):
+                <span class="control-label-value" id="ext-a-value">1.00</span>
+            </label>
+            <input type="range" class="slider" id="ext-a-slider" min="-3" max="3" step="0.1" value="1">
+        </div>
+
+        <div class="control-group">
+            <label class="control-label">
+                b:
+                <span class="control-label-value" id="ext-b-value">-3.00</span>
+            </label>
+            <input type="range" class="slider" id="ext-b-slider" min="-8" max="8" step="0.5" value="-3">
+        </div>
+
+        <div class="control-group">
+            <label class="control-label">
+                c:
+                <span class="control-label-value" id="ext-c-value">2.00</span>
+            </label>
+            <input type="range" class="slider" id="ext-c-slider" min="-10" max="10" step="0.5" value="2">
+        </div>
+
+        <div class="btn-group" style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 10px;">
+            <button class="btn" onclick="resetExtrema()">Reset</button>
+            <label style="color: var(--text-secondary); font-size: 0.9rem;">
+                <input type="checkbox" id="show-derivative" onchange="updateExtremaPlot()"> Show derivative
+            </label>
+            <div id="extrema-info" style="font-family: var(--font-mono); color: var(--neon-magenta); font-size: 0.85rem;">
+                Minimum at (1.50, -0.25)
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="equation-display">
+    <p><strong>Finding the Extremum of a Quadratic:</strong></p>
+    $$ x_{\text{extremum}} = -\frac{b}{2a} $$
+    <p style="font-size: 0.9rem; margin-top: var(--spacing-sm); color: var(--text-muted);">
+        If \( a > 0 \), this is a <strong>minimum</strong>. If \( a < 0 \), this is a <strong>maximum</strong>.
+    </p>
+</div>
+
+<div class="interactive-container question-section">
+    <div class="interactive-title">Test Your Understanding: Extrema</div>
+
+    <p style="margin-bottom: var(--spacing-md); color: var(--text-secondary);">
+        Use the Extrema Explorer above. Try checking "Show derivative" to see where the slope equals zero!
+    </p>
+
+    <div class="tabs">
+        <div class="tab-buttons">
+            <button class="tab-button active">Question 1</button>
+            <button class="tab-button">Question 2</button>
+            <button class="tab-button">Question 3</button>
+            <button class="tab-button">Question 4</button>
+        </div>
+
+        <div class="tab-content active">
+            <div class="question-container" data-type="fill" data-answer="3[2.9,3.1]">
+                <div class="question-text">
+                    For \( f(x) = x^2 - 6x + 5 \), use the formula \( x = -\frac{b}{2a} \) to find the x-coordinate of the extremum.<br><br>
+                    x = <input type="text" class="fill-blank" placeholder="number" style="width: 80px;">
+                    <br><br>
+                    <em>Hint: Here a = 1 and b = -6</em>
+                </div>
+                <div class="question-explanation" style="display: none;">
+                    <div class="question-explanation-title">Explanation</div>
+                    <div class="question-explanation-text">
+                        Using the formula with a = 1 and b = -6:<br>
+                        \( x = -\frac{-6}{2(1)} = \frac{6}{2} = 3 \)<br><br>
+                        You can verify by setting b = -6 and c = 5 in the explorer and checking that the extremum is at x = 3.
+                    </div>
+                </div>
+                <div class="question-actions">
+                    <button class="btn-verify">Verify</button>
+                </div>
+            </div>
+        </div>
+
+        <div class="tab-content">
+            <div class="question-container" data-type="mcq" data-answer="1">
+                <div class="question-text">
+                    Set a = -2 (negative!). What type of extremum does the parabola have now?
+                </div>
+                <div class="question-options">
+                    <label class="option">
+                        <input type="radio" name="q-ext-2" value="0">
+                        <span>A minimum (the lowest point)</span>
+                    </label>
+                    <label class="option">
+                        <input type="radio" name="q-ext-2" value="1">
+                        <span>A maximum (the highest point)</span>
+                    </label>
+                    <label class="option">
+                        <input type="radio" name="q-ext-2" value="2">
+                        <span>Neither — it's a straight line</span>
+                    </label>
+                    <label class="option">
+                        <input type="radio" name="q-ext-2" value="3">
+                        <span>Both a maximum and a minimum</span>
+                    </label>
+                </div>
+                <div class="question-explanation" style="display: none;">
+                    <div class="question-explanation-title">Explanation</div>
+                    <div class="question-explanation-text">
+                        When a < 0, the parabola opens <strong>downward</strong> (like an upside-down U).
+                        This means it has a highest point — a <strong>maximum</strong>.
+                        When a > 0, the parabola opens upward and has a minimum.
+                    </div>
+                </div>
+                <div class="question-actions">
+                    <button class="btn-verify">Verify</button>
+                </div>
+            </div>
+        </div>
+
+        <div class="tab-content">
+            <div class="question-container" data-type="fill" data-answer="1.5[1.4,1.6]|-0.25[-0.35,-0.15]">
+                <div class="question-text">
+                    Reset to defaults. Enable "Show derivative" and observe where the derivative (dashed line) crosses zero.<br><br>
+                    Read from the graph — the extremum is at:<br>
+                    x = <input type="text" class="fill-blank" placeholder="x" style="width: 80px;">
+                    with y = <input type="text" class="fill-blank" placeholder="y" style="width: 80px;">
+                </div>
+                <div class="question-explanation" style="display: none;">
+                    <div class="question-explanation-title">Explanation</div>
+                    <div class="question-explanation-text">
+                        The derivative crosses y = 0 at x = 1.5. This is where the slope of the original function is zero — the turning point!<br><br>
+                        The function value at this point is f(1.5) = (1.5)² - 3(1.5) + 2 = 2.25 - 4.5 + 2 = -0.25.
+                    </div>
+                </div>
+                <div class="question-actions">
+                    <button class="btn-verify">Verify</button>
+                </div>
+            </div>
+        </div>
+
+        <div class="tab-content">
+            <div class="question-container" data-type="msq" data-answer="0,2,3">
+                <div class="question-text">
+                    Which statements about extrema are TRUE? (Select all that apply)
+                </div>
+                <div class="question-options">
+                    <label class="option">
+                        <input type="checkbox" name="q-ext-4" value="0">
+                        <span>At an extremum, the derivative (slope) equals zero</span>
+                    </label>
+                    <label class="option">
+                        <input type="checkbox" name="q-ext-4" value="1">
+                        <span>Every function has exactly one extremum</span>
+                    </label>
+                    <label class="option">
+                        <input type="checkbox" name="q-ext-4" value="2">
+                        <span>A quadratic \( ax^2 + bx + c \) has a minimum when \( a > 0 \)</span>
+                    </label>
+                    <label class="option">
+                        <input type="checkbox" name="q-ext-4" value="3">
+                        <span>The extremum of a quadratic is at \( x = -\frac{b}{2a} \)</span>
+                    </label>
+                </div>
+                <div class="question-explanation" style="display: none;">
+                    <div class="question-explanation-title">Explanation</div>
+                    <div class="question-explanation-text">
+                        <strong>Statement 1 (TRUE):</strong> This is the fundamental criterion. The function is "flat" at extrema.<br><br>
+                        <strong>Statement 2 (FALSE):</strong> Different functions have different numbers of extrema. A cubic can have 0 or 2!<br><br>
+                        <strong>Statement 3 (TRUE):</strong> Positive a means the parabola opens upward, so it has a minimum.<br><br>
+                        <strong>Statement 4 (TRUE):</strong> This formula comes from setting the derivative \( 2ax + b = 0 \) and solving for x.
+                    </div>
+                </div>
+                <div class="question-actions">
+                    <button class="btn-verify">Verify</button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<hr>
+
+<h2>4. Asymptotes: Behavior at Infinity</h2>
+
+<p>
+    What happens to a function when x gets really, really big? Or really, really negative?
+    <strong>Asymptotes</strong> describe this long-range behavior — lines that the function approaches
+    but never quite reaches.
+</p>
+
+<p>
+    We've already seen <strong>vertical asymptotes</strong> at divergence points.
+    Now let's explore <strong>horizontal asymptotes</strong> — what happens as \( x \to \pm\infty \).
+</p>
+
+<h3>The Classic Example: \( f(x) = \frac{1}{x} \)</h3>
+
+<p>
+    As x gets larger and larger (1, 10, 100, 1000...), what happens to 1/x?
+    It gets smaller and smaller (1, 0.1, 0.01, 0.001...), approaching zero but never reaching it.
+</p>
+
+<p>
+    The line y = 0 (the x-axis) is a <strong>horizontal asymptote</strong>.
+</p>
+
+<div class="interactive-container">
+    <div class="interactive-title">Interactive: Asymptote Analyzer</div>
+
+    <div class="plot-container">
+        <div id="asymptote-plot" style="width: 100%; height: 400px;"></div>
+    </div>
+
+    <div class="control-panel">
+        <div class="control-group">
+            <label class="control-label">
+                Choose a function:
+            </label>
+            <select id="asymptote-function" class="control-select" onchange="updateAsymptotePlot()">
+                <option value="1">f(x) = 1/x</option>
+                <option value="2">f(x) = 5/(x² + 1)</option>
+                <option value="3">f(x) = (2x + 1)/(x - 1)</option>
+                <option value="4">f(x) = (x² + 1)/x</option>
+                <option value="5">f(x) = 5x/(x² + 1)</option>
+            </select>
+        </div>
+
+        <div class="control-group">
+            <label class="control-label">
+                Zoom out (x-range):
+                <span class="control-label-value" id="asymp-range-value">10</span>
+            </label>
+            <input type="range" class="slider" id="asymp-range-slider" min="2" max="10" step="0.5" value="5">
+        </div>
+
+        <div id="asymptote-info" style="font-family: var(--font-mono); color: var(--neon-green); font-size: 0.85rem; margin-top: 10px;">
+            Horizontal asymptote: y = 0 | Vertical asymptote: x = 0
+        </div>
+    </div>
+</div>
+
+<div class="info-box">
+    <div class="info-box-title">Finding Horizontal Asymptotes</div>
+    <p>
+        For a rational function \( \frac{P(x)}{Q(x)} \), compare the degrees of the polynomials:
+    </p>
+    <ul>
+        <li><strong>deg(P) < deg(Q):</strong> Horizontal asymptote at y = 0</li>
+        <li><strong>deg(P) = deg(Q):</strong> Horizontal asymptote at y = (leading coeff of P)/(leading coeff of Q)</li>
+        <li><strong>deg(P) > deg(Q):</strong> No horizontal asymptote (function grows without bound)</li>
+    </ul>
+    <p>
+        Try the different functions in the dropdown and zoom out to see the asymptotic behavior!
+    </p>
+</div>
+
+<div class="interactive-container question-section">
+    <div class="interactive-title">Test Your Understanding: Asymptotes</div>
+
+    <p style="margin-bottom: var(--spacing-md); color: var(--text-secondary);">
+        Use the Asymptote Analyzer above. Zoom out to see long-range behavior!
+    </p>
+
+    <div class="tabs">
+        <div class="tab-buttons">
+            <button class="tab-button active">Question 1</button>
+            <button class="tab-button">Question 2</button>
+            <button class="tab-button">Question 3</button>
+            <button class="tab-button">Question 4</button>
+        </div>
+
+        <div class="tab-content active">
+            <div class="question-container" data-type="mcq" data-answer="0">
+                <div class="question-text">
+                    Select "f(x) = 1/x" and zoom out to x-range 50. What is the horizontal asymptote?
+                </div>
+                <div class="question-options">
+                    <label class="option">
+                        <input type="radio" name="q-asymp-1" value="0">
+                        <span>y = 0</span>
+                    </label>
+                    <label class="option">
+                        <input type="radio" name="q-asymp-1" value="1">
+                        <span>y = 1</span>
+                    </label>
+                    <label class="option">
+                        <input type="radio" name="q-asymp-1" value="2">
+                        <span>y = x</span>
+                    </label>
+                    <label class="option">
+                        <input type="radio" name="q-asymp-1" value="3">
+                        <span>There is no horizontal asymptote</span>
+                    </label>
+                </div>
+                <div class="question-explanation" style="display: none;">
+                    <div class="question-explanation-title">Explanation</div>
+                    <div class="question-explanation-text">
+                        As x → ∞, the value 1/x → 0. The function gets closer and closer to the x-axis (y = 0) but never reaches it. This is the horizontal asymptote.
+                    </div>
+                </div>
+                <div class="question-actions">
+                    <button class="btn-verify">Verify</button>
+                </div>
+            </div>
+        </div>
+
+        <div class="tab-content">
+            <div class="question-container" data-type="fill" data-answer="2[1.9,2.1]">
+                <div class="question-text">
+                    Select "f(x) = (2x + 1)/(x - 1)" and zoom out. What is the horizontal asymptote?<br><br>
+                    y = <input type="text" class="fill-blank" placeholder="number" style="width: 80px;">
+                    <br><br>
+                    <em>Hint: Both numerator and denominator have degree 1. What's the ratio of leading coefficients?</em>
+                </div>
+                <div class="question-explanation" style="display: none;">
+                    <div class="question-explanation-title">Explanation</div>
+                    <div class="question-explanation-text">
+                        The numerator has leading coefficient 2 (from 2x), and the denominator has leading coefficient 1 (from x).
+                        When degrees are equal, the horizontal asymptote is y = 2/1 = 2.<br><br>
+                        You can verify: f(100) = 201/99 ≈ 2.03, f(1000) = 2001/999 ≈ 2.002. Getting closer to 2!
+                    </div>
+                </div>
+                <div class="question-actions">
+                    <button class="btn-verify">Verify</button>
+                </div>
+            </div>
+        </div>
+
+        <div class="tab-content">
+            <div class="question-container" data-type="mcq" data-answer="2">
+                <div class="question-text">
+                    Select "f(x) = (x² + 1)/x" and zoom out. What do you observe?
+                </div>
+                <div class="question-options">
+                    <label class="option">
+                        <input type="radio" name="q-asymp-3" value="0">
+                        <span>The function approaches y = 0</span>
+                    </label>
+                    <label class="option">
+                        <input type="radio" name="q-asymp-3" value="1">
+                        <span>The function approaches y = 1</span>
+                    </label>
+                    <label class="option">
+                        <input type="radio" name="q-asymp-3" value="2">
+                        <span>The function grows like y = x (oblique asymptote)</span>
+                    </label>
+                    <label class="option">
+                        <input type="radio" name="q-asymp-3" value="3">
+                        <span>The function oscillates forever</span>
+                    </label>
+                </div>
+                <div class="question-explanation" style="display: none;">
+                    <div class="question-explanation-title">Explanation</div>
+                    <div class="question-explanation-text">
+                        We can rewrite: \( \frac{x^2 + 1}{x} = x + \frac{1}{x} \)<br><br>
+                        As x → ∞, the 1/x part becomes negligible, leaving just x.
+                        This is an <strong>oblique (slant) asymptote</strong> — the function approaches the line y = x.
+                        Since deg(numerator) > deg(denominator), there's no horizontal asymptote.
+                    </div>
+                </div>
+                <div class="question-actions">
+                    <button class="btn-verify">Verify</button>
+                </div>
+            </div>
+        </div>
+
+        <div class="tab-content">
+            <div class="question-container" data-type="msq" data-answer="0,1,2">
+                <div class="question-text">
+                    Which statements about asymptotes are TRUE? (Select all that apply)
+                </div>
+                <div class="question-options">
+                    <label class="option">
+                        <input type="checkbox" name="q-asymp-4" value="0">
+                        <span>Horizontal asymptotes describe behavior as x → ±∞</span>
+                    </label>
+                    <label class="option">
+                        <input type="checkbox" name="q-asymp-4" value="1">
+                        <span>Vertical asymptotes occur at divergence points</span>
+                    </label>
+                    <label class="option">
+                        <input type="checkbox" name="q-asymp-4" value="2">
+                        <span>If the numerator degree exceeds the denominator degree, there's no horizontal asymptote</span>
+                    </label>
+                    <label class="option">
+                        <input type="checkbox" name="q-asymp-4" value="3">
+                        <span>A function can never cross its horizontal asymptote</span>
+                    </label>
+                </div>
+                <div class="question-explanation" style="display: none;">
+                    <div class="question-explanation-title">Explanation</div>
+                    <div class="question-explanation-text">
+                        <strong>Statement 1 (TRUE):</strong> By definition, horizontal asymptotes describe the limiting behavior as x grows large.<br><br>
+                        <strong>Statement 2 (TRUE):</strong> Vertical asymptotes mark where the function blows up to infinity.<br><br>
+                        <strong>Statement 3 (TRUE):</strong> When deg(P) > deg(Q), the function grows without bound.<br><br>
+                        <strong>Statement 4 (FALSE):</strong> Functions CAN cross horizontal asymptotes! For example, \( \frac{\sin x}{x} \) crosses y = 0 infinitely many times while approaching it.
+                    </div>
+                </div>
+                <div class="question-actions">
+                    <button class="btn-verify">Verify</button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<hr>
+
+<h2>5. Putting It All Together</h2>
+
+<p>
+    Now you have four powerful tools in your toolkit. Let's use them together to analyze
+    a complete function — like a doctor running a full check-up!
+</p>
+
+<div class="interactive-container">
+    <div class="interactive-title">Interactive: Complete Function Analyzer</div>
+
+    <div class="plot-container">
+        <div id="complete-plot" style="width: 100%; height: 450px;"></div>
+    </div>
+
+    <div class="control-panel">
+        <div class="control-group">
+            <label class="control-label">
+                Choose a function to analyze:
+            </label>
+            <select id="complete-function" class="control-select" onchange="updateCompletePlot()">
+                <option value="1">f(x) = (x² - 4)/(x - 3)</option>
+                <option value="2">f(x) = (x² - 1)/(x² - 4)</option>
+                <option value="3">f(x) = x³ - 3x</option>
+                <option value="4">f(x) = 1/(x² - 1)</option>
+                <option value="5">f(x) = (x - 1)/(x² + 1)</option>
+            </select>
+        </div>
+
+        <div id="complete-analysis" style="font-family: var(--font-mono); font-size: 0.85rem; margin-top: 15px; padding: 15px; background: var(--bg-code); border-radius: 8px; line-height: 1.8;">
+            <div style="color: var(--neon-cyan);">● Zeros: x = -2, x = 2</div>
+            <div style="color: var(--neon-magenta);">▼ Divergence: x = 3</div>
+            <div style="color: var(--neon-green);">◆ Extrema: analyzing...</div>
+            <div style="color: var(--neon-yellow);">— Asymptote: oblique y = x + 3</div>
+        </div>
+    </div>
+</div>
+
+<div class="info-box">
+    <div class="info-box-title">The Analysis Workflow</div>
+    <p>
+        When you encounter any function, follow this systematic approach:
+    </p>
+    <ol>
+        <li><strong>Find zeros:</strong> Set numerator = 0 and solve</li>
+        <li><strong>Find divergences:</strong> Set denominator = 0 and solve</li>
+        <li><strong>Find extrema:</strong> Set derivative = 0 and solve</li>
+        <li><strong>Find asymptotes:</strong> Check behavior as x → ±∞</li>
+    </ol>
+    <p>
+        With these four pieces of information, you can sketch the function accurately without plotting every point!
+    </p>
+</div>
+
+<div class="interactive-container question-section">
+    <div class="interactive-title">Test Your Understanding: Complete Analysis</div>
+
+    <p style="margin-bottom: var(--spacing-md); color: var(--text-secondary);">
+        Use the Complete Function Analyzer to answer these final questions.
+    </p>
+
+    <div class="tabs">
+        <div class="tab-buttons">
+            <button class="tab-button active">Question 1</button>
+            <button class="tab-button">Question 2</button>
+            <button class="tab-button">Question 3</button>
+            <button class="tab-button">Question 4</button>
+        </div>
+
+        <div class="tab-content active">
+            <div class="question-container" data-type="fill" data-answer="-1[-.1.1,-0.9]|1[0.9,1.1]">
+                <div class="question-text">
+                    Select "f(x) = (x² - 1)/(x² - 4)". What are the zeros?<br><br>
+                    x = <input type="text" class="fill-blank" placeholder="first" style="width: 80px;">
+                    and x = <input type="text" class="fill-blank" placeholder="second" style="width: 80px;">
+                    <br><br>
+                    <em>Hint: When is the numerator x² - 1 = 0?</em>
+                </div>
+                <div class="question-explanation" style="display: none;">
+                    <div class="question-explanation-title">Explanation</div>
+                    <div class="question-explanation-text">
+                        Zeros occur when the numerator equals zero:<br>
+                        \( x^2 - 1 = 0 \)<br>
+                        \( x^2 = 1 \)<br>
+                        \( x = \pm 1 \)<br><br>
+                        So the zeros are at x = -1 and x = 1.
+                    </div>
+                </div>
+                <div class="question-actions">
+                    <button class="btn-verify">Verify</button>
+                </div>
+            </div>
+        </div>
+
+        <div class="tab-content">
+            <div class="question-container" data-type="mcq" data-answer="1">
+                <div class="question-text">
+                    For "f(x) = 1/(x² - 1)", how many divergences are there?
+                </div>
+                <div class="question-options">
+                    <label class="option">
+                        <input type="radio" name="q-complete-2" value="0">
+                        <span>One divergence</span>
+                    </label>
+                    <label class="option">
+                        <input type="radio" name="q-complete-2" value="1">
+                        <span>Two divergences</span>
+                    </label>
+                    <label class="option">
+                        <input type="radio" name="q-complete-2" value="2">
+                        <span>No divergences</span>
+                    </label>
+                    <label class="option">
+                        <input type="radio" name="q-complete-2" value="3">
+                        <span>Infinitely many divergences</span>
+                    </label>
+                </div>
+                <div class="question-explanation" style="display: none;">
+                    <div class="question-explanation-title">Explanation</div>
+                    <div class="question-explanation-text">
+                        Divergences occur where the denominator x² - 1 = 0:<br>
+                        \( x^2 = 1 \)<br>
+                        \( x = \pm 1 \)<br><br>
+                        There are <strong>two divergences</strong>: at x = -1 and x = 1.
+                    </div>
+                </div>
+                <div class="question-actions">
+                    <button class="btn-verify">Verify</button>
+                </div>
+            </div>
+        </div>
+
+        <div class="tab-content">
+            <div class="question-container" data-type="fill" data-answer="0[-0.1,0.1]">
+                <div class="question-text">
+                    Select "f(x) = x³ - 3x". This cubic has a local maximum and a local minimum.
+                    Where is the local <strong>maximum</strong>?<br><br>
+                    x = <input type="text" class="fill-blank" placeholder="number" style="width: 80px;">
+                    <br><br>
+                    <em>Hint: Look at the graph for the peak (highest point in some region).</em>
+                </div>
+                <div class="question-explanation" style="display: none;">
+                    <div class="question-explanation-title">Explanation</div>
+                    <div class="question-explanation-text">
+                        For \( f(x) = x^3 - 3x \), the derivative is \( f'(x) = 3x^2 - 3 = 3(x^2 - 1) \).<br>
+                        Setting f'(x) = 0: \( x = \pm 1 \)<br><br>
+                        At x = -1: f(-1) = -1 + 3 = 2 (local maximum)<br>
+                        At x = 1: f(1) = 1 - 3 = -2 (local minimum)<br><br>
+                        The local maximum is at x = -1.
+                    </div>
+                </div>
+                <div class="question-actions">
+                    <button class="btn-verify">Verify</button>
+                </div>
+            </div>
+        </div>
+
+        <div class="tab-content">
+            <div class="question-container" data-type="msq" data-answer="0,1,2,3">
+                <div class="question-text">
+                    Which are useful for sketching a function? (Select all that apply)
+                </div>
+                <div class="question-options">
+                    <label class="option">
+                        <input type="checkbox" name="q-complete-4" value="0">
+                        <span>Finding where the function equals zero (zeros)</span>
+                    </label>
+                    <label class="option">
+                        <input type="checkbox" name="q-complete-4" value="1">
+                        <span>Finding where the function blows up (divergences)</span>
+                    </label>
+                    <label class="option">
+                        <input type="checkbox" name="q-complete-4" value="2">
+                        <span>Finding where the slope is zero (extrema)</span>
+                    </label>
+                    <label class="option">
+                        <input type="checkbox" name="q-complete-4" value="3">
+                        <span>Finding behavior at infinity (asymptotes)</span>
+                    </label>
+                </div>
+                <div class="question-explanation" style="display: none;">
+                    <div class="question-explanation-title">Explanation</div>
+                    <div class="question-explanation-text">
+                        <strong>All four are essential!</strong><br><br>
+                        Together, zeros, divergences, extrema, and asymptotes give you the complete picture of a function's behavior.
+                        These are the "vital signs" that define any function's shape.
+                    </div>
+                </div>
+                <div class="question-actions">
+                    <button class="btn-verify">Verify</button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<hr>
+
+<h2>Python Code Examples</h2>
+
+<p>
+    Let's see how to identify these properties computationally. Remember: same Plotly library
+    you've been seeing in the interactive plots!
+</p>
+
+<div class="tabs">
+    <div class="tab-buttons">
+        <button class="tab-button active">Finding Zeros</button>
+        <button class="tab-button">Visualizing Divergences</button>
+        <button class="tab-button">Finding Extrema</button>
+        <button class="tab-button">Prompt</button>
+    </div>
+
+    <div class="tab-content active">
+        <div class="code-block-container">
+            <div class="code-header">
+                <span class="code-lang">Python</span>
+                <button class="copy-btn">Copy</button>
+            </div>
+            <pre><code class="language-python">import numpy as np
+import plotly.graph_objects as go
+
+# Find zeros of a polynomial: x² - 3x + 2
+coefficients = [1, -3, 2]  # [a, b, c] for ax² + bx + c
+zeros = np.roots(coefficients)
+print(f"Zeros: {zeros}")  # Output: [2. 1.]
+
+# Plot the function with zeros marked
+x = np.linspace(-1, 4, 200)
+y = x**2 - 3*x + 2
+
+fig = go.Figure()
+
+# Plot the curve
+fig.add_trace(go.Scatter(
+    x=x, y=y, mode='lines',
+    name='f(x) = x² - 3x + 2',
+    line=dict(color='#00f3ff', width=2)
+))
+
+# Mark the zeros
+fig.add_trace(go.Scatter(
+    x=zeros, y=[0, 0], mode='markers',
+    name='Zeros',
+    marker=dict(color='#ff00ff', size=12, symbol='circle')
+))
+
+fig.update_layout(
+    template='plotly_dark',
+    title='Finding Zeros',
+    xaxis=dict(zeroline=True, zerolinecolor='#808080'),
+    yaxis=dict(zeroline=True, zerolinecolor='#808080')
+)
+fig.show()</code></pre>
+        </div>
+    </div>
+
+    <div class="tab-content">
+        <div class="code-block-container">
+            <div class="code-header">
+                <span class="code-lang">Python</span>
+                <button class="copy-btn">Copy</button>
+            </div>
+            <pre><code class="language-python">import numpy as np
+import plotly.graph_objects as go
+
+# Function with divergences: f(x) = 1/[(x-1)(x-2)]
+poles = [1, 2]  # Divergence points
+
+# Create x values, carefully avoiding poles
+x = np.linspace(-1, 4, 500)
+y = 1 / ((x - 1) * (x - 2))
+
+# Clip extreme values for cleaner plotting
+y = np.clip(y, -20, 20)
+y[np.abs(y) > 15] = np.nan  # Hide near-pole values
+
+fig = go.Figure()
+
+# Plot the function
+fig.add_trace(go.Scatter(
+    x=x, y=y, mode='lines',
+    name='f(x) = 1/[(x-1)(x-2)]',
+    line=dict(color='#00f3ff', width=2)
+))
+
+# Add vertical asymptotes
+for pole in poles:
+    fig.add_vline(x=pole, line=dict(color='#ff00ff', dash='dash'),
+                  annotation_text=f'x = {pole}')
+
+fig.update_layout(
+    template='plotly_dark',
+    title='Visualizing Divergences',
+    yaxis=dict(range=[-15, 15])
+)
+fig.show()</code></pre>
+        </div>
+    </div>
+
+    <div class="tab-content">
+        <div class="code-block-container">
+            <div class="code-header">
+                <span class="code-lang">Python</span>
+                <button class="copy-btn">Copy</button>
+            </div>
+            <pre><code class="language-python">import numpy as np
+import plotly.graph_objects as go
+from scipy.optimize import minimize_scalar
+
+# Find extremum of f(x) = x² - 6x + 5
+def f(x):
+    return x**2 - 6*x + 5
+
+# Find minimum using optimization
+result = minimize_scalar(f, bounds=(-10, 10), method='bounded')
+x_min = result.x
+y_min = result.fun
+
+print(f"Minimum at x = {x_min:.2f}, f(x) = {y_min:.2f}")
+
+# Plot with extremum marked
+x = np.linspace(-2, 8, 200)
+y = f(x)
+
+fig = go.Figure()
+
+fig.add_trace(go.Scatter(
+    x=x, y=y, mode='lines',
+    name='f(x) = x² - 6x + 5',
+    line=dict(color='#00f3ff', width=2)
+))
+
+fig.add_trace(go.Scatter(
+    x=[x_min], y=[y_min], mode='markers',
+    name=f'Minimum ({x_min:.1f}, {y_min:.1f})',
+    marker=dict(color='#00ff9f', size=14, symbol='triangle-down')
+))
+
+fig.update_layout(
+    template='plotly_dark',
+    title='Finding Extrema',
+    xaxis=dict(zeroline=True, zerolinecolor='#808080'),
+    yaxis=dict(zeroline=True, zerolinecolor='#808080')
+)
+fig.show()</code></pre>
+        </div>
+    </div>
+
+    <div class="tab-content">
+        <div class="info-box">
+            <div class="info-box-title">How to Prompt an AI Assistant</div>
+            <p>
+                Instead of memorizing code, learn to describe what you want clearly.
+                Here's an effective prompt to generate function analysis code:
+            </p>
+        </div>
+
+        <div class="code-block-container">
+            <div class="code-header">
+                <span class="code-lang">Prompt</span>
+                <button class="copy-btn">Copy</button>
+            </div>
+            <pre><code class="language-text">Create a Python script using Plotly that analyzes the rational function
+f(x) = (x² - 4)/(x - 3). The script should:
+
+1. Find and mark all zeros (where numerator = 0)
+2. Identify and draw vertical asymptotes at poles (where denominator = 0)
+3. Find extrema using scipy.optimize
+4. Determine horizontal or oblique asymptotes
+5. Plot everything on a dark-themed graph
+
+Use these colors:
+- Cyan (#00f3ff) for the main curve
+- Magenta (#ff00ff) for zeros
+- Green (#00ff9f) for extrema
+- Yellow dashed lines for asymptotes
+- Gray (#808080) for axes
+
+Include annotations explaining each feature.</code></pre>
+        </div>
+
+        <div class="warning-box">
+            <div class="info-box-title">Pro Tips for Effective Prompts</div>
+            <ul>
+                <li><strong>Be specific</strong> about the function and what features to analyze</li>
+                <li><strong>Specify colors and styling</strong> for consistency with this book</li>
+                <li><strong>Request annotations</strong> to make the output educational</li>
+                <li><strong>Iterate</strong> if the first result isn't perfect — ask for adjustments!</li>
+            </ul>
+        </div>
+    </div>
+</div>
+
+<hr>
+
+<h2>Exercises for Practice</h2>
+
+<div class="exercise-cards">
+    <div class="exercise-card">
+        <div class="exercise-card-header">
+            <span class="exercise-card-number">1.</span>
+            <span class="exercise-card-badge explore">Explore</span>
+        </div>
+        <div class="exercise-card-content">
+            Use the Complete Analyzer to analyze \( f(x) = (x^2 - 9)/(x^2 - 4) \).
+            List all zeros, divergences, and asymptotes. How many of each are there?
+        </div>
+    </div>
+
+    <div class="exercise-card">
+        <div class="exercise-card-header">
+            <span class="exercise-card-number">2.</span>
+            <span class="exercise-card-badge coding">Coding</span>
+        </div>
+        <div class="exercise-card-content">
+            Write Python code to find all special points of \( f(x) = (x^3 - x)/(x^2 - 4) \).
+            How many zeros? How many poles? Does it have a horizontal asymptote?
+        </div>
+    </div>
+
+    <div class="exercise-card">
+        <div class="exercise-card-header">
+            <span class="exercise-card-number">3.</span>
+            <span class="exercise-card-badge think">Think</span>
+        </div>
+        <div class="exercise-card-content">
+            A polynomial of degree n can have at most n zeros. Why? What about extrema —
+            what's the maximum number of extrema a polynomial of degree n can have?
+        </div>
+    </div>
+
+    <div class="exercise-card">
+        <div class="exercise-card-header">
+            <span class="exercise-card-number">4.</span>
+            <span class="exercise-card-badge think">Challenge</span>
+        </div>
+        <div class="exercise-card-content">
+            Design a function that has exactly: 2 zeros, 1 pole, and a horizontal asymptote at y = 3.
+            Write out the function and verify using the analyzer!
+        </div>
+    </div>
+</div>
+
+<hr>
+
+<h2>Summary</h2>
+
+<p>
+    You've learned to analyze any function using four key properties:
+</p>
+
+<ul>
+    <li><strong>Zeros</strong> — where f(x) = 0 (graph crosses x-axis)</li>
+    <li><strong>Divergences</strong> — where f(x) → ±∞ (denominator = 0)</li>
+    <li><strong>Extrema</strong> — where f'(x) = 0 (peaks and valleys)</li>
+    <li><strong>Asymptotes</strong> — long-range behavior as x → ±∞</li>
+</ul>
+
+<p>
+    These four properties are like a function's fingerprint — they uniquely identify its shape and behavior.
+    Master them, and you'll never need to plot hundreds of points again!
+</p>
+
+<h2>What's Next?</h2>
+
+<p>
+    Now that you can analyze scalar functions (one input, one output), we'll move to
+    <strong>vector fields</strong> — functions that assign an arrow to every point in space.
+    These are essential for understanding forces, velocities, and flows in physics!
+</p>
+
+<div class="btn-group mt-lg">
+    <button class="btn btn-magenta" onclick="navigateToSection('01-visual-thinking-intro')">← Previous: Visual Thinking Intro</button>
+    <button class="btn" onclick="scrollToTop()">↑ Back to Top</button>
+    <button class="btn btn-secondary" onclick="navigateToSection('03-vector-fields')">Next: Vector Fields →</button>
+</div>
+
+<!-- Section-specific JavaScript loaded dynamically from js/sections/02-visually-understanding-functions.js -->

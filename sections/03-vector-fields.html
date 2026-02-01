@@ -1,0 +1,1053 @@
+<!--
+    Section 1.3: Vector Fields and Field Lines
+    Source: Module 3 - Visualization and functions.nb, Lecture8_1.nb
+    Core Concept: Reading vector fields as visual maps of physics
+    Estimated Time: 20 minutes
+    Prerequisites: Sections 1.1, 1.2 (basic function visualization)
+-->
+
+<h1>Vector Fields and Field Lines</h1>
+
+<p>
+    Have you ever watched a weather forecast showing wind patterns across a map? Those swirling arrows
+    aren't just decoration—they're a <strong>vector field</strong>. At every point on the map, an arrow
+    tells you which way the wind blows and how fast. This same visual language describes electric fields,
+    magnetic fields, fluid flow, and countless other physical phenomena.
+</p>
+
+<div class="info-box">
+    <div class="info-box-title">Learning Objectives</div>
+    <ul>
+        <li>Understand what a vector field represents: a vector at every point in space</li>
+        <li>Read direction and magnitude from arrow plots</li>
+        <li>Trace field lines and understand their physical meaning</li>
+        <li>Recognize common field patterns: uniform, radial, and rotational</li>
+        <li>Combine simple fields to create complex flow patterns</li>
+    </ul>
+</div>
+
+<hr>
+
+<h2>What is a Vector Field?</h2>
+
+<p>
+    A <strong>scalar function</strong> like \( f(x) = x^2 \) gives you one number at each point.
+    A <strong>vector field</strong> gives you an <em>arrow</em> at each point—both a direction and a magnitude.
+</p>
+
+<p>
+    Mathematically, a 2D vector field assigns a vector \( \vec{F}(x, y) = (F_x(x,y), F_y(x,y)) \) to every
+    point \( (x, y) \). But forget the formulas for a moment—let's build intuition visually first.
+</p>
+
+<div class="equation-display">
+    <p><strong>Vector Field Notation:</strong></p>
+    $$ \vec{F}(x, y) = F_x(x,y) \, \hat{i} + F_y(x,y) \, \hat{j} $$
+    <p style="font-size: 0.9rem; margin-top: var(--spacing-sm); color: var(--text-muted);">
+        At each point \( (x, y) \), there's an arrow with horizontal component \( F_x \) and vertical component \( F_y \).
+    </p>
+</div>
+
+<hr>
+
+<h2>Classic Vector Field Patterns</h2>
+
+<p>
+    Before diving into complex physics, let's explore four fundamental field patterns that appear
+    everywhere in nature. Think of these as the "vocabulary" of vector fields.
+</p>
+
+<div class="interactive-container">
+    <div class="interactive-title">Interactive: Vector Field Explorer</div>
+
+    <div class="plot-container">
+        <div id="vector-field-plot" style="width: 100%; height: 400px;"></div>
+    </div>
+
+    <div class="control-panel">
+        <div class="control-group">
+            <label class="control-label">Field Type:</label>
+            <select id="field-type-select" class="control-select">
+                <option value="uniform">Uniform Flow (Constant Wind)</option>
+                <option value="source">Source (Explosion / Repulsion)</option>
+                <option value="sink">Sink (Drain / Attraction)</option>
+                <option value="vortex">Vortex (Hurricane / Whirlpool)</option>
+            </select>
+        </div>
+
+        <div class="control-group">
+            <label class="control-label">
+                Field Strength:
+                <span class="control-label-value" id="strength-value">1.0</span>
+            </label>
+            <input type="range" class="slider" id="strength-slider" min="0.5" max="3" step="0.1" value="1">
+        </div>
+
+        <div class="control-group">
+            <label class="control-label">
+                Arrow Density:
+                <span class="control-label-value" id="density-value">12</span>
+            </label>
+            <input type="range" class="slider" id="density-slider" min="6" max="20" step="2" value="12">
+        </div>
+
+        <div class="btn-group">
+            <button class="btn" onclick="resetVectorField()">Reset</button>
+        </div>
+    </div>
+</div>
+
+<div class="info-box">
+    <div class="info-box-title">Reading the Arrows</div>
+    <p>
+        <strong>Direction:</strong> Where the arrow points = where things flow (wind, water, force).<br>
+        <strong>Length:</strong> Longer arrows = stronger field = faster flow.<br>
+        <strong>Color:</strong> We color-code by magnitude—brighter colors mean stronger fields.
+    </p>
+</div>
+
+<div class="interactive-container question-section">
+    <div class="interactive-title">Test Your Understanding</div>
+
+    <p style="margin-bottom: var(--spacing-md); color: var(--text-secondary);">
+        Use the Vector Field Explorer above to answer these questions.
+    </p>
+
+    <div class="tabs">
+        <div class="tab-buttons">
+            <button class="tab-button active">Question 1</button>
+            <button class="tab-button">Question 2</button>
+            <button class="tab-button">Question 3</button>
+            <button class="tab-button">Question 4</button>
+        </div>
+
+        <div class="tab-content active">
+            <div class="question-container" data-type="mcq" data-answer="2">
+                <div class="question-text">
+                    Select "Source" in the explorer. If you placed a small cork at the origin, which way would it move?
+                </div>
+                <div class="question-options">
+                    <label class="option">
+                        <input type="radio" name="q3-1-1" value="0">
+                        <span>It would stay at the origin</span>
+                    </label>
+                    <label class="option">
+                        <input type="radio" name="q3-1-1" value="1">
+                        <span>It would spiral inward</span>
+                    </label>
+                    <label class="option">
+                        <input type="radio" name="q3-1-1" value="2">
+                        <span>It would move radially outward (away from origin)</span>
+                    </label>
+                    <label class="option">
+                        <input type="radio" name="q3-1-1" value="3">
+                        <span>It would move in a circle around the origin</span>
+                    </label>
+                </div>
+                <div class="question-explanation" style="display: none;">
+                    <div class="question-explanation-title">Explanation</div>
+                    <div class="question-explanation-text">
+                        A <strong>source field</strong> points radially outward from the origin. The arrows
+                        tell you the direction of flow—like an explosion pushing everything away from the center.
+                        In physics, this pattern appears in electric fields around positive charges and fluid
+                        flow from a pipe outlet.
+                    </div>
+                </div>
+                <div class="question-actions">
+                    <button class="btn-verify">Verify</button>
+                </div>
+            </div>
+        </div>
+
+        <div class="tab-content">
+            <div class="question-container" data-type="mcq" data-answer="1">
+                <div class="question-text">
+                    Compare the "Sink" and "Source" fields. How do they differ?
+                </div>
+                <div class="question-options">
+                    <label class="option">
+                        <input type="radio" name="q3-1-2" value="0">
+                        <span>Sink has circular flow, Source has radial flow</span>
+                    </label>
+                    <label class="option">
+                        <input type="radio" name="q3-1-2" value="1">
+                        <span>Arrows point in opposite directions (inward vs outward)</span>
+                    </label>
+                    <label class="option">
+                        <input type="radio" name="q3-1-2" value="2">
+                        <span>Source is stronger than Sink</span>
+                    </label>
+                    <label class="option">
+                        <input type="radio" name="q3-1-2" value="3">
+                        <span>They are identical</span>
+                    </label>
+                </div>
+                <div class="question-explanation" style="display: none;">
+                    <div class="question-explanation-title">Explanation</div>
+                    <div class="question-explanation-text">
+                        A <strong>source</strong> pushes outward (like fluid spraying from a point), while a
+                        <strong>sink</strong> pulls inward (like water draining down a hole). Mathematically,
+                        \( \vec{F}_{source} = (x, y) \) and \( \vec{F}_{sink} = (-x, -y) \). Same pattern,
+                        opposite signs!
+                    </div>
+                </div>
+                <div class="question-actions">
+                    <button class="btn-verify">Verify</button>
+                </div>
+            </div>
+        </div>
+
+        <div class="tab-content">
+            <div class="question-container" data-type="fill" data-answer="vortex|rotational">
+                <div class="question-text">
+                    Select "Vortex" and observe the pattern. A hurricane viewed from above would look like
+                    which field type?<br><br>
+                    Field type: <input type="text" class="fill-blank" placeholder="type name" style="width: 120px;">
+                    <br><br>
+                    This type of flow is called
+                    <select class="fill-blank-select">
+                        <option value=""></option>
+                        <option value="radial">radial</option>
+                        <option value="rotational">rotational</option>
+                        <option value="uniform">uniform</option>
+                        <option value="divergent">divergent</option>
+                    </select>
+                    flow.
+                </div>
+                <div class="question-explanation" style="display: none;">
+                    <div class="question-explanation-title">Explanation</div>
+                    <div class="question-explanation-text">
+                        The <strong>vortex</strong> pattern shows rotational flow—everything spins around the
+                        center without moving toward or away from it. Hurricanes, whirlpools, and even galaxies
+                        exhibit this pattern. The mathematical form is \( \vec{F} = (-y, x) \), which creates
+                        counterclockwise rotation.
+                    </div>
+                </div>
+                <div class="question-actions">
+                    <button class="btn-verify">Verify</button>
+                </div>
+            </div>
+        </div>
+
+        <div class="tab-content">
+            <div class="question-container" data-type="msq" data-answer="0,2,3">
+                <div class="question-text">
+                    Explore all four field types. Which statements are TRUE? (Select all that apply)
+                </div>
+                <div class="question-options">
+                    <label class="option">
+                        <input type="checkbox" name="q3-1-4" value="0">
+                        <span>In a uniform field, all arrows point the same direction</span>
+                    </label>
+                    <label class="option">
+                        <input type="checkbox" name="q3-1-4" value="1">
+                        <span>Source and vortex look identical</span>
+                    </label>
+                    <label class="option">
+                        <input type="checkbox" name="q3-1-4" value="2">
+                        <span>In the vortex field, arrows are perpendicular to the line from origin</span>
+                    </label>
+                    <label class="option">
+                        <input type="checkbox" name="q3-1-4" value="3">
+                        <span>Increasing field strength makes arrows longer</span>
+                    </label>
+                </div>
+                <div class="question-explanation" style="display: none;">
+                    <div class="question-explanation-title">Explanation</div>
+                    <div class="question-explanation-text">
+                        <strong>Statement 1 (TRUE):</strong> Uniform fields have constant direction and magnitude everywhere—like steady wind.<br>
+                        <strong>Statement 2 (FALSE):</strong> Source is radial (pointing outward), vortex is tangential (pointing around).<br>
+                        <strong>Statement 3 (TRUE):</strong> In a vortex, arrows are always perpendicular to the radius—that's what makes things spin!<br>
+                        <strong>Statement 4 (TRUE):</strong> Field strength scales arrow length proportionally.
+                    </div>
+                </div>
+                <div class="question-actions">
+                    <button class="btn-verify">Verify</button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<hr>
+
+<h2>Field Lines: Following the Flow</h2>
+
+<p>
+    Arrows tell you what happens <em>at a point</em>. But what if you want to know the whole journey?
+    <strong>Field lines</strong> (also called streamlines or flow lines) show the path a particle would
+    take if it followed the arrows continuously.
+</p>
+
+<p>
+    Imagine dropping a leaf into a stream. The leaf doesn't teleport—it flows smoothly along the water.
+    Field lines are the trajectories of such "test particles" in a vector field.
+</p>
+
+<div class="interactive-container">
+    <div class="interactive-title">Interactive: Field Line Tracer</div>
+
+    <p style="margin-bottom: var(--spacing-md); color: var(--text-secondary);">
+        <strong>Click anywhere on the plot</strong> to drop a "particle" and watch it trace a field line!
+    </p>
+
+    <div class="plot-container">
+        <div id="field-line-plot" style="width: 100%; height: 400px;"></div>
+    </div>
+
+    <div class="control-panel">
+        <div class="control-group">
+            <label class="control-label">Field Type:</label>
+            <select id="trace-field-select" class="control-select">
+                <option value="uniform">Uniform Flow</option>
+                <option value="source">Source</option>
+                <option value="sink">Sink</option>
+                <option value="vortex">Vortex</option>
+                <option value="saddle">Saddle Point</option>
+            </select>
+        </div>
+
+        <div class="control-group">
+            <label class="control-label">
+                Trace Duration:
+                <span class="control-label-value" id="duration-value">5.0</span>s
+            </label>
+            <input type="range" class="slider" id="duration-slider" min="1" max="10" step="0.5" value="5">
+        </div>
+
+        <div class="btn-group">
+            <button class="btn" onclick="clearFieldLines()">Clear Lines</button>
+            <button class="btn btn-secondary" onclick="traceMultipleLines()">Trace Grid</button>
+        </div>
+    </div>
+</div>
+
+<div class="warning-box">
+    <div class="info-box-title">Key Insight: Field Lines Never Cross</div>
+    <p>
+        At any point, there's only <em>one</em> direction the field points. If two field lines crossed,
+        the field would have to point in two directions at once—impossible! When you see field lines
+        getting closer together, it means the field is getting stronger (like water speeding up in
+        a narrow channel).
+    </p>
+</div>
+
+<div class="interactive-container question-section">
+    <div class="interactive-title">Test Your Understanding</div>
+
+    <p style="margin-bottom: var(--spacing-md); color: var(--text-secondary);">
+        Use the Field Line Tracer to answer these questions. Try clicking different starting points!
+    </p>
+
+    <div class="tabs">
+        <div class="tab-buttons">
+            <button class="tab-button active">Question 1</button>
+            <button class="tab-button">Question 2</button>
+            <button class="tab-button">Question 3</button>
+            <button class="tab-button">Question 4</button>
+        </div>
+
+        <div class="tab-content active">
+            <div class="question-container" data-type="mcq" data-answer="0">
+                <div class="question-text">
+                    Select "Vortex" and click to trace several field lines starting from different distances
+                    from the center. What shape do all the field lines form?
+                </div>
+                <div class="question-options">
+                    <label class="option">
+                        <input type="radio" name="q3-2-1" value="0">
+                        <span>Circles centered at the origin</span>
+                    </label>
+                    <label class="option">
+                        <input type="radio" name="q3-2-1" value="1">
+                        <span>Straight lines through the origin</span>
+                    </label>
+                    <label class="option">
+                        <input type="radio" name="q3-2-1" value="2">
+                        <span>Spirals moving outward</span>
+                    </label>
+                    <label class="option">
+                        <input type="radio" name="q3-2-1" value="3">
+                        <span>Ellipses</span>
+                    </label>
+                </div>
+                <div class="question-explanation" style="display: none;">
+                    <div class="question-explanation-title">Explanation</div>
+                    <div class="question-explanation-text">
+                        In a pure vortex field, particles orbit in perfect circles. The tangential arrows keep
+                        pushing the particle around, but never toward or away from the center. This is called
+                        <strong>incompressible rotational flow</strong>—think of a spinning merry-go-round
+                        where everyone stays the same distance from the center.
+                    </div>
+                </div>
+                <div class="question-actions">
+                    <button class="btn-verify">Verify</button>
+                </div>
+            </div>
+        </div>
+
+        <div class="tab-content">
+            <div class="question-container" data-type="mcq" data-answer="2">
+                <div class="question-text">
+                    Select "Saddle Point" and click "Trace Grid" to see multiple field lines.
+                    What happens to particles near the origin?
+                </div>
+                <div class="question-options">
+                    <label class="option">
+                        <input type="radio" name="q3-2-2" value="0">
+                        <span>All particles spiral into the origin</span>
+                    </label>
+                    <label class="option">
+                        <input type="radio" name="q3-2-2" value="1">
+                        <span>All particles move away from the origin</span>
+                    </label>
+                    <label class="option">
+                        <input type="radio" name="q3-2-2" value="2">
+                        <span>Some approach along one axis, others escape along the perpendicular axis</span>
+                    </label>
+                    <label class="option">
+                        <input type="radio" name="q3-2-2" value="3">
+                        <span>Particles orbit in ellipses</span>
+                    </label>
+                </div>
+                <div class="question-explanation" style="display: none;">
+                    <div class="question-explanation-title">Explanation</div>
+                    <div class="question-explanation-text">
+                        A <strong>saddle point</strong> is a special type of equilibrium—unstable in one direction,
+                        stable in another. Particles on the "stable" axis (y-axis here) approach the origin,
+                        but particles on the "unstable" axis (x-axis) escape to infinity. This pattern appears
+                        at mountain passes and in many dynamical systems. It's called a saddle because the
+                        potential energy surface looks like a horse saddle.
+                    </div>
+                </div>
+                <div class="question-actions">
+                    <button class="btn-verify">Verify</button>
+                </div>
+            </div>
+        </div>
+
+        <div class="tab-content">
+            <div class="question-container" data-type="fill" data-answer="origin|0[-.1,.1]">
+                <div class="question-text">
+                    Select "Sink" and trace several field lines. All field lines converge toward a single point.
+                    <br><br>
+                    This point is called the: <input type="text" class="fill-blank" placeholder="location" style="width: 100px;">
+                    <br><br>
+                    At this point, the x-coordinate is: <input type="text" class="fill-blank" placeholder="number" style="width: 80px;">
+                </div>
+                <div class="question-explanation" style="display: none;">
+                    <div class="question-explanation-title">Explanation</div>
+                    <div class="question-explanation-text">
+                        All field lines in a sink converge to the <strong>origin</strong> (0, 0). This is a
+                        <strong>stable fixed point</strong>—any particle released nearby will eventually end up
+                        here. In physics, this represents an attractor: a drain, a gravitational center, or
+                        the equilibrium position of a damped system.
+                    </div>
+                </div>
+                <div class="question-actions">
+                    <button class="btn-verify">Verify</button>
+                </div>
+            </div>
+        </div>
+
+        <div class="tab-content">
+            <div class="question-container" data-type="msq" data-answer="1,2">
+                <div class="question-text">
+                    Click "Trace Grid" for both "Source" and "Sink" fields. Which statements are TRUE?
+                </div>
+                <div class="question-options">
+                    <label class="option">
+                        <input type="checkbox" name="q3-2-4" value="0">
+                        <span>Field lines in a source curve toward the origin</span>
+                    </label>
+                    <label class="option">
+                        <input type="checkbox" name="q3-2-4" value="1">
+                        <span>Field lines in both source and sink are straight radial lines</span>
+                    </label>
+                    <label class="option">
+                        <input type="checkbox" name="q3-2-4" value="2">
+                        <span>The direction of flow along the lines is opposite in source vs sink</span>
+                    </label>
+                    <label class="option">
+                        <input type="checkbox" name="q3-2-4" value="3">
+                        <span>Particles in a source spiral outward</span>
+                    </label>
+                </div>
+                <div class="question-explanation" style="display: none;">
+                    <div class="question-explanation-title">Explanation</div>
+                    <div class="question-explanation-text">
+                        <strong>Statement 1 (FALSE):</strong> Source field lines point <em>away</em> from the origin.<br>
+                        <strong>Statement 2 (TRUE):</strong> Both fields are purely radial—no tangential component means straight lines.<br>
+                        <strong>Statement 3 (TRUE):</strong> Same geometry, opposite flow direction. Source: outward. Sink: inward.<br>
+                        <strong>Statement 4 (FALSE):</strong> There's no rotation in a pure source—particles move in straight lines.
+                    </div>
+                </div>
+                <div class="question-actions">
+                    <button class="btn-verify">Verify</button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<hr>
+
+<h2>Building Complex Fields: Superposition</h2>
+
+<p>
+    Here's where things get interesting. Real physical systems rarely have just one type of field.
+    The electric field around two charges combines contributions from both. Water draining in a river
+    mixes bulk flow with rotation. The key principle is <strong>superposition</strong>: vector fields add.
+</p>
+
+<p>
+    What happens if you add a source and a vortex? You get a <strong>spiral</strong>—like water swirling
+    down a drain, moving both around and toward the center!
+</p>
+
+<div class="interactive-container">
+    <div class="interactive-title">Interactive: Build Your Own Field</div>
+
+    <p style="margin-bottom: var(--spacing-md); color: var(--text-secondary);">
+        Combine basic fields by adjusting their strengths. Watch how the combined field pattern emerges!
+    </p>
+
+    <div class="plot-container">
+        <div id="combined-field-plot" style="width: 100%; height: 400px;"></div>
+    </div>
+
+    <div class="control-panel">
+        <div class="control-group">
+            <label class="control-label">
+                Uniform Flow (horizontal):
+                <span class="control-label-value" id="uniform-value">0.0</span>
+            </label>
+            <input type="range" class="slider" id="uniform-slider" min="-2" max="2" step="0.1" value="0">
+        </div>
+
+        <div class="control-group">
+            <label class="control-label">
+                Source/Sink (+ outward, - inward):
+                <span class="control-label-value" id="radial-value">0.0</span>
+            </label>
+            <input type="range" class="slider" id="radial-slider" min="-2" max="2" step="0.1" value="0">
+        </div>
+
+        <div class="control-group">
+            <label class="control-label">
+                Vortex (+ counterclockwise, - clockwise):
+                <span class="control-label-value" id="vortex-value">0.0</span>
+            </label>
+            <input type="range" class="slider" id="vortex-slider" min="-2" max="2" step="0.1" value="0">
+        </div>
+
+        <div class="btn-group">
+            <button class="btn" onclick="resetCombinedField()">Reset All</button>
+            <button class="btn btn-secondary" onclick="presetSpiral()">Preset: Spiral</button>
+            <button class="btn btn-magenta" onclick="presetDipole()">Preset: Dipole-like</button>
+        </div>
+    </div>
+</div>
+
+<div class="info-box">
+    <div class="info-box-title">Superposition Principle</div>
+    <p>
+        When multiple fields are present, the total field at any point is the <strong>vector sum</strong>
+        of the individual fields:
+    </p>
+    $$ \vec{F}_{total} = \vec{F}_1 + \vec{F}_2 + \vec{F}_3 + \ldots $$
+    <p style="margin-top: var(--spacing-sm);">
+        This is why we can understand complex fields by breaking them into simpler components!
+    </p>
+</div>
+
+<div class="interactive-container question-section">
+    <div class="interactive-title">Test Your Understanding</div>
+
+    <p style="margin-bottom: var(--spacing-md); color: var(--text-secondary);">
+        Use the Build Your Own Field explorer to answer these questions.
+    </p>
+
+    <div class="tabs">
+        <div class="tab-buttons">
+            <button class="tab-button active">Question 1</button>
+            <button class="tab-button">Question 2</button>
+            <button class="tab-button">Question 3</button>
+            <button class="tab-button">Question 4</button>
+        </div>
+
+        <div class="tab-content active">
+            <div class="question-container" data-type="mcq" data-answer="1">
+                <div class="question-text">
+                    Click "Preset: Spiral" (or set Source/Sink = -1, Vortex = 1). What motion would a
+                    particle follow in this field?
+                </div>
+                <div class="question-options">
+                    <label class="option">
+                        <input type="radio" name="q3-3-1" value="0">
+                        <span>Straight line toward the origin</span>
+                    </label>
+                    <label class="option">
+                        <input type="radio" name="q3-3-1" value="1">
+                        <span>Spiral inward toward the origin</span>
+                    </label>
+                    <label class="option">
+                        <input type="radio" name="q3-3-1" value="2">
+                        <span>Circle around the origin</span>
+                    </label>
+                    <label class="option">
+                        <input type="radio" name="q3-3-1" value="3">
+                        <span>Spiral outward away from the origin</span>
+                    </label>
+                </div>
+                <div class="question-explanation" style="display: none;">
+                    <div class="question-explanation-title">Explanation</div>
+                    <div class="question-explanation-text">
+                        The combination of a <strong>sink</strong> (inward radial) and a <strong>vortex</strong>
+                        (rotational) creates an inward spiral. The sink pulls particles toward the center while
+                        the vortex makes them rotate—exactly like water going down a drain! Mathematically:
+                        \( \vec{F} = (-x - y, -y + x) \).
+                    </div>
+                </div>
+                <div class="question-actions">
+                    <button class="btn-verify">Verify</button>
+                </div>
+            </div>
+        </div>
+
+        <div class="tab-content">
+            <div class="question-container" data-type="fill" data-answer="source|1[0.9,1.1]|1[0.9,1.1]">
+                <div class="question-text">
+                    To create an outward spiral (like a galaxy arm), you need to combine a
+                    <select class="fill-blank-select">
+                        <option value=""></option>
+                        <option value="source">source</option>
+                        <option value="sink">sink</option>
+                        <option value="uniform">uniform flow</option>
+                    </select>
+                    with a vortex.
+                    <br><br>
+                    Try it: Set Source/Sink to <input type="text" class="fill-blank" placeholder="value" style="width: 60px;">
+                    and Vortex to <input type="text" class="fill-blank" placeholder="value" style="width: 60px;">.
+                    <br>
+                    <span style="font-size: 0.85rem; color: var(--text-muted);">(Use positive values for both)</span>
+                </div>
+                <div class="question-explanation" style="display: none;">
+                    <div class="question-explanation-title">Explanation</div>
+                    <div class="question-explanation-text">
+                        An outward spiral needs <strong>source</strong> (radially outward) combined with rotation.
+                        Setting Source/Sink = +1 and Vortex = +1 creates counterclockwise outward spirals.
+                        This is the opposite of a drain—more like a spinning lawn sprinkler or a spiral galaxy
+                        where stars orbit while the whole structure expands.
+                    </div>
+                </div>
+                <div class="question-actions">
+                    <button class="btn-verify">Verify</button>
+                </div>
+            </div>
+        </div>
+
+        <div class="tab-content">
+            <div class="question-container" data-type="mcq" data-answer="3">
+                <div class="question-text">
+                    Reset all sliders to zero, then set only Uniform Flow = 1. What direction do all arrows point?
+                </div>
+                <div class="question-options">
+                    <label class="option">
+                        <input type="radio" name="q3-3-3" value="0">
+                        <span>Upward (positive y)</span>
+                    </label>
+                    <label class="option">
+                        <input type="radio" name="q3-3-3" value="1">
+                        <span>Toward the origin</span>
+                    </label>
+                    <label class="option">
+                        <input type="radio" name="q3-3-3" value="2">
+                        <span>Away from the origin</span>
+                    </label>
+                    <label class="option">
+                        <input type="radio" name="q3-3-3" value="3">
+                        <span>Rightward (positive x)</span>
+                    </label>
+                </div>
+                <div class="question-explanation" style="display: none;">
+                    <div class="question-explanation-title">Explanation</div>
+                    <div class="question-explanation-text">
+                        A uniform field with positive x-component points to the <strong>right</strong> everywhere.
+                        This is the simplest possible vector field: \( \vec{F} = (1, 0) \). Think of it as
+                        a constant wind blowing from west to east. Every arrow has the same magnitude and direction.
+                    </div>
+                </div>
+                <div class="question-actions">
+                    <button class="btn-verify">Verify</button>
+                </div>
+            </div>
+        </div>
+
+        <div class="tab-content">
+            <div class="question-container" data-type="msq" data-answer="0,1,3">
+                <div class="question-text">
+                    Experiment with different combinations. Which statements are TRUE?
+                </div>
+                <div class="question-options">
+                    <label class="option">
+                        <input type="checkbox" name="q3-3-4" value="0">
+                        <span>Adding uniform flow to a vortex shifts the center of rotation</span>
+                    </label>
+                    <label class="option">
+                        <input type="checkbox" name="q3-3-4" value="1">
+                        <span>Source + Sink with equal magnitudes (e.g., +1 and -1) cancel to zero field</span>
+                    </label>
+                    <label class="option">
+                        <input type="checkbox" name="q3-3-4" value="2">
+                        <span>Vortex + Vortex creates a source field</span>
+                    </label>
+                    <label class="option">
+                        <input type="checkbox" name="q3-3-4" value="3">
+                        <span>Negative vortex creates clockwise rotation</span>
+                    </label>
+                </div>
+                <div class="question-explanation" style="display: none;">
+                    <div class="question-explanation-title">Explanation</div>
+                    <div class="question-explanation-text">
+                        <strong>Statement 1 (TRUE):</strong> Uniform flow "pushes" the vortex center away from the origin. This creates interesting asymmetric patterns.<br>
+                        <strong>Statement 2 (TRUE):</strong> Source and sink are exact opposites. Adding \( (x,y) + (-x,-y) = (0,0) \)—the fields cancel!<br>
+                        <strong>Statement 3 (FALSE):</strong> Two vortices just make a stronger vortex. They don't change direction.<br>
+                        <strong>Statement 4 (TRUE):</strong> Positive vortex is counterclockwise; negative vortex is clockwise.
+                    </div>
+                </div>
+                <div class="question-actions">
+                    <button class="btn-verify">Verify</button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<hr>
+
+<h2>Python Code Examples</h2>
+
+<p>
+    Let's create these vector field visualizations in Python using Plotly. The same concepts apply—we're
+    just computing the field components programmatically.
+</p>
+
+<div class="tabs">
+    <div class="tab-buttons">
+        <button class="tab-button active">Basic Vector Field</button>
+        <button class="tab-button">Field Lines</button>
+        <button class="tab-button">Combined Fields</button>
+        <button class="tab-button">Prompt</button>
+    </div>
+
+    <div class="tab-content active">
+        <div class="code-block-container">
+            <div class="code-header">
+                <span class="code-lang">Python</span>
+                <button class="copy-btn">Copy</button>
+            </div>
+            <pre><code class="language-python">import numpy as np
+import plotly.figure_factory as ff
+import plotly.graph_objects as go
+
+# Create a grid of points
+x = np.linspace(-3, 3, 15)
+y = np.linspace(-3, 3, 15)
+X, Y = np.meshgrid(x, y)
+
+# Define vector field: Source (radial outward)
+U = X  # x-component
+V = Y  # y-component
+
+# Normalize for consistent arrow lengths
+magnitude = np.sqrt(U**2 + V**2)
+magnitude[magnitude == 0] = 1  # Avoid division by zero
+U_norm = U / magnitude
+V_norm = V / magnitude
+
+# Create quiver plot
+fig = ff.create_quiver(
+    X, Y, U_norm, V_norm,
+    scale=0.2,
+    arrow_scale=0.3,
+    line=dict(color='#00f3ff', width=1.5)
+)
+
+# Styling
+fig.update_layout(
+    template='plotly_dark',
+    title='Source Field: F(x,y) = (x, y)',
+    xaxis=dict(
+        range=[-4, 4],
+        gridcolor='#2a2f4a',
+        zerolinecolor='#808080'
+    ),
+    yaxis=dict(
+        range=[-4, 4],
+        gridcolor='#2a2f4a',
+        zerolinecolor='#808080',
+        scaleanchor='x'
+    )
+)
+
+fig.show()</code></pre>
+        </div>
+    </div>
+
+    <div class="tab-content">
+        <div class="code-block-container">
+            <div class="code-header">
+                <span class="code-lang">Python</span>
+                <button class="copy-btn">Copy</button>
+            </div>
+            <pre><code class="language-python">import numpy as np
+import plotly.graph_objects as go
+
+def trace_field_line(x0, y0, field_func, dt=0.05, steps=200):
+    """Trace a field line using Euler integration."""
+    x, y = [x0], [y0]
+
+    for _ in range(steps):
+        fx, fy = field_func(x[-1], y[-1])
+        mag = np.sqrt(fx**2 + fy**2)
+        if mag < 0.01:  # Stop at fixed points
+            break
+        # Normalize and step
+        x.append(x[-1] + dt * fx / mag)
+        y.append(y[-1] + dt * fy / mag)
+
+        # Stop if out of bounds
+        if abs(x[-1]) > 5 or abs(y[-1]) > 5:
+            break
+
+    return x, y
+
+# Define vortex field
+def vortex(x, y):
+    return -y, x
+
+# Trace several field lines
+fig = go.Figure()
+
+starting_points = [
+    (1, 0), (2, 0), (0, 1), (0, 2),
+    (-1, 0), (-2, 0), (0, -1), (0, -2)
+]
+
+colors = ['#00f3ff', '#ff00ff', '#ffff00', '#00ff9f',
+          '#00f3ff', '#ff00ff', '#ffff00', '#00ff9f']
+
+for (x0, y0), color in zip(starting_points, colors):
+    x, y = trace_field_line(x0, y0, vortex, steps=500)
+    fig.add_trace(go.Scatter(
+        x=x, y=y,
+        mode='lines',
+        line=dict(color=color, width=2),
+        showlegend=False
+    ))
+
+# Styling
+fig.update_layout(
+    template='plotly_dark',
+    title='Vortex Field Lines (Circular Orbits)',
+    xaxis=dict(
+        range=[-3, 3],
+        gridcolor='#2a2f4a',
+        zerolinecolor='#808080'
+    ),
+    yaxis=dict(
+        range=[-3, 3],
+        gridcolor='#2a2f4a',
+        zerolinecolor='#808080',
+        scaleanchor='x'
+    )
+)
+
+fig.show()</code></pre>
+        </div>
+    </div>
+
+    <div class="tab-content">
+        <div class="code-block-container">
+            <div class="code-header">
+                <span class="code-lang">Python</span>
+                <button class="copy-btn">Copy</button>
+            </div>
+            <pre><code class="language-python">import numpy as np
+import plotly.figure_factory as ff
+
+# Create grid
+x = np.linspace(-3, 3, 15)
+y = np.linspace(-3, 3, 15)
+X, Y = np.meshgrid(x, y)
+
+# Combine fields: Sink + Vortex = Spiral inward
+sink_strength = 1.0
+vortex_strength = 1.0
+
+U = -sink_strength * X - vortex_strength * Y
+V = -sink_strength * Y + vortex_strength * X
+
+# Normalize
+magnitude = np.sqrt(U**2 + V**2)
+magnitude[magnitude == 0] = 1
+U_norm = U / magnitude
+V_norm = V / magnitude
+
+# Create quiver plot
+fig = ff.create_quiver(
+    X, Y, U_norm, V_norm,
+    scale=0.2,
+    arrow_scale=0.3,
+    line=dict(color='#ff00ff', width=1.5)
+)
+
+# Styling
+fig.update_layout(
+    template='plotly_dark',
+    title='Spiral Field: Sink + Vortex',
+    xaxis=dict(
+        range=[-4, 4],
+        gridcolor='#2a2f4a',
+        zerolinecolor='#808080'
+    ),
+    yaxis=dict(
+        range=[-4, 4],
+        gridcolor='#2a2f4a',
+        zerolinecolor='#808080',
+        scaleanchor='x'
+    )
+)
+
+fig.show()</code></pre>
+        </div>
+    </div>
+
+    <div class="tab-content">
+        <div class="info-box">
+            <div class="info-box-title">How to Prompt an LLM</div>
+            <p>
+                Here are effective prompts for generating vector field visualizations with AI assistants.
+            </p>
+        </div>
+
+        <div class="code-block-container">
+            <div class="code-header">
+                <span class="code-lang">Prompt for Vector Field</span>
+                <button class="copy-btn">Copy</button>
+            </div>
+            <pre><code class="language-text">Create a Python script using Plotly to visualize a 2D vector field.
+
+Requirements:
+- Use plotly.figure_factory.create_quiver for arrow plot
+- Create a 15x15 grid from -3 to 3 in both x and y
+- Plot a "source" field where F(x,y) = (x, y)
+- Normalize arrows so they have equal length
+- Use dark theme (plotly_dark)
+- Color arrows cyan (#00f3ff)
+- Gray axes (#808080)
+- Set axis ranges to [-4, 4] and use scaleanchor for equal aspect</code></pre>
+        </div>
+
+        <div class="code-block-container">
+            <div class="code-header">
+                <span class="code-lang">Prompt for Field Lines</span>
+                <button class="copy-btn">Copy</button>
+            </div>
+            <pre><code class="language-text">Write a Python function to trace field lines in a vector field.
+
+Requirements:
+- Use simple Euler integration: x_new = x + dt * Fx/|F|
+- Accept starting point (x0, y0) and a field function
+- Return arrays of x and y coordinates along the trajectory
+- Stop at fixed points (where |F| is small) or out of bounds
+- Then plot 8 field lines for a vortex field F = (-y, x)
+- Use Plotly with dark theme and neon colors</code></pre>
+        </div>
+
+        <div class="warning-box">
+            <div class="info-box-title">Pro Tips for Effective Prompts</div>
+            <ul>
+                <li><strong>Specify the library</strong>: Plotly's figure_factory for quiver, not matplotlib</li>
+                <li><strong>Describe the math</strong>: Give the field function explicitly</li>
+                <li><strong>Mention normalization</strong>: Important for readable arrow plots</li>
+                <li><strong>Request equal aspect</strong>: scaleanchor='x' prevents distortion</li>
+                <li><strong>Iterate</strong>: Start simple, then add complexity</li>
+            </ul>
+        </div>
+    </div>
+</div>
+
+<hr>
+
+<h2>Exercises for Practice</h2>
+
+<div class="exercise-cards">
+    <div class="exercise-card">
+        <div class="exercise-card-header">
+            <span class="exercise-card-number">1.</span>
+            <span class="exercise-card-badge explore">Explore</span>
+        </div>
+        <div class="exercise-card-content">
+            In the Field Line Tracer, select "Saddle Point" and trace field lines starting from
+            points on both axes. Can you identify the "stable" and "unstable" directions?
+            What happens to particles starting exactly on each axis?
+        </div>
+    </div>
+
+    <div class="exercise-card">
+        <div class="exercise-card-header">
+            <span class="exercise-card-number">2.</span>
+            <span class="exercise-card-badge coding">Coding</span>
+        </div>
+        <div class="exercise-card-content">
+            Modify the Python field line code to trace a spiral inward (sink + vortex).
+            Start particles at 8 equally-spaced angles on a circle of radius 2.
+            How many orbits do they complete before reaching the origin?
+        </div>
+    </div>
+
+    <div class="exercise-card">
+        <div class="exercise-card-header">
+            <span class="exercise-card-number">3.</span>
+            <span class="exercise-card-badge think">Think</span>
+        </div>
+        <div class="exercise-card-content">
+            In the "Build Your Own Field" explorer, can you create a field where particles
+            approach the origin along the y-axis but escape along the x-axis?
+            <em>Hint: This is the saddle point pattern. What combination of fields produces it?</em>
+        </div>
+    </div>
+
+    <div class="exercise-card">
+        <div class="exercise-card-header">
+            <span class="exercise-card-number">4.</span>
+            <span class="exercise-card-badge think">Think</span>
+        </div>
+        <div class="exercise-card-content">
+            Electric field lines start on positive charges and end on negative charges.
+            If you have a single positive charge at the origin, which basic field pattern
+            describes its electric field? What about a single negative charge?
+        </div>
+    </div>
+</div>
+
+<hr>
+
+<h2>What's Next?</h2>
+
+<p>
+    You've learned to read vector fields—the direction and magnitude at every point. You've traced
+    field lines and seen how simple fields combine into complex patterns. In the next section, we'll
+    explore <strong>streamlines and flow visualization</strong> in more depth, including how to
+    identify sources, sinks, and vortices in real fluid flows.
+</p>
+
+<div class="btn-group mt-lg">
+    <button class="btn btn-magenta" onclick="navigateToSection('02-visually-understanding-functions')">← Previous: Understanding Functions</button>
+    <button class="btn" onclick="scrollToTop()">↑ Back to Top</button>
+    <button class="btn btn-secondary" onclick="navigateToSection('04-streamlines')">Next: Streamlines →</button>
+</div>
+
+<!-- Section-specific JavaScript loaded dynamically from js/sections/03-vector-fields.js -->

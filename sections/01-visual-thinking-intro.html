@@ -1,0 +1,893 @@
+<h1>Introduction to Visual Thinking</h1>
+
+<p>
+    Before diving into equations and algorithms, let's develop our intuition through <strong>visual thinking</strong>.
+    The human brain processes images 60,000 times faster than text. By visualizing mathematical relationships,
+    we can understand complex physics intuitively before formalizing our understanding.
+</p>
+
+<div class="info-box">
+    <div class="info-box-title">Learning Objectives</div>
+    <ul>
+        <li>Learn to represent data and functions visually</li>
+        <li>Understand function behavior through interactive exploration</li>
+        <li>Build intuition before diving into mathematics</li>
+        <li>Master basic plotting with Python</li>
+    </ul>
+</div>
+
+<hr>
+
+<h2>What is Visual Thinking?</h2>
+
+<p>
+    Visual thinking is the practice of using visual representations—graphs, charts, diagrams, and animations—to
+    understand and communicate ideas. In computational physics, we use it to:
+</p>
+
+<ul>
+    <li><strong>Explore</strong> - See patterns before proving them mathematically</li>
+    <li><strong>Verify</strong> - Check if our calculations make sense</li>
+    <li><strong>Communicate</strong> - Share insights with others effectively</li>
+    <li><strong>Discover</strong> - Find unexpected behaviors in systems</li>
+</ul>
+
+<hr>
+
+<h2>Plotting Basics: Your First Graphs</h2>
+
+<p>
+    Let's start with simple functions and build up. Every function tells a story—our job is to visualize that story.
+</p>
+
+<h3>Linear Functions</h3>
+
+<p>
+    The simplest non-trivial function: \( f(x) = 2x - 5 \)
+</p>
+
+<div class="interactive-container">
+    <div class="interactive-title">Interactive: Linear Function Explorer</div>
+
+    <div class="plot-container">
+        <div id="linear-plot" style="width: 100%; height: 400px;"></div>
+    </div>
+
+    <div class="control-panel">
+        <div class="control-group">
+            <label class="control-label">
+                Slope (m):
+                <span class="control-label-value">2.00</span>
+            </label>
+            <input type="range" class="slider" id="slope-slider" min="-5" max="5" step="0.1" value="2">
+        </div>
+
+        <div class="control-group">
+            <label class="control-label">
+                Intercept (b):
+                <span class="control-label-value">-5.00</span>
+            </label>
+            <input type="range" class="slider" id="intercept-slider" min="-10" max="10" step="0.5" value="-5">
+        </div>
+
+        <div class="btn-group">
+            <button class="btn" onclick="resetLinear()">Reset</button>
+        </div>
+    </div>
+</div>
+
+<div class="info-box">
+    <div class="info-box-title">Key Insight</div>
+    <p>
+        The slope <code>m</code> controls how steep the line is. Positive slopes go up, negative slopes go down.
+        The intercept <code>b</code> shifts the line up or down. Together, they completely determine the line!
+    </p>
+</div>
+
+<div class="interactive-container question-section">
+    <div class="interactive-title">Test Your Understanding</div>
+
+    <p style="margin-bottom: var(--spacing-md); color: var(--text-secondary);">
+        Use the linear function explorer above to answer these questions. Experiment with the sliders!
+    </p>
+
+    <div class="tabs">
+        <div class="tab-buttons">
+            <button class="tab-button active">Question 1</button>
+            <button class="tab-button">Question 2</button>
+            <button class="tab-button">Question 3</button>
+            <button class="tab-button">Question 4</button>
+        </div>
+
+        <div class="tab-content active">
+            <div class="question-container" data-type="mcq" data-answer="2">
+                <div class="question-text">
+                    Set the slope to 0 using the slider. What happens to the line?
+                </div>
+                <div class="question-options">
+                    <label class="option">
+                        <input type="radio" name="q1-1" value="0">
+                        <span>The line disappears completely</span>
+                    </label>
+                    <label class="option">
+                        <input type="radio" name="q1-1" value="1">
+                        <span>The line becomes vertical</span>
+                    </label>
+                    <label class="option">
+                        <input type="radio" name="q1-1" value="2">
+                        <span>The line becomes horizontal</span>
+                    </label>
+                    <label class="option">
+                        <input type="radio" name="q1-1" value="3">
+                        <span>The line tilts at 45 degrees</span>
+                    </label>
+                </div>
+                <div class="question-explanation" style="display: none;">
+                    <div class="question-explanation-title">Explanation</div>
+                    <div class="question-explanation-text">
+                        When the slope \( m = 0 \), the function becomes \( f(x) = b \) (just a constant).
+                        This means the output doesn't change with \( x \), creating a horizontal line at height \( b \).
+                        A zero slope means no vertical change as you move horizontally!
+                    </div>
+                </div>
+                <div class="question-actions">
+                    <button class="btn-verify">Verify</button>
+                </div>
+            </div>
+        </div>
+
+        <div class="tab-content">
+            <div class="question-container" data-type="mcq" data-answer="1">
+                <div class="question-text">
+                    Set slope = 2 and intercept = 0. Where does the line cross the origin?
+                </div>
+                <div class="question-options">
+                    <label class="option">
+                        <input type="radio" name="q1-2" value="0">
+                        <span>The line doesn't cross the origin</span>
+                    </label>
+                    <label class="option">
+                        <input type="radio" name="q1-2" value="1">
+                        <span>The line passes through the origin (0, 0)</span>
+                    </label>
+                    <label class="option">
+                        <input type="radio" name="q1-2" value="2">
+                        <span>The line crosses at (2, 0)</span>
+                    </label>
+                    <label class="option">
+                        <input type="radio" name="q1-2" value="3">
+                        <span>The line crosses at (0, 2)</span>
+                    </label>
+                </div>
+                <div class="question-explanation" style="display: none;">
+                    <div class="question-explanation-title">Explanation</div>
+                    <div class="question-explanation-text">
+                        When the y-intercept \( b = 0 \), the function is \( f(x) = 2x \).
+                        At \( x = 0 \), we get \( f(0) = 2(0) = 0 \), so the line passes through the origin.
+                        The y-intercept is exactly where the line crosses the y-axis (when \( x = 0 \))!
+                    </div>
+                </div>
+                <div class="question-actions">
+                    <button class="btn-verify">Verify</button>
+                </div>
+            </div>
+        </div>
+
+        <div class="tab-content">
+            <div class="question-container" data-type="fill" data-answer="positive|negative|3[2.8,3.2]">
+                <div class="question-text">
+                    Try different slope values and observe the line's direction.<br><br>
+                    When the slope is
+                    <select class="fill-blank-select">
+                        <option value=""></option>
+                        <option value="positive">positive</option>
+                        <option value="negative">negative</option>
+                        <option value="zero">zero</option>
+                    </select>,
+                    the line goes upward from left to right.<br>
+                    When the slope is
+                    <select class="fill-blank-select">
+                        <option value=""></option>
+                        <option value="positive">positive</option>
+                        <option value="negative">negative</option>
+                        <option value="zero">zero</option>
+                    </select>,
+                    the line goes downward.<br><br>
+                    Now set slope = 2 and intercept = -5. Read from the graph: when x = 4, what is y?<br>
+                    y ≈ <input type="text" class="fill-blank" placeholder="number" style="width: 80px;">
+                </div>
+                <div class="question-explanation" style="display: none;">
+                    <div class="question-explanation-title">Explanation</div>
+                    <div class="question-explanation-text">
+                        A <strong>positive slope</strong> means as \( x \) increases, \( y \) also increases (line goes up).
+                        A <strong>negative slope</strong> means as \( x \) increases, \( y \) decreases (line goes down).
+                        This is fundamental to understanding rates of change in physics!<br><br>
+                        For the numerical answer: Using \( f(x) = 2x - 5 \):<br>
+                        When \( x = 4 \): \( f(4) = 2(4) - 5 = 8 - 5 = 3 \)<br>
+                        We accept values near 3 since you're reading from the graph.
+                    </div>
+                </div>
+                <div class="question-actions">
+                    <button class="btn-verify">Verify</button>
+                </div>
+            </div>
+        </div>
+
+        <div class="tab-content">
+            <div class="question-container" data-type="msq" data-answer="0,2">
+                <div class="question-text">
+                    Set slope = -3 and intercept = 6. Which statements are TRUE? (Select all that apply)
+                </div>
+                <div class="question-options">
+                    <label class="option">
+                        <input type="checkbox" name="q1-4" value="0">
+                        <span>The line crosses the y-axis at \( y = 6 \)</span>
+                    </label>
+                    <label class="option">
+                        <input type="checkbox" name="q1-4" value="1">
+                        <span>The line slopes upward</span>
+                    </label>
+                    <label class="option">
+                        <input type="checkbox" name="q1-4" value="2">
+                        <span>At \( x = 2 \), the function value is \( f(2) = 0 \)</span>
+                    </label>
+                    <label class="option">
+                        <input type="checkbox" name="q1-4" value="3">
+                        <span>The line passes through the origin</span>
+                    </label>
+                </div>
+                <div class="question-explanation" style="display: none;">
+                    <div class="question-explanation-title">Explanation</div>
+                    <div class="question-explanation-text">
+                        For \( f(x) = -3x + 6 \):<br><br>
+                        <strong>Statement 1 (TRUE):</strong> When \( x = 0 \), \( f(0) = 6 \), so y-intercept is 6.<br>
+                        <strong>Statement 2 (FALSE):</strong> Negative slope (-3) means the line slopes <em>downward</em>.<br>
+                        <strong>Statement 3 (TRUE):</strong> \( f(2) = -3(2) + 6 = -6 + 6 = 0 \). This is the x-intercept!<br>
+                        <strong>Statement 4 (FALSE):</strong> Origin is at (0, 0), but the line crosses y-axis at (0, 6).
+                    </div>
+                </div>
+                <div class="question-actions">
+                    <button class="btn-verify">Verify</button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<h3>Quadratic Functions: The Power of Parabolas</h3>
+
+<p>
+    Quadratic functions appear everywhere in physics: projectile motion, springs, potential energy.
+    The general form is \( f(x) = ax^2 + bx + c \).
+</p>
+
+<div class="interactive-container">
+    <div class="interactive-title">Interactive: Quadratic Function Explorer</div>
+
+    <div class="plot-container">
+        <div id="quadratic-plot" style="width: 100%; height: 400px;"></div>
+    </div>
+
+    <div class="control-panel">
+        <div class="control-group">
+            <label class="control-label">
+                a (opens up/down):
+                <span class="control-label-value">1.00</span>
+            </label>
+            <input type="range" class="slider" id="a-slider" min="-3" max="3" step="0.1" value="1">
+        </div>
+
+        <div class="control-group">
+            <label class="control-label">
+                b (shifts left/right):
+                <span class="control-label-value">0.00</span>
+            </label>
+            <input type="range" class="slider" id="b-slider" min="-5" max="5" step="0.5" value="0">
+        </div>
+
+        <div class="control-group">
+            <label class="control-label">
+                c (shifts up/down):
+                <span class="control-label-value">0.00</span>
+            </label>
+            <input type="range" class="slider" id="c-slider" min="-10" max="10" step="0.5" value="0">
+        </div>
+
+        <div class="btn-group" style="display: flex; justify-content: space-between; align-items: center;">
+            <button class="btn" onclick="resetQuadratic()">Reset</button>
+            <div id="vertex-display" style="font-family: var(--font-mono); color: var(--neon-magenta); font-size: 0.9rem;">
+                Vertex: (0.00, 0.00)
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="interactive-container question-section">
+    <div class="interactive-title">Test Your Understanding</div>
+
+    <p style="margin-bottom: var(--spacing-md); color: var(--text-secondary);">
+        Use the quadratic function explorer above to answer these questions.
+    </p>
+
+    <div class="tabs">
+        <div class="tab-buttons">
+            <button class="tab-button active">Question 1</button>
+            <button class="tab-button">Question 2</button>
+            <button class="tab-button">Question 3</button>
+            <button class="tab-button">Question 4</button>
+        </div>
+
+        <div class="tab-content active">
+            <div class="question-container" data-type="mcq" data-answer="1">
+                <div class="question-text">
+                    Set a = -2, b = 0, c = 8. Does the parabola open upward or downward?
+                </div>
+                <div class="question-options">
+                    <label class="option">
+                        <input type="radio" name="q2-1" value="0">
+                        <span>Upward (U-shaped)</span>
+                    </label>
+                    <label class="option">
+                        <input type="radio" name="q2-1" value="1">
+                        <span>Downward (∩-shaped)</span>
+                    </label>
+                    <label class="option">
+                        <input type="radio" name="q2-1" value="2">
+                        <span>Neither - it's a straight line</span>
+                    </label>
+                </div>
+                <div class="question-explanation" style="display: none;">
+                    <div class="question-explanation-title">Explanation</div>
+                    <div class="question-explanation-text">
+                        When \( a < 0 \) (negative), the parabola opens <strong>downward</strong>.
+                        Think of it like a frown: ∩<br><br>
+                        When \( a > 0 \) (positive), it opens upward like a smile: U<br><br>
+                        The sign of \( a \) determines the direction the parabola opens!
+                    </div>
+                </div>
+                <div class="question-actions">
+                    <button class="btn-verify">Verify</button>
+                </div>
+            </div>
+        </div>
+
+        <div class="tab-content">
+            <div class="question-container" data-type="fill" data-answer="0[-.1,.1]|4[3.9,4.1]">
+                <div class="question-text">
+                    Set a = 1, b = 0, c = 4. Read the minimum point from the plot.<br>
+                    x-coordinate: <input type="text" class="fill-blank" placeholder="x" style="width: 80px;">
+                    &nbsp;&nbsp;
+                    y-coordinate: <input type="text" class="fill-blank" placeholder="y" style="width: 80px;">
+                </div>
+                <div class="question-explanation" style="display: none;">
+                    <div class="question-explanation-title">Explanation</div>
+                    <div class="question-explanation-text">
+                        For \( f(x) = x^2 + 4 \):<br>
+                        Using the extremum formula: \( x_{min} = -\frac{b}{2a} = -\frac{0}{2(1)} = 0 \)<br>
+                        Then: \( y_{min} = f(0) = 0^2 + 4 = 4 \)<br><br>
+                        The minimum is at <strong>(0, 4)</strong> since \( a > 0 \) (parabola opens upward).
+                    </div>
+                </div>
+                <div class="question-actions">
+                    <button class="btn-verify">Verify</button>
+                </div>
+            </div>
+        </div>
+
+        <div class="tab-content">
+            <div class="question-container" data-type="msq" data-answer="1,2">
+                <div class="question-text">
+                    Set a = 1, b = -4, c = 0. Which statements are TRUE? (Select all that apply)
+                </div>
+                <div class="question-options">
+                    <label class="option">
+                        <input type="checkbox" name="q2-3" value="0">
+                        <span>The parabola opens downward</span>
+                    </label>
+                    <label class="option">
+                        <input type="checkbox" name="q2-3" value="1">
+                        <span>The y-intercept is at \( y = 0 \)</span>
+                    </label>
+                    <label class="option">
+                        <input type="checkbox" name="q2-3" value="2">
+                        <span>The minimum is below the x-axis</span>
+                    </label>
+                    <label class="option">
+                        <input type="checkbox" name="q2-3" value="3">
+                        <span>The vertex is at \( x = -2 \)</span>
+                    </label>
+                </div>
+                <div class="question-explanation" style="display: none;">
+                    <div class="question-explanation-title">Explanation</div>
+                    <div class="question-explanation-text">
+                        For \( f(x) = x^2 - 4x \):<br><br>
+                        <strong>Statement 1 (FALSE):</strong> \( a = 1 > 0 \), so it opens upward.<br>
+                        <strong>Statement 2 (TRUE):</strong> \( f(0) = 0 - 0 = 0 \), y-intercept is 0.<br>
+                        <strong>Statement 3 (TRUE):</strong> Vertex at \( x = 2 \), \( y = 4 - 8 = -4 \) (below x-axis).<br>
+                        <strong>Statement 4 (FALSE):</strong> \( x_v = -\frac{-4}{2(1)} = 2 \), not -2.
+                    </div>
+                </div>
+                <div class="question-actions">
+                    <button class="btn-verify">Verify</button>
+                </div>
+            </div>
+        </div>
+
+        <div class="tab-content">
+            <div class="question-container" data-type="fill" data-answer="-4|11">
+                <div class="question-text">
+                    For a parabola with minimum at \( x = 2 \) and \( a = 1 \), use the formula
+                    \( x_{extremum} = -\frac{b}{2a} \) to find the value of \( b \).<br><br>
+                    b = <input type="text" class="fill-blank" placeholder="number" style="width: 100px;">
+                    <br><br>
+                    Now verify by setting a = 1 and your calculated b value in the explorer above.
+                    What value of c gives a minimum at \( y = 7 \)?<br>
+                    c = <input type="text" class="fill-blank" placeholder="number" style="width: 100px;">
+                </div>
+                <div class="question-explanation" style="display: none;">
+                    <div class="question-explanation-title">Explanation</div>
+                    <div class="question-explanation-text">
+                        Given: minimum at \( x = 2 \) and \( a = 1 \)<br>
+                        From \( x_{min} = -\frac{b}{2a} \):<br>
+                        \( 2 = -\frac{b}{2(1)} \)<br>
+                        \( 2 = -\frac{b}{2} \)<br>
+                        \( 4 = -b \)<br>
+                        \( b = -4 \)<br><br>
+                        For the minimum at \( (2, 7) \) with \( f(x) = x^2 - 4x + c \):<br>
+                        \( 7 = (2)^2 - 4(2) + c \)<br>
+                        \( 7 = 4 - 8 + c \)<br>
+                        \( 7 = -4 + c \)<br>
+                        \( c = 11 \)
+                    </div>
+                </div>
+                <div class="question-actions">
+                    <button class="btn-verify">Verify</button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="equation-display">
+    <p><strong>Extremum Formula:</strong></p>
+    $$ x_{extremum} = -\frac{b}{2a}, \quad y_{extremum} = f(x_{extremum}) $$
+    <p style="font-size: 0.9rem; margin-top: var(--spacing-sm); color: var(--text-muted);">
+        This gives a <strong>minimum</strong> when \( a > 0 \) and a <strong>maximum</strong> when \( a < 0 \).
+    </p>
+</div>
+
+<hr>
+
+<h2>Comparing Function Growth</h2>
+
+<p>
+    Different functions grow at different rates. Let's compare how \( \sqrt{x} \), \( x \), \( x^2 \), and \( x^3 \)
+    behave near the origin and far away.
+</p>
+
+<div class="interactive-container">
+    <div class="interactive-title">Interactive: Function Growth Comparison</div>
+
+    <div class="plot-container">
+        <div id="growth-plot" style="width: 100%; height: 400px;"></div>
+    </div>
+
+    <div class="control-panel">
+        <div class="control-group">
+            <label class="control-label">
+                X Range (0 to):
+                <span class="control-label-value">5.00</span>
+            </label>
+            <input type="range" class="slider" id="range-slider" min="0" max="5" step="0.1" value="5">
+        </div>
+
+        <div class="btn-group">
+            <button class="btn" onclick="updateGrowthPlot()">Update Plot</button>
+        </div>
+    </div>
+</div>
+
+<div class="interactive-container question-section">
+    <div class="interactive-title">Test Your Understanding</div>
+
+    <p style="margin-bottom: var(--spacing-md); color: var(--text-secondary);">
+        Use the function growth comparison above to answer these questions.
+    </p>
+
+    <div class="tabs">
+        <div class="tab-buttons">
+            <button class="tab-button active">Question 1</button>
+            <button class="tab-button">Question 2</button>
+            <button class="tab-button">Question 3</button>
+        </div>
+
+        <div class="tab-content active">
+            <div class="question-container" data-type="mcq" data-answer="2">
+                <div class="question-text">
+                    Set the slider to show x from 0 to 5. Which function grows the FASTEST as x increases?
+                </div>
+                <div class="question-options">
+                    <label class="option">
+                        <input type="radio" name="q3-1" value="0">
+                        <span>\( \sqrt{x} \)</span>
+                    </label>
+                    <label class="option">
+                        <input type="radio" name="q3-1" value="1">
+                        <span>\( x \)</span>
+                    </label>
+                    <label class="option">
+                        <input type="radio" name="q3-1" value="2">
+                        <span>\( x^3 \)</span>
+                    </label>
+                    <label class="option">
+                        <input type="radio" name="q3-1" value="3">
+                        <span>They all grow at the same rate</span>
+                    </label>
+                </div>
+                <div class="question-explanation" style="display: none;">
+                    <div class="question-explanation-title">Explanation</div>
+                    <div class="question-explanation-text">
+                        For large values of x, <strong>higher powers dominate</strong>.<br><br>
+                        At \( x = 5 \):<br>
+                        - \( \sqrt{5} \approx 2.24 \)<br>
+                        - \( 5 = 5 \)<br>
+                        - \( 5^2 = 25 \)<br>
+                        - \( 5^3 = 125 \) ← Largest!<br><br>
+                        This is why in physics, when analyzing behavior for large systems,
+                        we often only keep the highest power term!
+                    </div>
+                </div>
+                <div class="question-actions">
+                    <button class="btn-verify">Verify</button>
+                </div>
+            </div>
+        </div>
+
+        <div class="tab-content">
+            <div class="question-container" data-type="fill" data-answer="2.24[2.1,2.4]|1.41[1.3,1.5]">
+                <div class="question-text">
+                    Set the range slider to 5. Read approximate values from the graph:<br><br>
+                    At \( x = 5 \), what is \( \sqrt{x} \)?
+                    <input type="text" class="fill-blank" placeholder="approx value" style="width: 100px;">
+                    <br><br>
+                    At \( x = 2 \), what is \( \sqrt{x} \)?
+                    <input type="text" class="fill-blank" placeholder="approx value" style="width: 100px;">
+                </div>
+                <div class="question-explanation" style="display: none;">
+                    <div class="question-explanation-title">Explanation</div>
+                    <div class="question-explanation-text">
+                        Reading from the cyan curve (\( \sqrt{x} \)):<br>
+                        - At \( x = 5 \): \( \sqrt{5} \approx 2.24 \)<br>
+                        - At \( x = 2 \): \( \sqrt{2} \approx 1.41 \)<br><br>
+                        Notice how \( \sqrt{x} \) grows slowly - doubling x from 2 to 4 doesn't double \( \sqrt{x} \)!
+                        This sublinear growth is important in physics.
+                    </div>
+                </div>
+                <div class="question-actions">
+                    <button class="btn-verify">Verify</button>
+                </div>
+            </div>
+        </div>
+
+        <div class="tab-content">
+            <div class="question-container" data-type="msq" data-answer="0,1,2,3">
+                <div class="question-text">
+                    Adjust the slider and observe the functions. Which are TRUE? (Select all that apply)
+                </div>
+                <div class="question-options">
+                    <label class="option">
+                        <input type="checkbox" name="q3-3" value="0">
+                        <span>Near \( x = 0 \), \( x^3 \) is flatter than \( x \)</span>
+                    </label>
+                    <label class="option">
+                        <input type="checkbox" name="q3-3" value="1">
+                        <span>At \( x = 1 \), all four functions have the same value</span>
+                    </label>
+                    <label class="option">
+                        <input type="checkbox" name="q3-3" value="2">
+                        <span>\( \sqrt{x} \) grows slower than any of the other functions for large \( x \)</span>
+                    </label>
+                    <label class="option">
+                        <input type="checkbox" name="q3-3" value="3">
+                        <span>For small \( x \) (like 0.1), \( x^2 < x \)</span>
+                    </label>
+                </div>
+                <div class="question-explanation" style="display: none;">
+                    <div class="question-explanation-title">Explanation</div>
+                    <div class="question-explanation-text">
+                        <strong>All statements are TRUE!</strong><br><br>
+                        <strong>Statement 1:</strong> At \( x = 0.1 \): \( x = 0.1 \) but \( x^3 = 0.001 \) (much flatter).<br>
+                        <strong>Statement 2:</strong> At \( x = 1 \): \( \sqrt{1} = 1 \), \( 1 = 1 \), \( 1^2 = 1 \), \( 1^3 = 1 \). This special point is where they all meet!<br>
+                        <strong>Statement 3:</strong> \( \sqrt{x} \) is sublinear - grows slower than even \( x \) for large values.<br>
+                        <strong>Statement 4:</strong> \( 0.1^2 = 0.01 < 0.1 \). Higher powers are smaller near zero!
+                    </div>
+                </div>
+                <div class="question-actions">
+                    <button class="btn-verify">Verify</button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="warning-box">
+    <div class="info-box-title">Important Observation</div>
+    <p>
+        Near \( x = 0 \), higher powers grow <em>slower</em> (they're flatter).
+        Far from the origin, higher powers completely dominate. This asymptotic behavior is crucial in physics!
+    </p>
+</div>
+
+<hr>
+
+<h2>Python Code Examples</h2>
+
+<p>
+    Let's see how to create these plots in Python using <strong>Plotly</strong> — the same library powering
+    the interactive plots you see on this page. Learning one plotting approach works everywhere!
+</p>
+
+<div class="info-box">
+    <div class="info-box-title">One Library, Less Confusion</div>
+    <p>
+        Throughout this book, we use <strong>only Plotly</strong> for all visualizations. The same code patterns
+        you see on this webpage work in your Python scripts. No need to learn multiple plotting libraries —
+        focus on physics and problem-solving instead!
+    </p>
+</div>
+
+<div class="tabs">
+    <div class="tab-buttons">
+        <button class="tab-button active">Linear Function</button>
+        <button class="tab-button">Quadratic Function</button>
+        <button class="tab-button">Multiple Functions</button>
+        <button class="tab-button">Prompt</button>
+    </div>
+
+    <div class="tab-content active">
+        <div class="code-block-container">
+            <div class="code-header">
+                <span class="code-lang">Python</span>
+                <button class="copy-btn">Copy</button>
+            </div>
+            <pre><code class="language-python">import numpy as np
+import plotly.graph_objects as go
+
+# Generate x values
+x = np.linspace(-10, 10, 200)
+
+# Define the function
+y = 2*x - 5
+
+# Create the plot
+fig = go.Figure()
+fig.add_trace(go.Scatter(
+    x=x, y=y,
+    mode='lines',
+    name='f(x) = 2x - 5',
+    line=dict(color='cyan', width=2)
+))
+
+# Styling
+fig.update_layout(
+    template='plotly_dark',
+    title='Linear Function',
+    xaxis_title='x',
+    yaxis_title='f(x)',
+    xaxis=dict(range=[-10, 10], zeroline=True),
+    yaxis=dict(range=[-35, 35], zeroline=True)
+)
+
+fig.show()</code></pre>
+        </div>
+    </div>
+
+    <div class="tab-content">
+        <div class="code-block-container">
+            <div class="code-header">
+                <span class="code-lang">Python</span>
+                <button class="copy-btn">Copy</button>
+            </div>
+            <pre><code class="language-python">import numpy as np
+import plotly.graph_objects as go
+
+# Quadratic function plotter
+def plot_quadratic(a=1, b=0, c=0):
+    x = np.linspace(-10, 10, 200)
+    y = a*x**2 + b*x + c
+
+    fig = go.Figure()
+
+    # Plot the parabola
+    fig.add_trace(go.Scatter(
+        x=x, y=y,
+        mode='lines',
+        name=f'f(x) = {a}x² + {b}x + {c}',
+        line=dict(color='cyan', width=2)
+    ))
+
+    # Calculate and plot the minimum/maximum
+    if a != 0:
+        x_vertex = -b / (2*a)
+        y_vertex = a*x_vertex**2 + b*x_vertex + c
+
+        fig.add_trace(go.Scatter(
+            x=[x_vertex], y=[y_vertex],
+            mode='markers',
+            name='Minimum' if a > 0 else 'Maximum',
+            marker=dict(color='magenta', size=10)
+        ))
+
+    # Styling
+    fig.update_layout(
+        template='plotly_dark',
+        title='Quadratic Function',
+        xaxis_title='x',
+        yaxis_title='f(x)',
+        xaxis=dict(range=[-10, 10]),
+        yaxis=dict(range=[-25, 50])
+    )
+
+    return fig
+
+# Try different values
+fig = plot_quadratic(a=1, b=0, c=0)
+fig.show()</code></pre>
+        </div>
+    </div>
+
+    <div class="tab-content">
+        <div class="code-block-container">
+            <div class="code-header">
+                <span class="code-lang">Python</span>
+                <button class="copy-btn">Copy</button>
+            </div>
+            <pre><code class="language-python">import numpy as np
+import plotly.graph_objects as go
+
+# Generate x values
+x = np.linspace(0.1, 5, 200)
+
+# Create figure
+fig = go.Figure()
+
+# Add multiple functions
+functions = [
+    {'name': '√x', 'y': np.sqrt(x), 'color': 'cyan'},
+    {'name': 'x', 'y': x, 'color': 'magenta'},
+    {'name': 'x²', 'y': x**2, 'color': 'yellow'},
+    {'name': 'x³', 'y': x**3, 'color': 'lime'}
+]
+
+for func in functions:
+    fig.add_trace(go.Scatter(
+        x=x, y=func['y'],
+        mode='lines',
+        name=func['name'],
+        line=dict(color=func['color'], width=2)
+    ))
+
+# Styling
+fig.update_layout(
+    template='plotly_dark',
+    title='Function Growth Comparison',
+    xaxis_title='x',
+    yaxis_title='f(x)',
+    showlegend=True
+)
+
+fig.show()</code></pre>
+        </div>
+    </div>
+
+    <div class="tab-content">
+        <div class="info-box">
+            <div class="info-box-title">How to Prompt an LLM</div>
+            <p>
+                Instead of memorizing syntax, learn to <strong>describe what you want</strong>.
+                Here are effective prompts you could use with ChatGPT, Claude, or other AI assistants
+                to generate the code shown in the other tabs.
+            </p>
+        </div>
+
+        <div class="code-block-container">
+            <div class="code-header">
+                <span class="code-lang">Prompt for Linear Function</span>
+                <button class="copy-btn">Copy</button>
+            </div>
+            <pre><code class="language-text">Create a Python script using Plotly to plot the linear function f(x) = 2x - 5
+from x = -10 to 10. Use a dark theme with cyan-colored line. Set fixed axis
+ranges: x from -10 to 10, y from -35 to 35. Make axes gray (#808080) to
+differentiate from the data curve.</code></pre>
+        </div>
+
+        <div class="code-block-container">
+            <div class="code-header">
+                <span class="code-lang">Prompt for Quadratic Function</span>
+                <button class="copy-btn">Copy</button>
+            </div>
+            <pre><code class="language-text">Write a Python function using Plotly that plots a quadratic function
+f(x) = ax² + bx + c. The function should calculate and highlight the
+minimum or maximum point with a magenta marker. Use dark theme, cyan line
+for the parabola, gray axes. Set x range to [-10, 10] and y range to
+[-25, 50].</code></pre>
+        </div>
+
+        <div class="code-block-container">
+            <div class="code-header">
+                <span class="code-lang">Prompt for Multiple Functions</span>
+                <button class="copy-btn">Copy</button>
+            </div>
+            <pre><code class="language-text">Create a Plotly visualization comparing four functions: √x, x, x², and x³
+on the same plot from x = 0.1 to 5. Use different neon colors (cyan, magenta,
+yellow, lime) for each function. Apply dark theme and show a legend. This
+should demonstrate how different power functions grow at different rates.</code></pre>
+        </div>
+
+        <div class="warning-box">
+            <div class="info-box-title">Pro Tips for Effective Prompts</div>
+            <ul>
+                <li><strong>Be specific</strong>: Mention the library (Plotly), colors, ranges</li>
+                <li><strong>Describe the goal</strong>: What should the visualization show?</li>
+                <li><strong>Include constraints</strong>: Fixed ranges, specific styling</li>
+                <li><strong>Iterate</strong>: If the first result isn't perfect, ask for adjustments</li>
+                <li><strong>Learn from output</strong>: Study the generated code to understand patterns</li>
+            </ul>
+        </div>
+    </div>
+</div>
+
+<hr>
+
+<h2>Exercises for Practice</h2>
+
+<div class="exercise-cards">
+    <div class="exercise-card">
+        <div class="exercise-card-header">
+            <span class="exercise-card-number">1.</span>
+            <span class="exercise-card-badge explore">Explore</span>
+        </div>
+        <div class="exercise-card-content">
+            Use the quadratic explorer above. Set \( a = -1 \), \( b = 0 \), \( c = 4 \).
+            Where is the vertex? Is it a maximum or minimum?
+        </div>
+    </div>
+
+    <div class="exercise-card">
+        <div class="exercise-card-header">
+            <span class="exercise-card-number">2.</span>
+            <span class="exercise-card-badge coding">Coding</span>
+        </div>
+        <div class="exercise-card-content">
+            Modify the Python code to plot \( f(x) = e^{-x} \sin(x) \) from 0 to 10.
+            What do you observe about the amplitude?
+        </div>
+    </div>
+
+    <div class="exercise-card">
+        <div class="exercise-card-header">
+            <span class="exercise-card-number">3.</span>
+            <span class="exercise-card-badge think">Think</span>
+        </div>
+        <div class="exercise-card-content">
+            Why does \( x^3 \) grow faster than \( x^2 \) far from the origin, but slower near \( x = 0 \)?
+        </div>
+    </div>
+</div>
+
+<hr>
+
+<h2>What's Next?</h2>
+
+<p>
+    Now that you can visualize basic functions, we'll learn to <strong>understand any function</strong>
+    by identifying its key properties: zeros, divergences, extrema, and asymptotes. These are the
+    "vital signs" that reveal a function's complete behavior!
+</p>
+
+<div class="btn-group mt-lg">
+    <button class="btn" onclick="scrollToTop()">↑ Back to Top</button>
+    <button class="btn btn-secondary" onclick="navigateToSection('02-visually-understanding-functions')">Next: Visually Understanding Functions →</button>
+</div>
+
+<!-- Section-specific JavaScript loaded dynamically from js/sections/01-visual-thinking-intro.js -->
