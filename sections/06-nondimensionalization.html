@@ -1,0 +1,1067 @@
+<!-- Section 1.6: Non-Dimensionalization - Making Physics Universal
+     Source: Module-2 Visual Thinking and Non Dimensionalization-2.nb
+     Core Concept: Translate dimensional physics into dimensionless math (Define & Translate stage)
+     Estimated Time: 20-25 minutes
+     Prerequisites: Basic calculus, physical units, Sections 1.1-1.5
+-->
+
+<h1>Non-Dimensionalization: Making Physics Universal</h1>
+
+<p>
+    Every physics problem hides a universal mathematical truth—buried under units of meters, kilograms,
+    and seconds. <strong>Non-dimensionalization</strong> strips away this clutter to reveal the pure
+    mathematics beneath. One dimensionless equation can describe every pendulum that ever swung,
+    regardless of its mass, length, or what planet it's on.
+</p>
+
+<div class="info-box">
+    <div class="info-box-title">Learning Objectives</div>
+    <ul>
+        <li>Identify natural scales (length, time, energy) in physics problems</li>
+        <li>Transform dimensional equations into dimensionless form</li>
+        <li>Recognize that dimensionless solutions are universal—one plot covers all cases</li>
+        <li>Apply the "Define and Translate" stage of computational thinking</li>
+    </ul>
+</div>
+
+<hr>
+
+<h2>The Define → Translate Process</h2>
+
+<p>
+    In the <strong>4-step computational thinking</strong> approach, we follow:
+    <em>Define → Translate → Compute → Interpret</em>. Non-dimensionalization is the heart of
+    the first two steps:
+</p>
+
+<ul>
+    <li><strong>Define:</strong> Identify all physical variables and their natural scales</li>
+    <li><strong>Translate:</strong> Convert to dimensionless form by dividing by these scales</li>
+</ul>
+
+<div class="info-box">
+    <div class="info-box-title">Why Non-Dimensionalize?</div>
+    <p>
+        Consider the pendulum potential energy: \( V(\theta) = mg\ell(1 - \cos\theta) \). If you want to
+        plot this, you need to pick values for \( m \), \( g \), and \( \ell \). But there are
+        <strong>infinitely many combinations</strong>! Instead, define \( \bar{V} = V/(mg\ell) \), giving:
+    </p>
+    <p style="text-align: center; font-size: 1.2em;">
+        \( \bar{V}(\theta) = 1 - \cos\theta \)
+    </p>
+    <p>
+        This <strong>single curve</strong> describes ALL pendulums. One plot, infinite applicability.
+    </p>
+</div>
+
+<hr>
+
+<h2>Explorer 1: Pendulum Energy</h2>
+
+<p>
+    A pendulum of mass \( m \) and length \( \ell \) in gravitational field \( g \) has potential energy:
+</p>
+
+<div class="equation-display">
+    $$ V(\theta) = mg\ell(1 - \cos\theta) $$
+</div>
+
+<p>
+    The <strong>natural energy scale</strong> is \( mg\ell \)—the gravitational potential energy when the
+    pendulum is horizontal. Dividing by this scale gives the dimensionless potential \( \bar{V} = 1 - \cos\theta \).
+</p>
+
+<div class="interactive-container">
+    <div class="interactive-title">Interactive: Dimensional vs Dimensionless Potential</div>
+
+    <div class="control-panel">
+        <div class="control-group">
+            <label class="control-label">
+                Mass m (kg):
+                <span class="control-label-value" id="nondim-mass-value">1.0</span>
+            </label>
+            <input type="range" class="slider" id="nondim-mass-slider" min="0.1" max="10" step="0.1" value="1">
+        </div>
+
+        <div class="control-group">
+            <label class="control-label">
+                Length ℓ (m):
+                <span class="control-label-value" id="nondim-length-value">1.0</span>
+            </label>
+            <input type="range" class="slider" id="nondim-length-slider" min="0.1" max="5" step="0.1" value="1">
+        </div>
+
+        <div class="control-group">
+            <label class="control-label">
+                Gravity g (m/s²):
+                <span class="control-label-value" id="nondim-gravity-value">9.8</span>
+            </label>
+            <input type="range" class="slider" id="nondim-gravity-slider" min="1" max="25" step="0.1" value="9.8">
+        </div>
+
+        <div class="btn-group">
+            <button class="btn" onclick="resetPendulumExplorer()">Reset</button>
+        </div>
+    </div>
+
+    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: var(--spacing-md);">
+        <div>
+            <h4 style="text-align: center; color: var(--neon-cyan);">Dimensional: V(θ) in Joules</h4>
+            <div class="plot-container" id="nondim-pendulum-dimensional"></div>
+        </div>
+        <div>
+            <h4 style="text-align: center; color: var(--neon-magenta);">Dimensionless: V̄ = V/(mgℓ)</h4>
+            <div class="plot-container" id="nondim-pendulum-dimensionless"></div>
+        </div>
+    </div>
+
+    <div class="info-box" style="margin-top: var(--spacing-md);">
+        <div class="info-box-title">Observe</div>
+        <p>
+            Move the sliders and watch both plots. The <strong>left plot changes</strong> with every
+            parameter adjustment—different scales, different curves. The <strong>right plot stays
+            identical</strong>—always \( \bar{V} = 1 - \cos\theta \). This is the power of non-dimensionalization!
+        </p>
+    </div>
+</div>
+
+<div class="interactive-container question-section">
+    <div class="interactive-title">Test Your Understanding</div>
+
+    <p style="margin-bottom: var(--spacing-md); color: var(--text-secondary);">
+        Use the Pendulum Energy explorer above to answer these questions.
+    </p>
+
+    <div class="tabs">
+        <div class="tab-buttons">
+            <button class="tab-button active">Question 1</button>
+            <button class="tab-button">Question 2</button>
+            <button class="tab-button">Question 3</button>
+            <button class="tab-button">Question 4</button>
+        </div>
+
+        <div class="tab-content active">
+            <div class="question-container" data-type="mcq" data-answer="2">
+                <div class="question-text">
+                    What is the natural energy scale for a pendulum?
+                </div>
+                <div class="question-options">
+                    <label class="option">
+                        <input type="radio" name="q6-1-1" value="0">
+                        <span>\( mg \) (weight)</span>
+                    </label>
+                    <label class="option">
+                        <input type="radio" name="q6-1-1" value="1">
+                        <span>\( \ell \) (length)</span>
+                    </label>
+                    <label class="option">
+                        <input type="radio" name="q6-1-1" value="2">
+                        <span>\( mg\ell \) (gravitational potential at horizontal)</span>
+                    </label>
+                    <label class="option">
+                        <input type="radio" name="q6-1-1" value="3">
+                        <span>\( g/\ell \) (angular frequency squared)</span>
+                    </label>
+                </div>
+                <div class="question-explanation" style="display: none;">
+                    <div class="question-explanation-title">Explanation</div>
+                    <div class="question-explanation-text">
+                        The natural energy scale is \( mg\ell \), which has units of energy (Joules).
+                        It represents the potential energy when the pendulum is horizontal (\(\theta = \pi/2\)).
+                        Dividing by this scale makes the potential dimensionless: \( \bar{V} = V/(mg\ell) \).
+                    </div>
+                </div>
+                <div class="question-actions">
+                    <button class="btn-verify">Verify</button>
+                </div>
+            </div>
+        </div>
+
+        <div class="tab-content">
+            <div class="question-container" data-type="fill" data-answer="2[1.9,2.1]">
+                <div class="question-text">
+                    Look at the dimensionless plot. At \( \theta = \pi \) (pendulum pointing straight up),
+                    what is the value of \( \bar{V} \)?
+                    <br><br>
+                    \( \bar{V}(\pi) = \) <input type="text" class="fill-blank" style="width: 80px;">
+                </div>
+                <div class="question-explanation" style="display: none;">
+                    <div class="question-explanation-title">Explanation</div>
+                    <div class="question-explanation-text">
+                        At \( \theta = \pi \): \( \bar{V} = 1 - \cos(\pi) = 1 - (-1) = 2 \).
+                        This is the maximum potential energy, occurring when the pendulum is inverted.
+                        Notice this value is the same regardless of \( m \), \( g \), or \( \ell \)!
+                    </div>
+                </div>
+                <div class="question-actions">
+                    <button class="btn-verify">Verify</button>
+                </div>
+            </div>
+        </div>
+
+        <div class="tab-content">
+            <div class="question-container" data-type="msq" data-answer="0,2,3">
+                <div class="question-text">
+                    Which statements about non-dimensionalization are TRUE? (Select all that apply)
+                </div>
+                <div class="question-options">
+                    <label class="option">
+                        <input type="checkbox" name="q6-1-3" value="0">
+                        <span>One dimensionless curve can represent infinitely many physical systems</span>
+                    </label>
+                    <label class="option">
+                        <input type="checkbox" name="q6-1-3" value="1">
+                        <span>Non-dimensionalization changes the physics of the problem</span>
+                    </label>
+                    <label class="option">
+                        <input type="checkbox" name="q6-1-3" value="2">
+                        <span>The dimensionless potential \( \bar{V} = 1 - \cos\theta \) applies to pendulums on any planet</span>
+                    </label>
+                    <label class="option">
+                        <input type="checkbox" name="q6-1-3" value="3">
+                        <span>Natural scales are combinations of parameters with the correct physical units</span>
+                    </label>
+                </div>
+                <div class="question-explanation" style="display: none;">
+                    <div class="question-explanation-title">Explanation</div>
+                    <div class="question-explanation-text">
+                        <strong>Statement 1 (TRUE):</strong> The dimensionless form is universal—it describes all pendulums.<br>
+                        <strong>Statement 2 (FALSE):</strong> Non-dimensionalization is just a change of units, not physics.<br>
+                        <strong>Statement 3 (TRUE):</strong> Since \( g \) cancels out, it works on Earth, Moon, or Jupiter!<br>
+                        <strong>Statement 4 (TRUE):</strong> Natural scales must have the right dimensions (e.g., \( mg\ell \) has units of energy).
+                    </div>
+                </div>
+                <div class="question-actions">
+                    <button class="btn-verify">Verify</button>
+                </div>
+            </div>
+        </div>
+
+        <div class="tab-content">
+            <div class="question-container" data-type="mcq" data-answer="1">
+                <div class="question-text">
+                    Why is non-dimensionalization useful for computational physics?
+                </div>
+                <div class="question-options">
+                    <label class="option">
+                        <input type="radio" name="q6-1-4" value="0">
+                        <span>It makes equations more complicated but accurate</span>
+                    </label>
+                    <label class="option">
+                        <input type="radio" name="q6-1-4" value="1">
+                        <span>One computation/plot applies to all parameter values</span>
+                    </label>
+                    <label class="option">
+                        <input type="radio" name="q6-1-4" value="2">
+                        <span>It eliminates the need for numerical methods</span>
+                    </label>
+                    <label class="option">
+                        <input type="radio" name="q6-1-4" value="3">
+                        <span>It only works for pendulum problems</span>
+                    </label>
+                </div>
+                <div class="question-explanation" style="display: none;">
+                    <div class="question-explanation-title">Explanation</div>
+                    <div class="question-explanation-text">
+                        The key benefit is <strong>universality</strong>: solve once, apply everywhere.
+                        Instead of plotting V(θ) for every combination of m, g, and ℓ, we plot \( \bar{V}(\theta) \)
+                        once and it applies to ALL pendulums. This is tremendously efficient!
+                    </div>
+                </div>
+                <div class="question-actions">
+                    <button class="btn-verify">Verify</button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<hr>
+
+<h2>Identifying Natural Scales</h2>
+
+<p>
+    The key skill in non-dimensionalization is <strong>finding the natural scales</strong>. Every physics
+    problem contains its own built-in measuring sticks:
+</p>
+
+<div class="equation-display">
+    <p><strong>For any physical quantity, find a combination of parameters with the same units:</strong></p>
+    <ul style="text-align: left; max-width: 600px; margin: 0 auto;">
+        <li><strong>Energy scale:</strong> Look for products like \( mg\ell \), \( \frac{1}{2}kx^2 \), \( \frac{1}{2}mv^2 \)</li>
+        <li><strong>Length scale:</strong> Look for given lengths, or construct from \( v^2/g \), \( \sqrt{k/m} \cdot t \)</li>
+        <li><strong>Time scale:</strong> Look for periods like \( \sqrt{\ell/g} \), \( \sqrt{m/k} \), \( v/g \)</li>
+    </ul>
+</div>
+
+<div class="warning-box">
+    <div class="warning-icon">⚠️</div>
+    <div class="warning-content">
+        <strong>Dimensional Analysis Rule:</strong> You can only add or equate quantities with the
+        <em>same dimensions</em>. If your scales have the wrong units, the resulting equations
+        will be physically meaningless!
+    </div>
+</div>
+
+<hr>
+
+<h2>Explorer 2: Projectile on a Hill</h2>
+
+<p>
+    A more complex example: A projectile is launched from height \( h \) above a hill with slope angle \( \phi \).
+    It's launched at angle \( \theta \) with speed \( v \). Where does it land on the hill?
+</p>
+
+<p>
+    This problem has <strong>5 dimensional parameters</strong>: \( \theta, \phi, v, h, g \).
+    But we can reduce to <strong>3 dimensionless parameters</strong>:
+</p>
+
+<div class="equation-display">
+    <p><strong>Dimensionless Parameters:</strong></p>
+    $$ \theta \text{ (launch angle)}, \quad \phi \text{ (hill slope)}, \quad \Gamma = \frac{gh}{v^2} \text{ (dimensionless height)} $$
+    <p>
+        The parameter \( \Gamma \) compares gravitational potential (\( gh \)) to kinetic energy (\( v^2 \)).
+        Small \( \Gamma \) means high launch velocity; large \( \Gamma \) means gravity dominates.
+    </p>
+</div>
+
+<div class="interactive-container">
+    <div class="interactive-title">Interactive: Projectile Landing on Hill</div>
+
+    <div class="control-panel">
+        <div class="control-group">
+            <label class="control-label">
+                Launch angle θ (°):
+                <span class="control-label-value" id="nondim-theta-value">45</span>
+            </label>
+            <input type="range" class="slider" id="nondim-theta-slider" min="5" max="85" step="1" value="45">
+        </div>
+
+        <div class="control-group">
+            <label class="control-label">
+                Hill slope φ (°):
+                <span class="control-label-value" id="nondim-phi-value">20</span>
+            </label>
+            <input type="range" class="slider" id="nondim-phi-slider" min="0" max="45" step="1" value="20">
+        </div>
+
+        <div class="control-group">
+            <label class="control-label">
+                Γ = gh/v²:
+                <span class="control-label-value" id="nondim-gamma-value">0.30</span>
+            </label>
+            <input type="range" class="slider" id="nondim-gamma-slider" min="0.05" max="1.5" step="0.01" value="0.3">
+        </div>
+
+        <div class="btn-group">
+            <button class="btn" onclick="resetProjectileExplorer()">Reset</button>
+        </div>
+    </div>
+
+    <div class="plot-container" id="nondim-projectile-plot"></div>
+
+    <div class="info-box" style="margin-top: var(--spacing-md);">
+        <div class="info-box-title">Reading the Plot</div>
+        <p>
+            <strong>Cyan curve:</strong> Projectile trajectory in dimensionless coordinates \( (\bar{x}, \bar{y}) \)
+            where lengths are scaled by \( v^2/g \).<br>
+            <strong>Yellow line:</strong> The hill surface.<br>
+            <strong>Magenta dot:</strong> Landing point where trajectory meets hill.<br>
+            Try increasing \( \Gamma \)—what happens to the range?
+        </p>
+    </div>
+</div>
+
+<div class="interactive-container question-section">
+    <div class="interactive-title">Test Your Understanding</div>
+
+    <p style="margin-bottom: var(--spacing-md); color: var(--text-secondary);">
+        Use the Projectile explorer above to answer these questions.
+    </p>
+
+    <div class="tabs">
+        <div class="tab-buttons">
+            <button class="tab-button active">Question 1</button>
+            <button class="tab-button">Question 2</button>
+            <button class="tab-button">Question 3</button>
+            <button class="tab-button">Question 4</button>
+        </div>
+
+        <div class="tab-content active">
+            <div class="question-container" data-type="mcq" data-answer="2">
+                <div class="question-text">
+                    Starting with 5 dimensional parameters (\( \theta, \phi, v, h, g \)), how many
+                    independent dimensionless parameters describe this problem?
+                </div>
+                <div class="question-options">
+                    <label class="option">
+                        <input type="radio" name="q6-2-1" value="0">
+                        <span>1</span>
+                    </label>
+                    <label class="option">
+                        <input type="radio" name="q6-2-1" value="1">
+                        <span>2</span>
+                    </label>
+                    <label class="option">
+                        <input type="radio" name="q6-2-1" value="2">
+                        <span>3</span>
+                    </label>
+                    <label class="option">
+                        <input type="radio" name="q6-2-1" value="3">
+                        <span>5</span>
+                    </label>
+                </div>
+                <div class="question-explanation" style="display: none;">
+                    <div class="question-explanation-title">Explanation</div>
+                    <div class="question-explanation-text">
+                        The Buckingham Pi theorem tells us: # dimensionless groups = # variables - # fundamental dimensions.
+                        We have 5 variables and 2 fundamental dimensions (length, time). So 5 - 2 = 3 dimensionless parameters:
+                        \( \theta \), \( \phi \) (already dimensionless angles), and \( \Gamma = gh/v^2 \).
+                    </div>
+                </div>
+                <div class="question-actions">
+                    <button class="btn-verify">Verify</button>
+                </div>
+            </div>
+        </div>
+
+        <div class="tab-content">
+            <div class="question-container" data-type="mcq" data-answer="0">
+                <div class="question-text">
+                    What happens to the projectile range as \( \Gamma \to 0 \) (very high launch velocity)?
+                </div>
+                <div class="question-options">
+                    <label class="option">
+                        <input type="radio" name="q6-2-2" value="0">
+                        <span>Range increases (projectile goes farther)</span>
+                    </label>
+                    <label class="option">
+                        <input type="radio" name="q6-2-2" value="1">
+                        <span>Range decreases (projectile falls short)</span>
+                    </label>
+                    <label class="option">
+                        <input type="radio" name="q6-2-2" value="2">
+                        <span>Range stays the same</span>
+                    </label>
+                    <label class="option">
+                        <input type="radio" name="q6-2-2" value="3">
+                        <span>The projectile doesn't land on the hill</span>
+                    </label>
+                </div>
+                <div class="question-explanation" style="display: none;">
+                    <div class="question-explanation-title">Explanation</div>
+                    <div class="question-explanation-text">
+                        Small \( \Gamma = gh/v^2 \) means high velocity relative to height. The projectile
+                        has more kinetic energy compared to the gravitational potential, so it travels
+                        farther before gravity pulls it down to the hill. Try setting \( \Gamma \) to 0.1
+                        and observe the long range!
+                    </div>
+                </div>
+                <div class="question-actions">
+                    <button class="btn-verify">Verify</button>
+                </div>
+            </div>
+        </div>
+
+        <div class="tab-content">
+            <div class="question-container" data-type="msq" data-answer="0,1,3">
+                <div class="question-text">
+                    Which of the following are valid dimensionless combinations? (Select all that apply)
+                </div>
+                <div class="question-options">
+                    <label class="option">
+                        <input type="checkbox" name="q6-2-3" value="0">
+                        <span>\( gh/v^2 \)</span>
+                    </label>
+                    <label class="option">
+                        <input type="checkbox" name="q6-2-3" value="1">
+                        <span>\( v^2/(gh) \)</span>
+                    </label>
+                    <label class="option">
+                        <input type="checkbox" name="q6-2-3" value="2">
+                        <span>\( gh \)</span>
+                    </label>
+                    <label class="option">
+                        <input type="checkbox" name="q6-2-3" value="3">
+                        <span>\( \tan\theta \)</span>
+                    </label>
+                </div>
+                <div class="question-explanation" style="display: none;">
+                    <div class="question-explanation-title">Explanation</div>
+                    <div class="question-explanation-text">
+                        <strong>\( gh/v^2 \) (TRUE):</strong> [m/s² × m] / [m²/s²] = dimensionless ✓<br>
+                        <strong>\( v^2/(gh) \) (TRUE):</strong> Just the reciprocal of above, still dimensionless ✓<br>
+                        <strong>\( gh \) (FALSE):</strong> Has units of [m²/s²] = velocity² ✗<br>
+                        <strong>\( \tan\theta \) (TRUE):</strong> Ratio of lengths, dimensionless ✓
+                    </div>
+                </div>
+                <div class="question-actions">
+                    <button class="btn-verify">Verify</button>
+                </div>
+            </div>
+        </div>
+
+        <div class="tab-content">
+            <div class="question-container" data-type="fill" data-answer="45[40,50]">
+                <div class="question-text">
+                    Set \( \Gamma = 0.3 \) and \( \phi = 20° \). Experiment with \( \theta \) to find
+                    the launch angle that maximizes the landing distance (x-coordinate of magenta dot).
+                    <br><br>
+                    Optimal launch angle ≈ <input type="text" class="fill-blank" style="width: 80px;"> °
+                </div>
+                <div class="question-explanation" style="display: none;">
+                    <div class="question-explanation-title">Explanation</div>
+                    <div class="question-explanation-text">
+                        For \( \Gamma = 0.3 \) and \( \phi = 20° \), the optimal launch angle is around 45°.
+                        This is close to the classic result for flat ground (45°) because the hill slope
+                        is relatively gentle. For steeper hills, the optimal angle shifts!
+                    </div>
+                </div>
+                <div class="question-actions">
+                    <button class="btn-verify">Verify</button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<hr>
+
+<h2>Explorer 3: Scale Identifier</h2>
+
+<p>
+    Practice identifying natural scales for different physics problems. Select a problem type
+    and see how we identify the characteristic scales.
+</p>
+
+<div class="interactive-container">
+    <div class="interactive-title">Interactive: Finding Natural Scales</div>
+
+    <div class="control-panel">
+        <div class="control-group">
+            <label class="control-label">Select Physics Problem:</label>
+            <select class="control-select" id="nondim-problem-select">
+                <option value="pendulum">Simple Pendulum</option>
+                <option value="spring">Spring-Mass Oscillator</option>
+                <option value="projectile">Projectile Motion</option>
+                <option value="falling">Falling with Drag</option>
+            </select>
+        </div>
+    </div>
+
+    <div id="nondim-scales-display" class="info-box" style="margin-top: var(--spacing-md);">
+        <!-- Content populated by JavaScript -->
+    </div>
+
+    <div class="plot-container" id="nondim-scales-plot"></div>
+</div>
+
+<div class="interactive-container question-section">
+    <div class="interactive-title">Test Your Understanding</div>
+
+    <p style="margin-bottom: var(--spacing-md); color: var(--text-secondary);">
+        Use the Scale Identifier explorer above to answer these questions.
+    </p>
+
+    <div class="tabs">
+        <div class="tab-buttons">
+            <button class="tab-button active">Question 1</button>
+            <button class="tab-button">Question 2</button>
+            <button class="tab-button">Question 3</button>
+            <button class="tab-button">Question 4</button>
+        </div>
+
+        <div class="tab-content active">
+            <div class="question-container" data-type="fill" data-answer="sqrt(m/k)|root(m/k)|(m/k)^0.5|√(m/k)">
+                <div class="question-text">
+                    Select "Spring-Mass Oscillator" in the explorer. What is the natural time scale?
+                    <br><br>
+                    Time scale = <input type="text" class="fill-blank" style="width: 120px;">
+                    <br><br>
+                    <em>(Write as "sqrt(m/k)" or similar)</em>
+                </div>
+                <div class="question-explanation" style="display: none;">
+                    <div class="question-explanation-title">Explanation</div>
+                    <div class="question-explanation-text">
+                        For a spring-mass system with equation \( m\ddot{x} = -kx \), the natural time scale is
+                        \( \sqrt{m/k} \). This is related to the period: \( T = 2\pi\sqrt{m/k} \).
+                        The angular frequency is \( \omega = \sqrt{k/m} \), so the time scale is \( 1/\omega \).
+                    </div>
+                </div>
+                <div class="question-actions">
+                    <button class="btn-verify">Verify</button>
+                </div>
+            </div>
+        </div>
+
+        <div class="tab-content">
+            <div class="question-container" data-type="mcq" data-answer="3">
+                <div class="question-text">
+                    Select "Falling with Drag" (drag force \( F = -bv \)). What is the terminal velocity?
+                </div>
+                <div class="question-options">
+                    <label class="option">
+                        <input type="radio" name="q6-3-2" value="0">
+                        <span>\( \sqrt{mg/b} \)</span>
+                    </label>
+                    <label class="option">
+                        <input type="radio" name="q6-3-2" value="1">
+                        <span>\( b/m \)</span>
+                    </label>
+                    <label class="option">
+                        <input type="radio" name="q6-3-2" value="2">
+                        <span>\( mg \cdot b \)</span>
+                    </label>
+                    <label class="option">
+                        <input type="radio" name="q6-3-2" value="3">
+                        <span>\( mg/b \)</span>
+                    </label>
+                </div>
+                <div class="question-explanation" style="display: none;">
+                    <div class="question-explanation-title">Explanation</div>
+                    <div class="question-explanation-text">
+                        At terminal velocity, drag equals weight: \( bv_{term} = mg \), so \( v_{term} = mg/b \).
+                        Check the units: \( [kg \cdot m/s²] / [kg/s] = m/s \) ✓. This is the natural velocity scale
+                        for falling with linear drag.
+                    </div>
+                </div>
+                <div class="question-actions">
+                    <button class="btn-verify">Verify</button>
+                </div>
+            </div>
+        </div>
+
+        <div class="tab-content">
+            <div class="question-container" data-type="msq" data-answer="1,2">
+                <div class="question-text">
+                    For projectile motion (no drag), which are natural scales? (Select all that apply)
+                </div>
+                <div class="question-options">
+                    <label class="option">
+                        <input type="checkbox" name="q6-3-3" value="0">
+                        <span>Length scale: \( mg \)</span>
+                    </label>
+                    <label class="option">
+                        <input type="checkbox" name="q6-3-3" value="1">
+                        <span>Length scale: \( v^2/g \)</span>
+                    </label>
+                    <label class="option">
+                        <input type="checkbox" name="q6-3-3" value="2">
+                        <span>Time scale: \( v/g \)</span>
+                    </label>
+                    <label class="option">
+                        <input type="checkbox" name="q6-3-3" value="3">
+                        <span>Time scale: \( v \cdot g \)</span>
+                    </label>
+                </div>
+                <div class="question-explanation" style="display: none;">
+                    <div class="question-explanation-title">Explanation</div>
+                    <div class="question-explanation-text">
+                        <strong>\( mg \) (FALSE):</strong> Has units of force (Newtons), not length ✗<br>
+                        <strong>\( v^2/g \) (TRUE):</strong> [m²/s²] / [m/s²] = [m] ✓<br>
+                        <strong>\( v/g \) (TRUE):</strong> [m/s] / [m/s²] = [s] ✓<br>
+                        <strong>\( v \cdot g \) (FALSE):</strong> [m/s × m/s²] = [m²/s³] ✗
+                    </div>
+                </div>
+                <div class="question-actions">
+                    <button class="btn-verify">Verify</button>
+                </div>
+            </div>
+        </div>
+
+        <div class="tab-content">
+            <div class="question-container" data-type="mcq" data-answer="2">
+                <div class="question-text">
+                    The Buckingham Pi theorem states: If you have \( N \) variables and \( M \) fundamental
+                    dimensions, how many independent dimensionless groups exist?
+                </div>
+                <div class="question-options">
+                    <label class="option">
+                        <input type="radio" name="q6-3-4" value="0">
+                        <span>\( N \)</span>
+                    </label>
+                    <label class="option">
+                        <input type="radio" name="q6-3-4" value="1">
+                        <span>\( M \)</span>
+                    </label>
+                    <label class="option">
+                        <input type="radio" name="q6-3-4" value="2">
+                        <span>\( N - M \)</span>
+                    </label>
+                    <label class="option">
+                        <input type="radio" name="q6-3-4" value="3">
+                        <span>\( N \times M \)</span>
+                    </label>
+                </div>
+                <div class="question-explanation" style="display: none;">
+                    <div class="question-explanation-title">Explanation</div>
+                    <div class="question-explanation-text">
+                        The Buckingham Pi theorem: # dimensionless groups = \( N - M \).
+                        For mechanics with variables in mass, length, time: \( M = 3 \) (or \( M = 2 \) if mass
+                        doesn't appear independently). For the projectile: 5 variables - 2 dimensions = 3 groups.
+                    </div>
+                </div>
+                <div class="question-actions">
+                    <button class="btn-verify">Verify</button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<hr>
+
+<h2>Python Code Examples</h2>
+
+<p>
+    Here's how to implement non-dimensionalization workflows in Python using Plotly.
+</p>
+
+<div class="tabs">
+    <div class="tab-buttons">
+        <button class="tab-button active">Pendulum Energy</button>
+        <button class="tab-button">Projectile on Hill</button>
+        <button class="tab-button">General Workflow</button>
+        <button class="tab-button">Prompt</button>
+    </div>
+
+    <div class="tab-content active">
+        <div class="code-block-container">
+            <div class="code-header">
+                <span class="code-lang">Python</span>
+                <button class="copy-btn">Copy</button>
+            </div>
+            <pre><code class="language-python">import numpy as np
+import plotly.graph_objects as go
+from plotly.subplots import make_subplots
+
+# Physical parameters (these will vary)
+m = 2.0   # mass (kg)
+g = 9.8   # gravity (m/s²)
+l = 1.5   # length (m)
+
+# Natural energy scale
+E_scale = m * g * l
+
+# Angle array
+theta = np.linspace(-np.pi, np.pi, 200)
+
+# Dimensional potential (Joules)
+V_dim = m * g * l * (1 - np.cos(theta))
+
+# Dimensionless potential (universal!)
+V_bar = 1 - np.cos(theta)
+
+# Create side-by-side comparison
+fig = make_subplots(rows=1, cols=2,
+    subplot_titles=['Dimensional V(θ)', 'Dimensionless V̄(θ)'])
+
+fig.add_trace(go.Scatter(
+    x=theta * 180/np.pi, y=V_dim,
+    mode='lines', line=dict(color='#00f3ff', width=2),
+    name='V (Joules)'
+), row=1, col=1)
+
+fig.add_trace(go.Scatter(
+    x=theta * 180/np.pi, y=V_bar,
+    mode='lines', line=dict(color='#ff00ff', width=2),
+    name='V̄ (dimensionless)'
+), row=1, col=2)
+
+fig.update_layout(
+    template='plotly_dark',
+    title=f'Pendulum Energy: m={m}kg, g={g}m/s², ℓ={l}m',
+    showlegend=False
+)
+
+fig.update_xaxes(title_text='θ (degrees)', gridcolor='#2a2f4a')
+fig.update_yaxes(gridcolor='#2a2f4a', zerolinecolor='#808080')
+
+fig.show()</code></pre>
+        </div>
+    </div>
+
+    <div class="tab-content">
+        <div class="code-block-container">
+            <div class="code-header">
+                <span class="code-lang">Python</span>
+                <button class="copy-btn">Copy</button>
+            </div>
+            <pre><code class="language-python">import numpy as np
+import plotly.graph_objects as go
+
+def projectile_on_hill(theta_deg, phi_deg, Gamma, n_points=100):
+    """
+    Compute dimensionless trajectory and find landing point.
+
+    Parameters:
+        theta_deg: Launch angle (degrees)
+        phi_deg: Hill slope angle (degrees)
+        Gamma: Dimensionless parameter gh/v²
+        n_points: Number of trajectory points
+
+    Returns:
+        x_traj, y_traj: Trajectory coordinates (dimensionless)
+        x_land, y_land: Landing point
+    """
+    theta = np.radians(theta_deg)
+    phi = np.radians(phi_deg)
+
+    # Trajectory: y = -Γx²/(2cos²θ) + x·tanθ + Γ
+    # Hill: y = -x·tanφ + Γ
+    # (using Γ as dimensionless starting height)
+
+    # Find landing x by solving intersection
+    # -Γx²/(2cos²θ) + x·tanθ + Γ = -x·tanφ + Γ
+    # -Γx²/(2cos²θ) + x(tanθ + tanφ) = 0
+    # x(-Γx/(2cos²θ) + tanθ + tanφ) = 0
+
+    A = -Gamma / (2 * np.cos(theta)**2)
+    B = np.tan(theta) + np.tan(phi)
+
+    if abs(A) < 1e-10:
+        x_land = 0
+    else:
+        x_land = -B / A  # x = 0 or x = -B/A
+
+    x_land = max(0, x_land)  # Must be positive
+
+    # Generate trajectory
+    x_traj = np.linspace(0, x_land * 1.1, n_points)
+    y_traj = A * x_traj**2 + np.tan(theta) * x_traj + Gamma
+
+    # Hill line
+    x_hill = np.linspace(0, x_land * 1.2, 50)
+    y_hill = -np.tan(phi) * x_hill + Gamma
+
+    # Landing point
+    y_land = -np.tan(phi) * x_land + Gamma
+
+    return x_traj, y_traj, x_hill, y_hill, x_land, y_land
+
+# Example parameters
+theta, phi, Gamma = 45, 20, 0.3
+
+x_traj, y_traj, x_hill, y_hill, x_land, y_land = projectile_on_hill(theta, phi, Gamma)
+
+fig = go.Figure()
+
+# Trajectory
+fig.add_trace(go.Scatter(
+    x=x_traj, y=y_traj, mode='lines',
+    line=dict(color='#00f3ff', width=2),
+    name='Trajectory'
+))
+
+# Hill
+fig.add_trace(go.Scatter(
+    x=x_hill, y=y_hill, mode='lines',
+    line=dict(color='#ffff00', width=2),
+    name='Hill'
+))
+
+# Landing point
+fig.add_trace(go.Scatter(
+    x=[x_land], y=[y_land], mode='markers',
+    marker=dict(color='#ff00ff', size=12),
+    name='Landing'
+))
+
+fig.update_layout(
+    template='plotly_dark',
+    title=f'Projectile on Hill: θ={theta}°, φ={phi}°, Γ={Gamma}',
+    xaxis=dict(title='x̄ (dimensionless)', gridcolor='#2a2f4a',
+               scaleanchor='y', range=[-0.5, max(x_land*1.3, 2)]),
+    yaxis=dict(title='ȳ (dimensionless)', gridcolor='#2a2f4a',
+               range=[-0.5, Gamma*1.5]),
+)
+
+fig.show()</code></pre>
+        </div>
+    </div>
+
+    <div class="tab-content">
+        <div class="code-block-container">
+            <div class="code-header">
+                <span class="code-lang">Python</span>
+                <button class="copy-btn">Copy</button>
+            </div>
+            <pre><code class="language-python">"""
+General Non-Dimensionalization Workflow
+"""
+
+# Step 1: DEFINE - List all variables and their dimensions
+variables = {
+    'm': 'mass',        # [M]
+    'g': 'acceleration', # [L/T²]
+    'l': 'length',      # [L]
+    'v': 'velocity',    # [L/T]
+    't': 'time'         # [T]
+}
+
+# Step 2: IDENTIFY SCALES - Find combinations with correct units
+scales = {
+    'length': 'l or v²/g',
+    'time': 'sqrt(l/g) or v/g',
+    'energy': 'm*g*l or m*v²',
+    'velocity': 'sqrt(g*l) or v'
+}
+
+# Step 3: TRANSLATE - Divide by scales
+# x̄ = x / L_scale
+# t̄ = t / T_scale
+# V̄ = V / E_scale
+
+# Step 4: COMPUTE - Solve the dimensionless equations
+# These are universal - one solution fits all!
+
+# Example: Damped Harmonic Oscillator
+# Original: m*d²x/dt² = -k*x - b*dx/dt
+# Variables: m, k, b, x, t (5 variables, 3 dimensions MLT)
+# → 2 dimensionless parameters!
+
+import numpy as np
+
+# Natural scales
+m, k, b = 1.0, 4.0, 0.5  # example values
+omega_0 = np.sqrt(k/m)   # natural frequency
+T_scale = 1/omega_0      # time scale
+X_scale = 1.0            # arbitrary (set by initial conditions)
+
+# Dimensionless damping parameter
+zeta = b / (2 * np.sqrt(k * m))  # damping ratio
+
+print(f"Natural frequency ω₀ = {omega_0:.3f} rad/s")
+print(f"Time scale = {T_scale:.3f} s")
+print(f"Damping ratio ζ = {zeta:.3f}")
+print(f"System is: {'underdamped' if zeta < 1 else 'overdamped' if zeta > 1 else 'critically damped'}")</code></pre>
+        </div>
+    </div>
+
+    <div class="tab-content">
+        <div class="code-block-container">
+            <div class="code-header">
+                <span class="code-lang">Prompt for AI</span>
+                <button class="copy-btn">Copy</button>
+            </div>
+            <pre><code class="language-text">Create a Python script to non-dimensionalize the damped harmonic oscillator problem.
+
+The system: m*d²x/dt² = -k*x - b*dx/dt
+
+Requirements:
+1. Define the dimensional equation with parameters m, k, b
+2. Identify natural scales:
+   - Time scale: 1/ω₀ where ω₀ = sqrt(k/m)
+   - Length scale: initial displacement x₀
+3. Derive the dimensionless equation in terms of:
+   - τ = t*ω₀ (dimensionless time)
+   - X = x/x₀ (dimensionless displacement)
+   - ζ = b/(2*sqrt(k*m)) (damping ratio)
+4. Show that dimensionless equation is: d²X/dτ² = -X - 2ζ*dX/dτ
+5. Plot solutions for ζ = 0.1, 0.5, 1.0, 2.0 on the same graph
+6. Use Plotly with dark theme, different colors for each ζ value
+7. Label axes as dimensionless quantities (τ, X)
+
+This demonstrates how ONE dimensionless equation with parameter ζ
+describes ALL damped oscillators regardless of m, k, b values!</code></pre>
+        </div>
+
+        <div class="info-box" style="margin-top: var(--spacing-md);">
+            <div class="info-box-title">Pro Tips for Prompting</div>
+            <ul>
+                <li>Specify the original dimensional equation explicitly</li>
+                <li>Name the natural scales you expect (time, length, energy)</li>
+                <li>Ask for the derivation steps, not just the final result</li>
+                <li>Request multiple parameter values to show universality</li>
+                <li>Emphasize dimensionless axis labels in plots</li>
+            </ul>
+        </div>
+    </div>
+</div>
+
+<hr>
+
+<h2>Exercises for Practice</h2>
+
+<div class="exercise-cards">
+    <div class="exercise-card">
+        <div class="exercise-card-header">
+            <span class="exercise-card-number">1.</span>
+            <span class="exercise-card-badge explore">Explore</span>
+        </div>
+        <div class="exercise-card-content">
+            Use Explorer 2 (Projectile on Hill) to find the launch angle that maximizes range for
+            \( \Gamma = 0.5 \) and \( \phi = 30° \). How does this compare to the classic 45° result
+            for flat ground?
+        </div>
+    </div>
+
+    <div class="exercise-card">
+        <div class="exercise-card-header">
+            <span class="exercise-card-number">2.</span>
+            <span class="exercise-card-badge coding">Coding</span>
+        </div>
+        <div class="exercise-card-content">
+            Non-dimensionalize the damped harmonic oscillator \( m\ddot{x} = -kx - b\dot{x} \).
+            Identify: (1) the natural time scale, (2) the dimensionless damping parameter,
+            and (3) write the dimensionless equation. Plot solutions for different damping values.
+        </div>
+    </div>
+
+    <div class="exercise-card">
+        <div class="exercise-card-header">
+            <span class="exercise-card-number">3.</span>
+            <span class="exercise-card-badge think">Think</span>
+        </div>
+        <div class="exercise-card-content">
+            Why does the dimensionless pendulum potential \( \bar{V} = 1 - \cos\theta \) NOT depend
+            on the planet's gravity? What would change if we considered kinetic energy too?
+        </div>
+    </div>
+
+    <div class="exercise-card">
+        <div class="exercise-card-header">
+            <span class="exercise-card-number">4.</span>
+            <span class="exercise-card-badge think">Think</span>
+        </div>
+        <div class="exercise-card-content">
+            A famous result: the period of a pendulum is \( T = 2\pi\sqrt{\ell/g} \) (for small angles).
+            This contains no mass! Explain why using dimensional analysis: what combination of
+            \( m \), \( g \), \( \ell \) has units of time, and does it involve \( m \)?
+        </div>
+    </div>
+</div>
+
+<hr>
+
+<h2>Key Takeaways</h2>
+
+<div class="info-box">
+    <div class="info-box-title">Summary</div>
+    <ul>
+        <li><strong>Non-dimensionalization</strong> transforms physics problems into universal mathematical form</li>
+        <li><strong>Natural scales</strong> are parameter combinations with the correct physical units</li>
+        <li><strong>Dimensionless equations</strong> depend only on dimensionless parameters—one solution fits all!</li>
+        <li><strong>Buckingham Pi theorem:</strong> N variables with M dimensions → N-M dimensionless groups</li>
+        <li>This is the <strong>"Define and Translate"</strong> stage of computational thinking</li>
+    </ul>
+</div>
+
+<hr>
+
+<h2>What's Next?</h2>
+
+<p>
+    You've learned to strip away dimensions and reveal universal mathematical structures. This
+    completes Chapter 1 on Visual Thinking and Computational Foundations! In <strong>Chapter 2</strong>,
+    we'll explore <strong>Data Analysis and Statistical Thinking</strong>—extracting physics from
+    noisy experimental data.
+</p>
+
+<!-- Navigation -->
+<div class="btn-group mt-xl">
+    <button class="btn btn-magenta" onclick="navigateToSection('05-contour-plots')">← Previous: Contour Plots</button>
+    <button class="btn" onclick="scrollToTop()">↑ Back to Top</button>
+    <button class="btn btn-secondary" onclick="navigateToSection('07-data-statistics')">Next: Data & Statistics →</button>
+</div>

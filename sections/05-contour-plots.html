@@ -1,0 +1,919 @@
+<!--
+    Section 1.5: Contour Plots and Equipotentials
+    Source: Module 3 - Visualization and functions.nb (Part 2)
+    Core Concept: Representing scalar fields as 2D level curves
+    Estimated Time: 20 minutes
+    Prerequisites: Sections 1.3 (Vector Fields), 1.4 (Streamlines)
+-->
+
+<h1>Contour Plots and Equipotentials</h1>
+
+<p>
+    How does a topographic map show a 3D mountain range on a flat piece of paper? The answer is
+    <strong>contour lines</strong>—curves connecting points of equal elevation. This same technique
+    lets us visualize any scalar field: temperature distributions, air pressure, electric potential,
+    and countless other quantities that have a single value at each point in space.
+</p>
+
+<div class="info-box">
+    <div class="info-box-title">Learning Objectives</div>
+    <ul>
+        <li>Understand how contour plots compress 3D information into 2D level curves</li>
+        <li>Read contour plots: identify maxima, minima, and gradients from line spacing</li>
+        <li>Visualize electric equipotentials and their relationship to field lines</li>
+        <li>Recognize that gradients are always perpendicular to contour lines</li>
+        <li>Connect contour visualization to physical applications</li>
+    </ul>
+</div>
+
+<hr>
+
+<h2>From 3D Surfaces to 2D Contours</h2>
+
+<p>
+    A <strong>scalar field</strong> assigns a single number to each point in space: \( f(x, y) \).
+    We can visualize this as a 3D surface where height represents the function value. But 3D plots
+    can be hard to read precisely. Contour plots solve this by slicing the surface horizontally
+    and projecting those slices onto a 2D plane.
+</p>
+
+<div class="equation-display">
+    <p><strong>Contour Line Definition:</strong></p>
+    $$ f(x, y) = c \quad \text{(constant)} $$
+    <p style="font-size: 0.9rem; margin-top: var(--spacing-sm); color: var(--text-muted);">
+        A contour line connects all points where the function equals the same value \( c \).
+    </p>
+</div>
+
+<div class="interactive-container">
+    <div class="interactive-title">Interactive: Scalar Field Visualizer</div>
+
+    <p style="margin-bottom: var(--spacing-md); color: var(--text-secondary);">
+        Compare the 3D surface with its contour plot. Notice how horizontal slices become contour lines.
+    </p>
+
+    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: var(--spacing-md);">
+        <div class="plot-container" style="height: 380px;">
+            <div id="contours-3d-plot" style="width: 100%; height: 100%;"></div>
+        </div>
+        <div class="plot-container" style="height: 380px;">
+            <div id="contours-2d-plot" style="width: 100%; height: 100%;"></div>
+        </div>
+    </div>
+
+    <div class="control-panel">
+        <div class="control-group">
+            <label class="control-label">Function:</label>
+            <select id="contours-function-select" class="control-select">
+                <option value="paraboloid">Paraboloid: f(x,y) = x² + y²</option>
+                <option value="saddle">Saddle: f(x,y) = x² - y²</option>
+                <option value="gaussian">Gaussian Peak: f(x,y) = e^(-(x²+y²))</option>
+                <option value="cone">Cone: f(x,y) = √(x² + y²)</option>
+                <option value="ripple">Ripple: f(x,y) = sin(√(x²+y²))</option>
+            </select>
+        </div>
+
+        <div class="control-group">
+            <label class="control-label">
+                Number of Contour Levels:
+                <span class="control-label-value" id="contours-levels-value">10</span>
+            </label>
+            <input type="range" class="slider" id="contours-levels-slider" min="5" max="20" step="1" value="10">
+        </div>
+
+        <div class="btn-group">
+            <button class="btn" onclick="resetScalarViz()">Reset</button>
+        </div>
+    </div>
+</div>
+
+<div class="info-box">
+    <div class="info-box-title">Reading Contour Plots</div>
+    <ul>
+        <li><strong>Closely spaced contours:</strong> Steep slope (rapid change)</li>
+        <li><strong>Widely spaced contours:</strong> Gentle slope (gradual change)</li>
+        <li><strong>Closed loops:</strong> Hills (maxima) or valleys (minima)</li>
+        <li><strong>Saddle points:</strong> Where contours form an "X" pattern</li>
+    </ul>
+</div>
+
+<!-- Test Your Understanding #1 -->
+<div class="interactive-container question-section">
+    <div class="interactive-title">Test Your Understanding</div>
+
+    <p style="margin-bottom: var(--spacing-md); color: var(--text-secondary);">
+        Use the Scalar Field Visualizer above to answer these questions.
+    </p>
+
+    <div class="tabs">
+        <div class="tab-buttons">
+            <button class="tab-button active">Question 1</button>
+            <button class="tab-button">Question 2</button>
+            <button class="tab-button">Question 3</button>
+            <button class="tab-button">Question 4</button>
+        </div>
+
+        <div class="tab-content active">
+            <div class="question-container" data-type="mcq" data-answer="1">
+                <div class="question-text">
+                    In the paraboloid contour plot, which direction from the origin leads "uphill" (increasing values)?
+                </div>
+                <div class="question-options">
+                    <label class="option">
+                        <input type="radio" name="contours-q1" value="0">
+                        <span>Only along the x-axis</span>
+                    </label>
+                    <label class="option">
+                        <input type="radio" name="contours-q1" value="1">
+                        <span>Any direction away from the origin</span>
+                    </label>
+                    <label class="option">
+                        <input type="radio" name="contours-q1" value="2">
+                        <span>Only along the y-axis</span>
+                    </label>
+                    <label class="option">
+                        <input type="radio" name="contours-q1" value="3">
+                        <span>Toward the origin</span>
+                    </label>
+                </div>
+                <div class="question-actions">
+                    <button class="btn-verify">Verify</button>
+                </div>
+                <div class="question-explanation" style="display:none;">
+                    <strong>Explanation:</strong>
+                    The paraboloid \( f(x,y) = x^2 + y^2 \) has circular contours centered at the origin.
+                    The value increases as you move away from the origin in ANY direction, since \( x^2 + y^2 \)
+                    (the distance squared) increases. The origin is the minimum.
+                </div>
+            </div>
+        </div>
+
+        <div class="tab-content">
+            <div class="question-container" data-type="mcq" data-answer="2">
+                <div class="question-text">
+                    Switch to the "Saddle" function. What pattern do the contour lines form?
+                </div>
+                <div class="question-options">
+                    <label class="option">
+                        <input type="radio" name="contours-q2" value="0">
+                        <span>Concentric circles</span>
+                    </label>
+                    <label class="option">
+                        <input type="radio" name="contours-q2" value="1">
+                        <span>Parallel straight lines</span>
+                    </label>
+                    <label class="option">
+                        <input type="radio" name="contours-q2" value="2">
+                        <span>Hyperbolas (curves that approach diagonal lines)</span>
+                    </label>
+                    <label class="option">
+                        <input type="radio" name="contours-q2" value="3">
+                        <span>Ellipses</span>
+                    </label>
+                </div>
+                <div class="question-actions">
+                    <button class="btn-verify">Verify</button>
+                </div>
+                <div class="question-explanation" style="display:none;">
+                    <strong>Explanation:</strong>
+                    The saddle function \( f(x,y) = x^2 - y^2 \) produces hyperbolic contours.
+                    Setting \( x^2 - y^2 = c \) gives hyperbolas. When \( c = 0 \), we get the
+                    asymptotes \( y = \pm x \) (the diagonals). The surface goes up along the x-axis
+                    and down along the y-axis—like a horse saddle or a Pringles chip!
+                </div>
+            </div>
+        </div>
+
+        <div class="tab-content">
+            <div class="question-container" data-type="fill" data-answer="dense|close|closer|tight|tightly">
+                <div class="question-text">
+                    In the Gaussian peak, the contours near the center are more
+                    <input type="text" class="fill-blank" style="width: 100px;">
+                    spaced, indicating the slope is steeper there.
+                </div>
+                <div class="question-actions">
+                    <button class="btn-verify">Verify</button>
+                </div>
+                <div class="question-explanation" style="display:none;">
+                    <strong>Explanation:</strong>
+                    Near the peak of the Gaussian, contours are <strong>closely/densely</strong> spaced because
+                    the function changes rapidly (steep slope). Farther from the peak, contours spread apart
+                    as the function levels off. Dense contours = steep terrain!
+                </div>
+            </div>
+        </div>
+
+        <div class="tab-content">
+            <div class="question-container" data-type="msq" data-answer="0,2,3">
+                <div class="question-text">
+                    Which statements about contour plots are TRUE? (Select all that apply)
+                </div>
+                <div class="question-options">
+                    <label class="option">
+                        <input type="checkbox" value="0">
+                        <span>Contour lines never cross each other</span>
+                    </label>
+                    <label class="option">
+                        <input type="checkbox" value="1">
+                        <span>Closed contours always indicate a maximum</span>
+                    </label>
+                    <label class="option">
+                        <input type="checkbox" value="2">
+                        <span>Each contour line has a constant function value</span>
+                    </label>
+                    <label class="option">
+                        <input type="checkbox" value="3">
+                        <span>Widely spaced contours indicate a flat region</span>
+                    </label>
+                </div>
+                <div class="question-actions">
+                    <button class="btn-verify">Verify</button>
+                </div>
+                <div class="question-explanation" style="display:none;">
+                    <strong>Explanation:</strong>
+                    <ul>
+                        <li><strong>TRUE:</strong> Contour lines never cross because a point can only have one function value.</li>
+                        <li><strong>FALSE:</strong> Closed contours can indicate either a maximum OR a minimum (like the paraboloid's minimum at origin).</li>
+                        <li><strong>TRUE:</strong> By definition, every point on a contour line satisfies \( f(x,y) = c \).</li>
+                        <li><strong>TRUE:</strong> Wide spacing means small gradient—the function changes slowly.</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<hr>
+
+<h2>Equipotentials: Contours in Physics</h2>
+
+<p>
+    In electrostatics, the electric potential \( V(x, y) \) is a scalar field. Its contour lines are called
+    <strong>equipotential lines</strong>—paths along which a charge can move without gaining or losing energy.
+    The electric field \( \vec{E} \) is the negative gradient of potential: \( \vec{E} = -\nabla V \).
+</p>
+
+<div class="equation-display">
+    <p><strong>Electric Field from Potential:</strong></p>
+    $$ \vec{E} = -\nabla V = -\left( \frac{\partial V}{\partial x}\hat{i} + \frac{\partial V}{\partial y}\hat{j} \right) $$
+    <p style="font-size: 0.9rem; margin-top: var(--spacing-sm); color: var(--text-muted);">
+        The electric field points in the direction of steepest decrease of potential.
+    </p>
+</div>
+
+<div class="interactive-container">
+    <div class="interactive-title">Interactive: Equipotential Explorer</div>
+
+    <p style="margin-bottom: var(--spacing-md); color: var(--text-secondary);">
+        Visualize electric equipotentials (contours) and field lines. Notice how they're always perpendicular!
+    </p>
+
+    <div class="plot-container">
+        <div id="contours-equipotential-plot" style="width: 100%; height: 400px;"></div>
+    </div>
+
+    <div class="control-panel">
+        <div class="control-group">
+            <label class="control-label">Charge Configuration:</label>
+            <select id="contours-charge-select" class="control-select">
+                <option value="single-positive">Single Positive Charge</option>
+                <option value="single-negative">Single Negative Charge</option>
+                <option value="dipole">Dipole (+ and -)</option>
+                <option value="two-positive">Two Positive Charges</option>
+                <option value="quadrupole">Quadrupole</option>
+            </select>
+        </div>
+
+        <div class="control-group">
+            <label class="control-label">
+                <input type="checkbox" id="contours-show-field" checked style="margin-right: 8px;">
+                Show electric field lines
+            </label>
+        </div>
+
+        <div class="control-group">
+            <label class="control-label">
+                Charge Separation:
+                <span class="control-label-value" id="contours-separation-value">2.0</span>
+            </label>
+            <input type="range" class="slider" id="contours-separation-slider" min="0.5" max="3" step="0.25" value="2">
+        </div>
+
+        <div class="btn-group">
+            <button class="btn" onclick="resetEquipotential()">Reset</button>
+        </div>
+    </div>
+</div>
+
+<div class="info-box">
+    <div class="info-box-title">Key Insight: Perpendicularity</div>
+    <p>
+        Electric field lines are <strong>always perpendicular</strong> to equipotential lines.
+        This isn't a coincidence—it's because the gradient (which gives the field direction) is
+        mathematically perpendicular to level curves. A charge moving along an equipotential does
+        no work; moving across equipotentials requires or releases energy.
+    </p>
+</div>
+
+<!-- Test Your Understanding #2 -->
+<div class="interactive-container question-section">
+    <div class="interactive-title">Test Your Understanding</div>
+
+    <p style="margin-bottom: var(--spacing-md); color: var(--text-secondary);">
+        Use the Equipotential Explorer above to answer these questions.
+    </p>
+
+    <div class="tabs">
+        <div class="tab-buttons">
+            <button class="tab-button active">Question 1</button>
+            <button class="tab-button">Question 2</button>
+            <button class="tab-button">Question 3</button>
+            <button class="tab-button">Question 4</button>
+        </div>
+
+        <div class="tab-content active">
+            <div class="question-container" data-type="mcq" data-answer="0">
+                <div class="question-text">
+                    What angle do electric field lines make with equipotential lines?
+                </div>
+                <div class="question-options">
+                    <label class="option">
+                        <input type="radio" name="contours-q5" value="0">
+                        <span>90° (perpendicular)</span>
+                    </label>
+                    <label class="option">
+                        <input type="radio" name="contours-q5" value="1">
+                        <span>45°</span>
+                    </label>
+                    <label class="option">
+                        <input type="radio" name="contours-q5" value="2">
+                        <span>0° (parallel)</span>
+                    </label>
+                    <label class="option">
+                        <input type="radio" name="contours-q5" value="3">
+                        <span>It varies depending on location</span>
+                    </label>
+                </div>
+                <div class="question-actions">
+                    <button class="btn-verify">Verify</button>
+                </div>
+                <div class="question-explanation" style="display:none;">
+                    <strong>Explanation:</strong>
+                    Electric field lines are ALWAYS perpendicular (90°) to equipotential lines.
+                    This is because \( \vec{E} = -\nabla V \), and the gradient is always perpendicular
+                    to level curves of any scalar field. Toggle field lines on and observe this at any point!
+                </div>
+            </div>
+        </div>
+
+        <div class="tab-content">
+            <div class="question-container" data-type="mcq" data-answer="2">
+                <div class="question-text">
+                    In the dipole configuration, where is the potential exactly zero?
+                </div>
+                <div class="question-options">
+                    <label class="option">
+                        <input type="radio" name="contours-q6" value="0">
+                        <span>At the positive charge</span>
+                    </label>
+                    <label class="option">
+                        <input type="radio" name="contours-q6" value="1">
+                        <span>At the negative charge</span>
+                    </label>
+                    <label class="option">
+                        <input type="radio" name="contours-q6" value="2">
+                        <span>Along the perpendicular bisector (vertical line between charges)</span>
+                    </label>
+                    <label class="option">
+                        <input type="radio" name="contours-q6" value="3">
+                        <span>Nowhere—potential is never exactly zero</span>
+                    </label>
+                </div>
+                <div class="question-actions">
+                    <button class="btn-verify">Verify</button>
+                </div>
+                <div class="question-explanation" style="display:none;">
+                    <strong>Explanation:</strong>
+                    On the perpendicular bisector, every point is equidistant from both charges.
+                    Since the charges are equal and opposite (+q and -q), their potentials
+                    (\( +k q/r \) and \( -k q/r \)) exactly cancel, giving V = 0. This shows up
+                    as the straight vertical equipotential line in the middle.
+                </div>
+            </div>
+        </div>
+
+        <div class="tab-content">
+            <div class="question-container" data-type="msq" data-answer="1,2">
+                <div class="question-text">
+                    For the "Two Positive Charges" configuration, which statements are TRUE?
+                </div>
+                <div class="question-options">
+                    <label class="option">
+                        <input type="checkbox" value="0">
+                        <span>There is a point where potential equals zero</span>
+                    </label>
+                    <label class="option">
+                        <input type="checkbox" value="1">
+                        <span>Equipotentials form figure-8 shapes far from charges</span>
+                    </label>
+                    <label class="option">
+                        <input type="checkbox" value="2">
+                        <span>The midpoint between charges has a saddle-like potential</span>
+                    </label>
+                    <label class="option">
+                        <input type="checkbox" value="3">
+                        <span>Field lines point from one charge to the other</span>
+                    </label>
+                </div>
+                <div class="question-actions">
+                    <button class="btn-verify">Verify</button>
+                </div>
+                <div class="question-explanation" style="display:none;">
+                    <strong>Explanation:</strong>
+                    <ul>
+                        <li><strong>FALSE:</strong> Two positive charges both contribute positive potential—it never reaches zero.</li>
+                        <li><strong>TRUE:</strong> Far away, equipotentials merge into nearly circular shapes; closer, they form figure-8 patterns.</li>
+                        <li><strong>TRUE:</strong> The midpoint is a saddle point—potential decreases moving away perpendicular to the axis.</li>
+                        <li><strong>FALSE:</strong> Like charges repel! Field lines go outward from BOTH charges, never connecting them.</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <div class="tab-content">
+            <div class="question-container" data-type="fill" data-answer="infinity|infinite|∞|diverges">
+                <div class="question-text">
+                    At the exact location of a point charge, the potential goes to
+                    <input type="text" class="fill-blank" style="width: 100px;">.
+                </div>
+                <div class="question-actions">
+                    <button class="btn-verify">Verify</button>
+                </div>
+                <div class="question-explanation" style="display:none;">
+                    <strong>Explanation:</strong>
+                    The potential of a point charge is \( V = kq/r \). As \( r \to 0 \),
+                    \( V \to \infty \) (for positive charges) or \( V \to -\infty \) (for negative).
+                    This is why we exclude the charge locations in the visualization—they're singularities!
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<hr>
+
+<h2>The Gradient-Contour Connection</h2>
+
+<p>
+    The <strong>gradient</strong> \( \nabla f \) of a scalar field points in the direction of
+    steepest increase and has magnitude equal to the rate of change. Geometrically, the gradient
+    is always <strong>perpendicular to contour lines</strong>. This is a fundamental relationship
+    that appears throughout physics and mathematics.
+</p>
+
+<div class="equation-display">
+    <p><strong>Gradient in 2D:</strong></p>
+    $$ \nabla f = \frac{\partial f}{\partial x}\hat{i} + \frac{\partial f}{\partial y}\hat{j} $$
+    <p style="font-size: 0.9rem; margin-top: var(--spacing-sm); color: var(--text-muted);">
+        Points perpendicular to contours, toward increasing \( f \). Magnitude = slope steepness.
+    </p>
+</div>
+
+<div class="interactive-container">
+    <div class="interactive-title">Interactive: Gradient Visualizer</div>
+
+    <p style="margin-bottom: var(--spacing-md); color: var(--text-secondary);">
+        Click anywhere on the contour plot to see the gradient vector at that point.
+        Notice how gradients always point perpendicular to contour lines!
+    </p>
+
+    <div class="plot-container">
+        <div id="contours-gradient-plot" style="width: 100%; height: 400px;"></div>
+    </div>
+
+    <div class="control-panel">
+        <div class="control-group">
+            <label class="control-label">Function:</label>
+            <select id="contours-gradient-function" class="control-select">
+                <option value="paraboloid">Paraboloid: f(x,y) = x² + y²</option>
+                <option value="saddle">Saddle: f(x,y) = x² - y²</option>
+                <option value="tilted">Tilted Plane: f(x,y) = 2x + y</option>
+                <option value="wave">Wave: f(x,y) = sin(x) + cos(y)</option>
+            </select>
+        </div>
+
+        <div class="control-group">
+            <label class="control-label">
+                <input type="checkbox" id="contours-show-grid" style="margin-right: 8px;">
+                Show gradient field (grid of arrows)
+            </label>
+        </div>
+
+        <div id="contours-gradient-info" style="font-family: var(--font-mono); color: var(--neon-green); font-size: 0.85rem; margin-top: 10px; min-height: 24px;">
+            Click on the plot to see gradient at that point
+        </div>
+
+        <div class="btn-group">
+            <button class="btn" onclick="resetGradientViz()">Reset</button>
+            <button class="btn btn-secondary" onclick="clearGradientArrow()">Clear Arrow</button>
+        </div>
+    </div>
+</div>
+
+<div class="warning-box">
+    <div class="info-box-title">Common Misconception</div>
+    <p>
+        The gradient does NOT point "along" the contour—it points <strong>across</strong> contours,
+        perpendicular to them. Moving along a contour means zero change in \( f \), but the gradient
+        points where \( f \) changes most rapidly. That's why they must be perpendicular!
+    </p>
+</div>
+
+<!-- Test Your Understanding #3 -->
+<div class="interactive-container question-section">
+    <div class="interactive-title">Test Your Understanding</div>
+
+    <p style="margin-bottom: var(--spacing-md); color: var(--text-secondary);">
+        Use the Gradient Visualizer above to answer these questions.
+    </p>
+
+    <div class="tabs">
+        <div class="tab-buttons">
+            <button class="tab-button active">Question 1</button>
+            <button class="tab-button">Question 2</button>
+            <button class="tab-button">Question 3</button>
+            <button class="tab-button">Question 4</button>
+        </div>
+
+        <div class="tab-content active">
+            <div class="question-container" data-type="mcq" data-answer="1">
+                <div class="question-text">
+                    For the paraboloid \( f(x,y) = x^2 + y^2 \), which direction does the gradient point at the point (1, 0)?
+                </div>
+                <div class="question-options">
+                    <label class="option">
+                        <input type="radio" name="contours-q9" value="0">
+                        <span>Toward the origin (negative x-direction)</span>
+                    </label>
+                    <label class="option">
+                        <input type="radio" name="contours-q9" value="1">
+                        <span>Away from the origin (positive x-direction)</span>
+                    </label>
+                    <label class="option">
+                        <input type="radio" name="contours-q9" value="2">
+                        <span>Tangent to the circular contour</span>
+                    </label>
+                    <label class="option">
+                        <input type="radio" name="contours-q9" value="3">
+                        <span>In the y-direction</span>
+                    </label>
+                </div>
+                <div class="question-actions">
+                    <button class="btn-verify">Verify</button>
+                </div>
+                <div class="question-explanation" style="display:none;">
+                    <strong>Explanation:</strong>
+                    For \( f = x^2 + y^2 \), \( \nabla f = (2x, 2y) \). At (1, 0), this gives (2, 0)—pointing
+                    in the positive x-direction, away from the origin. The gradient always points toward
+                    increasing values, which for this paraboloid means away from the minimum at the origin.
+                    Click on (1, 0) in the visualizer to verify!
+                </div>
+            </div>
+        </div>
+
+        <div class="tab-content">
+            <div class="question-container" data-type="fill" data-answer="large|big|high|strong|steep">
+                <div class="question-text">
+                    Where contours are closely spaced, the gradient magnitude is
+                    <input type="text" class="fill-blank" style="width: 100px;">.
+                </div>
+                <div class="question-actions">
+                    <button class="btn-verify">Verify</button>
+                </div>
+                <div class="question-explanation" style="display:none;">
+                    <strong>Explanation:</strong>
+                    The gradient magnitude \( |\nabla f| \) represents the rate of change of \( f \).
+                    Closely spaced contours mean \( f \) changes a lot over a short distance—a <strong>large/steep</strong>
+                    gradient. Enable "Show gradient field" and notice longer arrows where contours bunch up!
+                </div>
+            </div>
+        </div>
+
+        <div class="tab-content">
+            <div class="question-container" data-type="msq" data-answer="0,1,3">
+                <div class="question-text">
+                    Which statements about the gradient are TRUE? (Select all that apply)
+                </div>
+                <div class="question-options">
+                    <label class="option">
+                        <input type="checkbox" value="0">
+                        <span>The gradient is a vector (has direction and magnitude)</span>
+                    </label>
+                    <label class="option">
+                        <input type="checkbox" value="1">
+                        <span>The gradient points toward increasing function values</span>
+                    </label>
+                    <label class="option">
+                        <input type="checkbox" value="2">
+                        <span>The gradient is parallel to contour lines</span>
+                    </label>
+                    <label class="option">
+                        <input type="checkbox" value="3">
+                        <span>At a saddle point, the gradient is zero</span>
+                    </label>
+                </div>
+                <div class="question-actions">
+                    <button class="btn-verify">Verify</button>
+                </div>
+                <div class="question-explanation" style="display:none;">
+                    <strong>Explanation:</strong>
+                    <ul>
+                        <li><strong>TRUE:</strong> The gradient \( \nabla f \) is a vector with components \( (\partial f/\partial x, \partial f/\partial y) \).</li>
+                        <li><strong>TRUE:</strong> By definition, gradient points in the direction of steepest increase.</li>
+                        <li><strong>FALSE:</strong> Gradient is PERPENDICULAR to contours, not parallel!</li>
+                        <li><strong>TRUE:</strong> At critical points (maxima, minima, saddle points), \( \nabla f = 0 \).</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <div class="tab-content">
+            <div class="question-container" data-type="mcq" data-answer="3">
+                <div class="question-text">
+                    Select the "Tilted Plane" function. What do you notice about the gradient field?
+                </div>
+                <div class="question-options">
+                    <label class="option">
+                        <input type="radio" name="contours-q12" value="0">
+                        <span>Gradients point toward the origin</span>
+                    </label>
+                    <label class="option">
+                        <input type="radio" name="contours-q12" value="1">
+                        <span>Gradients vary in direction across the plane</span>
+                    </label>
+                    <label class="option">
+                        <input type="radio" name="contours-q12" value="2">
+                        <span>Gradients are all zero</span>
+                    </label>
+                    <label class="option">
+                        <input type="radio" name="contours-q12" value="3">
+                        <span>All gradients are identical (same direction and magnitude)</span>
+                    </label>
+                </div>
+                <div class="question-actions">
+                    <button class="btn-verify">Verify</button>
+                </div>
+                <div class="question-explanation" style="display:none;">
+                    <strong>Explanation:</strong>
+                    For \( f(x,y) = 2x + y \), \( \nabla f = (2, 1) \) everywhere—a constant vector!
+                    The plane has uniform slope, so the gradient is the same at every point. The contours
+                    are equally-spaced parallel lines (perpendicular to the direction (2, 1)).
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<hr>
+
+<h2>Python Code Examples</h2>
+
+<p>
+    Create your own contour plots and explore scalar fields with these Python examples using Plotly.
+</p>
+
+<div class="tabs">
+    <div class="tab-buttons">
+        <button class="tab-button active">Basic Contour</button>
+        <button class="tab-button">With Gradient</button>
+        <button class="tab-button">Equipotentials</button>
+        <button class="tab-button">Prompt</button>
+    </div>
+
+    <div class="tab-content active">
+        <div class="code-block-container">
+            <div class="code-header">
+                <span class="code-lang">Python</span>
+                <button class="copy-btn">Copy</button>
+            </div>
+            <pre><code class="language-python">import numpy as np
+import plotly.graph_objects as go
+
+# Create grid
+x = np.linspace(-3, 3, 100)
+y = np.linspace(-3, 3, 100)
+X, Y = np.meshgrid(x, y)
+
+# Scalar field: paraboloid
+Z = X**2 + Y**2
+
+# Create contour plot
+fig = go.Figure(data=go.Contour(
+    x=x, y=y, z=Z,
+    colorscale='Viridis',
+    contours=dict(
+        showlabels=True,
+        labelfont=dict(size=10, color='white')
+    ),
+    colorbar=dict(title='f(x,y)')
+))
+
+fig.update_layout(
+    template='plotly_dark',
+    title='Contour Plot: f(x,y) = x² + y²',
+    xaxis=dict(title='x', scaleanchor='y'),
+    yaxis=dict(title='y')
+)
+
+fig.show()</code></pre>
+        </div>
+    </div>
+
+    <div class="tab-content">
+        <div class="code-block-container">
+            <div class="code-header">
+                <span class="code-lang">Python</span>
+                <button class="copy-btn">Copy</button>
+            </div>
+            <pre><code class="language-python">import numpy as np
+import plotly.graph_objects as go
+import plotly.figure_factory as ff
+
+# Create grid for contours
+x = np.linspace(-3, 3, 100)
+y = np.linspace(-3, 3, 100)
+X, Y = np.meshgrid(x, y)
+Z = X**2 + Y**2
+
+# Create grid for gradient arrows (coarser)
+x_grad = np.linspace(-2.5, 2.5, 10)
+y_grad = np.linspace(-2.5, 2.5, 10)
+X_grad, Y_grad = np.meshgrid(x_grad, y_grad)
+
+# Gradient components: ∇f = (2x, 2y)
+U = 2 * X_grad
+V = 2 * Y_grad
+
+# Normalize for display
+mag = np.sqrt(U**2 + V**2)
+mag[mag == 0] = 1
+U_norm = U / mag * 0.3
+V_norm = V / mag * 0.3
+
+# Create figure with contours
+fig = go.Figure()
+
+fig.add_trace(go.Contour(
+    x=x, y=y, z=Z,
+    colorscale='Viridis',
+    showscale=False,
+    contours=dict(showlabels=True)
+))
+
+# Add gradient arrows using annotations
+for i in range(len(x_grad)):
+    for j in range(len(y_grad)):
+        fig.add_annotation(
+            x=X_grad[j, i], y=Y_grad[j, i],
+            ax=X_grad[j, i] + U_norm[j, i],
+            ay=Y_grad[j, i] + V_norm[j, i],
+            xref='x', yref='y', axref='x', ayref='y',
+            showarrow=True, arrowhead=2, arrowsize=1.5,
+            arrowcolor='#ff00ff'
+        )
+
+fig.update_layout(
+    template='plotly_dark',
+    title='Contours with Gradient Vectors',
+    xaxis=dict(range=[-3, 3], scaleanchor='y'),
+    yaxis=dict(range=[-3, 3])
+)
+
+fig.show()</code></pre>
+        </div>
+    </div>
+
+    <div class="tab-content">
+        <div class="code-block-container">
+            <div class="code-header">
+                <span class="code-lang">Python</span>
+                <button class="copy-btn">Copy</button>
+            </div>
+            <pre><code class="language-python">import numpy as np
+import plotly.graph_objects as go
+
+# Create grid
+x = np.linspace(-4, 4, 200)
+y = np.linspace(-4, 4, 200)
+X, Y = np.meshgrid(x, y)
+
+# Dipole potential: V = 1/r1 - 1/r2
+d = 1.0  # charge separation
+r1 = np.sqrt((X - d)**2 + Y**2)
+r2 = np.sqrt((X + d)**2 + Y**2)
+
+# Avoid singularities
+r1[r1 < 0.1] = 0.1
+r2[r2 < 0.1] = 0.1
+
+V = 1/r1 - 1/r2
+
+# Clip extreme values for visualization
+V = np.clip(V, -5, 5)
+
+fig = go.Figure(data=go.Contour(
+    x=x, y=y, z=V,
+    colorscale='RdBu_r',
+    contours=dict(
+        start=-4, end=4, size=0.5,
+        showlabels=True
+    ),
+    colorbar=dict(title='V')
+))
+
+# Mark charge positions
+fig.add_trace(go.Scatter(
+    x=[d, -d], y=[0, 0],
+    mode='markers+text',
+    marker=dict(size=15, color=['red', 'blue']),
+    text=['+', '−'],
+    textposition='top center',
+    textfont=dict(size=20, color='white'),
+    showlegend=False
+))
+
+fig.update_layout(
+    template='plotly_dark',
+    title='Electric Dipole Equipotentials',
+    xaxis=dict(range=[-4, 4], scaleanchor='y'),
+    yaxis=dict(range=[-4, 4])
+)
+
+fig.show()</code></pre>
+        </div>
+    </div>
+
+    <div class="tab-content">
+        <div class="code-block-container">
+            <div class="code-header">
+                <span class="code-lang">Prompt for AI</span>
+                <button class="copy-btn">Copy</button>
+            </div>
+            <pre><code class="language-text">Create a Python script using Plotly to visualize a scalar field as a contour plot.
+
+Requirements:
+- Use numpy to create a meshgrid over [-3, 3] x [-3, 3]
+- Define the scalar field f(x,y) = sin(x) * cos(y)
+- Create a contour plot using go.Contour with:
+  - Viridis colorscale
+  - Labeled contour lines
+  - Equal aspect ratio (scaleanchor)
+- Apply dark theme (plotly_dark)
+- Add a second plot showing gradient vectors overlaid on contours
+- Use magenta (#ff00ff) for gradient arrows</code></pre>
+        </div>
+
+        <div class="info-box" style="margin-top: var(--spacing-md);">
+            <div class="info-box-title">Pro Tips for Prompting</div>
+            <ul>
+                <li>Specify the scalar field function explicitly</li>
+                <li>Request contour labels for quantitative reading</li>
+                <li>Ask for equal aspect ratio to avoid distortion</li>
+                <li>For gradients, specify arrow normalization method</li>
+            </ul>
+        </div>
+    </div>
+</div>
+
+<hr>
+
+<h2>Key Takeaways</h2>
+
+<div class="info-box">
+    <div class="info-box-title">Summary</div>
+    <ul>
+        <li><strong>Contour plots</strong> compress 3D scalar field information into 2D level curves</li>
+        <li><strong>Closely spaced contours</strong> indicate steep slopes; widely spaced means flat regions</li>
+        <li><strong>Equipotentials</strong> are contours of electric potential—charges move freely along them</li>
+        <li><strong>Gradients are perpendicular</strong> to contour lines and point toward increasing values</li>
+        <li><strong>Electric fields</strong> are perpendicular to equipotentials: \( \vec{E} = -\nabla V \)</li>
+    </ul>
+</div>
+
+<hr>
+
+<h2>What's Next?</h2>
+
+<p>
+    You've learned to visualize scalar fields with contour plots and understand their deep
+    connection to vector fields through gradients. Next, we'll explore
+    <strong>non-dimensionalization</strong> - a powerful technique for simplifying physics
+    problems by identifying the essential parameters that truly matter.
+</p>
+
+<!-- Navigation -->
+<div class="btn-group mt-xl">
+    <button class="btn btn-magenta" onclick="navigateToSection('04-streamlines')">← Previous: Streamlines</button>
+    <button class="btn" onclick="scrollToTop()">↑ Back to Top</button>
+    <button class="btn btn-secondary" onclick="navigateToSection('06-nondimensionalization')">Next: Non-Dimensionalization →</button>
+</div>
