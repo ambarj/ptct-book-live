@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PTCT Book - Redirecting...</title>
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+            background: #1a1a2e;
+            color: #eee;
+        }
+        .loading {
+            text-align: center;
+        }
+        .spinner {
+            width: 40px;
+            height: 40px;
+            border: 3px solid #333;
+            border-top-color: #00f3ff;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 20px;
+        }
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+    </style>
+    <script>
+        // Get QR code from multiple sources (for flexibility)
+        // 1. Query param: /q/?c=VT0101 or /q/index.html?c=VT0101
+        // 2. Hash: /q/#VT0101
+        // 3. Path (if server supports): /q/VT0101
+
+        const urlParams = new URLSearchParams(window.location.search);
+        let code = urlParams.get('c') || urlParams.get('code');
+
+        if (!code && window.location.hash) {
+            code = window.location.hash.substring(1);
+        }
+
+        if (!code) {
+            const pathParts = window.location.pathname.split('/');
+            const lastPart = pathParts[pathParts.length - 1].replace('.html', '');
+            if (lastPart && lastPart !== 'index' && lastPart !== 'q') {
+                code = lastPart;
+            }
+        }
+
+        if (code) {
+            // Load QR map and redirect
+            fetch('../qr-map.json')
+                .then(response => response.json())
+                .then(map => {
+                    const entry = map[code];
+                    if (entry && entry.page) {
+                        // Use hash-based routing: #section/anchor
+                        let hash = entry.page;
+                        if (entry.anchor) {
+                            hash += '/' + entry.anchor;
+                        }
+                        window.location.href = '../index.html#' + hash;
+                    } else {
+                        // Code not found, go to home
+                        console.error('QR code not found:', code);
+                        window.location.href = '../index.html';
+                    }
+                })
+                .catch(error => {
+                    console.error('Failed to load QR map:', error);
+                    window.location.href = '../index.html';
+                });
+        } else {
+            // No code provided, go to home
+            window.location.href = '../index.html';
+        }
+    </script>
+</head>
+<body>
+    <div class="loading">
+        <div class="spinner"></div>
+        <p>Redirecting to PTCT Book...</p>
+    </div>
+</body>
+</html>

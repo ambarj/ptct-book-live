@@ -45,6 +45,31 @@
   box-sizing: border-box;
 }
 
+/* Ultra-Thin Scrollbars - Webkit (Chrome, Safari, Edge) */
+::-webkit-scrollbar {
+  width: 2px !important;
+  height: 2px !important;
+}
+
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+  background: rgba(0, 243, 255, 0.4);
+  border-radius: 1px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: rgba(0, 243, 255, 0.7);
+}
+
+/* Thin Scrollbars - Firefox */
+* {
+  scrollbar-width: thin;
+  scrollbar-color: rgba(0, 243, 255, 0.4) transparent;
+}
+
 html {
   font-size: 16px;
   scroll-behavior: smooth;
@@ -232,4 +257,19 @@ hr {
 
 .fade-in {
   animation: fadeIn 0.6s ease-out;
+}
+
+/* Highlight animation for QR code anchor targets */
+@keyframes highlightPulse {
+  0%, 100% {
+    box-shadow: none;
+  }
+  50% {
+    box-shadow: 0 0 0 4px var(--neon-cyan), 0 0 20px var(--neon-cyan);
+  }
+}
+
+.highlight-anchor {
+  animation: highlightPulse 0.5s ease-in-out 3;
+  border-radius: 8px;
 }

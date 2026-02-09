@@ -7,6 +7,7 @@
     // State
     const state = {
         currentSection: '01-visual-thinking-intro',
+        pendingAnchor: null,  // Anchor to scroll to after section loads
         isMobile: window.innerWidth <= 768
     };
 
@@ -24,6 +25,32 @@
     function init() {
         setupEventListeners();
         setupChapterToggles();
+
+        // Check URL hash first before loading default section
+        // Format: #section-name or #section-name/anchor-id
+        const hash = window.location.hash.substring(1);
+        if (hash) {
+            const [sectionId, anchor] = hash.split('/');
+            const sectionExists = document.querySelector(`[data-section="${sectionId}"]`);
+            if (sectionExists) {
+                state.currentSection = sectionId;
+                if (anchor) {
+                    state.pendingAnchor = anchor;
+                }
+            }
+        }
+
+        // Clear any default active states first, then set correct one
+        elements.navSections.forEach(s => s.classList.remove('active'));
+        const activeNav = document.querySelector(`[data-section="${state.currentSection}"]`);
+        if (activeNav) {
+            activeNav.classList.add('active');
+            const parentChapter = activeNav.closest('.nav-chapter');
+            if (parentChapter) {
+                parentChapter.classList.add('expanded');
+            }
+        }
+
         loadSection(state.currentSection);
         updateResponsive();
     }
@@ -166,6 +193,21 @@
         // Load section-specific JavaScript if it exists
         loadSectionScript(state.currentSection);
 
+        // Scroll to anchor if one is pending (from QR code or direct link)
+        if (state.pendingAnchor) {
+            // Small delay to ensure content is rendered
+            setTimeout(() => {
+                const anchorElement = document.getElementById(state.pendingAnchor);
+                if (anchorElement) {
+                    anchorElement.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                    // Optional: highlight the element briefly
+                    anchorElement.classList.add('highlight-anchor');
+                    setTimeout(() => anchorElement.classList.remove('highlight-anchor'), 2000);
+                }
+                state.pendingAnchor = null;  // Clear after scrolling
+            }, 300);
+        }
+
         // Fade in animation
         elements.contentWrapper.classList.add('fade-in');
         setTimeout(() => {
@@ -215,27 +257,11 @@
         }
     }
 
-    // Load section from URL hash on page load
-    function loadFromHash() {
-        const hash = window.location.hash.substring(1);
-        if (hash) {
-            const sectionExists = document.querySelector(`[data-section="${hash}"]`);
-            if (sectionExists) {
-                state.currentSection = hash;
-                navigateToSection(hash);
-            }
-        }
-    }
-
     // Run on DOM ready
     if (document.readyState === 'loading') {
-        document.addEventListener('DOMContentLoaded', function() {
-            init();
-            loadFromHash();
-        });
+        document.addEventListener('DOMContentLoaded', init);
     } else {
         init();
-        loadFromHash();
     }
 
     // Scroll to top function for button

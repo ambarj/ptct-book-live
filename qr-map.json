@@ -1,0 +1,77 @@
+{
+  "_comment": "QR Code to Page Map - Auto-updated when book sections are built",
+  "_format": "CODE: {page, anchor, description}",
+  "_codeFormat": "[CH][XXXX] - Chapter prefix (2) + Random (4)",
+  "_urlFormat": "index.html#section-name/anchor-id",
+  "_chapters": {
+    "VT": "Visual Thinking",
+    "DA": "Data Analysis",
+    "OS": "Oscillations",
+    "NM": "Numerical Methods",
+    "PS": "Phase Space",
+    "MC": "Monte Carlo",
+    "RW": "Random Walks",
+    "CF": "Central Force"
+  },
+
+  "VT09C0": {
+    "page": "01-visual-thinking-intro",
+    "anchor": "linear-explorer",
+    "description": "Linear Function Explorer"
+  },
+  "VT99DA": {
+    "page": "01-visual-thinking-intro",
+    "anchor": "quadratic-explorer",
+    "description": "Quadratic Function Explorer"
+  },
+  "VT3FD7": {
+    "page": "01-visual-thinking-intro",
+    "anchor": "growth-explorer",
+    "description": "Function Growth Comparison"
+  },
+  "VT205D": {
+    "page": "02-visually-understanding-functions",
+    "anchor": "complete-analyzer",
+    "description": "Complete Function Analyzer"
+  },
+  "VT30F5": {
+    "page": "02-visually-understanding-functions",
+    "anchor": "zero-finder",
+    "description": "Zero Finder"
+  },
+  "VTACD0": {
+    "page": "02-visually-understanding-functions",
+    "anchor": "divergence-explorer",
+    "description": "Divergence Visualizer"
+  },
+  "VT812D": {
+    "page": "02-visually-understanding-functions",
+    "anchor": "extrema-explorer",
+    "description": "Extrema Explorer"
+  },
+  "VTF3A4": {
+    "page": "02-visually-understanding-functions",
+    "anchor": "asymptote-explorer",
+    "description": "Asymptote Analyzer"
+  },
+  "VT9D95": {
+    "page": "03-vector-fields",
+    "anchor": "vector-field-explorer",
+    "description": "Vector Field Explorer"
+  },
+  "VTCA78": {
+    "page": "04-streamlines",
+    "anchor": "streamline-visualizer",
+    "description": "Streamline Visualizer & Fixed Point Classifier"
+  },
+  "VTCD14": {
+    "page": "05-contour-plots",
+    "anchor": "scalar-field-visualizer",
+    "description": "Scalar Field Visualizer & Equipotential Explorer"
+  },
+  "VTA2FA": {
+    "page": "06-nondimensionalization",
+    "anchor": "pendulum-energy-explorer",
+    "description": "Non-Dimensionalization Visualizer"
+  }
+}
