@@ -1,0 +1,749 @@
+<!-- Section 2.4: Galileo's Experiment — Complete Workflow -->
+<!-- Source: Lecture1.nb (Part 4) -->
+<!-- Core concept: End-to-end data analysis: generate → compute → plot → interpret -->
+<!-- Time: ~25 minutes -->
+<!-- Prerequisites: Sections 2.2 (Random Variables), 2.3 (Error Bars) -->
+
+<h1>Galileo's Experiment: Complete Workflow</h1>
+
+<p>
+    Galileo drops a ball and times how far it falls.  He repeats each measurement several times
+    because no single trial is perfectly accurate.  By the end of this section <em>you</em> will
+    do exactly the same thing &mdash; virtually &mdash; and extract the acceleration due to gravity
+    \( g \) from noisy data.  This is the complete experimental workflow:
+    generate data &rarr; compute statistics &rarr; plot with error bars &rarr; compare to theory.
+</p>
+
+<div class="info-box">
+    <div class="info-box-title">Learning Objectives</div>
+    <ul>
+        <li>Generate synthetic experimental data with controlled noise</li>
+        <li>Compute mean and error bar at each time point from repeated trials</li>
+        <li>Create an error-bar plot and overlay the theoretical curve \( d = \tfrac{1}{2}g\,t^2 \)</li>
+        <li>Judge whether your data is consistent with the known value \( g = 9.8\;\text{m/s}^2 \)</li>
+    </ul>
+</div>
+
+<hr>
+
+<!-- ========== EXPLORER 1: GALILEO'S VIRTUAL LAB ========== -->
+
+<h2>Galileo's Virtual Lab</h2>
+
+<p>
+    The ball falls a distance \( d = \tfrac{1}{2}g\,t^2 \) with \( g = 9.8\;\text{m/s}^2 \).
+    At each of 10 time points (\( t = 1, 2, \ldots, 10 \) seconds) you take \( N \) repeated
+    measurements, each corrupted by random noise.  The explorer shows every individual measurement
+    (small dots), the sample mean at each time point (large markers with error bars), and the
+    true theoretical curve.
+</p>
+
+<div class="interactive-container" id="galileo-virtual-lab">
+    <div class="interactive-title">Interactive: Galileo's Virtual Lab</div>
+
+    <div class="plot-container">
+        <div id="gal-lab-plot" style="width: 100%; height: 420px;"></div>
+    </div>
+
+    <div id="gal-lab-stats"
+         style="display: flex; justify-content: center; gap: 1.5rem; padding: 8px 0; font-size: 0.85rem; color: #c8c8e0; flex-wrap: wrap;">
+    </div>
+
+    <div class="control-panel">
+        <div class="control-group">
+            <label class="control-label">Trials per time point (N):
+                <span class="control-label-value" id="gal-lab-n-val">10</span>
+            </label>
+            <input type="range" class="slider" id="gal-lab-n-slider" min="3" max="30" step="1" value="10">
+        </div>
+        <div class="control-group">
+            <label class="control-label">Noise level (&sigma;%):
+                <span class="control-label-value" id="gal-lab-noise-val">20</span>
+            </label>
+            <input type="range" class="slider" id="gal-lab-noise-slider" min="5" max="40" step="1" value="20">
+        </div>
+        <div class="btn-group">
+            <button class="btn" onclick="newLabDraw()">New Data</button>
+            <button class="btn" onclick="resetLabExplorer()">Reset</button>
+        </div>
+    </div>
+</div>
+
+<!-- Test Your Understanding #1 -->
+<div class="interactive-container question-section">
+    <div class="interactive-title">Test Your Understanding</div>
+
+    <p style="margin-bottom: var(--spacing-md); color: var(--text-secondary);">
+        Use the Virtual Lab explorer above to answer these questions.
+    </p>
+
+    <div class="tabs">
+        <div class="tab-buttons">
+            <button class="tab-button active">Question 1</button>
+            <button class="tab-button">Question 2</button>
+            <button class="tab-button">Question 3</button>
+        </div>
+
+        <!-- Q1: MCQ -->
+        <div class="tab-content active">
+            <div class="question-container" data-type="mcq" data-answer="1">
+                <div class="question-text">
+                    Increase \( N \) from 3 to 30 while keeping noise at 20%.  What happens to the error bars?
+                </div>
+                <div class="question-options">
+                    <label class="option">
+                        <input type="radio" name="gal-q1" value="0">
+                        <span>They get wider — more data means more uncertainty</span>
+                    </label>
+                    <label class="option">
+                        <input type="radio" name="gal-q1" value="1">
+                        <span>They get narrower — averaging more trials reduces the standard error</span>
+                    </label>
+                    <label class="option">
+                        <input type="radio" name="gal-q1" value="2">
+                        <span>They stay the same — error bars only depend on noise level</span>
+                    </label>
+                </div>
+                <div class="question-actions">
+                    <button class="btn-verify">Verify</button>
+                </div>
+                <div class="question-explanation" style="display:none;">
+                    <strong>Explanation:</strong>
+                    The standard error scales as \( s/\sqrt{N-1} \).  Increasing \( N \) from 3 to 30
+                    reduces the error bars by a factor of roughly \( \sqrt{29}/\sqrt{2} \approx 3.8 \).
+                    More trials → better estimate of the true mean.
+                </div>
+            </div>
+        </div>
+
+        <!-- Q2: Fill -->
+        <div class="tab-content">
+            <div class="question-container" data-type="fill" data-answer="122.5[90,155]">
+                <div class="question-text">
+                    Set \( N = 10 \), noise = 20%.  Read the mean distance at \( t = 5 \) s from the plot.
+                    The theoretical value is \( d = \frac{1}{2}(9.8)(25) = 122.5 \) m.
+                    What is the approximate mean distance at \( t = 5 \)?
+                    <br><br>
+                    \( \bar{d}(t\!=\!5) \approx \) <input type="text" class="fill-blank" placeholder="value"> m
+                </div>
+                <div class="question-actions">
+                    <button class="btn-verify">Verify</button>
+                </div>
+                <div class="question-explanation" style="display:none;">
+                    <strong>Explanation:</strong>
+                    The theoretical value is 122.5 m.  With 20% noise and 10 trials, the sample mean
+                    should be close to 122.5 but will fluctuate.  A range of roughly 90–155 m is
+                    typical (± one standard deviation of the individual measurements).
+                    Click "New Data" a few times to see the variation.
+                </div>
+            </div>
+        </div>
+
+        <!-- Q3: MSQ -->
+        <div class="tab-content">
+            <div class="question-container" data-type="msq" data-answer="0,2">
+                <div class="question-text">
+                    With noise at 40% and \( N = 3 \), which of the following are true?  (Select all that apply.)
+                </div>
+                <div class="question-options">
+                    <label class="option">
+                        <input type="checkbox" value="0">
+                        <span>The scatter of individual measurements (dots) is very large</span>
+                    </label>
+                    <label class="option">
+                        <input type="checkbox" value="1">
+                        <span>The error bars are small because we used Bessel's correction</span>
+                    </label>
+                    <label class="option">
+                        <input type="checkbox" value="2">
+                        <span>Some error bars may not contain the true theoretical curve</span>
+                    </label>
+                    <label class="option">
+                        <input type="checkbox" value="3">
+                        <span>The mean values are always exactly on the theoretical curve</span>
+                    </label>
+                </div>
+                <div class="question-actions">
+                    <button class="btn-verify">Verify</button>
+                </div>
+                <div class="question-explanation" style="display:none;">
+                    <strong>Explanation:</strong>
+                    <ul>
+                        <li><strong>True:</strong> 40% noise means individual measurements scatter widely around the true value.</li>
+                        <li><strong>False:</strong> Bessel's correction makes the variance estimate <em>unbiased</em>, not small.  With only 3 trials and 40% noise, error bars are large.</li>
+                        <li><strong>True:</strong> At 1σ, about 68% of error bars should contain the true value.  With only 10 time points and large noise, some will miss.</li>
+                        <li><strong>False:</strong> Sample means fluctuate around the true curve — they are not exact.</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<hr>
+
+<!-- ========== EXPLORER 2: NOISE vs TRUTH ========== -->
+
+<h2>How Much Noise Can You Tolerate?</h2>
+
+<p>
+    A measurement is only useful if the error bar is small enough to tell theory and falsehood apart.
+    This explorer fixes \( N = 10 \) trials and lets you crank the noise up.
+    The readout counts how many of the 10 time points have the theoretical curve <em>inside</em>
+    their 1σ error bar.  Statistially you expect about 7 out of 10 (68%).
+</p>
+
+<div class="interactive-container" id="noise-vs-truth">
+    <div class="interactive-title">Interactive: Noise vs Truth</div>
+
+    <div class="plot-container">
+        <div id="gal-noise-plot" style="width: 100%; height: 420px;"></div>
+    </div>
+
+    <div id="gal-noise-stats"
+         style="display: flex; justify-content: center; gap: 1.5rem; padding: 8px 0; font-size: 0.85rem; color: #c8c8e0; flex-wrap: wrap;">
+    </div>
+
+    <div class="control-panel">
+        <div class="control-group">
+            <label class="control-label">Noise level (&sigma;%):
+                <span class="control-label-value" id="gal-noise-noise-val">20</span>
+            </label>
+            <input type="range" class="slider" id="gal-noise-noise-slider" min="5" max="50" step="1" value="20">
+        </div>
+        <div class="btn-group">
+            <button class="btn" onclick="newNoiseDraw()">New Data</button>
+            <button class="btn" onclick="resetNoiseExplorer()">Reset</button>
+        </div>
+    </div>
+</div>
+
+<!-- Test Your Understanding #2 -->
+<div class="interactive-container question-section">
+    <div class="interactive-title">Test Your Understanding</div>
+
+    <p style="margin-bottom: var(--spacing-md); color: var(--text-secondary);">
+        Use the Noise vs Truth explorer to answer these questions.
+    </p>
+
+    <div class="tabs">
+        <div class="tab-buttons">
+            <button class="tab-button active">Question 4</button>
+            <button class="tab-button">Question 5</button>
+            <button class="tab-button">Question 6</button>
+        </div>
+
+        <!-- Q4: MCQ -->
+        <div class="tab-content active">
+            <div class="question-container" data-type="mcq" data-answer="2">
+                <div class="question-text">
+                    If your error bars represent ±1 standard error, what fraction of them should
+                    contain the true value (on average)?
+                </div>
+                <div class="question-options">
+                    <label class="option">
+                        <input type="radio" name="gal-q4" value="0">
+                        <span>50% — it's a coin flip</span>
+                    </label>
+                    <label class="option">
+                        <input type="radio" name="gal-q4" value="1">
+                        <span>95% — that's the standard confidence level</span>
+                    </label>
+                    <label class="option">
+                        <input type="radio" name="gal-q4" value="2">
+                        <span>68% — the 1σ rule for Gaussian errors</span>
+                    </label>
+                    <label class="option">
+                        <input type="radio" name="gal-q4" value="3">
+                        <span>100% — error bars must always contain the truth</span>
+                    </label>
+                </div>
+                <div class="question-actions">
+                    <button class="btn-verify">Verify</button>
+                </div>
+                <div class="question-explanation" style="display:none;">
+                    <strong>Explanation:</strong>
+                    For a Gaussian distribution, roughly 68% of measurements fall within ±1σ of the mean.
+                    So about 68% of 1σ error bars should contain the true value.
+                    For 95% coverage you need ±2σ error bars.
+                </div>
+            </div>
+        </div>
+
+        <!-- Q5: Fill -->
+        <div class="tab-content">
+            <div class="question-container" data-type="fill" data-answer="3[2,5]">
+                <div class="question-text">
+                    With 10 time points and 1σ error bars, roughly how many points do you expect
+                    to <em>miss</em> the theoretical curve (i.e., the theory lies outside the error bar)?
+                    <br><br>
+                    Expected misses ≈ <input type="text" class="fill-blank" placeholder="count"> out of 10
+                </div>
+                <div class="question-actions">
+                    <button class="btn-verify">Verify</button>
+                </div>
+                <div class="question-explanation" style="display:none;">
+                    <strong>Explanation:</strong>
+                    If 68% of error bars contain the true value, then 32% miss.
+                    Out of 10 points: \( 10 \times 0.32 \approx 3 \) misses.
+                    Click "New Data" several times — you'll see the count fluctuate around 2–4.
+                </div>
+            </div>
+        </div>
+
+        <!-- Q6: MCQ -->
+        <div class="tab-content">
+            <div class="question-container" data-type="mcq" data-answer="1">
+                <div class="question-text">
+                    You run the experiment and find that <strong>0 out of 10</strong> error bars contain the
+                    theoretical curve \( d = \frac{1}{2}(9.8)\,t^2 \).  What is the most likely explanation?
+                </div>
+                <div class="question-options">
+                    <label class="option">
+                        <input type="radio" name="gal-q6" value="0">
+                        <span>Bad luck — 0/10 is perfectly normal at 1σ</span>
+                    </label>
+                    <label class="option">
+                        <input type="radio" name="gal-q6" value="1">
+                        <span>Systematic error — something besides random noise is biasing your data</span>
+                    </label>
+                    <label class="option">
+                        <input type="radio" name="gal-q6" value="2">
+                        <span>The error bars are too large — you need smaller noise</span>
+                    </label>
+                </div>
+                <div class="question-actions">
+                    <button class="btn-verify">Verify</button>
+                </div>
+                <div class="question-explanation" style="display:none;">
+                    <strong>Explanation:</strong>
+                    The probability of 0 out of 10 error bars containing the true value (at 1σ) is
+                    \( (0.32)^{10} \approx 0.00001 \) — essentially impossible from random noise alone.
+                    When <em>all</em> points are off in the same direction, a systematic error
+                    (e.g., a miscalibrated timer, air resistance) is almost certainly to blame.
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<hr>
+
+<!-- ========== EXPLORER 3: EXTRACTING g ========== -->
+
+<h2>Extracting \( g \) from Your Data</h2>
+
+<p>
+    The ultimate goal: fit \( d = \tfrac{1}{2}g\,t^2 \) to your data and extract the
+    acceleration due to gravity.  The explorer performs a least-squares fit (minimising the
+    sum of squared residuals weighted by the error bars) and reports \( g_{\text{fit}} \).
+    Is it consistent with 9.8?  That depends on the uncertainty.
+</p>
+
+<div class="interactive-container" id="extract-g">
+    <div class="interactive-title">Interactive: Extracting g</div>
+
+    <div class="plot-container">
+        <div id="gal-fit-plot" style="width: 100%; height: 420px;"></div>
+    </div>
+
+    <div id="gal-fit-stats"
+         style="display: flex; justify-content: center; gap: 1.5rem; padding: 8px 0; font-size: 0.85rem; color: #c8c8e0; flex-wrap: wrap;">
+    </div>
+
+    <div class="control-panel">
+        <div class="control-group">
+            <label class="control-label">Trials per time point (N):
+                <span class="control-label-value" id="gal-fit-n-val">10</span>
+            </label>
+            <input type="range" class="slider" id="gal-fit-n-slider" min="3" max="30" step="1" value="10">
+        </div>
+        <div class="control-group">
+            <label class="control-label">Noise level (&sigma;%):
+                <span class="control-label-value" id="gal-fit-noise-val">20</span>
+            </label>
+            <input type="range" class="slider" id="gal-fit-noise-slider" min="5" max="40" step="1" value="20">
+        </div>
+        <div class="btn-group">
+            <button class="btn" onclick="newFitDraw()">New Data</button>
+            <button class="btn" onclick="resetFitExplorer()">Reset</button>
+        </div>
+    </div>
+</div>
+
+<div class="info-box">
+    <div class="info-box-title">Key Insight</div>
+    <p>
+        A single number is never the answer — the answer is always a number <em>plus its
+        uncertainty</em>.  Reporting \( g = 9.7 \) is meaningless; reporting
+        \( g = 9.7 \pm 0.3 \;\text{m/s}^2 \) tells us the measurement is consistent with the
+        known value 9.8.  The complete workflow
+        (data → statistics → error bars → fit → interpretation) is how real experimental
+        physics works.
+    </p>
+</div>
+
+<!-- Test Your Understanding #3 -->
+<div class="interactive-container question-section">
+    <div class="interactive-title">Test Your Understanding</div>
+
+    <p style="margin-bottom: var(--spacing-md); color: var(--text-secondary);">
+        Use the Extracting g explorer to answer these questions.
+    </p>
+
+    <div class="tabs">
+        <div class="tab-buttons">
+            <button class="tab-button active">Question 7</button>
+            <button class="tab-button">Question 8</button>
+            <button class="tab-button">Question 9</button>
+        </div>
+
+        <!-- Q7: MCQ -->
+        <div class="tab-content active">
+            <div class="question-container" data-type="mcq" data-answer="0">
+                <div class="question-text">
+                    Which combination gives the most reliable estimate of \( g \)?
+                </div>
+                <div class="question-options">
+                    <label class="option">
+                        <input type="radio" name="gal-q7" value="0">
+                        <span>\( N = 30 \), noise = 5% — many trials with low noise</span>
+                    </label>
+                    <label class="option">
+                        <input type="radio" name="gal-q7" value="1">
+                        <span>\( N = 3 \), noise = 5% — few trials but low noise</span>
+                    </label>
+                    <label class="option">
+                        <input type="radio" name="gal-q7" value="2">
+                        <span>\( N = 30 \), noise = 40% — many trials with high noise</span>
+                    </label>
+                    <label class="option">
+                        <input type="radio" name="gal-q7" value="3">
+                        <span>\( N = 3 \), noise = 40% — few trials with high noise</span>
+                    </label>
+                </div>
+                <div class="question-actions">
+                    <button class="btn-verify">Verify</button>
+                </div>
+                <div class="question-explanation" style="display:none;">
+                    <strong>Explanation:</strong>
+                    Reliability improves with both more trials (larger \( N \), reducing standard error
+                    by \( 1/\sqrt{N-1} \)) <em>and</em> lower noise (smaller \( \sigma \)).
+                    The best combination is large \( N \) with small \( \sigma \).
+                    Try all four combinations in the explorer to see the difference.
+                </div>
+            </div>
+        </div>
+
+        <!-- Q8: Fill -->
+        <div class="tab-content">
+            <div class="question-container" data-type="fill" data-answer="9.8[8.5,11.1]">
+                <div class="question-text">
+                    Set \( N = 10 \), noise = 20%.  Click "New Data" and read the fitted value of \( g \).
+                    <br><br>
+                    \( g_{\text{fit}} \approx \) <input type="text" class="fill-blank" placeholder="value"> m/s²
+                </div>
+                <div class="question-actions">
+                    <button class="btn-verify">Verify</button>
+                </div>
+                <div class="question-explanation" style="display:none;">
+                    <strong>Explanation:</strong>
+                    With \( N = 10 \) and 20% noise, the fitted \( g \) should be somewhere near 9.8
+                    but will fluctuate.  Typical values range from about 8.5 to 11.1.
+                    Click "New Data" several times to see the spread.
+                    The uncertainty on \( g_{\text{fit}} \) quantifies this spread.
+                </div>
+            </div>
+        </div>
+
+        <!-- Q9: MSQ -->
+        <div class="tab-content">
+            <div class="question-container" data-type="msq" data-answer="0,1,3">
+                <div class="question-text">
+                    Which of the following would improve the accuracy of the \( g \) measurement?
+                    (Select all that apply.)
+                </div>
+                <div class="question-options">
+                    <label class="option">
+                        <input type="checkbox" value="0">
+                        <span>Increase the number of trials \( N \) at each time point</span>
+                    </label>
+                    <label class="option">
+                        <input type="checkbox" value="1">
+                        <span>Reduce experimental noise (better equipment)</span>
+                    </label>
+                    <label class="option">
+                        <input type="checkbox" value="2">
+                        <span>Use fewer time points so each gets more attention</span>
+                    </label>
+                    <label class="option">
+                        <input type="checkbox" value="3">
+                        <span>Measure at more time points to constrain the parabola better</span>
+                    </label>
+                </div>
+                <div class="question-actions">
+                    <button class="btn-verify">Verify</button>
+                </div>
+                <div class="question-explanation" style="display:none;">
+                    <strong>Explanation:</strong>
+                    <ul>
+                        <li><strong>More trials (True):</strong> Reduces standard error at each point via \( s/\sqrt{N-1} \).</li>
+                        <li><strong>Lower noise (True):</strong> Directly reduces \( s \), tightening error bars.</li>
+                        <li><strong>Fewer time points (False):</strong> Fewer data points means the fit is less constrained, not better.</li>
+                        <li><strong>More time points (True):</strong> More data constrains the parabola shape better, improving the fit.</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<hr>
+
+<!-- ========== PYTHON CODE ========== -->
+
+<h2>Python Code</h2>
+
+<p>Here's how to run Galileo's experiment computationally.</p>
+
+<div class="tabs">
+    <div class="tab-buttons">
+        <button class="tab-button active">Generating Data</button>
+        <button class="tab-button">Error Bars &amp; Fit</button>
+        <button class="tab-button">Prompt</button>
+    </div>
+
+    <!-- Tab 1: Generating Data -->
+    <div class="tab-content active">
+        <div class="code-block-container">
+            <div class="code-header">
+                <span class="code-lang">Python</span>
+                <button class="copy-btn">Copy</button>
+            </div>
+            <pre><code class="language-python">
+import numpy as np
+import plotly.graph_objects as go
+
+# Physical constants
+g_true = 9.8          # m/s^2
+times = np.arange(1, 11)  # t = 1, 2, ..., 10 seconds
+d_true = 0.5 * g_true * times**2
+
+# Experiment parameters
+N_trials = 10         # measurements per time point
+noise_pct = 0.20      # 20% relative noise
+
+# Generate noisy measurements
+rng = np.random.default_rng(42)
+data = np.zeros((len(times), N_trials))
+for i, t in enumerate(times):
+    sigma = noise_pct * d_true[i]
+    data[i, :] = d_true[i] + rng.normal(0, sigma, N_trials)
+
+# Compute statistics at each time point
+means = data.mean(axis=1)
+stds  = data.std(axis=1, ddof=1)       # Bessel's correction
+errors = stds / np.sqrt(N_trials - 1)  # standard error
+
+# Plot all individual measurements
+fig = go.Figure()
+for j in range(N_trials):
+    fig.add_trace(go.Scatter(
+        x=times, y=data[:, j], mode='markers',
+        marker=dict(size=4, color='rgba(0,243,255,0.3)'),
+        showlegend=(j == 0),
+        name='Individual trials' if j == 0 else None
+    ))
+
+# Overlay means with error bars
+fig.add_trace(go.Scatter(
+    x=times, y=means, mode='markers',
+    error_y=dict(type='data', array=errors, visible=True,
+                 color='#ffff00'),
+    marker=dict(size=10, color='#ffff00', symbol='diamond'),
+    name='Mean ± SE'
+))
+
+# Overlay theoretical curve
+t_fine = np.linspace(0, 11, 200)
+fig.add_trace(go.Scatter(
+    x=t_fine, y=0.5 * g_true * t_fine**2,
+    mode='lines', line=dict(color='#ff00ff', width=2),
+    name='Theory: d = ½(9.8)t²'
+))
+
+fig.update_layout(
+    template='plotly_dark',
+    xaxis=dict(title='Time (s)', range=[0, 11],
+               gridcolor='#2a2f4a', zerolinecolor='#808080',
+               linecolor='#808080'),
+    yaxis=dict(title='Distance (m)', range=[0, 600],
+               gridcolor='#2a2f4a', zerolinecolor='#808080',
+               linecolor='#808080')
+)
+fig.show()
+            </code></pre>
+        </div>
+    </div>
+
+    <!-- Tab 2: Error Bars & Fit -->
+    <div class="tab-content">
+        <div class="code-block-container">
+            <div class="code-header">
+                <span class="code-lang">Python</span>
+                <button class="copy-btn">Copy</button>
+            </div>
+            <pre><code class="language-python">
+import numpy as np
+import plotly.graph_objects as go
+
+# --- Assume data, means, stds, errors from Tab 1 ---
+
+# Weighted least-squares fit for g
+# Model: d = (g/2) * t^2  =>  g = 2d/t^2
+# Weighted average: g_fit = sum(w_i * g_i) / sum(w_i)
+# where g_i = 2*mean_i / t_i^2 and w_i = 1/sigma_g_i^2
+
+g_estimates = 2 * means / times**2
+sigma_g = 2 * errors / times**2           # error propagation
+weights = 1.0 / sigma_g**2
+g_fit = np.sum(weights * g_estimates) / np.sum(weights)
+g_unc = 1.0 / np.sqrt(np.sum(weights))    # combined uncertainty
+
+print(f"g_fit = {g_fit:.3f} ± {g_unc:.3f} m/s²")
+print(f"|g_fit - 9.8| = {abs(g_fit - 9.8):.3f} m/s²")
+print(f"Deviation in σ: {abs(g_fit - 9.8)/g_unc:.1f}")
+
+# Plot: data + fit + true
+fig = go.Figure()
+fig.add_trace(go.Scatter(
+    x=times, y=means, mode='markers',
+    error_y=dict(type='data', array=errors, visible=True,
+                 color='#ffff00'),
+    marker=dict(size=10, color='#ffff00', symbol='diamond'),
+    name='Data (mean ± SE)'
+))
+
+t_fine = np.linspace(0, 11, 200)
+fig.add_trace(go.Scatter(
+    x=t_fine, y=0.5 * g_fit * t_fine**2,
+    mode='lines', line=dict(color='#00ff9f', width=2.5),
+    name=f'Fit: g = {g_fit:.2f}'
+))
+fig.add_trace(go.Scatter(
+    x=t_fine, y=0.5 * 9.8 * t_fine**2,
+    mode='lines', line=dict(color='#ff00ff', width=2, dash='dash'),
+    name='True: g = 9.80'
+))
+
+fig.update_layout(
+    template='plotly_dark',
+    title=f'g = {g_fit:.3f} ± {g_unc:.3f} m/s²',
+    xaxis=dict(title='Time (s)', range=[0, 11],
+               gridcolor='#2a2f4a', zerolinecolor='#808080',
+               linecolor='#808080'),
+    yaxis=dict(title='Distance (m)', range=[0, 600],
+               gridcolor='#2a2f4a', zerolinecolor='#808080',
+               linecolor='#808080')
+)
+fig.show()
+            </code></pre>
+        </div>
+    </div>
+
+    <!-- Tab 3: Prompt -->
+    <div class="tab-content">
+        <div class="code-block-container">
+            <div class="code-header">
+                <span class="code-lang">Prompt for AI</span>
+                <button class="copy-btn">Copy</button>
+            </div>
+            <pre><code class="language-text">
+Simulate Galileo's free-fall experiment in Python with Plotly.
+
+Setup:
+- True g = 9.8 m/s², distance d = (1/2)g*t²
+- 10 time points: t = 1, 2, ..., 10 seconds
+- N repeated measurements at each time point
+- Each measurement has Gaussian noise: σ = noise% × d_true(t)
+
+Steps:
+1. Generate N noisy measurements at each of 10 time points
+2. Compute mean and standard error (s/√(N-1)) at each point
+3. Plot all individual measurements as small dots (cyan, 30% opacity)
+4. Overlay means with error bars (yellow diamonds)
+5. Overlay theoretical curve d = (1/2)(9.8)t² (magenta line)
+6. Fit g using weighted least-squares: g_i = 2*mean_i/t_i²
+7. Report g_fit ± uncertainty and whether it's consistent with 9.8
+
+Use dark theme, gray axes (#808080), fixed ranges: x=[0,11], y=[0,600].
+            </code></pre>
+        </div>
+
+        <div class="info-box" style="margin-top: var(--spacing-md);">
+            <div class="info-box-title">Tips for Prompting</div>
+            <ul>
+                <li>Specify the physics model explicitly — don't assume the AI knows</li>
+                <li>Be precise about noise model (Gaussian, relative vs absolute)</li>
+                <li>Ask for both the plot and numerical output</li>
+                <li>Iterate: adjust N and noise% to explore different scenarios</li>
+            </ul>
+        </div>
+    </div>
+</div>
+
+<hr>
+
+<!-- ========== EXERCISES ========== -->
+
+<h2>Exercises for Practice</h2>
+
+<div class="exercise-cards">
+    <div class="exercise-card">
+        <div class="exercise-card-header">
+            <span class="exercise-card-number">1.</span>
+            <span class="exercise-card-badge explore">Explore</span>
+        </div>
+        <div class="exercise-card-content">
+            In the Extracting \( g \) explorer, set noise to 5% and try \( N = 3, 10, 30 \).
+            Record \( g_{\text{fit}} \pm \Delta g \) for each.
+            How does the uncertainty scale with \( N \)?  Does it match the \( 1/\sqrt{N-1} \) prediction?
+        </div>
+    </div>
+
+    <div class="exercise-card">
+        <div class="exercise-card-header">
+            <span class="exercise-card-number">2.</span>
+            <span class="exercise-card-badge coding">Coding</span>
+        </div>
+        <div class="exercise-card-content">
+            Modify the Python code to simulate an experiment where the noise is <em>absolute</em>
+            (σ = 10 m at every time point) instead of <em>relative</em> (σ = 20% of d).
+            How does this change the relative importance of early vs late time points?
+            Which time points contribute most to the fit?
+        </div>
+    </div>
+
+    <div class="exercise-card">
+        <div class="exercise-card-header">
+            <span class="exercise-card-number">3.</span>
+            <span class="exercise-card-badge think">Think</span>
+        </div>
+        <div class="exercise-card-content">
+            Galileo actually measured distance at fixed time intervals using an inclined plane
+            (not free-fall in vacuum).  If air resistance systematically reduces the distance fallen,
+            would the fitted \( g \) be too high or too low?  Would error bars help you detect this bias?
+            Explain the difference between <em>random</em> and <em>systematic</em> errors.
+        </div>
+    </div>
+</div>
+
+<hr>
+
+<!-- ========== NAVIGATION ========== -->
+
+<div class="btn-group mt-xl">
+    <button class="btn btn-magenta" onclick="navigateToSection('09-error-bars')">&larr; Previous: Error Bars</button>
+    <button class="btn" onclick="scrollToTop()">&uarr; Back to Top</button>
+    <button class="btn btn-secondary" onclick="navigateToSection('11-chi-squared')">Next: The &chi;&sup2; Criterion &rarr;</button>
+</div>

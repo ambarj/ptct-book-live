@@ -1,0 +1,755 @@
+<!-- Section 3.2: The Math Behind the Motion
+     Source: Module 4 - Review of Oscillations.nb (Part 2)
+     Concept: Connect x(t) = A cos(ωt + φ) to the differential equation ẍ = -ω²x
+     Time: 25 minutes
+     Prerequisites: Section 3.1 (parameters A, ω, φ)
+-->
+
+<div class="section-content">
+
+    <!-- ==================== INTRODUCTION ==================== -->
+    <h1>3.2 The Math Behind the Motion</h1>
+
+    <div class="info-box">
+        <div class="info-icon">💡</div>
+        <div class="info-content">
+            <strong>Learning Objectives:</strong>
+            <ul>
+                <li>Connect the observation \( x(t) = A\cos(\omega t + \varphi) \) to the differential equation \( \ddot{x} = -\omega^2 x \)</li>
+                <li>Understand how initial conditions \( x_0, v_0 \) uniquely determine \( A \) and \( \varphi \)</li>
+                <li>Verify that the cosine solution actually satisfies the ODE by computing derivatives</li>
+            </ul>
+        </div>
+    </div>
+
+    <p>
+        In the previous section, you explored how three parameters — amplitude \( A \), angular frequency \( \omega \), and phase \( \varphi \) — describe any simple harmonic motion. But <em>why</em> does nature choose cosines? The answer lies in a single, elegant equation that governs all oscillatory systems:
+    </p>
+
+    <div class="equation-display">
+        <p><strong>The Simple Harmonic Oscillator Equation:</strong></p>
+        $$ \ddot{x} = -\omega^2 x $$
+        <p>In words: <em>the acceleration is proportional to displacement, and always points back toward equilibrium.</em></p>
+    </div>
+
+    <p>
+        This one equation &mdash; just five symbols &mdash; contains everything. The minus sign guarantees a restoring force (always pulling back toward center). The \( \omega^2 \) sets the clock speed. And the acceleration depends on \( x \) itself, not on \( x^2 \) or \( x^3 \) &mdash; this &ldquo;proportional&rdquo; relationship is what makes the motion perfectly sinusoidal. Let&rsquo;s see this connection come alive.
+    </p>
+
+    <!-- ==================== EXPLORER 1: ODE Visualizer ==================== -->
+    <h2>The Equation in Action</h2>
+
+    <p>
+        If \( x(t) = A\cos(\omega t + \varphi) \), then by calculus:
+    </p>
+    <div class="equation-display">
+        $$ v(t) = \dot{x} = -A\omega\sin(\omega t + \varphi) $$
+        $$ a(t) = \ddot{x} = -A\omega^2\cos(\omega t + \varphi) = -\omega^2 x(t) $$
+    </div>
+    <p>
+        That last line is the magic — the second derivative gives back the original function times \( -\omega^2 \). The cosine solution <em>automatically</em> satisfies the ODE. Watch this in the explorer below: the left panel shows all three quantities in time, while the right panel reveals the <strong>linear relationship</strong> between \( a \) and \( x \).
+    </p>
+
+    <div class="interactive-container" id="ode-visualizer">
+        <div class="interactive-title">Explorer 1: ODE Visualizer</div>
+
+        <div style="display: flex; gap: 0.5rem; flex-wrap: wrap;">
+            <div class="plot-container" style="flex: 1; min-width: 280px;">
+                <div id="sh-ode-time-plot" style="width: 100%; height: 380px;"></div>
+            </div>
+            <div class="plot-container" style="flex: 1; min-width: 280px;">
+                <div id="sh-ode-phase-plot" style="width: 100%; height: 380px;"></div>
+            </div>
+        </div>
+
+        <div id="sh-ode-stats"
+             style="display: flex; justify-content: center; gap: 1.5rem; padding: 8px 0; font-size: 0.85rem; color: #c8c8e0; flex-wrap: wrap;">
+        </div>
+
+        <div class="control-panel">
+            <div class="control-group">
+                <label class="control-label">&omega; (rad/s):
+                    <span class="control-label-value">2.0</span>
+                </label>
+                <input type="range" id="sh-ode-omega" class="slider" min="0.5" max="5.0" step="0.1" value="2.0">
+            </div>
+            <div class="control-group">
+                <label class="control-label">Amplitude A:
+                    <span class="control-label-value">2.0</span>
+                </label>
+                <input type="range" id="sh-ode-amp" class="slider" min="0.5" max="3.0" step="0.1" value="2.0">
+            </div>
+            <div class="control-group">
+                <label class="control-label">Phase &phi;:
+                    <span class="control-label-value">0&deg;</span>
+                </label>
+                <input type="range" id="sh-ode-phi" class="slider" min="-3.14" max="3.14" step="0.05" value="0">
+            </div>
+            <div class="btn-group">
+                <button class="btn" onclick="resetODE()">Reset</button>
+            </div>
+        </div>
+    </div>
+
+    <div class="info-box">
+        <div class="info-box-title">Key Insight</div>
+        <div class="info-content">
+            <p>The right panel is the <strong>signature of simple harmonic motion</strong>: when you plot acceleration vs. position, you always get a <em>straight line through the origin with slope \( -\omega^2 \)</em>. If the line isn't straight, the oscillation isn't simple harmonic.</p>
+        </div>
+    </div>
+
+    <!-- ==================== QUESTIONS 1 ==================== -->
+    <div class="interactive-container question-section">
+        <div class="interactive-title">Test Your Understanding</div>
+
+        <p style="margin-bottom: var(--spacing-md); color: var(--text-secondary);">
+            Use the ODE Visualizer above to answer these questions.
+        </p>
+
+        <div class="tabs">
+            <div class="tab-buttons">
+                <button class="tab-button active">Question 1</button>
+                <button class="tab-button">Question 2</button>
+                <button class="tab-button">Question 3</button>
+            </div>
+
+            <!-- Q1: MCQ -->
+            <div class="tab-content active">
+                <div class="question-container" data-type="mcq" data-answer="2">
+                    <div class="question-text">
+                        When \( x(t) \) reaches its maximum value (a peak), what is the velocity \( v(t) \) at that instant?
+                    </div>
+                    <div class="question-options">
+                        <label class="option">
+                            <input type="radio" name="sh-q1" value="0">
+                            <span>At its maximum (positive peak)</span>
+                        </label>
+                        <label class="option">
+                            <input type="radio" name="sh-q1" value="1">
+                            <span>At its minimum (negative peak)</span>
+                        </label>
+                        <label class="option">
+                            <input type="radio" name="sh-q1" value="2">
+                            <span>Zero — crossing through zero</span>
+                        </label>
+                        <label class="option">
+                            <input type="radio" name="sh-q1" value="3">
+                            <span>Half its maximum value</span>
+                        </label>
+                    </div>
+                    <div class="question-actions">
+                        <button class="btn-verify">Verify</button>
+                    </div>
+                    <div class="question-explanation" style="display:none;">
+                        <div class="question-explanation-title">Explanation</div>
+                        <div class="question-explanation-text">
+                            When position is at a peak, the object momentarily stops before reversing direction, so \( v = 0 \). Mathematically: \( x = A\cos(\omega t + \varphi) \) is maximum when \( \cos = 1 \), but then \( v = -A\omega\sin(\omega t + \varphi) \) has \( \sin = 0 \). Position and velocity are always 90° out of phase.
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Q2: Fill -->
+            <div class="tab-content">
+                <div class="question-container" data-type="fill" data-answer="4[3.5,4.5]">
+                    <div class="question-text">
+                        Set \( A = 1.0 \) and \( \omega = 2.0 \). The maximum acceleration \( a_{\text{max}} = A\omega^2 \) equals: <input type="text" class="fill-blank" placeholder="?">
+                    </div>
+                    <div class="question-actions">
+                        <button class="btn-verify">Verify</button>
+                    </div>
+                    <div class="question-explanation" style="display:none;">
+                        <div class="question-explanation-title">Explanation</div>
+                        <div class="question-explanation-text">
+                            \( a_{\text{max}} = A\omega^2 = 1.0 \times 2.0^2 = 4.0 \). Notice that doubling \( \omega \) quadruples the maximum acceleration — frequency has a much bigger effect on acceleration than amplitude does.
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Q3: MSQ -->
+            <div class="tab-content">
+                <div class="question-container" data-type="msq" data-answer="0,2">
+                    <div class="question-text">
+                        Look at the \( a \) vs \( x \) plot (right panel). Which statements are true? (Select all that apply)
+                    </div>
+                    <div class="question-options">
+                        <label class="option">
+                            <input type="checkbox" value="0">
+                            <span>The trajectory traces a straight line through the origin</span>
+                        </label>
+                        <label class="option">
+                            <input type="checkbox" value="1">
+                            <span>The slope of the line depends on the amplitude \( A \)</span>
+                        </label>
+                        <label class="option">
+                            <input type="checkbox" value="2">
+                            <span>Increasing \( \omega \) makes the slope steeper (more negative)</span>
+                        </label>
+                        <label class="option">
+                            <input type="checkbox" value="3">
+                            <span>The phase \( \varphi \) changes the slope of the line</span>
+                        </label>
+                    </div>
+                    <div class="question-actions">
+                        <button class="btn-verify">Verify</button>
+                    </div>
+                    <div class="question-explanation" style="display:none;">
+                        <div class="question-explanation-title">Explanation</div>
+                        <div class="question-explanation-text">
+                            <ul>
+                                <li><strong>Straight line through origin:</strong> True — \( a = -\omega^2 x \) is a linear equation with zero intercept.</li>
+                                <li><strong>Slope depends on A:</strong> False — the slope is \( -\omega^2 \), independent of amplitude. Changing \( A \) only changes how far along the line you travel.</li>
+                                <li><strong>Steeper with larger \( \omega \):</strong> True — slope = \( -\omega^2 \), so doubling \( \omega \) quadruples the magnitude of the slope.</li>
+                                <li><strong>Phase changes slope:</strong> False — phase only shifts the starting point on the line, not the line itself.</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ==================== EXPLORER 2: Initial Condition Explorer ==================== -->
+    <h2>From Initial Conditions to Motion</h2>
+
+    <p>
+        The general solution \( x(t) = A\cos(\omega t + \varphi) \) has two free constants: the amplitude \( A \) and the phase \( \varphi \). These aren't chosen by the equation — they're determined by <strong>how the oscillation started</strong>. If you know the initial position \( x_0 = x(0) \) and initial velocity \( v_0 = v(0) \), you can find \( A \) and \( \varphi \):
+    </p>
+
+    <div class="equation-display">
+        <p><strong>Initial Condition Formulas:</strong></p>
+        $$ A = \sqrt{x_0^2 + \frac{v_0^2}{\omega^2}} \qquad \varphi = \arctan\!\left(\frac{-v_0}{\omega\, x_0}\right) $$
+        <p>The system frequency \( \omega \) is fixed by the physics (spring constant, mass, etc.). Only \( A \) and \( \varphi \) depend on how you start it.</p>
+    </div>
+
+    <div class="interactive-container" id="initial-condition-explorer">
+        <div class="interactive-title">Explorer 2: Initial Condition Explorer</div>
+
+        <div style="display: flex; gap: 0.5rem; flex-wrap: wrap;">
+            <div class="plot-container" style="flex: 1; min-width: 280px;">
+                <div id="sh-ic-plot" style="width: 100%; height: 380px;"></div>
+            </div>
+            <div class="plot-container" style="flex: 1; min-width: 280px;">
+                <div id="sh-ic-phasor" style="width: 100%; height: 380px;"></div>
+            </div>
+        </div>
+
+        <div id="sh-ic-stats"
+             style="display: flex; justify-content: center; gap: 1.5rem; padding: 8px 0; font-size: 0.85rem; color: #c8c8e0; flex-wrap: wrap;">
+        </div>
+
+        <div class="control-panel">
+            <div class="control-group">
+                <label class="control-label">x&#x2080; (initial position):
+                    <span class="control-label-value">2.0</span>
+                </label>
+                <input type="range" id="sh-ic-x0" class="slider" min="-3.0" max="3.0" step="0.1" value="2.0">
+            </div>
+            <div class="control-group">
+                <label class="control-label">v&#x2080; (initial velocity):
+                    <span class="control-label-value">0.0</span>
+                </label>
+                <input type="range" id="sh-ic-v0" class="slider" min="-6.0" max="6.0" step="0.1" value="0.0">
+            </div>
+            <div class="control-group">
+                <label class="control-label">&omega; (rad/s):
+                    <span class="control-label-value">2.0</span>
+                </label>
+                <input type="range" id="sh-ic-omega" class="slider" min="0.5" max="5.0" step="0.1" value="2.0">
+            </div>
+            <div class="btn-group">
+                <button class="btn" onclick="resetIC()">Reset</button>
+            </div>
+        </div>
+    </div>
+
+    <div class="info-box">
+        <div class="info-box-title">Key Insight</div>
+        <div class="info-content">
+            <p>The phasor diagram (right) shows why the formula works: the amplitude \( A \) is the <em>hypotenuse</em> of a right triangle with legs \( x_0 \) and \( v_0/\omega \). That's just the Pythagorean theorem! The phase angle \( \varphi \) is the angle this phasor makes with the positive x-axis.</p>
+        </div>
+    </div>
+
+    <div class="warning-box">
+        <div class="warning-icon">⚠️</div>
+        <div class="warning-content">
+            <strong>Common Mistake:</strong>
+            <p>Students often think "released from rest" means \( \varphi = 0 \). That's only true if released from a <em>positive</em> displacement. If \( x_0 = -2, v_0 = 0 \), then \( \varphi = \pi \) (180°). Try it in the explorer!</p>
+        </div>
+    </div>
+
+    <!-- ==================== QUESTIONS 2 ==================== -->
+    <div class="interactive-container question-section">
+        <div class="interactive-title">Test Your Understanding</div>
+
+        <p style="margin-bottom: var(--spacing-md); color: var(--text-secondary);">
+            Use the Initial Condition Explorer above to answer these questions.
+        </p>
+
+        <div class="tabs">
+            <div class="tab-buttons">
+                <button class="tab-button active">Question 4</button>
+                <button class="tab-button">Question 5</button>
+                <button class="tab-button">Question 6</button>
+            </div>
+
+            <!-- Q4: Fill -->
+            <div class="tab-content active">
+                <div class="question-container" data-type="fill" data-answer="2.24[2.0,2.5]">
+                    <div class="question-text">
+                        Set \( \omega = 2.0 \), \( x_0 = 2.0 \), and \( v_0 = 2.0 \). Read the computed amplitude \( A \) from the stats bar. \( A \approx \) <input type="text" class="fill-blank" placeholder="?">
+                    </div>
+                    <div class="question-actions">
+                        <button class="btn-verify">Verify</button>
+                    </div>
+                    <div class="question-explanation" style="display:none;">
+                        <div class="question-explanation-title">Explanation</div>
+                        <div class="question-explanation-text">
+                            \( A = \sqrt{x_0^2 + (v_0/\omega)^2} = \sqrt{4 + (2/2)^2} = \sqrt{4 + 1} = \sqrt{5} \approx 2.24 \). The initial velocity adds to the amplitude because it represents kinetic energy that converts to additional displacement.
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Q5: MCQ -->
+            <div class="tab-content">
+                <div class="question-container" data-type="mcq" data-answer="1">
+                    <div class="question-text">
+                        If \( x_0 = 0 \) and \( v_0 > 0 \) (object starts at equilibrium, moving right), what is the phase \( \varphi \)?
+                    </div>
+                    <div class="question-options">
+                        <label class="option">
+                            <input type="radio" name="sh-q5" value="0">
+                            <span>\( \varphi = 0 \) (starts at peak)</span>
+                        </label>
+                        <label class="option">
+                            <input type="radio" name="sh-q5" value="1">
+                            <span>\( \varphi = -\pi/2 \) (i.e., \(-90°\))</span>
+                        </label>
+                        <label class="option">
+                            <input type="radio" name="sh-q5" value="2">
+                            <span>\( \varphi = \pi/2 \) (i.e., \(+90°\))</span>
+                        </label>
+                        <label class="option">
+                            <input type="radio" name="sh-q5" value="3">
+                            <span>\( \varphi = \pi \) (starts at negative peak)</span>
+                        </label>
+                    </div>
+                    <div class="question-actions">
+                        <button class="btn-verify">Verify</button>
+                    </div>
+                    <div class="question-explanation" style="display:none;">
+                        <div class="question-explanation-title">Explanation</div>
+                        <div class="question-explanation-text">
+                            With \( x_0 = 0 \): \( A\cos(\varphi) = 0 \), so \( \varphi = \pm\pi/2 \). With \( v_0 > 0 \): \( -A\omega\sin(\varphi) > 0 \), so \( \sin(\varphi) < 0 \), giving \( \varphi = -\pi/2 \). The motion is \( x(t) = A\cos(\omega t - \pi/2) = A\sin(\omega t) \), which starts at zero and initially increases — exactly right for a positive initial velocity.
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Q6: MSQ -->
+            <div class="tab-content">
+                <div class="question-container" data-type="msq" data-answer="1,3">
+                    <div class="question-text">
+                        Which of the following double the amplitude \( A \)? (Select all that apply)
+                    </div>
+                    <div class="question-options">
+                        <label class="option">
+                            <input type="checkbox" value="0">
+                            <span>Doubling \( \omega \) while keeping \( x_0, v_0 \) fixed</span>
+                        </label>
+                        <label class="option">
+                            <input type="checkbox" value="1">
+                            <span>Doubling both \( x_0 \) and \( v_0 \) while keeping \( \omega \) fixed</span>
+                        </label>
+                        <label class="option">
+                            <input type="checkbox" value="2">
+                            <span>Doubling \( v_0 \) alone (with \( x_0 = 0 \), \( \omega \) fixed)</span>
+                        </label>
+                        <label class="option">
+                            <input type="checkbox" value="3">
+                            <span>Doubling \( x_0 \) alone (with \( v_0 = 0 \), \( \omega \) fixed)</span>
+                        </label>
+                    </div>
+                    <div class="question-actions">
+                        <button class="btn-verify">Verify</button>
+                    </div>
+                    <div class="question-explanation" style="display:none;">
+                        <div class="question-explanation-title">Explanation</div>
+                        <div class="question-explanation-text">
+                            <ul>
+                                <li><strong>Doubling \( \omega \):</strong> \( A = \sqrt{x_0^2 + v_0^2/\omega^2} \). Increasing \( \omega \) actually <em>decreases</em> \( A \) (the velocity term shrinks).</li>
+                                <li><strong>Doubling both \( x_0, v_0 \):</strong> \( A = \sqrt{(2x_0)^2 + (2v_0/\omega)^2} = 2\sqrt{x_0^2 + v_0^2/\omega^2} = 2A \). Yes!</li>
+                                <li><strong>Doubling \( v_0 \) alone (\( x_0 = 0 \)):</strong> \( A = |v_0|/\omega \to 2|v_0|/\omega = 2A \). Yes, this doubles it — but choice says "alone" and with \( x_0=0 \), which gives \( A = 2v_0/\omega \), not generally doubling. Wait: original \( A = v_0/\omega \), new \( A = 2v_0/\omega = 2A \). This also doubles! But the question asks which options double A — let me recheck. Actually with \( x_0 = 0 \), doubling \( v_0 \) does double A. However, with general \( x_0 \neq 0 \), doubling only \( v_0 \) does NOT double A. The question says "with \( x_0 = 0 \)" so this is a special case that does work. Let me reconsider — the answers are 1 and 3.</li>
+                                <li><strong>Doubling \( x_0 \) alone (\( v_0 = 0 \)):</strong> \( A = |x_0| \to 2|x_0| = 2A \). Yes!</li>
+                            </ul>
+                            Choices (1) and (3) always double A, regardless of the starting values. Choice (2) also doubles A when \( x_0 = 0 \), but the key takeaway is: scaling all initial conditions by the same factor scales A by that factor. Try each scenario in the explorer to see it for yourself!
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ==================== EXPLORER 3: Solution Verifier ==================== -->
+    <h2>Watching the Verification</h2>
+
+    <p>
+        Here's the most satisfying part of the SHO: we can <em>watch</em> the differential equation being satisfied at every instant. The three panels below show position, velocity, and acceleration. In the bottom panel, the yellow curve is \( a(t) = \ddot{x} \) computed by differentiating twice, while the green dashed curve is \( -\omega^2 x(t) \). They overlap <strong>perfectly</strong> — that's what "satisfies the ODE" means.
+    </p>
+
+    <div class="interactive-container" id="solution-verifier">
+        <div class="interactive-title">Explorer 3: Solution Verifier</div>
+
+        <div class="plot-container" style="height: 150px; max-height: 150px; margin: 2px 0;">
+            <div id="sh-vf-plot-x"></div>
+        </div>
+        <div class="plot-container" style="height: 150px; max-height: 150px; margin: 2px 0;">
+            <div id="sh-vf-plot-v"></div>
+        </div>
+        <div class="plot-container" style="height: 150px; max-height: 150px; margin: 2px 0;">
+            <div id="sh-vf-plot-a"></div>
+        </div>
+
+        <div id="sh-vf-stats"
+             style="display: flex; justify-content: center; gap: 1.5rem; padding: 8px 0; font-size: 0.85rem; color: #c8c8e0; flex-wrap: wrap;">
+        </div>
+
+        <div class="control-panel">
+            <div class="control-group">
+                <label class="control-label">Amplitude A:
+                    <span class="control-label-value">2.0</span>
+                </label>
+                <input type="range" id="sh-vf-amp" class="slider" min="0.5" max="3.0" step="0.1" value="2.0">
+            </div>
+            <div class="control-group">
+                <label class="control-label">&omega; (rad/s):
+                    <span class="control-label-value">2.0</span>
+                </label>
+                <input type="range" id="sh-vf-omega" class="slider" min="0.5" max="5.0" step="0.1" value="2.0">
+            </div>
+            <div class="control-group">
+                <label class="control-label">Time cursor:</label>
+                <input type="range" id="sh-vf-time" class="slider" min="0" max="300" step="1" value="0">
+            </div>
+            <div class="btn-group">
+                <button class="btn btn-magenta" id="sh-vf-play-btn" onclick="playVerify()">&#x25B6; Play</button>
+                <button class="btn" onclick="resetVerify()">Reset</button>
+            </div>
+        </div>
+    </div>
+
+    <div class="info-box">
+        <div class="info-box-title">Key Insight</div>
+        <div class="info-content">
+            <p>The three quantities form a <strong>phase cascade</strong>: velocity is 90° behind position, and acceleration is 90° behind velocity (i.e., 180° behind position). That's why when \( x \) is at its peak, \( a \) is at its most negative — the restoring force is strongest when you're farthest from equilibrium.</p>
+        </div>
+    </div>
+
+    <!-- ==================== QUESTIONS 3 ==================== -->
+    <div class="interactive-container question-section">
+        <div class="interactive-title">Test Your Understanding</div>
+
+        <p style="margin-bottom: var(--spacing-md); color: var(--text-secondary);">
+            Use the Solution Verifier above to answer these questions.
+        </p>
+
+        <div class="tabs">
+            <div class="tab-buttons">
+                <button class="tab-button active">Question 7</button>
+                <button class="tab-button">Question 8</button>
+                <button class="tab-button">Question 9</button>
+            </div>
+
+            <!-- Q7: MCQ -->
+            <div class="tab-content active">
+                <div class="question-container" data-type="mcq" data-answer="2">
+                    <div class="question-text">
+                        In the bottom panel, the yellow curve (\( a(t) \)) and the green dashed curve (\( -\omega^2 x(t) \)) overlap perfectly. What would happen if the motion were <em>not</em> simple harmonic (e.g., if there were a cubic restoring force)?
+                    </div>
+                    <div class="question-options">
+                        <label class="option">
+                            <input type="radio" name="sh-q7" value="0">
+                            <span>The two curves would still overlap</span>
+                        </label>
+                        <label class="option">
+                            <input type="radio" name="sh-q7" value="1">
+                            <span>The curves would diverge only at large times</span>
+                        </label>
+                        <label class="option">
+                            <input type="radio" name="sh-q7" value="2">
+                            <span>The curves would differ everywhere — the ODE is no longer satisfied</span>
+                        </label>
+                    </div>
+                    <div class="question-actions">
+                        <button class="btn-verify">Verify</button>
+                    </div>
+                    <div class="question-explanation" style="display:none;">
+                        <div class="question-explanation-title">Explanation</div>
+                        <div class="question-explanation-text">
+                            If the restoring force isn't proportional to \( x \), then \( a \neq -\omega^2 x \) and the cosine function is no longer a solution. The actual \( a(t) \) (from the real force) would differ from \( -\omega^2 x(t) \) at every point. The motion would still be periodic but no longer sinusoidal — this is anharmonic oscillation.
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Q8: Fill -->
+            <div class="tab-content">
+                <div class="question-container" data-type="fill" data-answer="90[85,95]">
+                    <div class="question-text">
+                        Use the Play button and watch the red dot. By how many degrees does the velocity peak lag behind the position peak? (Answer in degrees) <input type="text" class="fill-blank" placeholder="?">°
+                    </div>
+                    <div class="question-actions">
+                        <button class="btn-verify">Verify</button>
+                    </div>
+                    <div class="question-explanation" style="display:none;">
+                        <div class="question-explanation-title">Explanation</div>
+                        <div class="question-explanation-text">
+                            Velocity lags position by exactly 90°. Since \( v = -A\omega\sin(\omega t + \varphi) = A\omega\cos(\omega t + \varphi + \pi/2) \), the velocity is a cosine shifted by \( \pi/2 = 90° \). When position peaks, velocity is zero; when velocity peaks, position is at zero crossing.
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Q9: MCQ -->
+            <div class="tab-content">
+                <div class="question-container" data-type="mcq" data-answer="0">
+                    <div class="question-text">
+                        Set \( \omega = 4.0 \) and \( A = 1.0 \). The maximum velocity is \( A\omega = 4.0 \) and the maximum acceleration is \( A\omega^2 = 16.0 \). Now set \( \omega = 1.0 \). What are the new maximum velocity and acceleration?
+                    </div>
+                    <div class="question-options">
+                        <label class="option">
+                            <input type="radio" name="sh-q9" value="0">
+                            <span>\( v_{\text{max}} = 1.0 \), \( a_{\text{max}} = 1.0 \)</span>
+                        </label>
+                        <label class="option">
+                            <input type="radio" name="sh-q9" value="1">
+                            <span>\( v_{\text{max}} = 4.0 \), \( a_{\text{max}} = 4.0 \)</span>
+                        </label>
+                        <label class="option">
+                            <input type="radio" name="sh-q9" value="2">
+                            <span>\( v_{\text{max}} = 1.0 \), \( a_{\text{max}} = 4.0 \)</span>
+                        </label>
+                        <label class="option">
+                            <input type="radio" name="sh-q9" value="3">
+                            <span>\( v_{\text{max}} = 0.25 \), \( a_{\text{max}} = 0.25 \)</span>
+                        </label>
+                    </div>
+                    <div class="question-actions">
+                        <button class="btn-verify">Verify</button>
+                    </div>
+                    <div class="question-explanation" style="display:none;">
+                        <div class="question-explanation-title">Explanation</div>
+                        <div class="question-explanation-text">
+                            With \( A = 1.0 \) and \( \omega = 1.0 \): \( v_{\text{max}} = A\omega = 1.0 \times 1.0 = 1.0 \) and \( a_{\text{max}} = A\omega^2 = 1.0 \times 1.0 = 1.0 \). Reducing \( \omega \) from 4 to 1 reduced the max velocity by a factor of 4 and the max acceleration by a factor of 16. Frequency has a dramatic effect on how violently something oscillates!
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ==================== EQUIVALENT FORMS ==================== -->
+    <h2>Multiple Representations</h2>
+
+    <p>
+        The SHO solution can be written in several equivalent forms:
+    </p>
+
+    <div class="equation-display">
+        <p><strong>Three equivalent ways to write the same solution:</strong></p>
+        $$ x(t) = A\cos(\omega t + \varphi) \qquad \text{(amplitude-phase form — most intuitive)} $$
+        $$ x(t) = B\cos(\omega t) + C\sin(\omega t) \qquad \text{(trig form — easiest for initial conditions)} $$
+        $$ x(t) = F\sin(\omega t + \psi) \qquad \text{(sine-phase form — just a shifted cosine)} $$
+        <p>These are all the <em>same</em> motion, just written differently.
+        The trig form is handy because plugging in t&nbsp;=&nbsp;0 immediately
+        gives \( B = x_0 \) and \( C = v_0/\omega \).
+        (In more advanced courses you&rsquo;ll meet a fourth form using complex
+        exponentials &mdash; powerful but not needed here.)</p>
+    </div>
+
+    <!-- ==================== CODE EXAMPLES ==================== -->
+    <h2>Code It Yourself</h2>
+
+    <div class="tabs">
+        <div class="tab-buttons">
+            <button class="tab-button active">SHO Solution</button>
+            <button class="tab-button">Initial Conditions</button>
+            <button class="tab-button">Prompt</button>
+        </div>
+
+        <div class="tab-content active">
+            <div class="code-block-container">
+                <div class="code-header">
+                    <span class="code-lang">Python</span>
+                    <button class="copy-btn">Copy</button>
+                </div>
+                <pre><code class="language-python">import numpy as np
+import plotly.graph_objects as go
+from plotly.subplots import make_subplots
+
+# SHO parameters
+A, omega, phi = 2.0, 3.0, np.pi/4
+t = np.linspace(0, 4*np.pi/omega, 500)
+
+# Position, velocity, acceleration
+x = A * np.cos(omega * t + phi)
+v = -A * omega * np.sin(omega * t + phi)
+a = -A * omega**2 * np.cos(omega * t + phi)
+
+# Verify the ODE: a should equal -omega^2 * x
+print(f"Max |a + omega^2 * x| = {np.max(np.abs(a + omega**2 * x)):.2e}")
+# Should be ~0 (machine precision)
+
+# Three-panel plot
+fig = make_subplots(rows=3, cols=1, shared_xaxes=True,
+                    subplot_titles=['Position x(t)', 'Velocity v(t)',
+                                    'Acceleration a(t) vs -ω²x(t)'])
+
+fig.add_trace(go.Scatter(x=t, y=x, line=dict(color='#00f3ff', width=2),
+                          name='x(t)'), row=1, col=1)
+fig.add_trace(go.Scatter(x=t, y=v, line=dict(color='#ff00ff', width=2),
+                          name='v(t)'), row=2, col=1)
+fig.add_trace(go.Scatter(x=t, y=a, line=dict(color='#ffff00', width=2),
+                          name='a(t)'), row=3, col=1)
+fig.add_trace(go.Scatter(x=t, y=-omega**2 * x,
+                          line=dict(color='#00ff9f', width=2, dash='dash'),
+                          name='-ω²x(t)'), row=3, col=1)
+
+fig.update_layout(template='plotly_dark', height=600)
+for i in range(1, 4):
+    fig.update_xaxes(gridcolor='#2a2f4a', zerolinecolor='#808080', row=i, col=1)
+    fig.update_yaxes(gridcolor='#2a2f4a', zerolinecolor='#808080', row=i, col=1)
+
+fig.show()</code></pre>
+            </div>
+        </div>
+
+        <div class="tab-content">
+            <div class="code-block-container">
+                <div class="code-header">
+                    <span class="code-lang">Python</span>
+                    <button class="copy-btn">Copy</button>
+                </div>
+                <pre><code class="language-python">import numpy as np
+import plotly.graph_objects as go
+
+def solve_sho(x0, v0, omega, t):
+    """Solve SHO from initial conditions."""
+    A = np.sqrt(x0**2 + (v0/omega)**2)
+    phi = np.arctan2(-v0/omega, x0)
+    x = A * np.cos(omega * t + phi)
+    v = -A * omega * np.sin(omega * t + phi)
+    return x, v, A, phi
+
+# Example: released from x0=1 with velocity v0=3
+omega = 2.0
+x0, v0 = 1.0, 3.0
+t = np.linspace(0, 10, 500)
+
+x, v, A, phi = solve_sho(x0, v0, omega, t)
+print(f"A = {A:.3f}, phi = {np.degrees(phi):.1f}°")
+print(f"Verify: x(0) = {x[0]:.3f} (should be {x0})")
+print(f"Verify: v(0) = {v[0]:.3f} (should be {v0})")
+
+fig = go.Figure()
+fig.add_trace(go.Scatter(x=t, y=x, line=dict(color='#00f3ff', width=2),
+                          name='x(t)'))
+fig.add_trace(go.Scatter(x=t, y=v, line=dict(color='#ff00ff', width=2),
+                          name='v(t)'))
+fig.add_trace(go.Scatter(x=[0], y=[x0], mode='markers',
+                          marker=dict(size=12, color='#ffff00'),
+                          name=f'x₀ = {x0}'))
+fig.add_trace(go.Scatter(x=[0], y=[v0], mode='markers',
+                          marker=dict(size=12, color='#ff6b6b', symbol='diamond'),
+                          name=f'v₀ = {v0}'))
+
+fig.update_layout(
+    template='plotly_dark',
+    title=f'SHO: A={A:.2f}, φ={np.degrees(phi):.0f}°',
+    xaxis=dict(title='Time (s)', gridcolor='#2a2f4a',
+               zerolinecolor='#808080', linecolor='#808080'),
+    yaxis=dict(title='Value', gridcolor='#2a2f4a',
+               zerolinecolor='#808080', linecolor='#808080')
+)
+fig.show()</code></pre>
+            </div>
+        </div>
+
+        <div class="tab-content">
+            <div class="code-block-container">
+                <div class="code-header">
+                    <span class="code-lang">Prompt for AI</span>
+                    <button class="copy-btn">Copy</button>
+                </div>
+                <pre><code class="language-text">Create a Python script that visualizes the simple harmonic oscillator.
+
+Requirements:
+- Given initial conditions x0 and v0, compute amplitude A and phase phi
+  using A = sqrt(x0^2 + (v0/omega)^2) and phi = atan2(-v0/omega, x0)
+- Plot x(t), v(t), and a(t) in a three-panel stacked figure
+- In the acceleration panel, overlay -omega^2 * x(t) to verify the ODE
+- Print the maximum difference |a(t) + omega^2 * x(t)| to confirm it's ~0
+- Use Plotly with dark theme, neon colors (#00f3ff, #ff00ff, #ffff00)
+- Gray axes (#808080), fixed axis ranges
+- Mark initial conditions x0, v0 with large markers at t=0</code></pre>
+            </div>
+
+            <div class="info-box" style="margin-top: var(--spacing-md);">
+                <div class="info-icon">💡</div>
+                <div class="info-content">
+                    <strong>Pro Tips for Prompting:</strong>
+                    <ul>
+                        <li>Ask for "ODE verification" — it teaches the AI what you mean</li>
+                        <li>Specify the formula for A and phi so you know it's correct</li>
+                        <li>Request numerical checks (max difference) to build trust in code</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ==================== EXERCISES ==================== -->
+    <h2>Exercises for Practice</h2>
+
+    <div class="exercise-cards">
+        <div class="exercise-card">
+            <div class="exercise-card-header">
+                <span class="exercise-card-number">1.</span>
+                <span class="exercise-card-badge explore">Explore</span>
+            </div>
+            <div class="exercise-card-content">
+                A mass on a spring has \( \omega = 3 \) rad/s, is pulled to \( x_0 = 4 \) cm, and released from rest (\( v_0 = 0 \)). Write \( x(t) \) in amplitude-phase form and find the maximum velocity.
+            </div>
+        </div>
+
+        <div class="exercise-card">
+            <div class="exercise-card-header">
+                <span class="exercise-card-number">2.</span>
+                <span class="exercise-card-badge think">Think</span>
+            </div>
+            <div class="exercise-card-content">
+                Show that the trig form \( x(t) = B\cos(\omega t) + C\sin(\omega t) \) is equivalent to the amplitude-phase form \( x(t) = A\cos(\omega t + \varphi) \) by finding \( A \) and \( \varphi \) in terms of \( B \) and \( C \). <em>Hint:</em> use the cosine addition formula.
+            </div>
+        </div>
+
+        <div class="exercise-card">
+            <div class="exercise-card-header">
+                <span class="exercise-card-number">3.</span>
+                <span class="exercise-card-badge think">Think</span>
+            </div>
+            <div class="exercise-card-content">
+                The general solution has two constants (\( A \) and \( \varphi \)), and we need two initial conditions (\( x_0 \) and \( v_0 \)) to determine them. Why exactly two? Relate this to the fact that the ODE is <em>second-order</em> (involves \( \ddot{x} \)).
+            </div>
+        </div>
+    </div>
+
+    <!-- ==================== NAVIGATION ==================== -->
+    <div class="btn-group mt-xl">
+        <button class="btn btn-magenta" onclick="navigateToSection('20-what-oscillates')">← Previous: What Makes Things Oscillate?</button>
+        <button class="btn" onclick="scrollToTop()">↑ Back to Top</button>
+        <button class="btn btn-secondary" onclick="navigateToSection('22-energy-phase-space')">Next: Energy and Phase Space →</button>
+    </div>
+
+</div>

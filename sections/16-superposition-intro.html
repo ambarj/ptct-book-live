@@ -1,0 +1,832 @@
+<!-- Section 2.10: The Superposition Principle -->
+<!-- Source: Lecture3.nb (Part 1) -->
+<!-- Core concept: Linear superposition of oscillations -->
+<!-- Time: ~20 minutes -->
+<!-- Prerequisites: Familiarity with sine/cosine, basic plotting -->
+
+<h1>The Superposition Principle</h1>
+
+<p>
+    Drop two stones into a pond.  The ripples from each stone spread outward
+    independently &mdash; and where they overlap, the water simply adds the
+    two displacements together.  This is the <strong>superposition principle</strong>:
+    for linear systems, the sum of any two solutions is itself a solution.
+    It's one of the most powerful ideas in physics, underlying everything from
+    sound and light to quantum mechanics.
+</p>
+
+<div class="info-box">
+    <div class="info-box-title">Learning Objectives</div>
+    <ul>
+        <li>State the superposition principle and explain when it applies</li>
+        <li>Add two sinusoidal waves and predict the resulting amplitude</li>
+        <li>Distinguish linear from nonlinear systems using the superposition test</li>
+        <li>Build complex waveforms from simple sinusoidal components</li>
+    </ul>
+</div>
+
+<div class="equation-display">
+    <p><strong>The superposition principle:</strong></p>
+    $$ \text{If } x_1(t) \text{ and } x_2(t) \text{ are solutions, then }
+       x(t) = A\,x_1(t) + B\,x_2(t) \text{ is also a solution.} $$
+    <p>
+        This works for any linear system &mdash; the simple harmonic oscillator
+        \( \ddot{x} + \omega^2 x = 0 \), the wave equation, Maxwell's equations
+        (in vacuum), and Schr&ouml;dinger's equation.  It fails for nonlinear
+        systems like \( \ddot{x} + x^3 = 0 \).
+    </p>
+</div>
+
+<hr>
+
+<!-- ========== EXPLORER 1: WAVE ADDER ========== -->
+
+<h2>Adding Two Waves</h2>
+
+<p>
+    Start with the simplest case: two cosine waves at the <em>same frequency</em>
+    \( \omega \).  Adjust the amplitudes and phases to see how the sum changes.
+    The key discovery: the sum of two cosines at frequency \( \omega \) is
+    <strong>always another cosine at frequency \( \omega \)</strong> &mdash; only
+    the amplitude and phase change.
+</p>
+
+<div class="interactive-container" id="wave-adder">
+    <div class="interactive-title">Interactive: Wave Adder</div>
+
+    <div class="plot-container">
+        <div id="sp-wave-plot" style="width: 100%; height: 400px;"></div>
+    </div>
+
+    <div id="sp-wave-stats"
+         style="display: flex; justify-content: center; gap: 1.5rem; padding: 8px 0; font-size: 0.85rem; color: #c8c8e0; flex-wrap: wrap;">
+    </div>
+
+    <div class="control-panel">
+        <div class="control-group">
+            <label class="control-label">A&sub1;:
+                <span class="control-label-value">1.0</span>
+            </label>
+            <input type="range" class="slider" id="sp-a1-slider"
+                   min="0" max="2" step="0.1" value="1.0">
+        </div>
+        <div class="control-group">
+            <label class="control-label">A&sub2;:
+                <span class="control-label-value">1.0</span>
+            </label>
+            <input type="range" class="slider" id="sp-a2-slider"
+                   min="0" max="2" step="0.1" value="1.0">
+        </div>
+        <div class="control-group">
+            <label class="control-label">&phi;&sub1;:
+                <span class="control-label-value">0&deg;</span>
+            </label>
+            <input type="range" class="slider" id="sp-phi1-slider"
+                   min="0" max="6.283" step="0.05" value="0">
+        </div>
+        <div class="control-group">
+            <label class="control-label">&phi;&sub2;:
+                <span class="control-label-value">0&deg;</span>
+            </label>
+            <input type="range" class="slider" id="sp-phi2-slider"
+                   min="0" max="6.283" step="0.05" value="0">
+        </div>
+        <div class="control-group">
+            <label class="control-label">&omega;:
+                <span class="control-label-value">1.0</span>
+            </label>
+            <input type="range" class="slider" id="sp-omega-slider"
+                   min="0.5" max="3.0" step="0.1" value="1.0">
+        </div>
+        <div class="btn-group">
+            <button class="btn" onclick="resetWaveAdder()">Reset</button>
+        </div>
+    </div>
+</div>
+
+<div class="info-box">
+    <div class="info-box-title">Key Insight</div>
+    <p>
+        When \( \Delta\phi = 0 \) (waves in phase), the amplitudes <strong>add</strong>:
+        \( A = A_1 + A_2 \).  When \( \Delta\phi = 180° \) (waves out of phase),
+        they <strong>subtract</strong>: \( A = |A_1 - A_2| \).  In general,
+        \( A^2 = A_1^2 + A_2^2 + 2A_1A_2\cos(\Delta\phi) \).
+        Set A&sub1; = A&sub2; = 1 and sweep &phi;&sub2; from 0&deg; to 180&deg;
+        to watch the sum smoothly go from constructive to destructive interference.
+    </p>
+</div>
+
+<!-- Test Your Understanding #1 -->
+<div class="interactive-container question-section">
+    <div class="interactive-title">Test Your Understanding</div>
+
+    <p style="margin-bottom: var(--spacing-md); color: var(--text-secondary);">
+        Use the Wave Adder to answer these questions.
+    </p>
+
+    <div class="tabs">
+        <div class="tab-buttons">
+            <button class="tab-button active">Question 1</button>
+            <button class="tab-button">Question 2</button>
+            <button class="tab-button">Question 3</button>
+        </div>
+
+        <!-- Q1: MCQ -->
+        <div class="tab-content active">
+            <div class="question-container" data-type="mcq" data-answer="2">
+                <div class="question-text">
+                    Set A&sub1; = 1, A&sub2; = 1, &phi;&sub1; = 0.
+                    What phase difference &Delta;&phi; gives complete cancellation (A = 0)?
+                </div>
+                <div class="question-options">
+                    <label class="option">
+                        <input type="radio" name="sp-q1" value="0">
+                        <span>0&deg;</span>
+                    </label>
+                    <label class="option">
+                        <input type="radio" name="sp-q1" value="1">
+                        <span>90&deg;</span>
+                    </label>
+                    <label class="option">
+                        <input type="radio" name="sp-q1" value="2">
+                        <span>180&deg;</span>
+                    </label>
+                    <label class="option">
+                        <input type="radio" name="sp-q1" value="3">
+                        <span>270&deg;</span>
+                    </label>
+                </div>
+                <div class="question-actions">
+                    <button class="btn-verify">Verify</button>
+                </div>
+                <div class="question-explanation" style="display: none;">
+                    <div class="question-explanation-title">Explanation</div>
+                    <div class="question-explanation-text">
+                        When \( \Delta\phi = 180° = \pi \), the two waves are perfectly
+                        out of phase: one reaches its peak exactly when the other reaches
+                        its trough.  With equal amplitudes, they cancel completely.
+                        This is <strong>destructive interference</strong>.  Set &phi;&sub2;
+                        to 180&deg; to see the yellow sum flatline at zero.
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Q2: Fill -->
+        <div class="tab-content">
+            <div class="question-container" data-type="fill" data-answer="2[1.8,2.2]">
+                <div class="question-text">
+                    With A&sub1; = 1, A&sub2; = 1, and &Delta;&phi; = 0, the
+                    resultant amplitude A is:
+                    <br><br>
+                    A = <input type="text" class="fill-blank" placeholder="value">
+                </div>
+                <div class="question-actions">
+                    <button class="btn-verify">Verify</button>
+                </div>
+                <div class="question-explanation" style="display: none;">
+                    <div class="question-explanation-title">Explanation</div>
+                    <div class="question-explanation-text">
+                        When two waves are in phase (\( \Delta\phi = 0 \)), their amplitudes
+                        simply add: \( A = A_1 + A_2 = 1 + 1 = 2 \).  This is
+                        <strong>constructive interference</strong>.  The formula gives
+                        \( A^2 = 1 + 1 + 2\cos(0) = 4 \), so \( A = 2 \).
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Q3: Fill -->
+        <div class="tab-content">
+            <div class="question-container" data-type="fill" data-answer="1.41[1.3,1.5]">
+                <div class="question-text">
+                    With A&sub1; = 1, A&sub2; = 1, and &Delta;&phi; = 90&deg;,
+                    the resultant amplitude A is approximately:
+                    <br><br>
+                    A &asymp; <input type="text" class="fill-blank" placeholder="value">
+                </div>
+                <div class="question-actions">
+                    <button class="btn-verify">Verify</button>
+                </div>
+                <div class="question-explanation" style="display: none;">
+                    <div class="question-explanation-title">Explanation</div>
+                    <div class="question-explanation-text">
+                        \( A^2 = 1 + 1 + 2\cos(90°) = 2 + 0 = 2 \), so
+                        \( A = \sqrt{2} \approx 1.41 \).  At 90&deg; phase difference,
+                        there's neither constructive nor destructive interference &mdash;
+                        the result is between the two extremes.
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<hr>
+
+<!-- ========== EXPLORER 2: LINEARITY TESTER ========== -->
+
+<h2>When Does Superposition Work?</h2>
+
+<p>
+    Superposition works because the governing equation is <strong>linear</strong>.
+    Here's the test: take two signals, apply the system to their sum, and compare
+    with applying the system to each separately then adding.  If
+    \( f(x_1 + x_2) = f(x_1) + f(x_2) \), the system is linear and
+    superposition holds.  Try switching to a nonlinear system to see what breaks.
+</p>
+
+<div class="interactive-container" id="linearity-tester">
+    <div class="interactive-title">Interactive: Linearity Tester</div>
+
+    <div style="display: flex; gap: 0.5rem; flex-wrap: wrap;">
+        <div class="plot-container" style="flex: 1; min-width: 280px;">
+            <div id="sp-lin-input-plot" style="width: 100%; height: 380px;"></div>
+        </div>
+        <div class="plot-container" style="flex: 1; min-width: 280px;">
+            <div id="sp-lin-output-plot" style="width: 100%; height: 380px;"></div>
+        </div>
+    </div>
+
+    <div id="sp-lin-stats"
+         style="display: flex; justify-content: center; gap: 1.5rem; padding: 8px 0; font-size: 0.85rem; color: #c8c8e0; flex-wrap: wrap;">
+    </div>
+
+    <div class="control-panel">
+        <div class="control-group">
+            <label class="control-label">System:
+                <span class="control-label-value">f(x) = x (linear)</span>
+            </label>
+            <select id="sp-system-select"
+                    style="width: 100%; padding: 8px 12px; background: #1a1f3a; color: #c8c8e0; border: 1px solid #2a2f4a; border-radius: 6px; font-size: 0.85rem; cursor: pointer;">
+                <option value="linear" selected>f(x) = x (linear)</option>
+                <option value="double">f(x) = 2x (linear, scaled)</option>
+                <option value="square">f(x) = x&sup2; (nonlinear)</option>
+                <option value="cubic">f(x) = x&sup3; (nonlinear)</option>
+            </select>
+        </div>
+        <div class="btn-group">
+            <button class="btn" onclick="resetLinearityTester()">Reset</button>
+        </div>
+    </div>
+</div>
+
+<div class="info-box">
+    <div class="info-box-title">Key Insight</div>
+    <p>
+        For \( f(x) = x \) and \( f(x) = 2x \), the yellow and green curves overlap
+        perfectly: superposition holds.  But for \( f(x) = x^2 \), they diverge
+        dramatically because \( (x_1+x_2)^2 \neq x_1^2 + x_2^2 \) &mdash; the
+        cross term \( 2x_1 x_2 \) breaks superposition.  This is why nonlinear
+        systems are so much harder to analyse: you can't solve the parts separately
+        and add them up.
+    </p>
+</div>
+
+<!-- Test Your Understanding #2 -->
+<div class="interactive-container question-section">
+    <div class="interactive-title">Test Your Understanding</div>
+
+    <p style="margin-bottom: var(--spacing-md); color: var(--text-secondary);">
+        Use the Linearity Tester to answer these questions.
+    </p>
+
+    <div class="tabs">
+        <div class="tab-buttons">
+            <button class="tab-button active">Question 4</button>
+            <button class="tab-button">Question 5</button>
+            <button class="tab-button">Question 6</button>
+        </div>
+
+        <!-- Q4: MCQ -->
+        <div class="tab-content active">
+            <div class="question-container" data-type="mcq" data-answer="0">
+                <div class="question-text">
+                    For which system(s) do the two curves in the right panel
+                    overlap exactly?
+                </div>
+                <div class="question-options">
+                    <label class="option">
+                        <input type="radio" name="sp-q4" value="0">
+                        <span>f(x) = x and f(x) = 2x (both linear)</span>
+                    </label>
+                    <label class="option">
+                        <input type="radio" name="sp-q4" value="1">
+                        <span>f(x) = x&sup2; and f(x) = x&sup3;</span>
+                    </label>
+                    <label class="option">
+                        <input type="radio" name="sp-q4" value="2">
+                        <span>All four systems</span>
+                    </label>
+                    <label class="option">
+                        <input type="radio" name="sp-q4" value="3">
+                        <span>None of them</span>
+                    </label>
+                </div>
+                <div class="question-actions">
+                    <button class="btn-verify">Verify</button>
+                </div>
+                <div class="question-explanation" style="display: none;">
+                    <div class="question-explanation-title">Explanation</div>
+                    <div class="question-explanation-text">
+                        Superposition holds only for linear systems.  Both \( f(x) = x \) and
+                        \( f(x) = 2x \) are linear (they satisfy \( f(\alpha x) = \alpha f(x) \)
+                        and \( f(x_1+x_2) = f(x_1)+f(x_2) \)).  The nonlinear systems
+                        \( x^2 \) and \( x^3 \) fail the test.
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Q5: MCQ -->
+        <div class="tab-content">
+            <div class="question-container" data-type="mcq" data-answer="2">
+                <div class="question-text">
+                    Switch to f(x) = x&sup2;.  Why does superposition fail?
+                </div>
+                <div class="question-options">
+                    <label class="option">
+                        <input type="radio" name="sp-q5" value="0">
+                        <span>The inputs are too large</span>
+                    </label>
+                    <label class="option">
+                        <input type="radio" name="sp-q5" value="1">
+                        <span>The frequencies are wrong</span>
+                    </label>
+                    <label class="option">
+                        <input type="radio" name="sp-q5" value="2">
+                        <span>The cross term \( 2x_1 x_2 \) has no counterpart in \( x_1^2 + x_2^2 \)</span>
+                    </label>
+                </div>
+                <div class="question-actions">
+                    <button class="btn-verify">Verify</button>
+                </div>
+                <div class="question-explanation" style="display: none;">
+                    <div class="question-explanation-title">Explanation</div>
+                    <div class="question-explanation-text">
+                        \( (x_1 + x_2)^2 = x_1^2 + 2x_1 x_2 + x_2^2 \), but
+                        \( x_1^2 + x_2^2 \) is missing the \( 2x_1 x_2 \) cross term.
+                        This "mixing" of the two signals is the hallmark of nonlinearity.
+                        It's why nonlinear systems generate new frequencies (harmonics,
+                        sum/difference frequencies) not present in the inputs.
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Q6: MSQ -->
+        <div class="tab-content">
+            <div class="question-container" data-type="msq" data-answer="0,1,3">
+                <div class="question-text">
+                    Which of these physical systems obey superposition?
+                    <strong>(Select all that apply)</strong>
+                </div>
+                <div class="question-options">
+                    <label class="option">
+                        <input type="checkbox" value="0">
+                        <span>Sound waves at normal loudness</span>
+                    </label>
+                    <label class="option">
+                        <input type="checkbox" value="1">
+                        <span>Light in vacuum</span>
+                    </label>
+                    <label class="option">
+                        <input type="checkbox" value="2">
+                        <span>Water waves crashing on a shore</span>
+                    </label>
+                    <label class="option">
+                        <input type="checkbox" value="3">
+                        <span>Voltages in a circuit with resistors only</span>
+                    </label>
+                </div>
+                <div class="question-actions">
+                    <button class="btn-verify">Verify</button>
+                </div>
+                <div class="question-explanation" style="display: none;">
+                    <div class="question-explanation-title">Explanation</div>
+                    <div class="question-explanation-text">
+                        <ul>
+                            <li><strong>True:</strong> Sound waves at normal loudness are well
+                                described by the linear wave equation.  Two conversations don't
+                                "mix" into new frequencies.</li>
+                            <li><strong>True:</strong> Maxwell's equations in vacuum are linear,
+                                so light beams pass through each other without interaction.</li>
+                            <li><strong>False:</strong> Breaking waves are highly nonlinear &mdash;
+                                the large amplitudes and turbulence violate the small-amplitude
+                                assumption needed for linearity.</li>
+                            <li><strong>True:</strong> Ohm's law \( V = IR \) is linear, so
+                                voltages from different sources add directly (this is the basis
+                                of circuit superposition theorems).</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<hr>
+
+<!-- ========== EXPLORER 3: PATTERN BUILDER ========== -->
+
+<h2>Building Complex Waves from Simple Ones</h2>
+
+<p>
+    Since superposition lets us add solutions, we can work backwards: decompose
+    any periodic signal into a sum of sinusoids.  This is the idea behind
+    <strong>Fourier analysis</strong>.  Use the sliders to adjust the amplitudes
+    of the first four harmonics (\( \omega, 2\omega, 3\omega, 4\omega \)) and
+    try to match the target waveform.  Can you build a square wave from sines?
+</p>
+
+<div class="interactive-container" id="pattern-builder">
+    <div class="interactive-title">Interactive: Pattern Builder</div>
+
+    <div style="display: flex; gap: 0.5rem; flex-wrap: wrap;">
+        <div class="plot-container" style="flex: 1; min-width: 280px;">
+            <div id="sp-fourier-comp-plot" style="width: 100%; height: 380px;"></div>
+        </div>
+        <div class="plot-container" style="flex: 1; min-width: 280px;">
+            <div id="sp-fourier-target-plot" style="width: 100%; height: 380px;"></div>
+        </div>
+    </div>
+
+    <div id="sp-fourier-stats"
+         style="display: flex; justify-content: center; gap: 1.5rem; padding: 8px 0; font-size: 0.85rem; color: #c8c8e0; flex-wrap: wrap;">
+    </div>
+
+    <div class="control-panel">
+        <div class="control-group">
+            <label class="control-label">Target:
+                <span class="control-label-value">Square wave</span>
+            </label>
+            <select id="sp-target-select"
+                    style="width: 100%; padding: 8px 12px; background: #1a1f3a; color: #c8c8e0; border: 1px solid #2a2f4a; border-radius: 6px; font-size: 0.85rem; cursor: pointer;">
+                <option value="square" selected>Square wave</option>
+                <option value="sawtooth">Sawtooth wave</option>
+                <option value="triangle">Triangle wave</option>
+            </select>
+        </div>
+        <div class="control-group">
+            <label class="control-label">1&omega; amplitude:
+                <span class="control-label-value">0.00</span>
+            </label>
+            <input type="range" class="slider" id="sp-h1-slider"
+                   min="-2" max="2" step="0.01" value="0">
+        </div>
+        <div class="control-group">
+            <label class="control-label">2&omega; amplitude:
+                <span class="control-label-value">0.00</span>
+            </label>
+            <input type="range" class="slider" id="sp-h2-slider"
+                   min="-2" max="2" step="0.01" value="0">
+        </div>
+        <div class="control-group">
+            <label class="control-label">3&omega; amplitude:
+                <span class="control-label-value">0.00</span>
+            </label>
+            <input type="range" class="slider" id="sp-h3-slider"
+                   min="-2" max="2" step="0.01" value="0">
+        </div>
+        <div class="control-group">
+            <label class="control-label">4&omega; amplitude:
+                <span class="control-label-value">0.00</span>
+            </label>
+            <input type="range" class="slider" id="sp-h4-slider"
+                   min="-2" max="2" step="0.01" value="0">
+        </div>
+        <div class="btn-group">
+            <button class="btn" onclick="showFourierHint()">Hint</button>
+            <button class="btn" onclick="resetPatternBuilder()">Reset</button>
+        </div>
+    </div>
+</div>
+
+<div class="info-box">
+    <div class="info-box-title">Key Insight</div>
+    <p>
+        A square wave's Fourier series is
+        \( \frac{4}{\pi}\left[\sin(\omega t) + \frac{\sin(3\omega t)}{3}
+        + \frac{\sin(5\omega t)}{5} + \cdots\right] \).  Only <em>odd</em>
+        harmonics appear!  With just 4 harmonics, you can already get a
+        recognisable approximation.  This is the power of superposition:
+        infinitely complex signals are built from infinitely simple components.
+    </p>
+</div>
+
+<!-- Test Your Understanding #3 -->
+<div class="interactive-container question-section">
+    <div class="interactive-title">Test Your Understanding</div>
+
+    <p style="margin-bottom: var(--spacing-md); color: var(--text-secondary);">
+        Use the Pattern Builder to answer these questions.
+    </p>
+
+    <div class="tabs">
+        <div class="tab-buttons">
+            <button class="tab-button active">Question 7</button>
+            <button class="tab-button">Question 8</button>
+            <button class="tab-button">Question 9</button>
+        </div>
+
+        <!-- Q7: MCQ -->
+        <div class="tab-content active">
+            <div class="question-container" data-type="mcq" data-answer="1">
+                <div class="question-text">
+                    For a square wave, which harmonic amplitudes should be zero?
+                </div>
+                <div class="question-options">
+                    <label class="option">
+                        <input type="radio" name="sp-q7" value="0">
+                        <span>Odd harmonics (1&omega;, 3&omega;)</span>
+                    </label>
+                    <label class="option">
+                        <input type="radio" name="sp-q7" value="1">
+                        <span>Even harmonics (2&omega;, 4&omega;)</span>
+                    </label>
+                    <label class="option">
+                        <input type="radio" name="sp-q7" value="2">
+                        <span>All harmonics</span>
+                    </label>
+                </div>
+                <div class="question-actions">
+                    <button class="btn-verify">Verify</button>
+                </div>
+                <div class="question-explanation" style="display: none;">
+                    <div class="question-explanation-title">Explanation</div>
+                    <div class="question-explanation-text">
+                        A square wave has half-wave symmetry: \( f(t + T/2) = -f(t) \).
+                        This symmetry forces all even harmonics to zero.  Only odd
+                        harmonics (1&omega;, 3&omega;, 5&omega;, ...) appear, with
+                        amplitudes decreasing as \( 1/n \).  Click "Hint" then set
+                        2&omega; and 4&omega; to zero to see the match improve.
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Q8: Fill -->
+        <div class="tab-content">
+            <div class="question-container" data-type="fill" data-answer="1.27[1.2,1.35]">
+                <div class="question-text">
+                    The fundamental harmonic amplitude for a unit square wave is
+                    \( 4/\pi \approx \):
+                    <br><br>
+                    <input type="text" class="fill-blank" placeholder="value">
+                </div>
+                <div class="question-actions">
+                    <button class="btn-verify">Verify</button>
+                </div>
+                <div class="question-explanation" style="display: none;">
+                    <div class="question-explanation-title">Explanation</div>
+                    <div class="question-explanation-text">
+                        \( 4/\pi \approx 1.273 \).  The fundamental harmonic has a larger
+                        amplitude than the square wave itself because the higher harmonics
+                        subtract from it to create the flat tops and sharp corners.
+                        Set the 1&omega; slider to about 1.27 to see the best fundamental
+                        approximation.
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Q9: MSQ -->
+        <div class="tab-content">
+            <div class="question-container" data-type="msq" data-answer="0,2">
+                <div class="question-text">
+                    Which are true about Fourier decomposition?
+                    <strong>(Select all that apply)</strong>
+                </div>
+                <div class="question-options">
+                    <label class="option">
+                        <input type="checkbox" value="0">
+                        <span>Any periodic signal can be decomposed into sinusoids</span>
+                    </label>
+                    <label class="option">
+                        <input type="checkbox" value="1">
+                        <span>You always need an infinite number of harmonics</span>
+                    </label>
+                    <label class="option">
+                        <input type="checkbox" value="2">
+                        <span>Higher harmonics capture finer details (sharp corners, jumps)</span>
+                    </label>
+                    <label class="option">
+                        <input type="checkbox" value="3">
+                        <span>It only works for square waves</span>
+                    </label>
+                </div>
+                <div class="question-actions">
+                    <button class="btn-verify">Verify</button>
+                </div>
+                <div class="question-explanation" style="display: none;">
+                    <div class="question-explanation-title">Explanation</div>
+                    <div class="question-explanation-text">
+                        <ul>
+                            <li><strong>True:</strong> Fourier's theorem guarantees that any
+                                periodic signal can be decomposed into a sum of sines and cosines.</li>
+                            <li><strong>False:</strong> A pure sine wave needs only 1 harmonic.
+                                Smooth signals need few; sharp signals need many.</li>
+                            <li><strong>True:</strong> High-frequency components oscillate rapidly,
+                                which is needed to create sharp features.  Try removing the
+                                3&omega; term and watch the corners round off.</li>
+                            <li><strong>False:</strong> Fourier decomposition works for sawtooth,
+                                triangle, and any periodic waveform.  Switch the target to see.</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<hr>
+
+<!-- ========== PYTHON CODE ========== -->
+
+<h2>Python Code</h2>
+
+<p>Here's the Python equivalent for superposition and Fourier synthesis.</p>
+
+<div class="tabs">
+    <div class="tab-buttons">
+        <button class="tab-button active">Wave Addition</button>
+        <button class="tab-button">Fourier Synthesis</button>
+        <button class="tab-button">Prompt</button>
+    </div>
+
+    <!-- Tab 1: Wave addition -->
+    <div class="tab-content active">
+        <div class="code-block-container">
+            <div class="code-header">
+                <span class="code-lang">Python</span>
+                <button class="copy-btn">Copy</button>
+            </div>
+            <pre><code class="language-python">import numpy as np
+import plotly.graph_objects as go
+
+t = np.linspace(0, 8*np.pi, 1000)
+
+# Two waves with same frequency, different amplitude and phase
+A1, A2 = 1.0, 1.0
+omega = 1.0
+phi1, phi2 = 0, np.pi/2  # 90° phase difference
+
+x1 = A1 * np.cos(omega*t + phi1)
+x2 = A2 * np.cos(omega*t + phi2)
+x_sum = x1 + x2
+
+# Resultant amplitude from formula
+A_res = np.sqrt(A1**2 + A2**2 + 2*A1*A2*np.cos(phi2-phi1))
+print(f"A_result = {A_res:.4f}  (expected sqrt(2) = {np.sqrt(2):.4f})")
+
+fig = go.Figure()
+fig.add_trace(go.Scatter(x=t, y=x1, name='x₁', line=dict(color='#00f3ff', dash='dot')))
+fig.add_trace(go.Scatter(x=t, y=x2, name='x₂', line=dict(color='#ff00ff', dash='dot')))
+fig.add_trace(go.Scatter(x=t, y=x_sum, name='Sum', line=dict(color='#ffff00', width=2.5)))
+fig.update_layout(template='plotly_dark',
+    xaxis=dict(title='t', gridcolor='#2a2f4a', zerolinecolor='#808080', linecolor='#808080'),
+    yaxis=dict(title='x(t)', range=[-2.5, 2.5], gridcolor='#2a2f4a', zerolinecolor='#808080', linecolor='#808080'))
+fig.show()</code></pre>
+        </div>
+    </div>
+
+    <!-- Tab 2: Fourier synthesis -->
+    <div class="tab-content">
+        <div class="code-block-container">
+            <div class="code-header">
+                <span class="code-lang">Python</span>
+                <button class="copy-btn">Copy</button>
+            </div>
+            <pre><code class="language-python">import numpy as np
+import plotly.graph_objects as go
+
+t = np.linspace(0, 4*np.pi, 1000)
+
+# Build a square wave from Fourier series
+n_harmonics = 20
+x_fourier = np.zeros_like(t)
+for n in range(1, n_harmonics+1, 2):  # odd harmonics only
+    x_fourier += (4/np.pi) * np.sin(n*t) / n
+
+# True square wave for comparison
+x_square = np.sign(np.sin(t))
+
+fig = go.Figure()
+fig.add_trace(go.Scatter(x=t, y=x_square, name='True square wave',
+    line=dict(color='#808080', dash='dash', width=2)))
+fig.add_trace(go.Scatter(x=t, y=x_fourier, name=f'{n_harmonics//2+1} harmonics',
+    line=dict(color='#ffff00', width=2.5)))
+
+# Also show partial sums
+for k in [1, 3, 5]:
+    partial = np.zeros_like(t)
+    for n in range(1, k+1, 2):
+        partial += (4/np.pi) * np.sin(n*t) / n
+    fig.add_trace(go.Scatter(x=t, y=partial, name=f'{k//2+1} term(s)',
+        line=dict(width=1, dash='dot'), opacity=0.5))
+
+fig.update_layout(template='plotly_dark',
+    xaxis=dict(title='t', gridcolor='#2a2f4a', zerolinecolor='#808080', linecolor='#808080'),
+    yaxis=dict(title='x(t)', range=[-1.5, 1.5], gridcolor='#2a2f4a', zerolinecolor='#808080', linecolor='#808080'))
+fig.show()</code></pre>
+        </div>
+    </div>
+
+    <!-- Tab 3: Prompt -->
+    <div class="tab-content">
+        <div class="code-block-container">
+            <div class="code-header">
+                <span class="code-lang">Prompt for AI</span>
+                <button class="copy-btn">Copy</button>
+            </div>
+            <pre><code class="language-text">Explore the superposition principle in Python:
+
+Tasks:
+1. Add two cosine waves at the same frequency ω = 1:
+   - x₁ = A₁ cos(ωt + φ₁), x₂ = A₂ cos(ωt + φ₂)
+   - Plot x₁, x₂, and their sum x₁ + x₂
+   - Verify the amplitude formula: A² = A₁² + A₂² + 2A₁A₂cos(Δφ)
+   - Show constructive (Δφ=0) and destructive (Δφ=π) cases
+
+2. Build a square wave from Fourier series:
+   - Use the formula: (4/π)[sin(ωt) + sin(3ωt)/3 + sin(5ωt)/5 + ...]
+   - Plot partial sums with 1, 3, 5, 10, 20 harmonics
+   - Overlay the true square wave for comparison
+   - Show how more harmonics improve the approximation
+
+3. Linearity test: compute f(x₁+x₂) vs f(x₁)+f(x₂) for:
+   - f(x) = x (should match)
+   - f(x) = x² (should differ by 2x₁x₂ cross term)
+   - Plot both and show the difference
+
+Use plotly_dark template. Gray axes (#808080).</code></pre>
+        </div>
+
+        <div class="info-box" style="margin-top: var(--spacing-md);">
+            <div class="info-box-title">Tips for Prompting</div>
+            <ul>
+                <li>Specify the amplitude formula so you can verify numerically</li>
+                <li>Ask for partial Fourier sums to see convergence</li>
+                <li>Request side-by-side linear vs nonlinear comparisons</li>
+                <li>Try other target waveforms: sawtooth, triangle, pulse train</li>
+            </ul>
+        </div>
+    </div>
+</div>
+
+<hr>
+
+<!-- ========== EXERCISES ========== -->
+
+<h2>Exercises for Practice</h2>
+
+<div class="exercise-cards">
+    <div class="exercise-card">
+        <div class="exercise-card-header">
+            <span class="exercise-card-number">1.</span>
+            <span class="exercise-card-badge explore">Explore</span>
+        </div>
+        <div class="exercise-card-content">
+            In the Wave Adder, set A&sub1; = 1, A&sub2; = 0.5 and sweep
+            &phi;&sub2; from 0&deg; to 360&deg;.  What are the maximum and
+            minimum possible resultant amplitudes?  Verify with the formula
+            \( A^2 = A_1^2 + A_2^2 + 2A_1 A_2 \cos(\Delta\phi) \).
+        </div>
+    </div>
+
+    <div class="exercise-card">
+        <div class="exercise-card-header">
+            <span class="exercise-card-number">2.</span>
+            <span class="exercise-card-badge coding">Coding</span>
+        </div>
+        <div class="exercise-card-content">
+            Write a Python script that builds a sawtooth wave from its
+            Fourier series: \( \frac{2}{\pi}\sum_{n=1}^{N} \frac{(-1)^{n+1}}{n}
+            \sin(n\omega t) \).  Plot partial sums for N = 1, 5, 10, 50 and
+            show how the Gibbs phenomenon creates overshoot at the jumps.
+        </div>
+    </div>
+
+    <div class="exercise-card">
+        <div class="exercise-card-header">
+            <span class="exercise-card-number">3.</span>
+            <span class="exercise-card-badge think">Think</span>
+        </div>
+        <div class="exercise-card-content">
+            In the Linearity Tester, switch between x&sup2; and x&sup3;.  Both
+            are nonlinear, but the x&sup3; curve looks "closer" to matching.
+            Is \( f(x) = x^3 \) "more linear" than \( f(x) = x^2 \)?
+            Can you explain this by expanding \( (x_1 + x_2)^3 \)?
+        </div>
+    </div>
+</div>
+
+<hr>
+
+<!-- ========== NAVIGATION ========== -->
+
+<div class="btn-group mt-xl">
+    <button class="btn btn-magenta" onclick="navigateToSection('15-fitting-uncertainties')">&larr; Previous: Error Bars in Fitting</button>
+    <button class="btn" onclick="scrollToTop()">&uarr; Back to Top</button>
+    <button class="btn btn-secondary" onclick="navigateToSection('17-interference')">Next: Same Frequency Interference &rarr;</button>
+</div>

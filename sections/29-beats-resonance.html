@@ -1,0 +1,776 @@
+<!-- Section 3.10: Beats and Near-Resonance -->
+<!-- Source: Lecture4.nb (Part 3), Lecture4_3.nb -->
+<!-- Core concept: Beats from near-resonant driving, beat frequency, approach to resonance -->
+<!-- Time: ~20 minutes -->
+<!-- Prerequisites: Section 3.9 (resonance, amplitude response, Q factor) -->
+
+<h1>Beats and Near-Resonance</h1>
+
+<p>
+    What happens when the driving frequency is <em>close</em> to the natural
+    frequency but not exactly equal?  You don't get steady resonance &mdash;
+    you get something stranger.  The amplitude rises and falls in a slow,
+    periodic rhythm called <strong>beats</strong>.  The system alternates
+    between moments of strong response (constructive interference) and
+    near-silence (destructive interference).
+</p>
+
+<p>
+    Beats are the bridge between "nothing special" (frequencies far apart) and
+    resonance (frequencies equal).  As you tune \( \omega_d \) closer to
+    \( \omega_0 \), the beats slow down, the peak amplitude grows, and you
+    slide smoothly toward the resonance catastrophe.
+</p>
+
+<div class="info-box">
+    <div class="info-box-title">Learning Objectives</div>
+    <ul>
+        <li>Explain why near-resonant driving produces amplitude modulation (beats)</li>
+        <li>Calculate the beat frequency \( f_{\text{beat}} = |\omega_0 - \omega_d| / (2\pi) \) and beat period</li>
+        <li>Use the product-to-sum identity to decompose beats into carrier and envelope</li>
+        <li>Describe how beats transition into resonance as \( \omega_d \rightarrow \omega_0 \)</li>
+    </ul>
+</div>
+
+<div class="equation-display">
+    <p><strong>Beats from the driven oscillator</strong> (undamped, \( x(0) = 0, v(0) = 0 \)):</p>
+    $$ x(t) = \frac{F_0/m}{\omega_0^2 - \omega_d^2}\bigl[\cos(\omega_d t) - \cos(\omega_0 t)\bigr] $$
+    <p>There's a trig identity that lets us rewrite a <em>difference</em> of two cosines as a <em>product</em> of two sines
+       (you can verify it by expanding the right side).  Applying it here separates the motion into a slow part and a fast part:</p>
+    $$ x(t) = \frac{2(F_0/m)}{\omega_0^2 - \omega_d^2}\;\sin\!\Bigl(\frac{\Delta\omega}{2}\,t\Bigr)\;\sin\!\Bigl(\frac{\omega_0 + \omega_d}{2}\,t\Bigr) $$
+    <p>
+        <strong>Slow envelope:</strong> \( \sin(\Delta\omega\, t/2) \) with beat period \( T_{\text{beat}} = 2\pi / \Delta\omega \)<br>
+        <strong>Fast carrier:</strong> \( \sin(\bar\omega\, t) \) at the average frequency \( \bar\omega = (\omega_0 + \omega_d)/2 \)
+    </p>
+</div>
+
+<hr>
+
+<!-- ========== EXPLORER 1: BEAT VISUALIZER ========== -->
+
+<h2>Seeing the Beats</h2>
+
+<p>
+    The left panel shows \( x(t) \) with its envelope (red dashed).  The right
+    panel shows the <strong>frequency content</strong>: two peaks at \( \omega_0 \)
+    and \( \omega_d \).  As you bring \( \omega_d \) closer to \( \omega_0 \),
+    the two peaks merge, the beats slow down, and the envelope grows taller.
+    Toggle "Add damping" to see how a small \( \gamma = 0.08 \) causes the
+    beats to fade as the transient dies.
+</p>
+
+<div class="interactive-container" id="beat-visualizer">
+    <div class="interactive-title">Explorer 1: Beat Visualizer</div>
+
+    <div style="display: flex; gap: 0.5rem; flex-wrap: wrap;">
+        <div class="plot-container" style="flex: 1; min-width: 280px;">
+            <div id="bt-bv-plot" style="width: 100%; height: 380px;"></div>
+        </div>
+        <div class="plot-container" style="flex: 1; min-width: 280px;">
+            <div id="bt-bv-freq-plot" style="width: 100%; height: 380px;"></div>
+        </div>
+    </div>
+
+    <div id="bt-bv-stats"
+         style="display: flex; justify-content: center; gap: 1.5rem; padding: 8px 0; font-size: 0.85rem; color: #c8c8e0; flex-wrap: wrap;">
+    </div>
+
+    <div class="control-panel">
+        <div class="control-group">
+            <label class="control-label">Driving frequency &omega;<sub>d</sub>:
+                <span class="control-label-value">2.70</span>
+            </label>
+            <input type="range" class="slider" id="bt-bv-wd"
+                   min="1.00" max="4.90" step="0.01" value="2.70">
+        </div>
+        <div class="control-group">
+            <label class="control-label" style="display: flex; align-items: center; gap: 0.5rem;">
+                Add damping (&gamma; = 0.08):
+                <input type="checkbox" id="bt-bv-damp">
+            </label>
+        </div>
+        <div class="btn-group">
+            <button class="btn" onclick="resetBeatVis()">Reset</button>
+        </div>
+    </div>
+</div>
+
+<div class="info-box">
+    <div class="info-box-title">Key Insight</div>
+    <p>
+        Beats are simply <strong>two close frequencies interfering</strong>.
+        The sum \( \cos(\omega_d t) - \cos(\omega_0 t) \) is exactly the same
+        mathematics as two-wave interference from Chapter 2 &mdash; but now one
+        frequency is the drive and the other is the system's natural response.
+        The "slow" factor \( \sin(\Delta\omega\, t/2) \) is the envelope, and
+        the "fast" factor \( \sin(\bar\omega\, t) \) is the carrier.  When you
+        add damping, the natural-frequency component decays and only the
+        driving frequency survives &mdash; the beats fade to a steady state.
+    </p>
+</div>
+
+<!-- Test Your Understanding #1 -->
+<div class="interactive-container question-section">
+    <div class="interactive-title">Test Your Understanding</div>
+
+    <p style="margin-bottom: var(--spacing-md); color: var(--text-secondary);">
+        Use the Beat Visualizer to answer these questions.
+    </p>
+
+    <div class="tabs">
+        <div class="tab-buttons">
+            <button class="tab-button active">Question 1</button>
+            <button class="tab-button">Question 2</button>
+            <button class="tab-button">Question 3</button>
+        </div>
+
+        <!-- Q1: Fill -->
+        <div class="tab-content active">
+            <div class="question-container" data-type="fill" data-answer="0.30[0.25,0.35]">
+                <div class="question-text">
+                    Set \( \omega_d = 2.70 \) with \( \omega_0 = 3.0 \).
+                    The beat frequency \( \Delta\omega = |\omega_0 - \omega_d| \) is:
+                    <br><br>
+                    &Delta;&omega; = <input type="text" class="fill-blank" placeholder="rad/s"> rad/s
+                </div>
+                <div class="question-actions">
+                    <button class="btn-verify">Verify</button>
+                </div>
+                <div class="question-explanation" style="display: none;">
+                    <div class="question-explanation-title">Explanation</div>
+                    <div class="question-explanation-text">
+                        \( \Delta\omega = |3.0 - 2.70| = 0.30 \) rad/s.  The beat period
+                        is \( T_{\text{beat}} = 2\pi / 0.30 \approx 20.9 \) s.  Count
+                        the envelope cycles in the plot: you should see about 3 complete
+                        beats in 60 seconds, consistent with \( T_{\text{beat}} \approx 21 \) s.
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Q2: MCQ -->
+        <div class="tab-content">
+            <div class="question-container" data-type="mcq" data-answer="1">
+                <div class="question-text">
+                    Now set \( \omega_d = 2.90 \) (closer to \( \omega_0 \)).
+                    Compared to \( \omega_d = 2.70 \), the beats are:
+                </div>
+                <div class="question-options">
+                    <label class="option">
+                        <input type="radio" name="bt-q2" value="0">
+                        <span>Faster and smaller (less interference)</span>
+                    </label>
+                    <label class="option">
+                        <input type="radio" name="bt-q2" value="1">
+                        <span>Slower and taller (closer frequencies = slower beats, larger peak)</span>
+                    </label>
+                    <label class="option">
+                        <input type="radio" name="bt-q2" value="2">
+                        <span>The same (frequency doesn't matter)</span>
+                    </label>
+                    <label class="option">
+                        <input type="radio" name="bt-q2" value="3">
+                        <span>Gone entirely (too close to resonate)</span>
+                    </label>
+                </div>
+                <div class="question-actions">
+                    <button class="btn-verify">Verify</button>
+                </div>
+                <div class="question-explanation" style="display: none;">
+                    <div class="question-explanation-title">Explanation</div>
+                    <div class="question-explanation-text">
+                        At \( \omega_d = 2.90 \), \( \Delta\omega = 0.10 \), three times
+                        smaller than before.  So the beat period is three times longer
+                        (\( T_{\text{beat}} \approx 63 \) s) and the peak amplitude is
+                        three times larger (\( \propto 1/\Delta\omega \)).  Closer
+                        frequencies = slower beats with bigger swings.  This trend
+                        continues toward resonance.
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Q3: MCQ -->
+        <div class="tab-content">
+            <div class="question-container" data-type="mcq" data-answer="2">
+                <div class="question-text">
+                    Toggle "Add damping" on with \( \omega_d = 2.70 \).
+                    What happens to the beats over time?
+                </div>
+                <div class="question-options">
+                    <label class="option">
+                        <input type="radio" name="bt-q3" value="0">
+                        <span>They get faster</span>
+                    </label>
+                    <label class="option">
+                        <input type="radio" name="bt-q3" value="1">
+                        <span>They get louder</span>
+                    </label>
+                    <label class="option">
+                        <input type="radio" name="bt-q3" value="2">
+                        <span>They fade away as the system settles to a steady state</span>
+                    </label>
+                    <label class="option">
+                        <input type="radio" name="bt-q3" value="3">
+                        <span>Nothing changes (damping doesn't affect beats)</span>
+                    </label>
+                </div>
+                <div class="question-actions">
+                    <button class="btn-verify">Verify</button>
+                </div>
+                <div class="question-explanation" style="display: none;">
+                    <div class="question-explanation-title">Explanation</div>
+                    <div class="question-explanation-text">
+                        Beats arise from the interference between the driving frequency
+                        and the natural frequency.  With damping, the natural-frequency
+                        component (the transient) decays as \( e^{-\gamma t} \), leaving
+                        only the steady-state response at \( \omega_d \).  The beats
+                        are a transient phenomenon &mdash; they are the system's "memory"
+                        of its natural frequency, fading away as damping erases that memory.
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<hr>
+
+<!-- ========== EXPLORER 2: APPROACH TO RESONANCE ========== -->
+
+<h2>The Road to Resonance</h2>
+
+<p>
+    Slowly drag \( \omega_d \) toward \( \omega_0 = 3.0 \) and watch the
+    transformation.  The beats get slower (longer \( T_{\text{beat}} \)),
+    taller (larger peak amplitude), and eventually &mdash; at exact resonance
+    &mdash; the beat period becomes infinite and the amplitude grows without
+    bound.  The right panel shows how the peak envelope height diverges as
+    \( \Delta\omega \rightarrow 0 \).
+</p>
+
+<div class="interactive-container" id="approach-to-resonance">
+    <div class="interactive-title">Explorer 2: Approaching Resonance</div>
+
+    <div style="display: flex; gap: 0.5rem; flex-wrap: wrap;">
+        <div class="plot-container" style="flex: 1; min-width: 280px;">
+            <div id="bt-ap-plot" style="width: 100%; height: 380px;"></div>
+        </div>
+        <div class="plot-container" style="flex: 1; min-width: 280px;">
+            <div id="bt-ap-peak-plot" style="width: 100%; height: 380px;"></div>
+        </div>
+    </div>
+
+    <div id="bt-ap-stats"
+         style="display: flex; justify-content: center; gap: 1.5rem; padding: 8px 0; font-size: 0.85rem; color: #c8c8e0; flex-wrap: wrap;">
+    </div>
+
+    <div class="control-panel">
+        <div class="control-group">
+            <label class="control-label">Driving frequency &omega;<sub>d</sub>:
+                <span class="control-label-value">2.50</span>
+            </label>
+            <input type="range" class="slider" id="bt-ap-wd"
+                   min="1.00" max="2.99" step="0.01" value="2.50">
+        </div>
+        <div class="btn-group">
+            <button class="btn" onclick="resetApproach()">Reset</button>
+        </div>
+    </div>
+</div>
+
+<div class="info-box">
+    <div class="info-box-title">Key Insight</div>
+    <p>
+        At exact resonance (\( \omega_d = \omega_0 \)), the undamped solution becomes
+        \( x(t) = \frac{F_0}{2m\omega_0}\, t \sin(\omega_0 t) \).  The factor
+        of \( t \) means the amplitude grows <strong>linearly</strong> with time
+        &mdash; the system absorbs energy every cycle and never gives it back.
+        This is the limiting case of beats: an infinitely slow beat with
+        ever-increasing peaks.  In real systems, damping prevents this, capping
+        the amplitude at \( A_{\text{peak}} = F_0 / (2m\gamma\omega_0) \).
+    </p>
+</div>
+
+<!-- Test Your Understanding #2 -->
+<div class="interactive-container question-section">
+    <div class="interactive-title">Test Your Understanding</div>
+
+    <p style="margin-bottom: var(--spacing-md); color: var(--text-secondary);">
+        Use the Approaching Resonance explorer to answer these questions.
+    </p>
+
+    <div class="tabs">
+        <div class="tab-buttons">
+            <button class="tab-button active">Question 4</button>
+            <button class="tab-button">Question 5</button>
+            <button class="tab-button">Question 6</button>
+        </div>
+
+        <!-- Q4: Fill -->
+        <div class="tab-content active">
+            <div class="question-container" data-type="fill" data-answer="12.6[11,14]">
+                <div class="question-text">
+                    At \( \omega_d = 2.50 \), the detuning is \( \Delta\omega = 0.50 \).
+                    The beat period is \( T_{\text{beat}} = 2\pi / \Delta\omega \):
+                    <br><br>
+                    T<sub>beat</sub> = <input type="text" class="fill-blank" placeholder="seconds"> s
+                </div>
+                <div class="question-actions">
+                    <button class="btn-verify">Verify</button>
+                </div>
+                <div class="question-explanation" style="display: none;">
+                    <div class="question-explanation-title">Explanation</div>
+                    <div class="question-explanation-text">
+                        \( T_{\text{beat}} = 2\pi / 0.50 = 4\pi \approx 12.6 \) s.
+                        Count the envelope peaks in the plot: in 60 seconds you should
+                        see about \( 60/12.6 \approx 4.8 \) complete beat cycles.
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Q5: MCQ -->
+        <div class="tab-content">
+            <div class="question-container" data-type="mcq" data-answer="0">
+                <div class="question-text">
+                    As \( \omega_d \) moves from 2.50 toward 2.99, the peak envelope
+                    height on the right panel:
+                </div>
+                <div class="question-options">
+                    <label class="option">
+                        <input type="radio" name="bt-q5" value="0">
+                        <span>Shoots upward, approaching infinity as \( \Delta\omega \rightarrow 0 \)</span>
+                    </label>
+                    <label class="option">
+                        <input type="radio" name="bt-q5" value="1">
+                        <span>Stays constant (peak height doesn't depend on detuning)</span>
+                    </label>
+                    <label class="option">
+                        <input type="radio" name="bt-q5" value="2">
+                        <span>Decreases (closer frequencies cancel better)</span>
+                    </label>
+                    <label class="option">
+                        <input type="radio" name="bt-q5" value="3">
+                        <span>Oscillates unpredictably</span>
+                    </label>
+                </div>
+                <div class="question-actions">
+                    <button class="btn-verify">Verify</button>
+                </div>
+                <div class="question-explanation" style="display: none;">
+                    <div class="question-explanation-title">Explanation</div>
+                    <div class="question-explanation-text">
+                        The peak envelope is \( 2(F_0/m)/|\omega_0^2 - \omega_d^2| \).
+                        As \( \omega_d \rightarrow \omega_0 \), the denominator
+                        \( \omega_0^2 - \omega_d^2 = (\omega_0 - \omega_d)(\omega_0 + \omega_d) \rightarrow 0 \),
+                        so the amplitude diverges.  This is why the star marker climbs
+                        the curve toward the vertical asymptote on the right panel.
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Q6: MCQ -->
+        <div class="tab-content">
+            <div class="question-container" data-type="mcq" data-answer="2">
+                <div class="question-text">
+                    At \( \omega_d = 2.99 \) (\( \Delta\omega = 0.01 \)), the beat
+                    period is about \( 2\pi/0.01 \approx 628 \) seconds.  Over a
+                    60-second observation window, you would see:
+                </div>
+                <div class="question-options">
+                    <label class="option">
+                        <input type="radio" name="bt-q6" value="0">
+                        <span>Many complete beat cycles</span>
+                    </label>
+                    <label class="option">
+                        <input type="radio" name="bt-q6" value="1">
+                        <span>Exactly one beat cycle</span>
+                    </label>
+                    <label class="option">
+                        <input type="radio" name="bt-q6" value="2">
+                        <span>Just the beginning of one beat: amplitude rising steadily</span>
+                    </label>
+                    <label class="option">
+                        <input type="radio" name="bt-q6" value="3">
+                        <span>A flat line (frequencies too close to interact)</span>
+                    </label>
+                </div>
+                <div class="question-actions">
+                    <button class="btn-verify">Verify</button>
+                </div>
+                <div class="question-explanation" style="display: none;">
+                    <div class="question-explanation-title">Explanation</div>
+                    <div class="question-explanation-text">
+                        With \( T_{\text{beat}} \approx 628 \) s, in 60 seconds you see
+                        only about 10% of one beat cycle.  The amplitude is still rising
+                        &mdash; it looks like unbounded growth.  This is exactly what
+                        resonance looks like in the early stages: the "beats are so slow
+                        that you only see the rising part."  At exact resonance
+                        (\( \Delta\omega = 0 \)), this rising never stops.
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<hr>
+
+<!-- ========== EXPLORER 3: BEAT FREQUENCY CHALLENGE ========== -->
+
+<h2>Measure the Beat Frequency</h2>
+
+<p>
+    A mystery driven oscillator is producing beats.  Your job: read the beat
+    pattern, measure \( T_{\text{beat}} \), and determine \( \Delta\omega \).
+    You know \( \omega_0 = 3.0 \) rad/s.  Measure the time between
+    envelope peaks or nulls, compute \( \Delta\omega = 2\pi / T_{\text{beat}} \),
+    and enter your answer.
+</p>
+
+<div class="interactive-container" id="beat-frequency-challenge">
+    <div class="interactive-title">Explorer 3: Beat Frequency Challenge</div>
+
+    <div class="plot-container">
+        <div id="bt-ch-plot" style="width: 100%; height: 380px;"></div>
+    </div>
+
+    <div id="bt-ch-feedback"
+         style="text-align: center; padding: 8px; font-size: 0.95rem; min-height: 28px;">
+    </div>
+
+    <div class="control-panel">
+        <div class="control-group">
+            <label class="control-label">Your guess for &Delta;&omega;:
+                <input type="number" id="bt-ch-guess" step="0.01" min="0" max="2"
+                       style="width: 80px; background: #1a1b2e; color: #c8c8e0; border: 1px solid #3a3f6a; border-radius: 4px; padding: 4px 8px; margin-left: 8px;">
+                rad/s
+            </label>
+        </div>
+        <div class="btn-group">
+            <button class="btn" id="bt-ch-check">Check</button>
+            <button class="btn btn-secondary" onclick="newBeatChallenge()">New Challenge</button>
+        </div>
+    </div>
+</div>
+
+<div class="info-box">
+    <div class="info-box-title">Key Insight</div>
+    <p>
+        Measuring beat frequency is a real experimental technique.  Piano tuners
+        listen for beats between a tuning fork and a piano string.  When the
+        beats slow to zero, the string is in tune.  The same principle is used
+        in heterodyne receivers, frequency counters, and laser stabilization.
+        Every time you hear a "wah-wah-wah" between two notes, you're hearing
+        beats &mdash; and the beat rate tells you how far apart the frequencies are.
+    </p>
+</div>
+
+<!-- Test Your Understanding #3 -->
+<div class="interactive-container question-section">
+    <div class="interactive-title">Test Your Understanding</div>
+
+    <p style="margin-bottom: var(--spacing-md); color: var(--text-secondary);">
+        Use the Beat Frequency Challenge to answer these questions.
+    </p>
+
+    <div class="tabs">
+        <div class="tab-buttons">
+            <button class="tab-button active">Question 7</button>
+            <button class="tab-button">Question 8</button>
+            <button class="tab-button">Question 9</button>
+        </div>
+
+        <!-- Q7: MCQ -->
+        <div class="tab-content active">
+            <div class="question-container" data-type="mcq" data-answer="1">
+                <div class="question-text">
+                    You observe a beat pattern where the envelope goes through
+                    exactly 3 complete cycles in 30 seconds.  What is \( \Delta\omega \)?
+                </div>
+                <div class="question-options">
+                    <label class="option">
+                        <input type="radio" name="bt-q7" value="0">
+                        <span>\( \Delta\omega = 0.1 \) rad/s</span>
+                    </label>
+                    <label class="option">
+                        <input type="radio" name="bt-q7" value="1">
+                        <span>\( \Delta\omega = 2\pi \times 3/30 \approx 0.63 \) rad/s</span>
+                    </label>
+                    <label class="option">
+                        <input type="radio" name="bt-q7" value="2">
+                        <span>\( \Delta\omega = 3/30 = 0.1 \) rad/s</span>
+                    </label>
+                    <label class="option">
+                        <input type="radio" name="bt-q7" value="3">
+                        <span>\( \Delta\omega = 30/(2\pi \times 3) \approx 1.59 \) rad/s</span>
+                    </label>
+                </div>
+                <div class="question-actions">
+                    <button class="btn-verify">Verify</button>
+                </div>
+                <div class="question-explanation" style="display: none;">
+                    <div class="question-explanation-title">Explanation</div>
+                    <div class="question-explanation-text">
+                        3 cycles in 30 seconds gives beat frequency
+                        \( f_{\text{beat}} = 3/30 = 0.1 \) Hz.  Then
+                        \( \Delta\omega = 2\pi f_{\text{beat}} = 2\pi \times 0.1 \approx 0.63 \) rad/s.
+                        Don't confuse \( f \) (Hz) with \( \omega \) (rad/s) &mdash;
+                        they differ by a factor of \( 2\pi \).
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Q8: MCQ -->
+        <div class="tab-content">
+            <div class="question-container" data-type="mcq" data-answer="0">
+                <div class="question-text">
+                    A piano tuner hears 4 beats per second between a 440 Hz
+                    tuning fork and a piano string.  By how many Hz is the
+                    string out of tune?
+                </div>
+                <div class="question-options">
+                    <label class="option">
+                        <input type="radio" name="bt-q8" value="0">
+                        <span>4 Hz (beat frequency equals the frequency difference)</span>
+                    </label>
+                    <label class="option">
+                        <input type="radio" name="bt-q8" value="1">
+                        <span>2 Hz (half the beat frequency)</span>
+                    </label>
+                    <label class="option">
+                        <input type="radio" name="bt-q8" value="2">
+                        <span>8 Hz</span>
+                    </label>
+                    <label class="option">
+                        <input type="radio" name="bt-q8" value="3">
+                        <span>Impossible to determine without more information</span>
+                    </label>
+                </div>
+                <div class="question-actions">
+                    <button class="btn-verify">Verify</button>
+                </div>
+                <div class="question-explanation" style="display: none;">
+                    <div class="question-explanation-title">Explanation</div>
+                    <div class="question-explanation-text">
+                        The beat frequency equals the difference in frequencies:
+                        \( f_{\text{beat}} = |f_1 - f_2| \).  So the string is at
+                        either 436 Hz or 444 Hz &mdash; 4 Hz away from 440 Hz.
+                        (To determine which direction, the tuner adds a small amount
+                        of tension and checks whether the beats speed up or slow down.)
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Q9: Fill -->
+        <div class="tab-content">
+            <div class="question-container" data-type="fill" data-answer="0.99[0.90,1.10]">
+                <div class="question-text">
+                    With \( \omega_0 = 3.0 \) and \( \omega_d = 2.64 \), what is
+                    the peak envelope amplitude?  Use the formula
+                    \( A_{\text{peak}} = 2(F_0/m) / |\omega_0^2 - \omega_d^2| \)
+                    with \( F_0/m = 1.0 \).
+                    <br><br>
+                    A<sub>peak</sub> = <input type="text" class="fill-blank" placeholder="value">
+                </div>
+                <div class="question-actions">
+                    <button class="btn-verify">Verify</button>
+                </div>
+                <div class="question-explanation" style="display: none;">
+                    <div class="question-explanation-title">Explanation</div>
+                    <div class="question-explanation-text">
+                        \( \omega_0^2 - \omega_d^2 = 9.00 - 2.64^2 = 9.00 - 6.97 = 2.03 \).
+                        Then \( A_{\text{peak}} = 2 \times 1.0 / 2.03 \approx 0.99 \).
+                        Verify by setting \( \omega_d = 2.64 \) in Explorer 1 and reading
+                        the envelope maximum from the dashed red curve.
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<hr>
+
+<!-- ========== CODE EXAMPLES ========== -->
+<h2>Code It Yourself</h2>
+
+<div class="tabs">
+    <div class="tab-buttons">
+        <button class="tab-button active">Beats</button>
+        <button class="tab-button">Approach</button>
+        <button class="tab-button">Prompt</button>
+    </div>
+
+    <div class="tab-content active">
+        <div class="code-block-container">
+            <div class="code-header">
+                <span class="code-lang">Python</span>
+                <button class="copy-btn">Copy</button>
+            </div>
+            <pre><code class="language-python">import numpy as np
+import plotly.graph_objects as go
+
+omega0, F0m = 3.0, 1.0
+wd = 2.7  # close to omega0
+dw = omega0 - wd
+
+t = np.linspace(0, 80, 2000)
+# Exact undamped solution
+x = F0m / (omega0**2 - wd**2) * (np.cos(wd*t) - np.cos(omega0*t))
+
+# Envelope: ±2F0m / |ω₀²-ω_d²| × |sin(Δω t/2)|
+env = 2*F0m / abs(omega0**2 - wd**2) * np.abs(np.sin(dw*t/2))
+
+fig = go.Figure()
+fig.add_trace(go.Scatter(x=t, y=env, name='Envelope',
+    line=dict(color='#ff6b6b', dash='dash', width=1.5)))
+fig.add_trace(go.Scatter(x=t, y=-env, showlegend=False,
+    line=dict(color='#ff6b6b', dash='dash', width=1.5)))
+fig.add_trace(go.Scatter(x=t, y=x, name='x(t)',
+    line=dict(color='#00f3ff', width=1.5)))
+
+fig.update_layout(template='plotly_dark',
+    title=f'Beats: ω₀={omega0}, ω_d={wd}, Δω={dw:.2f}',
+    xaxis=dict(title='Time (s)', range=[0, 80],
+        gridcolor='#2a2f4a', zerolinecolor='#808080', linecolor='#808080'),
+    yaxis=dict(title='x(t)', range=[-1.5, 1.5],
+        gridcolor='#2a2f4a', zerolinecolor='#808080', linecolor='#808080'))
+fig.show()</code></pre>
+        </div>
+    </div>
+
+    <div class="tab-content">
+        <div class="code-block-container">
+            <div class="code-header">
+                <span class="code-lang">Python</span>
+                <button class="copy-btn">Copy</button>
+            </div>
+            <pre><code class="language-python">import numpy as np
+import plotly.graph_objects as go
+
+omega0, F0m = 3.0, 1.0
+t = np.linspace(0, 60, 2000)
+
+fig = go.Figure()
+for wd, color in [(2.5, '#00f3ff'), (2.8, '#00ff9f'),
+                   (2.95, '#ffff00'), (2.99, '#ff6b6b')]:
+    dw = omega0 - wd
+    x = F0m / (omega0**2 - wd**2) * (np.cos(wd*t) - np.cos(omega0*t))
+    fig.add_trace(go.Scatter(x=t, y=x,
+        name=f'ω_d={wd} (Δω={dw:.2f})',
+        line=dict(color=color, width=1.5)))
+
+fig.update_layout(template='plotly_dark',
+    title='Approaching Resonance: Beats Slow and Grow',
+    xaxis=dict(title='Time (s)', range=[0, 60],
+        gridcolor='#2a2f4a', zerolinecolor='#808080', linecolor='#808080'),
+    yaxis=dict(title='x(t)',
+        gridcolor='#2a2f4a', zerolinecolor='#808080', linecolor='#808080'))
+fig.show()</code></pre>
+        </div>
+    </div>
+
+    <div class="tab-content">
+        <div class="code-block-container">
+            <div class="code-header">
+                <span class="code-lang">Prompt for AI</span>
+                <button class="copy-btn">Copy</button>
+            </div>
+            <pre><code class="language-text">Create a Python visualization of beats in a driven oscillator.
+
+Part 1 - Beat pattern:
+- Undamped driven oscillator: x'' + ω₀²x = (F₀/m)cos(ω_d t)
+- Solution: x(t) = [F₀/m / (ω₀²-ω_d²)] [cos(ω_d t) - cos(ω₀ t)]
+- Parameters: ω₀=3.0, F₀/m=1.0, ω_d=2.7
+- Plot x(t) with envelope ±2(F₀/m)/|ω₀²-ω_d²| × |sin(Δω t/2)|
+- Label beat period T_beat = 2π/Δω
+
+Part 2 - Approach to resonance:
+- Same system, overlay 4 curves: ω_d = 2.5, 2.8, 2.95, 2.99
+- Show beats getting slower and taller as ω_d → ω₀
+- Note: at ω_d = ω₀ exactly, x(t) = (F₀/2mω₀)t sin(ω₀t)
+
+Part 3 - Damped beats:
+- Add damping γ = 0.1 to the ω_d = 2.7 case
+- Show transient beats fading to steady state
+- Compare with undamped beats on same plot
+
+Use Plotly dark theme, gray axes (#808080), fixed ranges.</code></pre>
+        </div>
+
+        <div class="info-box" style="margin-top: var(--spacing-md);">
+            <div class="info-box-title">Pro Tips for Prompting</div>
+            <ul>
+                <li>Specify the exact solution formula &mdash; AI sometimes uses the wrong sign</li>
+                <li>Ask for the envelope separately to highlight the slow modulation</li>
+                <li>Request multiple detuning values on one plot to show the trend toward resonance</li>
+            </ul>
+        </div>
+    </div>
+</div>
+
+<hr>
+
+<!-- ========== EXERCISES ========== -->
+<h2>Exercises for Practice</h2>
+
+<div class="exercise-cards">
+    <div class="exercise-card">
+        <div class="exercise-card-header">
+            <span class="exercise-card-number">1.</span>
+            <span class="exercise-card-badge explore">Explore</span>
+        </div>
+        <div class="exercise-card-content">
+            In the Beat Visualizer, set \( \omega_d \) to produce exactly
+            2 complete beat cycles in 40 seconds.  What \( \omega_d \) did
+            you find?  (Hint: \( T_{\text{beat}} = 20 \) s means
+            \( \Delta\omega = 2\pi/20 \approx 0.314 \), so
+            \( \omega_d \approx 3.0 - 0.314 = 2.69 \).)  Verify by counting
+            the envelope peaks.
+        </div>
+    </div>
+
+    <div class="exercise-card">
+        <div class="exercise-card-header">
+            <span class="exercise-card-number">2.</span>
+            <span class="exercise-card-badge coding">Coding</span>
+        </div>
+        <div class="exercise-card-content">
+            Write a Python function that takes \( \omega_0, \omega_d, F_0/m \)
+            and returns: (1) the beat frequency, (2) the beat period,
+            (3) the peak envelope amplitude, and (4) the carrier frequency.
+            Plot the beat pattern and its envelope for \( \omega_d = 2.5, 2.8, 2.95 \)
+            on three subplots, showing how the pattern transforms as you approach
+            resonance.
+        </div>
+    </div>
+
+    <div class="exercise-card">
+        <div class="exercise-card-header">
+            <span class="exercise-card-number">3.</span>
+            <span class="exercise-card-badge think">Think</span>
+        </div>
+        <div class="exercise-card-content">
+            Show that the undamped resonance solution
+            \( x(t) = (F_0/2m\omega_0)\, t\sin(\omega_0 t) \)
+            can be obtained as the limit \( \omega_d \rightarrow \omega_0 \)
+            of the beat solution using L'H&ocirc;pital's rule on the ratio
+            \( [\cos(\omega_d t) - \cos(\omega_0 t)] / (\omega_0^2 - \omega_d^2) \).
+            This proves that resonance is the natural endpoint of beats.
+        </div>
+    </div>
+</div>
+
+<hr>
+
+<!-- ========== NAVIGATION ========== -->
+<div class="btn-group mt-xl">
+    <button class="btn btn-magenta" onclick="navigateToSection('28-resonance')">&larr; Previous: Resonance</button>
+    <button class="btn" onclick="scrollToTop()">&uarr; Back to Top</button>
+    <button class="btn btn-secondary" onclick="navigateToSection('30-resonance-disasters')">Next: Resonance Disasters and Designs &rarr;</button>
+</div>

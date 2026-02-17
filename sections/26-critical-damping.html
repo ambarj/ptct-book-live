@@ -1,0 +1,819 @@
+<!-- Section 3.7: Critical Damping in Engineering -->
+<!-- Source: Module 5 - Damped Harmonic Oscillator.nb (Part 3) -->
+<!-- Core concept: Engineering applications of critical damping — fastest settling without overshoot -->
+<!-- Time: ~20 minutes -->
+<!-- Prerequisites: Section 3.6 (three regimes, discriminant, characteristic equation) -->
+
+<h1>Critical Damping in Engineering</h1>
+
+<p>
+    You've seen three damping regimes.  Now the engineering question:
+    <strong>which one should you choose?</strong>  The answer, almost
+    universally, is critical damping &mdash; or something very close to it.
+</p>
+
+<p>
+    A door closer that oscillates (underdamped) lets the door slam back and
+    forth.  One that's overdamped takes forever to close, leaving you standing
+    in a draft.  Critical damping closes the door as fast as possible without
+    any bounce.  The same logic applies to car suspensions, galvanometers,
+    earthquake dampers, and RLC circuits.
+</p>
+
+<div class="info-box">
+    <div class="info-box-title">Learning Objectives</div>
+    <ul>
+        <li>Use the damping ratio \( \zeta = \gamma / \omega_0 \) to characterize a system's behavior</li>
+        <li>Design a door closer that achieves critical damping by choosing spring stiffness and damping coefficient</li>
+        <li>Tune a car suspension for a target overshoot percentage</li>
+        <li>Meet engineering specifications (settling time, maximum overshoot) by adjusting \( \zeta \)</li>
+    </ul>
+</div>
+
+<div class="equation-display">
+    <p><strong>The damping ratio:</strong></p>
+    $$ \zeta = \frac{\gamma}{\omega_0} = \frac{b}{2\sqrt{km}} $$
+    <p>
+        <strong>Three regimes revisited:</strong><br>
+        \( \zeta < 1 \): underdamped (oscillates) &mdash; overshoot = \( 100 \, e^{-\pi\zeta/\sqrt{1-\zeta^2}} \)%<br>
+        \( \zeta = 1 \): critically damped (fastest non-oscillatory return)<br>
+        \( \zeta > 1 \): overdamped (sluggish, no overshoot)
+    </p>
+</div>
+
+<hr>
+
+<!-- ========== EXPLORER 1: DOOR CLOSER DESIGNER ========== -->
+
+<h2>Designing a Door Closer</h2>
+
+<p>
+    A door with mass \( m = 5 \) kg swings on hinges with a return spring
+    (stiffness \( k \)) and a hydraulic damper (damping coefficient \( b \)).
+    Your job: choose \( k \) and \( b \) so the door closes smoothly.
+    Too little damping and it bounces.  Too much and it creeps.  The sweet
+    spot is \( b = b_{\text{crit}} = 2\sqrt{km} \).
+</p>
+
+<p>
+    The left panel shows how the door angle decays over time.  The dashed
+    green curve is the <em>ideal</em> (critical damping for that \( k \)).  The right
+    panel shows performance metrics: overshoot percentage, settling time,
+    and the damping ratio \( \zeta \).
+</p>
+
+<div class="interactive-container" id="door-closer-designer">
+    <div class="interactive-title">Explorer 1: Door Closer Designer</div>
+
+    <div style="display: flex; gap: 0.5rem; flex-wrap: wrap;">
+        <div class="plot-container" style="flex: 1; min-width: 280px;">
+            <div id="cd-dr-plot" style="width: 100%; height: 380px;"></div>
+        </div>
+        <div class="plot-container" style="flex: 1; min-width: 280px;">
+            <div id="cd-dr-metrics-plot" style="width: 100%; height: 380px;"></div>
+        </div>
+    </div>
+
+    <div id="cd-dr-stats"
+         style="display: flex; justify-content: center; gap: 1.5rem; padding: 8px 0; font-size: 0.85rem; color: #c8c8e0; flex-wrap: wrap;">
+    </div>
+
+    <div class="control-panel">
+        <div class="control-group">
+            <label class="control-label">Spring k (N/m):
+                <span class="control-label-value">20</span>
+            </label>
+            <input type="range" class="slider" id="cd-dr-k"
+                   min="5" max="80" step="1" value="20">
+        </div>
+        <div class="control-group">
+            <label class="control-label">Damper b (Ns/m):
+                <span class="control-label-value">20</span>
+            </label>
+            <input type="range" class="slider" id="cd-dr-b"
+                   min="1" max="80" step="1" value="20">
+        </div>
+        <div class="btn-group">
+            <button class="btn" onclick="resetDoor()">Reset</button>
+        </div>
+    </div>
+</div>
+
+<div class="info-box">
+    <div class="info-box-title">Key Insight</div>
+    <p>
+        For critical damping, \( b_{\text{crit}} = 2\sqrt{km} \).  Notice that
+        a stiffer spring (larger \( k \)) requires a <em>stronger</em> damper.
+        This makes sense: a stiffer spring pushes harder, so the damper needs
+        more force to prevent overshoot.  Set \( k = 20 \) N/m and you'll find
+        \( b_{\text{crit}} = 2\sqrt{20 \times 5} = 20 \) Ns/m &mdash; a
+        satisfying coincidence.
+    </p>
+</div>
+
+<!-- Test Your Understanding #1 -->
+<div class="interactive-container question-section">
+    <div class="interactive-title">Test Your Understanding</div>
+
+    <p style="margin-bottom: var(--spacing-md); color: var(--text-secondary);">
+        Use the Door Closer Designer to answer these questions.
+    </p>
+
+    <div class="tabs">
+        <div class="tab-buttons">
+            <button class="tab-button active">Question 1</button>
+            <button class="tab-button">Question 2</button>
+            <button class="tab-button">Question 3</button>
+        </div>
+
+        <!-- Q1: MCQ -->
+        <div class="tab-content active">
+            <div class="question-container" data-type="mcq" data-answer="2">
+                <div class="question-text">
+                    Set \( k = 20 \) N/m and try \( b = 10, 20, 40 \) Ns/m.
+                    Which value produces the "Smooth close" verdict?
+                </div>
+                <div class="question-options">
+                    <label class="option">
+                        <input type="radio" name="cd-q1" value="0">
+                        <span>\( b = 10 \) (the door bounces)</span>
+                    </label>
+                    <label class="option">
+                        <input type="radio" name="cd-q1" value="1">
+                        <span>\( b = 40 \) (sluggish but no bounce)</span>
+                    </label>
+                    <label class="option">
+                        <input type="radio" name="cd-q1" value="2">
+                        <span>\( b = 20 \) (matches \( b_{\text{crit}} = 2\sqrt{km} \))</span>
+                    </label>
+                    <label class="option">
+                        <input type="radio" name="cd-q1" value="3">
+                        <span>All three work equally well</span>
+                    </label>
+                </div>
+                <div class="question-actions">
+                    <button class="btn-verify">Verify</button>
+                </div>
+                <div class="question-explanation" style="display: none;">
+                    <div class="question-explanation-title">Explanation</div>
+                    <div class="question-explanation-text">
+                        With \( k = 20 \) and \( m = 5 \), the critical damping
+                        coefficient is \( b_{\text{crit}} = 2\sqrt{20 \times 5} = 20 \).
+                        At \( b = 10 \), \( \zeta = 0.5 \) (underdamped, bounces).
+                        At \( b = 40 \), \( \zeta = 2.0 \) (overdamped, sluggish).
+                        At \( b = 20 \), \( \zeta = 1.0 \) (critical, smooth).
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Q2: Fill -->
+        <div class="tab-content">
+            <div class="question-container" data-type="fill" data-answer="40[38,42]">
+                <div class="question-text">
+                    If you increase the spring to \( k = 80 \) N/m (four times
+                    stiffer), what is the new critical damping coefficient \( b_{\text{crit}} \)?
+                    <br><br>
+                    b<sub>crit</sub> = 2&radic;(km) = <input type="text" class="fill-blank" placeholder="Ns/m"> Ns/m
+                </div>
+                <div class="question-actions">
+                    <button class="btn-verify">Verify</button>
+                </div>
+                <div class="question-explanation" style="display: none;">
+                    <div class="question-explanation-title">Explanation</div>
+                    <div class="question-explanation-text">
+                        \( b_{\text{crit}} = 2\sqrt{80 \times 5} = 2\sqrt{400} = 2 \times 20 = 40 \)
+                        Ns/m.  Doubling the spring stiffness (×4) only doubles the
+                        critical damping (×2) because of the square root.  Verify by
+                        setting \( k = 80, b = 40 \) &mdash; you should see \( \zeta = 1.0 \).
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Q3: MCQ -->
+        <div class="tab-content">
+            <div class="question-container" data-type="mcq" data-answer="0">
+                <div class="question-text">
+                    At fixed \( b = 20 \) Ns/m, increase \( k \) from 20 to 80.
+                    The system transitions from:
+                </div>
+                <div class="question-options">
+                    <label class="option">
+                        <input type="radio" name="cd-q3" value="0">
+                        <span>Critical &rarr; underdamped (starts bouncing at higher \( k \))</span>
+                    </label>
+                    <label class="option">
+                        <input type="radio" name="cd-q3" value="1">
+                        <span>Critical &rarr; overdamped (slows down at higher \( k \))</span>
+                    </label>
+                    <label class="option">
+                        <input type="radio" name="cd-q3" value="2">
+                        <span>Stays critical regardless of \( k \)</span>
+                    </label>
+                    <label class="option">
+                        <input type="radio" name="cd-q3" value="3">
+                        <span>Underdamped &rarr; overdamped</span>
+                    </label>
+                </div>
+                <div class="question-actions">
+                    <button class="btn-verify">Verify</button>
+                </div>
+                <div class="question-explanation" style="display: none;">
+                    <div class="question-explanation-title">Explanation</div>
+                    <div class="question-explanation-text">
+                        The damping ratio is \( \zeta = b / (2\sqrt{km}) \).  At fixed
+                        \( b \), increasing \( k \) increases \( \omega_0 = \sqrt{k/m} \)
+                        while \( \gamma = b/(2m) \) stays the same.  So \( \zeta \)
+                        decreases: the system moves from critically damped toward
+                        underdamped.  The stronger spring overcomes the damper and
+                        the door starts bouncing.
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<hr>
+
+<!-- ========== EXPLORER 2: SUSPENSION TUNER ========== -->
+
+<h2>Tuning a Car Suspension</h2>
+
+<p>
+    When a car hits a bump, each wheel's suspension compresses and then
+    recovers.  The mass \( m \) is the car's weight on that wheel, the spring
+    \( k \) supports the weight, and the shock absorber provides damping \( b \).
+    Most cars target \( \zeta \approx 0.3 \) (sporty, some bounce) to
+    \( \zeta \approx 0.7 \) (comfortable, minimal bounce).  Exactly
+    \( \zeta = 1 \) would feel "dead" &mdash; no road feedback at all.
+</p>
+
+<p>
+    The left panel shows suspension displacement after a 10 cm bump, with
+    reference curves at three standard damping ratios.  The right panel shows
+    overshoot percentage as a function of \( \zeta \).
+</p>
+
+<div class="interactive-container" id="suspension-tuner">
+    <div class="interactive-title">Explorer 2: Suspension Tuner</div>
+
+    <div style="display: flex; gap: 0.5rem; flex-wrap: wrap;">
+        <div class="plot-container" style="flex: 1; min-width: 280px;">
+            <div id="cd-sp-plot" style="width: 100%; height: 380px;"></div>
+        </div>
+        <div class="plot-container" style="flex: 1; min-width: 280px;">
+            <div id="cd-sp-os-plot" style="width: 100%; height: 380px;"></div>
+        </div>
+    </div>
+
+    <div id="cd-sp-stats"
+         style="display: flex; justify-content: center; gap: 1.5rem; padding: 8px 0; font-size: 0.85rem; color: #c8c8e0; flex-wrap: wrap;">
+    </div>
+
+    <div class="control-panel">
+        <div class="control-group">
+            <label class="control-label">Car mass per wheel (kg):
+                <span class="control-label-value">300</span>
+            </label>
+            <input type="range" class="slider" id="cd-sp-mass"
+                   min="200" max="500" step="10" value="300">
+        </div>
+        <div class="control-group">
+            <label class="control-label">Spring k (N/m):
+                <span class="control-label-value">20000</span>
+            </label>
+            <input type="range" class="slider" id="cd-sp-k"
+                   min="5000" max="50000" step="500" value="20000">
+        </div>
+        <div class="control-group">
+            <label class="control-label">Damper b (Ns/m):
+                <span class="control-label-value">3000</span>
+            </label>
+            <input type="range" class="slider" id="cd-sp-b"
+                   min="500" max="10000" step="100" value="3000">
+        </div>
+        <div class="btn-group">
+            <button class="btn" onclick="resetSuspension()">Reset</button>
+        </div>
+    </div>
+</div>
+
+<div class="info-box">
+    <div class="info-box-title">Key Insight</div>
+    <p>
+        The overshoot formula \( \text{OS}(\%) = 100 \, e^{-\pi\zeta / \sqrt{1-\zeta^2}} \)
+        is one of the most useful results in control engineering.  At \( \zeta = 0.3 \),
+        overshoot is about 37% &mdash; noticeably bouncy.  At \( \zeta = 0.7 \),
+        it drops to about 5% &mdash; barely perceptible.  At \( \zeta = 1 \),
+        overshoot is zero.  Real car suspensions sit around \( \zeta = 0.2 \)&ndash;\( 0.4 \)
+        because some oscillation gives the driver road "feel."
+    </p>
+</div>
+
+<!-- Test Your Understanding #2 -->
+<div class="interactive-container question-section">
+    <div class="interactive-title">Test Your Understanding</div>
+
+    <p style="margin-bottom: var(--spacing-md); color: var(--text-secondary);">
+        Use the Suspension Tuner to answer these questions.
+    </p>
+
+    <div class="tabs">
+        <div class="tab-buttons">
+            <button class="tab-button active">Question 4</button>
+            <button class="tab-button">Question 5</button>
+            <button class="tab-button">Question 6</button>
+        </div>
+
+        <!-- Q4: Fill -->
+        <div class="tab-content active">
+            <div class="question-container" data-type="fill" data-answer="4899[4700,5100]">
+                <div class="question-text">
+                    With \( m = 300 \) kg and \( k = 20000 \) N/m, what is the
+                    critical damping coefficient \( b_{\text{crit}} = 2\sqrt{km} \)?
+                    <br><br>
+                    b<sub>crit</sub> = <input type="text" class="fill-blank" placeholder="Ns/m"> Ns/m
+                </div>
+                <div class="question-actions">
+                    <button class="btn-verify">Verify</button>
+                </div>
+                <div class="question-explanation" style="display: none;">
+                    <div class="question-explanation-title">Explanation</div>
+                    <div class="question-explanation-text">
+                        \( b_{\text{crit}} = 2\sqrt{20000 \times 300} = 2\sqrt{6{,}000{,}000} \approx 2 \times 2449 = 4899 \)
+                        Ns/m.  Set the damper to this value and verify that the star
+                        marker on the overshoot plot sits exactly at \( \zeta = 1 \)
+                        with 0% overshoot.
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Q5: MCQ -->
+        <div class="tab-content">
+            <div class="question-container" data-type="mcq" data-answer="1">
+                <div class="question-text">
+                    If you load the car with heavy cargo (increase \( m \) from
+                    300 to 500 kg) but keep \( k \) and \( b \) the same, the ride becomes:
+                </div>
+                <div class="question-options">
+                    <label class="option">
+                        <input type="radio" name="cd-q5" value="0">
+                        <span>Stiffer (less bounce)</span>
+                    </label>
+                    <label class="option">
+                        <input type="radio" name="cd-q5" value="1">
+                        <span>Bouncier (lower \( \zeta \), more oscillation)</span>
+                    </label>
+                    <label class="option">
+                        <input type="radio" name="cd-q5" value="2">
+                        <span>Unchanged (mass doesn't affect damping ratio)</span>
+                    </label>
+                    <label class="option">
+                        <input type="radio" name="cd-q5" value="3">
+                        <span>More overdamped (sluggish)</span>
+                    </label>
+                </div>
+                <div class="question-actions">
+                    <button class="btn-verify">Verify</button>
+                </div>
+                <div class="question-explanation" style="display: none;">
+                    <div class="question-explanation-title">Explanation</div>
+                    <div class="question-explanation-text">
+                        \( \zeta = b / (2\sqrt{km}) \).  Increasing \( m \) increases
+                        \( \sqrt{km} \), which <em>decreases</em> \( \zeta \).  The system
+                        becomes more underdamped: it bounces more.  This is why heavily
+                        loaded vehicles ride bouncier on the same suspension &mdash;
+                        and why trucks have adjustable dampers.
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Q6: MCQ -->
+        <div class="tab-content">
+            <div class="question-container" data-type="mcq" data-answer="2">
+                <div class="question-text">
+                    On the overshoot curve, the overshoot at \( \zeta = 0.5 \) is about:
+                </div>
+                <div class="question-options">
+                    <label class="option">
+                        <input type="radio" name="cd-q6" value="0">
+                        <span>0% (no overshoot)</span>
+                    </label>
+                    <label class="option">
+                        <input type="radio" name="cd-q6" value="1">
+                        <span>5%</span>
+                    </label>
+                    <label class="option">
+                        <input type="radio" name="cd-q6" value="2">
+                        <span>16% (read from the curve at \( \zeta = 0.5 \))</span>
+                    </label>
+                    <label class="option">
+                        <input type="radio" name="cd-q6" value="3">
+                        <span>50%</span>
+                    </label>
+                </div>
+                <div class="question-actions">
+                    <button class="btn-verify">Verify</button>
+                </div>
+                <div class="question-explanation" style="display: none;">
+                    <div class="question-explanation-title">Explanation</div>
+                    <div class="question-explanation-text">
+                        The exact formula gives
+                        \( 100 \cdot e^{-\pi \times 0.5 / \sqrt{1 - 0.25}} = 100 \cdot e^{-\pi/\sqrt{3}} \approx 16.3\% \).
+                        Read it off the red curve at \( \zeta = 0.5 \) &mdash; the marker
+                        should show about 16%.  This level of overshoot would be quite
+                        bouncy for a car suspension.
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<hr>
+
+<!-- ========== EXPLORER 3: DESIGN CHALLENGE ========== -->
+
+<h2>The Design Challenge</h2>
+
+<p>
+    Real engineering means meeting <em>specifications</em>.  Below, you'll be
+    given random design specs: a system with a certain \( \omega_0 \), a maximum
+    settling time, and a maximum overshoot.  Your job is to choose the damping
+    ratio \( \zeta \) that satisfies both constraints.  Too little damping and
+    you violate the overshoot spec.  Too much and you blow the settling time.
+</p>
+
+<div class="interactive-container" id="design-challenge">
+    <div class="interactive-title">Explorer 3: Design Challenge</div>
+
+    <div id="cd-ch-specs"
+         style="text-align: center; padding: 10px; color: #c8c8e0; font-size: 0.95rem; background: rgba(0,0,0,0.2); border-radius: 6px; margin-bottom: 8px;">
+    </div>
+
+    <div class="plot-container">
+        <div id="cd-ch-plot" style="width: 100%; height: 380px;"></div>
+    </div>
+
+    <div id="cd-ch-feedback"
+         style="text-align: center; padding: 8px; font-size: 0.95rem; min-height: 28px;">
+    </div>
+
+    <div class="control-panel">
+        <div class="control-group">
+            <label class="control-label">Damping ratio &zeta;:
+                <span class="control-label-value">0.50</span>
+            </label>
+            <input type="range" class="slider" id="cd-ch-zeta"
+                   min="0.05" max="3.00" step="0.01" value="0.50">
+        </div>
+        <div class="btn-group">
+            <button class="btn" id="cd-ch-check">Check Design</button>
+            <button class="btn btn-secondary" onclick="newChallenge()">New Challenge</button>
+        </div>
+    </div>
+</div>
+
+<div class="info-box">
+    <div class="info-box-title">Key Insight</div>
+    <p>
+        In practice, engineers rarely aim for exactly \( \zeta = 1 \).  Many
+        systems work best at \( \zeta \approx 0.7 \): small overshoot (about 5%),
+        fast settling, and good disturbance rejection.  This is the "standard
+        second-order design" used throughout control engineering &mdash; from
+        autopilots to servo motors to audio amplifiers.
+    </p>
+</div>
+
+<!-- Test Your Understanding #3 -->
+<div class="interactive-container question-section">
+    <div class="interactive-title">Test Your Understanding</div>
+
+    <p style="margin-bottom: var(--spacing-md); color: var(--text-secondary);">
+        Use the Design Challenge to answer these questions.
+    </p>
+
+    <div class="tabs">
+        <div class="tab-buttons">
+            <button class="tab-button active">Question 7</button>
+            <button class="tab-button">Question 8</button>
+            <button class="tab-button">Question 9</button>
+        </div>
+
+        <!-- Q7: MCQ -->
+        <div class="tab-content active">
+            <div class="question-container" data-type="mcq" data-answer="1">
+                <div class="question-text">
+                    If the spec says "overshoot &le; 0%", what is the minimum \( \zeta \)
+                    you can use?
+                </div>
+                <div class="question-options">
+                    <label class="option">
+                        <input type="radio" name="cd-q7" value="0">
+                        <span>\( \zeta = 0.5 \) (still overshoots a little)</span>
+                    </label>
+                    <label class="option">
+                        <input type="radio" name="cd-q7" value="1">
+                        <span>\( \zeta = 1.0 \) (critical damping &mdash; zero overshoot boundary)</span>
+                    </label>
+                    <label class="option">
+                        <input type="radio" name="cd-q7" value="2">
+                        <span>\( \zeta = 0.7 \) (close enough)</span>
+                    </label>
+                    <label class="option">
+                        <input type="radio" name="cd-q7" value="3">
+                        <span>Any \( \zeta \) works if \( \omega_0 \) is high enough</span>
+                    </label>
+                </div>
+                <div class="question-actions">
+                    <button class="btn-verify">Verify</button>
+                </div>
+                <div class="question-explanation" style="display: none;">
+                    <div class="question-explanation-title">Explanation</div>
+                    <div class="question-explanation-text">
+                        Overshoot is zero only when \( \zeta \geq 1 \).  Any
+                        \( \zeta < 1 \) produces nonzero overshoot (the formula
+                        \( 100 e^{-\pi\zeta / \sqrt{1-\zeta^2}} \) is always positive
+                        for \( \zeta < 1 \)).  So the minimum \( \zeta \) for
+                        zero overshoot is exactly 1.0 &mdash; critical damping.
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Q8: MCQ -->
+        <div class="tab-content">
+            <div class="question-container" data-type="mcq" data-answer="2">
+                <div class="question-text">
+                    For a given \( \omega_0 \), if you must settle within 2 seconds
+                    <em>and</em> have no overshoot, which is the best strategy?
+                </div>
+                <div class="question-options">
+                    <label class="option">
+                        <input type="radio" name="cd-q8" value="0">
+                        <span>Set \( \zeta = 3 \) (very overdamped, no overshoot for sure)</span>
+                    </label>
+                    <label class="option">
+                        <input type="radio" name="cd-q8" value="1">
+                        <span>Set \( \zeta = 0.5 \) (fast but overshoots)</span>
+                    </label>
+                    <label class="option">
+                        <input type="radio" name="cd-q8" value="2">
+                        <span>Set \( \zeta = 1.0 \) (fastest possible without overshoot)</span>
+                    </label>
+                    <label class="option">
+                        <input type="radio" name="cd-q8" value="3">
+                        <span>It's impossible &mdash; you can't have both</span>
+                    </label>
+                </div>
+                <div class="question-actions">
+                    <button class="btn-verify">Verify</button>
+                </div>
+                <div class="question-explanation" style="display: none;">
+                    <div class="question-explanation-title">Explanation</div>
+                    <div class="question-explanation-text">
+                        Critical damping (\( \zeta = 1 \)) is the fastest
+                        non-oscillatory response.  Higher \( \zeta \) is slower
+                        (overdamped = sluggish), and lower \( \zeta \) overshoots.
+                        So \( \zeta = 1 \) is the optimal choice when you need both
+                        speed and no overshoot.  Whether it meets the 2-second deadline
+                        depends on \( \omega_0 \).
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Q9: Fill -->
+        <div class="tab-content">
+            <div class="question-container" data-type="fill" data-answer="0.59[0.56,0.62]">
+                <div class="question-text">
+                    At what \( \zeta \) is the overshoot exactly 10%?
+                    You can solve this by trial and error in the explorer,
+                    or use the overshoot formula:
+                    \( 10 = 100 \, e^{-\pi\zeta/\sqrt{1-\zeta^2}} \).
+                    <br><br>
+                    Hint: try values in the explorer first, then refine.
+                    <br><br>
+                    &zeta; &approx; <input type="text" class="fill-blank" placeholder="0.XX">
+                </div>
+                <div class="question-actions">
+                    <button class="btn-verify">Verify</button>
+                </div>
+                <div class="question-explanation" style="display: none;">
+                    <div class="question-explanation-title">Explanation</div>
+                    <div class="question-explanation-text">
+                        The answer is &zeta;&nbsp;&asymp;&nbsp;0.59.  You can find this
+                        by trial in the explorer: &zeta;&nbsp;=&nbsp;0.5 gives about
+                        16% overshoot (too high), &zeta;&nbsp;=&nbsp;0.7 gives about
+                        5% (too low), and &zeta;&nbsp;&asymp;&nbsp;0.59 lands right
+                        on 10%.  If you want to solve algebraically: divide both
+                        sides by 100, take ln, square both sides, and rearrange
+                        to get &zeta;&sup2;&nbsp;=&nbsp;(ln&nbsp;10)&sup2;&nbsp;/&nbsp;(&pi;&sup2;&nbsp;+&nbsp;(ln&nbsp;10)&sup2;)
+                        &asymp;&nbsp;0.349, so &zeta;&nbsp;&asymp;&nbsp;0.59.
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<hr>
+
+<!-- ========== CODE EXAMPLES ========== -->
+<h2>Code It Yourself</h2>
+
+<div class="tabs">
+    <div class="tab-buttons">
+        <button class="tab-button active">Door Closer</button>
+        <button class="tab-button">Suspension</button>
+        <button class="tab-button">Prompt</button>
+    </div>
+
+    <div class="tab-content active">
+        <div class="code-block-container">
+            <div class="code-header">
+                <span class="code-lang">Python</span>
+                <button class="copy-btn">Copy</button>
+            </div>
+            <pre><code class="language-python">import numpy as np
+import plotly.graph_objects as go
+from plotly.subplots import make_subplots
+
+def damped(t, x0, gamma, omega0):
+    disc = gamma**2 - omega0**2
+    if disc < 0:
+        wd = np.sqrt(-disc)
+        return x0 * np.exp(-gamma*t) * (np.cos(wd*t) + gamma/wd * np.sin(wd*t))
+    elif disc > 0:
+        s = np.sqrt(disc)
+        r1, r2 = -gamma + s, -gamma - s
+        return x0/(r2-r1) * (r2*np.exp(r1*t) - r1*np.exp(r2*t))
+    else:
+        return x0 * (1 + gamma*t) * np.exp(-gamma*t)
+
+m, k = 5.0, 20.0
+omega0 = np.sqrt(k/m)
+b_crit = 2 * np.sqrt(k * m)
+
+t = np.linspace(0, 8, 500)
+fig = make_subplots(rows=1, cols=2,
+    subplot_titles=['Door Angle vs Time', 'Performance'])
+
+for b, name, color in [
+    (b_crit*0.5, 'Underdamped', '#00f3ff'),
+    (b_crit, 'Critical', '#00ff9f'),
+    (b_crit*2, 'Overdamped', '#ff00ff')]:
+    gamma = b / (2*m)
+    fig.add_trace(go.Scatter(x=t, y=damped(t, 1, gamma, omega0),
+        name=f'{name} (b={b:.0f})', line=dict(color=color)),
+        row=1, col=1)
+
+fig.update_layout(template='plotly_dark',
+    title=f'Door Closer Design (m={m} kg, k={k} N/m, b_crit={b_crit:.0f} Ns/m)')
+fig.update_xaxes(title='Time (s)', gridcolor='#2a2f4a', linecolor='#808080')
+fig.update_yaxes(title='Angle (norm.)', gridcolor='#2a2f4a', linecolor='#808080')
+fig.show()</code></pre>
+        </div>
+    </div>
+
+    <div class="tab-content">
+        <div class="code-block-container">
+            <div class="code-header">
+                <span class="code-lang">Python</span>
+                <button class="copy-btn">Copy</button>
+            </div>
+            <pre><code class="language-python">import numpy as np
+import plotly.graph_objects as go
+
+def overshoot_pct(zeta):
+    if zeta >= 1: return 0
+    return 100 * np.exp(-np.pi * zeta / np.sqrt(1 - zeta**2))
+
+# Overshoot vs damping ratio
+zetas = np.linspace(0.01, 2.0, 200)
+os = [overshoot_pct(z) for z in zetas]
+
+fig = go.Figure()
+fig.add_trace(go.Scatter(x=zetas, y=os,
+    line=dict(color='#ff6b6b', width=2.5), name='Overshoot %'))
+fig.add_vline(x=1.0, line=dict(color='#00ff9f', dash='dash', width=1.5),
+    annotation_text='Critical (ζ=1)')
+
+# Mark common design points
+for z, label in [(0.3, 'Sporty'), (0.7, 'Standard'), (1.0, 'Critical')]:
+    fig.add_trace(go.Scatter(x=[z], y=[overshoot_pct(z)],
+        mode='markers+text', marker=dict(size=10),
+        text=[f'{label}: {overshoot_pct(z):.1f}%'],
+        textposition='top right', showlegend=False))
+
+fig.update_layout(template='plotly_dark',
+    title='Overshoot vs Damping Ratio',
+    xaxis=dict(title='ζ', range=[0, 2],
+        gridcolor='#2a2f4a', linecolor='#808080'),
+    yaxis=dict(title='Overshoot %', range=[0, 55],
+        gridcolor='#2a2f4a', linecolor='#808080'))
+fig.show()</code></pre>
+        </div>
+    </div>
+
+    <div class="tab-content">
+        <div class="code-block-container">
+            <div class="code-header">
+                <span class="code-lang">Prompt for AI</span>
+                <button class="copy-btn">Copy</button>
+            </div>
+            <pre><code class="language-text">Create a Python visualization for engineering damping design.
+
+Part 1 - Door closer simulation:
+- A door (m=5 kg) with spring (k) and damper (b)
+- Plot door angle vs time for b = 0.5×b_crit, b_crit, 2×b_crit
+- where b_crit = 2√(km)
+- Show that critical damping closes fastest without bounce
+
+Part 2 - Overshoot vs damping ratio:
+- Plot OS(%) = 100·exp(-πζ/√(1-ζ²)) for ζ from 0 to 2
+- Mark key design points: ζ=0.3 (sporty), 0.7 (standard), 1.0 (critical)
+- Add vertical line at ζ=1
+
+Part 3 - Car suspension response:
+- m=300 kg, k=20000 N/m, 10cm bump
+- Compare ride quality at ζ=0.3, 0.5, 0.7, 1.0
+- Show displacement vs time for all four cases
+
+Use Plotly dark theme, gray axes (#808080), fixed ranges.</code></pre>
+        </div>
+
+        <div class="info-box" style="margin-top: var(--spacing-md);">
+            <div class="info-box-title">Pro Tips for Prompting</div>
+            <ul>
+                <li>The damping ratio \( \zeta = b/(2\sqrt{km}) \) is the single most useful parameter</li>
+                <li>Ask for the overshoot formula explicitly &mdash; AI often gets the sign wrong</li>
+                <li>Request comparison plots with multiple \( \zeta \) values to build intuition</li>
+            </ul>
+        </div>
+    </div>
+</div>
+
+<hr>
+
+<!-- ========== EXERCISES ========== -->
+<h2>Exercises for Practice</h2>
+
+<div class="exercise-cards">
+    <div class="exercise-card">
+        <div class="exercise-card-header">
+            <span class="exercise-card-number">1.</span>
+            <span class="exercise-card-badge explore">Explore</span>
+        </div>
+        <div class="exercise-card-content">
+            In the Door Closer Designer, find three different \( (k, b) \)
+            combinations that all give \( \zeta = 1 \).  Record \( k \), \( b \),
+            and the settling time for each.  Which \( k \) gives the fastest
+            close?  Explain why using the relationship between \( \omega_0 \)
+            and settling time.
+        </div>
+    </div>
+
+    <div class="exercise-card">
+        <div class="exercise-card-header">
+            <span class="exercise-card-number">2.</span>
+            <span class="exercise-card-badge coding">Coding</span>
+        </div>
+        <div class="exercise-card-content">
+            Write a Python function <code>design_damper(m, k, target_os)</code>
+            that takes a mass, spring constant, and target overshoot percentage,
+            then returns the required damping coefficient \( b \).  Use the
+            overshoot formula to solve for \( \zeta \), then compute
+            \( b = 2\zeta\sqrt{km} \).  Test with \( m = 5, k = 20,
+            \text{target} = 5\% \) and verify in the explorer.
+        </div>
+    </div>
+
+    <div class="exercise-card">
+        <div class="exercise-card-header">
+            <span class="exercise-card-number">3.</span>
+            <span class="exercise-card-badge think">Think</span>
+        </div>
+        <div class="exercise-card-content">
+            A car's suspension must support the static weight \( mg = k \cdot \delta \)
+            where \( \delta \) is the static deflection.  Show that
+            \( \omega_0 = \sqrt{g / \delta} \), meaning the natural frequency
+            depends only on how much the car sags, not on its mass.  If a car
+            sags 10 cm on its springs, what is \( \omega_0 \) and the oscillation
+            period?  Why is this a useful result for suspension designers?
+        </div>
+    </div>
+</div>
+
+<hr>
+
+<!-- ========== NAVIGATION ========== -->
+<div class="btn-group mt-xl">
+    <button class="btn btn-magenta" onclick="navigateToSection('25-damping-regimes')">&larr; Previous: Three Regimes of Damping</button>
+    <button class="btn" onclick="scrollToTop()">&uarr; Back to Top</button>
+    <button class="btn btn-secondary" onclick="navigateToSection('27-external-forces')">Next: Adding External Forces &rarr;</button>
+</div>

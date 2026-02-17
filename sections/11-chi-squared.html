@@ -1,0 +1,749 @@
+<!-- Section 2.5: The χ² Criterion — Finding Best Fit -->
+<!-- Source: Lecture2.nb (Parts 1-2) -->
+<!-- Core concept: Chi-squared minimization for parameter estimation -->
+<!-- Time: ~20 minutes -->
+<!-- Prerequisites: Section 2.3 (Error Bars), Section 2.4 (Galileo's Experiment) -->
+
+<h1>The &chi;&sup2; Criterion: Finding Best Fit</h1>
+
+<p>
+    You have data with error bars.  You have a model with an unknown parameter.
+    How do you find the "best" value?  Eyeballing is subjective &mdash;
+    &chi;&sup2; (chi-squared) gives you a <em>number</em>.  The smaller
+    &chi;&sup2; is, the better the model fits the data.  The parameter value
+    that minimises &chi;&sup2; is your best-fit estimate.
+</p>
+
+<div class="info-box">
+    <div class="info-box-title">Learning Objectives</div>
+    <ul>
+        <li>Define the &chi;&sup2; statistic: \( \chi^2 = \sum_i \frac{(y_i - f(x_i))^2}{\sigma_i^2} \)</li>
+        <li>Visualise &chi;&sup2; as a function of model parameters (the &chi;&sup2; landscape)</li>
+        <li>Understand why data points with smaller uncertainties get more weight</li>
+        <li>Find the best-fit parameter by locating the minimum of &chi;&sup2;</li>
+    </ul>
+</div>
+
+<div class="equation-display">
+    <p><strong>The &chi;&sup2; statistic:</strong></p>
+    $$ \chi^2(a) = \sum_{i=1}^{N} \frac{\big(y_i - f(x_i;\, a)\big)^2}{\sigma_i^2} $$
+    <p>
+        Each residual \( y_i - f(x_i;\,a) \) is the gap between data and model.
+        Dividing by \( \sigma_i^2 \) gives more weight to precise measurements.
+    </p>
+</div>
+
+<hr>
+
+<!-- ========== EXPLORER 1: WHAT IS χ²? ========== -->
+
+<h2>Sliding Toward the Best Fit</h2>
+
+<p>
+    Galileo's data follows \( d = \tfrac{1}{2}g\,t^2 \).  Writing \( a = g/2 \), the model
+    is \( d = a\,t^2 \) with one unknown parameter \( a \).  The explorer below generates
+    noisy data and lets you drag \( a \) across a range.  On the left you see how the curve
+    matches the data; on the right you see &chi;&sup2; change &mdash; it forms a parabola
+    with a clear minimum at the best-fit value.
+</p>
+
+<div class="interactive-container" id="chi2-slider">
+    <div class="interactive-title">Interactive: What is &chi;&sup2;?</div>
+
+    <div style="display: flex; gap: 0.5rem; flex-wrap: wrap;">
+        <div class="plot-container" style="flex: 1; min-width: 280px;">
+            <div id="chi2-data-plot" style="width: 100%; height: 380px;"></div>
+        </div>
+        <div class="plot-container" style="flex: 1; min-width: 280px;">
+            <div id="chi2-curve-plot" style="width: 100%; height: 380px;"></div>
+        </div>
+    </div>
+
+    <div id="chi2-slider-stats"
+         style="display: flex; justify-content: center; gap: 1.5rem; padding: 8px 0; font-size: 0.85rem; color: #c8c8e0; flex-wrap: wrap;">
+    </div>
+
+    <div class="control-panel">
+        <div class="control-group">
+            <label class="control-label">Parameter a = g/2:
+                <span class="control-label-value" id="chi2-a-val">4.9</span>
+            </label>
+            <input type="range" class="slider" id="chi2-a-slider" min="3.0" max="7.0" step="0.01" value="4.9">
+        </div>
+        <div class="btn-group">
+            <button class="btn" onclick="newChi2Data()">New Data</button>
+            <button class="btn" onclick="resetChi2Slider()">Reset</button>
+        </div>
+    </div>
+</div>
+
+<!-- Test Your Understanding #1 -->
+<div class="interactive-container question-section">
+    <div class="interactive-title">Test Your Understanding</div>
+
+    <p style="margin-bottom: var(--spacing-md); color: var(--text-secondary);">
+        Use the explorer above to answer these questions.
+    </p>
+
+    <div class="tabs">
+        <div class="tab-buttons">
+            <button class="tab-button active">Question 1</button>
+            <button class="tab-button">Question 2</button>
+            <button class="tab-button">Question 3</button>
+        </div>
+
+        <!-- Q1: MCQ -->
+        <div class="tab-content active">
+            <div class="question-container" data-type="mcq" data-answer="2">
+                <div class="question-text">
+                    What does the minimum of the &chi;&sup2; curve represent?
+                </div>
+                <div class="question-options">
+                    <label class="option">
+                        <input type="radio" name="chi2-q1" value="0">
+                        <span>The point where all residuals are exactly zero</span>
+                    </label>
+                    <label class="option">
+                        <input type="radio" name="chi2-q1" value="1">
+                        <span>The point where the model passes through every data point</span>
+                    </label>
+                    <label class="option">
+                        <input type="radio" name="chi2-q1" value="2">
+                        <span>The parameter value where the weighted sum of squared residuals is smallest</span>
+                    </label>
+                    <label class="option">
+                        <input type="radio" name="chi2-q1" value="3">
+                        <span>The point where &chi;&sup2; equals zero</span>
+                    </label>
+                </div>
+                <div class="question-actions">
+                    <button class="btn-verify">Verify</button>
+                </div>
+                <div class="question-explanation" style="display:none;">
+                    <strong>Explanation:</strong>
+                    The minimum of &chi;&sup2; is where the model curve comes closest to the data,
+                    in the weighted least-squares sense.  It is <em>not</em> zero (there is always
+                    residual noise), and the curve won't pass through every point — it finds the
+                    best overall compromise.
+                </div>
+            </div>
+        </div>
+
+        <!-- Q2: Fill -->
+        <div class="tab-content">
+            <div class="question-container" data-type="fill" data-answer="4.9[4.3,5.5]">
+                <div class="question-text">
+                    Drag the slider to find the minimum of &chi;&sup2;.
+                    What is the approximate best-fit value of \( a \)?
+                    <br><br>
+                    \( a_{\text{best}} \approx \) <input type="text" class="fill-blank" placeholder="value">
+                </div>
+                <div class="question-actions">
+                    <button class="btn-verify">Verify</button>
+                </div>
+                <div class="question-explanation" style="display:none;">
+                    <strong>Explanation:</strong>
+                    The true value is \( a = g/2 = 4.9 \).  With 15% noise, the best-fit value
+                    should be close to 4.9 but will vary between data sets.
+                    Click "New Data" a few times to see the variation.
+                </div>
+            </div>
+        </div>
+
+        <!-- Q3: MCQ -->
+        <div class="tab-content">
+            <div class="question-container" data-type="mcq" data-answer="1">
+                <div class="question-text">
+                    Why does the &chi;&sup2; formula divide each residual by \( \sigma_i^2 \)?
+                </div>
+                <div class="question-options">
+                    <label class="option">
+                        <input type="radio" name="chi2-q3" value="0">
+                        <span>To make the units cancel out</span>
+                    </label>
+                    <label class="option">
+                        <input type="radio" name="chi2-q3" value="1">
+                        <span>To give more weight to precise measurements (small \( \sigma_i \))</span>
+                    </label>
+                    <label class="option">
+                        <input type="radio" name="chi2-q3" value="2">
+                        <span>To make &chi;&sup2; always equal to 1</span>
+                    </label>
+                </div>
+                <div class="question-actions">
+                    <button class="btn-verify">Verify</button>
+                </div>
+                <div class="question-explanation" style="display:none;">
+                    <strong>Explanation:</strong>
+                    Dividing by \( \sigma_i^2 \) means that a point with \( \sigma = 1 \) contributes
+                    100× more to &chi;&sup2; than a point with \( \sigma = 10 \).
+                    This is physically sensible: you should trust your most precise measurements the most.
+                    (Making units cancel is a side benefit, not the main reason.)
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<hr>
+
+<!-- ========== EXPLORER 2: χ² LANDSCAPE ========== -->
+
+<h2>The &chi;&sup2; Landscape in Two Dimensions</h2>
+
+<p>
+    Real models often have more than one parameter.  For \( d = a + c\,t^2 \)
+    (a constant offset plus a quadratic), the &chi;&sup2; becomes a surface over
+    the \( (a, c) \) plane.  The contour plot below shows this landscape: dark colours
+    are low &chi;&sup2; (good fit), bright colours are high (bad fit).  The minimum
+    is in the valley.
+</p>
+
+<div class="interactive-container" id="chi2-landscape">
+    <div class="interactive-title">Interactive: &chi;&sup2; Landscape</div>
+
+    <div style="display: flex; gap: 0.5rem; flex-wrap: wrap;">
+        <div class="plot-container" style="flex: 1; min-width: 280px;">
+            <div id="chi2-contour-plot" style="width: 100%; height: 400px;"></div>
+        </div>
+        <div class="plot-container" style="flex: 1; min-width: 280px;">
+            <div id="chi2-landscape-data-plot" style="width: 100%; height: 400px;"></div>
+        </div>
+    </div>
+
+    <div id="chi2-landscape-stats"
+         style="display: flex; justify-content: center; gap: 1.5rem; padding: 8px 0; font-size: 0.85rem; color: #c8c8e0; flex-wrap: wrap;">
+    </div>
+
+    <div class="control-panel">
+        <div class="control-group">
+            <label class="control-label">Offset a:
+                <span class="control-label-value" id="chi2-land-a-val">0</span>
+            </label>
+            <input type="range" class="slider" id="chi2-land-a-slider" min="-20" max="20" step="0.5" value="0">
+        </div>
+        <div class="control-group">
+            <label class="control-label">Coefficient c:
+                <span class="control-label-value" id="chi2-land-c-val">4.9</span>
+            </label>
+            <input type="range" class="slider" id="chi2-land-c-slider" min="3.0" max="7.0" step="0.05" value="4.9">
+        </div>
+        <div class="btn-group">
+            <button class="btn" onclick="newLandscapeData()">New Data</button>
+            <button class="btn" onclick="resetLandscapeExplorer()">Reset</button>
+        </div>
+    </div>
+</div>
+
+<!-- Test Your Understanding #2 -->
+<div class="interactive-container question-section">
+    <div class="interactive-title">Test Your Understanding</div>
+
+    <p style="margin-bottom: var(--spacing-md); color: var(--text-secondary);">
+        Use the &chi;&sup2; Landscape explorer to answer these questions.
+    </p>
+
+    <div class="tabs">
+        <div class="tab-buttons">
+            <button class="tab-button active">Question 4</button>
+            <button class="tab-button">Question 5</button>
+            <button class="tab-button">Question 6</button>
+        </div>
+
+        <!-- Q4: MCQ -->
+        <div class="tab-content active">
+            <div class="question-container" data-type="mcq" data-answer="1">
+                <div class="question-text">
+                    What shape do the &chi;&sup2; contours form around the minimum?
+                </div>
+                <div class="question-options">
+                    <label class="option">
+                        <input type="radio" name="chi2-q4" value="0">
+                        <span>Concentric circles — both parameters are equally constrained</span>
+                    </label>
+                    <label class="option">
+                        <input type="radio" name="chi2-q4" value="1">
+                        <span>Tilted ellipses — the parameters are correlated</span>
+                    </label>
+                    <label class="option">
+                        <input type="radio" name="chi2-q4" value="2">
+                        <span>Squares — the parameters are independent</span>
+                    </label>
+                </div>
+                <div class="question-actions">
+                    <button class="btn-verify">Verify</button>
+                </div>
+                <div class="question-explanation" style="display:none;">
+                    <strong>Explanation:</strong>
+                    For the model \( d = a + c\,t^2 \), changing the offset \( a \) can be partly
+                    compensated by adjusting \( c \), so the parameters are correlated.
+                    This shows up as tilted ellipses in the contour plot.  Circular contours
+                    would mean the parameters are independent.
+                </div>
+            </div>
+        </div>
+
+        <!-- Q5: Fill -->
+        <div class="tab-content">
+            <div class="question-container" data-type="fill" data-answer="4.9[4.2,5.6]">
+                <div class="question-text">
+                    Navigate the sliders to find the minimum of &chi;&sup2;.
+                    What is the approximate best-fit value of \( c \)?
+                    <br><br>
+                    \( c_{\text{best}} \approx \) <input type="text" class="fill-blank" placeholder="value">
+                </div>
+                <div class="question-actions">
+                    <button class="btn-verify">Verify</button>
+                </div>
+                <div class="question-explanation" style="display:none;">
+                    <strong>Explanation:</strong>
+                    The true value is \( c = g/2 = 4.9 \).  The contour minimum should be near
+                    \( (a, c) \approx (0, 4.9) \), but noise shifts it.  The elliptical contours
+                    show how \( a \) and \( c \) trade off.
+                </div>
+            </div>
+        </div>
+
+        <!-- Q6: MSQ -->
+        <div class="tab-content">
+            <div class="question-container" data-type="msq" data-answer="0,2">
+                <div class="question-text">
+                    Which statements about the &chi;&sup2; landscape are true? (Select all that apply.)
+                </div>
+                <div class="question-options">
+                    <label class="option">
+                        <input type="checkbox" value="0">
+                        <span>Moving away from the minimum in any direction increases &chi;&sup2;</span>
+                    </label>
+                    <label class="option">
+                        <input type="checkbox" value="1">
+                        <span>There can be multiple equally good minima</span>
+                    </label>
+                    <label class="option">
+                        <input type="checkbox" value="2">
+                        <span>Elongated contours mean one parameter is less well-determined than the other</span>
+                    </label>
+                    <label class="option">
+                        <input type="checkbox" value="3">
+                        <span>The shape of the contours does not depend on the data uncertainties</span>
+                    </label>
+                </div>
+                <div class="question-actions">
+                    <button class="btn-verify">Verify</button>
+                </div>
+                <div class="question-explanation" style="display:none;">
+                    <strong>Explanation:</strong>
+                    <ul>
+                        <li><strong>True:</strong> By definition, the minimum is the global low point of the &chi;&sup2; surface — any direction leads uphill.</li>
+                        <li><strong>False:</strong> For linear models (like our polynomial), the &chi;&sup2; surface is a paraboloid with a single unique minimum.</li>
+                        <li><strong>True:</strong> If contours are stretched along one axis, that parameter can vary widely without much penalty — it's poorly constrained.</li>
+                        <li><strong>False:</strong> The \( 1/\sigma_i^2 \) weighting directly shapes the landscape. Smaller &sigma; sharpens the valley.</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<hr>
+
+<!-- ========== EXPLORER 3: WEIGHTING BY UNCERTAINTY ========== -->
+
+<h2>Why Weighting Matters</h2>
+
+<p>
+    Not all data points are created equal.  A measurement with a tiny error bar
+    should count more than one with a huge error bar.  This explorer lets you
+    toggle between <em>weighted</em> &chi;&sup2; (dividing by \( \sigma_i^2 \))
+    and <em>unweighted</em> (all residuals treated equally).
+    Watch how the best-fit value changes.
+</p>
+
+<div class="interactive-container" id="chi2-weighting">
+    <div class="interactive-title">Interactive: Weighting by Uncertainty</div>
+
+    <div class="plot-container">
+        <div id="chi2-weight-plot" style="width: 100%; height: 420px;"></div>
+    </div>
+
+    <div id="chi2-weight-stats"
+         style="display: flex; justify-content: center; gap: 1.5rem; padding: 8px 0; font-size: 0.85rem; color: #c8c8e0; flex-wrap: wrap;">
+    </div>
+
+    <div class="control-panel">
+        <div class="control-group">
+            <label class="control-label">Noise level (&sigma;%):
+                <span class="control-label-value" id="chi2-weight-noise-val">20</span>
+            </label>
+            <input type="range" class="slider" id="chi2-weight-noise-slider" min="5" max="40" step="1" value="20">
+        </div>
+        <div class="control-group">
+            <label class="control-label">Mode:
+                <span class="control-label-value" id="chi2-weight-mode-val">Weighted</span>
+            </label>
+            <select id="chi2-weight-mode-select"
+                    style="width: 100%; padding: 8px 12px; background: #1a1f3a; color: #c8c8e0; border: 1px solid #2a2f4a; border-radius: 6px; font-size: 0.85rem; cursor: pointer;">
+                <option value="weighted">Weighted (÷ σ²)</option>
+                <option value="unweighted">Unweighted</option>
+            </select>
+        </div>
+        <div class="btn-group">
+            <button class="btn" onclick="newWeightData()">New Data</button>
+            <button class="btn" onclick="resetWeightExplorer()">Reset</button>
+        </div>
+    </div>
+</div>
+
+<div class="info-box">
+    <div class="info-box-title">Key Insight</div>
+    <p>
+        Weighting by \( 1/\sigma_i^2 \) matters most when uncertainties vary across data points.
+        With relative noise (\( \sigma = 20\% \times d \)), early time points (small \( d \),
+        small \( \sigma \)) get more weight than late ones.  Unweighted fitting treats
+        a measurement at \( t = 1 \) the same as one at \( t = 10 \), even though the latter
+        has much larger absolute uncertainty.
+    </p>
+</div>
+
+<!-- Test Your Understanding #3 -->
+<div class="interactive-container question-section">
+    <div class="interactive-title">Test Your Understanding</div>
+
+    <p style="margin-bottom: var(--spacing-md); color: var(--text-secondary);">
+        Use the Weighting explorer to answer these questions.
+    </p>
+
+    <div class="tabs">
+        <div class="tab-buttons">
+            <button class="tab-button active">Question 7</button>
+            <button class="tab-button">Question 8</button>
+            <button class="tab-button">Question 9</button>
+        </div>
+
+        <!-- Q7: MCQ -->
+        <div class="tab-content active">
+            <div class="question-container" data-type="mcq" data-answer="2">
+                <div class="question-text">
+                    If one data point has \( \sigma_i = 5 \) and another has \( \sigma_j = 10 \),
+                    how does their relative weight in &chi;&sup2; compare?
+                </div>
+                <div class="question-options">
+                    <label class="option">
+                        <input type="radio" name="chi2-q7" value="0">
+                        <span>They have equal weight</span>
+                    </label>
+                    <label class="option">
+                        <input type="radio" name="chi2-q7" value="1">
+                        <span>The first point has 2× the weight</span>
+                    </label>
+                    <label class="option">
+                        <input type="radio" name="chi2-q7" value="2">
+                        <span>The first point has 4× the weight</span>
+                    </label>
+                    <label class="option">
+                        <input type="radio" name="chi2-q7" value="3">
+                        <span>The second point has 4× the weight</span>
+                    </label>
+                </div>
+                <div class="question-actions">
+                    <button class="btn-verify">Verify</button>
+                </div>
+                <div class="question-explanation" style="display:none;">
+                    <strong>Explanation:</strong>
+                    Weight goes as \( 1/\sigma^2 \).  Point \( i \): \( 1/25 = 0.04 \).
+                    Point \( j \): \( 1/100 = 0.01 \).  Ratio: \( 0.04/0.01 = 4 \).
+                    The more precise point (smaller &sigma;) gets 4× the weight.
+                </div>
+            </div>
+        </div>
+
+        <!-- Q8: Fill -->
+        <div class="tab-content">
+            <div class="question-container" data-type="fill" data-answer="4.9[3.5,6.5]">
+                <div class="question-text">
+                    Set noise to 30%.  Click "New Data", then compare the best-fit \( a \) in
+                    Weighted vs Unweighted mode.  Report the <strong>weighted</strong> best-fit.
+                    <br><br>
+                    \( a_{\text{weighted}} \approx \) <input type="text" class="fill-blank" placeholder="value">
+                </div>
+                <div class="question-actions">
+                    <button class="btn-verify">Verify</button>
+                </div>
+                <div class="question-explanation" style="display:none;">
+                    <strong>Explanation:</strong>
+                    The weighted best-fit should be near 4.9 (the true value).  At 30% noise
+                    it fluctuates, but weighting by \( 1/\sigma_i^2 \) typically gives a
+                    value closer to the truth than the unweighted version, because it
+                    down-weights the noisy late-time points.
+                </div>
+            </div>
+        </div>
+
+        <!-- Q9: MSQ -->
+        <div class="tab-content">
+            <div class="question-container" data-type="msq" data-answer="1,2">
+                <div class="question-text">
+                    When does weighting by \( 1/\sigma_i^2 \) make a significant difference?
+                    (Select all that apply.)
+                </div>
+                <div class="question-options">
+                    <label class="option">
+                        <input type="checkbox" value="0">
+                        <span>When all data points have exactly the same uncertainty</span>
+                    </label>
+                    <label class="option">
+                        <input type="checkbox" value="1">
+                        <span>When uncertainties vary widely across data points (e.g. relative noise)</span>
+                    </label>
+                    <label class="option">
+                        <input type="checkbox" value="2">
+                        <span>When a few points are much more precise than the rest</span>
+                    </label>
+                    <label class="option">
+                        <input type="checkbox" value="3">
+                        <span>When you have only 2 data points</span>
+                    </label>
+                </div>
+                <div class="question-actions">
+                    <button class="btn-verify">Verify</button>
+                </div>
+                <div class="question-explanation" style="display:none;">
+                    <strong>Explanation:</strong>
+                    <ul>
+                        <li><strong>False:</strong> If all \( \sigma_i \) are equal, the \( 1/\sigma^2 \) factor is the same for every term and cancels out &mdash; weighting makes no difference.</li>
+                        <li><strong>True:</strong> With relative noise, early points (small \( d \)) have much smaller \( \sigma \) than late points, so weighting changes the fit significantly.</li>
+                        <li><strong>True:</strong> A few very precise points will dominate the weighted fit, pulling the curve toward them.</li>
+                        <li><strong>False:</strong> With only 2 points, any model with &ge;2 parameters will fit perfectly regardless of weighting.</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<hr>
+
+<!-- ========== PYTHON CODE ========== -->
+
+<h2>Python Code</h2>
+
+<p>Here's how to compute &chi;&sup2; and visualise the parameter landscape.</p>
+
+<div class="tabs">
+    <div class="tab-buttons">
+        <button class="tab-button active">Computing &chi;&sup2;</button>
+        <button class="tab-button">&chi;&sup2; Landscape</button>
+        <button class="tab-button">Prompt</button>
+    </div>
+
+    <!-- Tab 1: Computing χ² -->
+    <div class="tab-content active">
+        <div class="code-block-container">
+            <div class="code-header">
+                <span class="code-lang">Python</span>
+                <button class="copy-btn">Copy</button>
+            </div>
+            <pre><code class="language-python">
+import numpy as np
+import plotly.graph_objects as go
+
+# Galileo's data: d = (g/2) * t^2, g = 9.8
+g_true = 9.8
+times = np.arange(1, 11)
+d_true = 0.5 * g_true * times**2
+
+# Generate noisy data (5 trials, 15% noise)
+rng = np.random.default_rng(42)
+N_trials = 5
+noise_pct = 0.15
+data = np.array([d_true + rng.normal(0, noise_pct * d_true)
+                 for _ in range(N_trials)])
+means = data.mean(axis=0)
+stds = data.std(axis=0, ddof=1)
+errors = stds / np.sqrt(N_trials - 1)
+
+# Compute χ² for a range of parameter values
+a_values = np.linspace(3.0, 7.0, 500)
+chi2_values = np.array([
+    np.sum(((means - a * times**2) / errors)**2)
+    for a in a_values
+])
+
+# Find minimum
+a_best = a_values[np.argmin(chi2_values)]
+chi2_min = chi2_values.min()
+
+# Plot
+fig = go.Figure()
+fig.add_trace(go.Scatter(
+    x=a_values, y=chi2_values, mode='lines',
+    line=dict(color='#00f3ff', width=2),
+    name='χ²(a)'
+))
+fig.add_trace(go.Scatter(
+    x=[a_best], y=[chi2_min], mode='markers',
+    marker=dict(size=12, color='#ffff00', symbol='star'),
+    name=f'Min: a = {a_best:.3f}'
+))
+fig.update_layout(
+    template='plotly_dark',
+    title=f'χ² landscape — best fit a = {a_best:.3f}',
+    xaxis=dict(title='Parameter a', range=[3, 7],
+               gridcolor='#2a2f4a', zerolinecolor='#808080',
+               linecolor='#808080'),
+    yaxis=dict(title='χ²', gridcolor='#2a2f4a',
+               zerolinecolor='#808080', linecolor='#808080')
+)
+fig.show()
+            </code></pre>
+        </div>
+    </div>
+
+    <!-- Tab 2: χ² Landscape -->
+    <div class="tab-content">
+        <div class="code-block-container">
+            <div class="code-header">
+                <span class="code-lang">Python</span>
+                <button class="copy-btn">Copy</button>
+            </div>
+            <pre><code class="language-python">
+import numpy as np
+import plotly.graph_objects as go
+
+# Using means and errors from Tab 1...
+# Model: d = a + c * t^2 (offset + quadratic)
+a_range = np.linspace(-20, 20, 100)
+c_range = np.linspace(3.0, 7.0, 100)
+
+# Compute χ² on 2D grid
+chi2_grid = np.zeros((len(c_range), len(a_range)))
+for i, c in enumerate(c_range):
+    for j, a in enumerate(a_range):
+        model = a + c * times**2
+        chi2_grid[i, j] = np.sum(((means - model) / errors)**2)
+
+# Find minimum
+idx = np.unravel_index(chi2_grid.argmin(), chi2_grid.shape)
+a_best = a_range[idx[1]]
+c_best = c_range[idx[0]]
+
+# Contour plot
+fig = go.Figure(data=go.Contour(
+    x=a_range, y=c_range, z=chi2_grid,
+    colorscale='Viridis', ncontours=20,
+    colorbar=dict(title='χ²')
+))
+fig.add_trace(go.Scatter(
+    x=[a_best], y=[c_best], mode='markers',
+    marker=dict(size=14, color='#ff00ff', symbol='x'),
+    name=f'Min: ({a_best:.1f}, {c_best:.2f})'
+))
+fig.update_layout(
+    template='plotly_dark',
+    title=f'χ² Landscape — min at a={a_best:.1f}, c={c_best:.3f}',
+    xaxis=dict(title='Offset a', range=[-20, 20],
+               gridcolor='#2a2f4a', zerolinecolor='#808080',
+               linecolor='#808080'),
+    yaxis=dict(title='Coefficient c', range=[3, 7],
+               gridcolor='#2a2f4a', zerolinecolor='#808080',
+               linecolor='#808080')
+)
+fig.show()
+            </code></pre>
+        </div>
+    </div>
+
+    <!-- Tab 3: Prompt -->
+    <div class="tab-content">
+        <div class="code-block-container">
+            <div class="code-header">
+                <span class="code-lang">Prompt for AI</span>
+                <button class="copy-btn">Copy</button>
+            </div>
+            <pre><code class="language-text">
+Build a chi-squared analysis tool in Python with Plotly.
+
+Setup:
+- Galileo's data: d = (g/2)t² at t = 1..10, with 15% relative Gaussian noise
+- 5 trials per time point, compute mean and standard error
+
+Tasks:
+1. One-parameter χ² scan: model d = a*t², sweep a from 3 to 7
+   - Plot χ²(a) and mark the minimum
+2. Two-parameter χ² landscape: model d = a + c*t²
+   - Compute χ² on a 100×100 grid: a in [-20, 20], c in [3, 7]
+   - Show contour plot with minimum marked
+3. Compare weighted (÷ σ²) vs unweighted fitting
+
+Use dark theme, gray axes (#808080), Viridis colorscale for contours.
+            </code></pre>
+        </div>
+
+        <div class="info-box" style="margin-top: var(--spacing-md);">
+            <div class="info-box-title">Tips for Prompting</div>
+            <ul>
+                <li>Specify the physics model and noise model explicitly</li>
+                <li>Ask for both the 1D scan and 2D landscape</li>
+                <li>Request the minimum location marked on the plot</li>
+                <li>Try changing the model to a + b*t + c*t² for 3 parameters</li>
+            </ul>
+        </div>
+    </div>
+</div>
+
+<hr>
+
+<!-- ========== EXERCISES ========== -->
+
+<h2>Exercises for Practice</h2>
+
+<div class="exercise-cards">
+    <div class="exercise-card">
+        <div class="exercise-card-header">
+            <span class="exercise-card-number">1.</span>
+            <span class="exercise-card-badge explore">Explore</span>
+        </div>
+        <div class="exercise-card-content">
+            In the &chi;&sup2; Landscape explorer, try different data sets (click "New Data"
+            several times).  How much does the minimum location \( (a, c) \) move?
+            Does the <em>shape</em> of the contours change, or just the centre?
+        </div>
+    </div>
+
+    <div class="exercise-card">
+        <div class="exercise-card-header">
+            <span class="exercise-card-number">2.</span>
+            <span class="exercise-card-badge coding">Coding</span>
+        </div>
+        <div class="exercise-card-content">
+            Modify the Python code to fit the model \( d = a + b\,t + c\,t^2 \) (three parameters).
+            Fix \( b = 0 \) and sweep \( a \) and \( c \) as before.
+            How does adding the linear term change the best-fit \( c \)?
+            What happens if you let \( b \) vary freely?
+        </div>
+    </div>
+
+    <div class="exercise-card">
+        <div class="exercise-card-header">
+            <span class="exercise-card-number">3.</span>
+            <span class="exercise-card-badge think">Think</span>
+        </div>
+        <div class="exercise-card-content">
+            A good fit has \( \chi^2 / N_{\text{dof}} \approx 1 \), where
+            \( N_{\text{dof}} = N_{\text{data}} - N_{\text{params}} \).
+            If \( \chi^2 / N_{\text{dof}} \gg 1 \), the model doesn't fit the data.
+            If \( \chi^2 / N_{\text{dof}} \ll 1 \), your error bars may be too large.
+            Explain why in your own words.
+        </div>
+    </div>
+</div>
+
+<hr>
+
+<!-- ========== NAVIGATION ========== -->
+
+<div class="btn-group mt-xl">
+    <button class="btn btn-magenta" onclick="navigateToSection('10-galileo-workflow')">&larr; Previous: Galileo's Experiment</button>
+    <button class="btn" onclick="scrollToTop()">&uarr; Back to Top</button>
+    <button class="btn btn-secondary" onclick="navigateToSection('12-parameter-exploration')">Next: Manual Parameter Exploration &rarr;</button>
+</div>

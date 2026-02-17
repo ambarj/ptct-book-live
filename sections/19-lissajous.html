@@ -1,0 +1,869 @@
+<!-- Section 2.13: Lissajous Figures -->
+<!-- Source: Lecture3.nb (Part 4) -->
+<!-- Core concept: Parametric curves from perpendicular oscillations -->
+<!-- Time: ~20 minutes -->
+<!-- Prerequisites: Superposition, same-frequency interference, beats -->
+
+<h1>Lissajous Figures</h1>
+
+<p>
+    So far we've added waves that move in the <em>same</em> direction.  What
+    happens when two oscillations act <strong>perpendicularly</strong> &mdash;
+    one driving \( x(t) \) and the other driving \( y(t) \)?  The result is a
+    <strong>Lissajous figure</strong>: a parametric curve in the \( x \)-\( y \)
+    plane whose shape encodes the frequency ratio and phase relationship.
+    These patterns appear everywhere &mdash; on oscilloscopes, in laser shows,
+    and even in planetary orbits.
+</p>
+
+<div class="info-box">
+    <div class="info-box-title">Learning Objectives</div>
+    <ul>
+        <li>Generate Lissajous figures from perpendicular oscillations \( x(t) \) and \( y(t) \)</li>
+        <li>Predict the shape from the frequency ratio and phase difference</li>
+        <li>Distinguish closed curves (rational \( \omega_x/\omega_y \)) from space-filling trajectories (irrational ratio)</li>
+        <li>Identify classic patterns: line, circle, ellipse, figure-8, trefoil</li>
+    </ul>
+</div>
+
+<div class="equation-display">
+    <p><strong>Perpendicular oscillations:</strong></p>
+    $$ x(t) = A_x\cos(\omega_x\, t + \phi_x), \qquad y(t) = A_y\cos(\omega_y\, t + \phi_y) $$
+    <p>
+        The trajectory \( (x(t),\, y(t)) \) traces a curve that depends on three things:
+        the <strong>frequency ratio</strong> \( \omega_x/\omega_y \), the
+        <strong>phase difference</strong> \( \Delta\phi = \phi_y - \phi_x \),
+        and the <strong>amplitude ratio</strong> \( A_x/A_y \).
+    </p>
+</div>
+
+<hr>
+
+<!-- ========== EXPLORER 1: LISSAJOUS GENERATOR ========== -->
+
+<h2>The Lissajous Generator</h2>
+
+<p>
+    Adjust the frequencies and phases to create different patterns.  The left
+    panel shows the parametric curve \( (x(t), y(t)) \); the right panel shows
+    the individual oscillations \( x(t) \) and \( y(t) \) in the time domain.
+    Start with \( \omega_x = 1 \), \( \omega_y = 2 \), \( \Delta\phi = 0 \)
+    to see a figure-8, then explore.
+</p>
+
+<div class="interactive-container" id="lissajous-generator">
+    <div class="interactive-title">Interactive: Lissajous Generator</div>
+
+    <div style="display: flex; gap: 0.5rem; flex-wrap: wrap;">
+        <div class="plot-container" style="flex: 1; min-width: 280px;">
+            <div id="lj-parametric-plot" style="width: 100%; height: 400px;"></div>
+        </div>
+        <div class="plot-container" style="flex: 1; min-width: 280px;">
+            <div id="lj-time-plot" style="width: 100%; height: 400px;"></div>
+        </div>
+    </div>
+
+    <div id="lj-gen-stats"
+         style="display: flex; justify-content: center; gap: 1.5rem; padding: 8px 0; font-size: 0.85rem; color: #c8c8e0; flex-wrap: wrap;">
+    </div>
+
+    <div class="control-panel">
+        <div class="control-group">
+            <label class="control-label">&omega;<sub>x</sub>:
+                <span class="control-label-value">1.0</span>
+            </label>
+            <input type="range" class="slider" id="lj-wx-slider"
+                   min="0.5" max="5" step="0.1" value="1.0">
+        </div>
+        <div class="control-group">
+            <label class="control-label">&omega;<sub>y</sub>:
+                <span class="control-label-value">2.0</span>
+            </label>
+            <input type="range" class="slider" id="lj-wy-slider"
+                   min="0.5" max="5" step="0.1" value="2.0">
+        </div>
+        <div class="control-group">
+            <label class="control-label">&phi;<sub>x</sub>:
+                <span class="control-label-value">0&deg;</span>
+            </label>
+            <input type="range" class="slider" id="lj-phix-slider"
+                   min="0" max="6.283" step="0.05" value="0">
+        </div>
+        <div class="control-group">
+            <label class="control-label">&phi;<sub>y</sub>:
+                <span class="control-label-value">0&deg;</span>
+            </label>
+            <input type="range" class="slider" id="lj-phiy-slider"
+                   min="0" max="6.283" step="0.05" value="0">
+        </div>
+        <div class="btn-group">
+            <button class="btn" onclick="resetLissajous()">Reset</button>
+        </div>
+    </div>
+</div>
+
+<div class="info-box">
+    <div class="info-box-title">Key Insight</div>
+    <p>
+        When \( \omega_x = \omega_y \) (1:1 ratio), the Lissajous figure is always
+        an <strong>ellipse</strong> (or degenerate cases: a circle at \( \Delta\phi = 90° \),
+        a straight line at \( \Delta\phi = 0° \) or \( 180° \)).  The math behind
+        this is the equation \( x^2/A_x^2 + y^2/A_y^2 - 2xy\cos(\Delta\phi)/(A_x A_y)
+        = \sin^2(\Delta\phi) \), which is always an ellipse.  Try sweeping &phi;<sub>y</sub>
+        from 0&deg; to 360&deg; with \( \omega_x = \omega_y = 1 \) to watch the
+        ellipse rotate and degenerate.
+    </p>
+</div>
+
+<!-- Test Your Understanding #1 -->
+<div class="interactive-container question-section">
+    <div class="interactive-title">Test Your Understanding</div>
+
+    <p style="margin-bottom: var(--spacing-md); color: var(--text-secondary);">
+        Use the Lissajous Generator to answer these questions.
+    </p>
+
+    <div class="tabs">
+        <div class="tab-buttons">
+            <button class="tab-button active">Question 1</button>
+            <button class="tab-button">Question 2</button>
+            <button class="tab-button">Question 3</button>
+        </div>
+
+        <!-- Q1: MCQ -->
+        <div class="tab-content active">
+            <div class="question-container" data-type="mcq" data-answer="1">
+                <div class="question-text">
+                    Set &omega;<sub>x</sub> = 1, &omega;<sub>y</sub> = 1, &phi;<sub>x</sub> = 0,
+                    &phi;<sub>y</sub> = 90&deg;.  What shape do you see?
+                </div>
+                <div class="question-options">
+                    <label class="option">
+                        <input type="radio" name="lj-q1" value="0">
+                        <span>A straight line</span>
+                    </label>
+                    <label class="option">
+                        <input type="radio" name="lj-q1" value="1">
+                        <span>A circle</span>
+                    </label>
+                    <label class="option">
+                        <input type="radio" name="lj-q1" value="2">
+                        <span>A figure-8</span>
+                    </label>
+                    <label class="option">
+                        <input type="radio" name="lj-q1" value="3">
+                        <span>A parabola</span>
+                    </label>
+                </div>
+                <div class="question-actions">
+                    <button class="btn-verify">Verify</button>
+                </div>
+                <div class="question-explanation" style="display: none;">
+                    <div class="question-explanation-title">Explanation</div>
+                    <div class="question-explanation-text">
+                        With equal frequencies and a 90&deg; phase difference,
+                        \( x = \cos(t) \) and \( y = \cos(t + \pi/2) = -\sin(t) \).
+                        This gives \( x^2 + y^2 = 1 \) &mdash; a perfect circle!
+                        The two perpendicular oscillations are "in quadrature," each
+                        reaching its peak when the other crosses zero.
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Q2: MCQ -->
+        <div class="tab-content">
+            <div class="question-container" data-type="mcq" data-answer="2">
+                <div class="question-text">
+                    Set &omega;<sub>x</sub> = 1, &omega;<sub>y</sub> = 2, &phi;<sub>y</sub> = 0.
+                    How many lobes does the figure have?
+                </div>
+                <div class="question-options">
+                    <label class="option">
+                        <input type="radio" name="lj-q2" value="0">
+                        <span>1</span>
+                    </label>
+                    <label class="option">
+                        <input type="radio" name="lj-q2" value="1">
+                        <span>3</span>
+                    </label>
+                    <label class="option">
+                        <input type="radio" name="lj-q2" value="2">
+                        <span>2 (figure-8)</span>
+                    </label>
+                    <label class="option">
+                        <input type="radio" name="lj-q2" value="3">
+                        <span>4</span>
+                    </label>
+                </div>
+                <div class="question-actions">
+                    <button class="btn-verify">Verify</button>
+                </div>
+                <div class="question-explanation" style="display: none;">
+                    <div class="question-explanation-title">Explanation</div>
+                    <div class="question-explanation-text">
+                        With \( \omega_y = 2\omega_x \), the \( y \)-oscillation completes
+                        two full cycles for every one \( x \)-cycle.  This creates a
+                        figure-8 with two lobes.  In general, the number of lobes
+                        in the \( y \)-direction equals the frequency ratio's numerator
+                        when expressed as a simple fraction.
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Q3: Fill -->
+        <div class="tab-content">
+            <div class="question-container" data-type="fill" data-answer="3[2.8,3.2]">
+                <div class="question-text">
+                    Set &omega;<sub>x</sub> = 2, &omega;<sub>y</sub> = 3.  Count the
+                    number of times the curve touches the right edge (x = 1).
+                    <br><br>
+                    Touches on right edge = <input type="text" class="fill-blank" placeholder="count">
+                </div>
+                <div class="question-actions">
+                    <button class="btn-verify">Verify</button>
+                </div>
+                <div class="question-explanation" style="display: none;">
+                    <div class="question-explanation-title">Explanation</div>
+                    <div class="question-explanation-text">
+                        The curve touches \( x = 1 \) whenever \( \cos(\omega_x t) = 1 \),
+                        which happens at \( t = 0, 2\pi/\omega_x, 4\pi/\omega_x, \ldots \).
+                        In the time it takes the \( y \)-oscillation to complete 2 full cycles
+                        (\( T = 2 \times 2\pi/\omega_y = 4\pi/3 \)), the \( x \)-oscillation
+                        reaches its peak \( \omega_x / \omega_y \times 2 = 4/3 \times \ldots \)
+                        &mdash; actually, the simpler way: the curve touches the right edge
+                        \( \omega_y / \gcd = 3 \) times per period.  Count them in the figure!
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<hr>
+
+<!-- ========== EXPLORER 2: PATTERN GALLERY ========== -->
+
+<h2>The Pattern Gallery</h2>
+
+<p>
+    Select a classic Lissajous pattern from the dropdown.  Then drag the
+    phase slider to morph the shape &mdash; watch how a figure-8 transforms into
+    a bowtie, or how a line becomes a circle becomes a line again.  The
+    frequency ratio determines the <em>topology</em> (how many lobes); the
+    phase difference determines the <em>geometry</em> (tilt and shape).
+</p>
+
+<div class="interactive-container" id="pattern-gallery">
+    <div class="interactive-title">Interactive: Pattern Gallery</div>
+
+    <div class="plot-container">
+        <div id="lj-gallery-plot" style="width: 100%; height: 450px;"></div>
+    </div>
+
+    <div id="lj-gallery-stats"
+         style="display: flex; justify-content: center; gap: 1.5rem; padding: 8px 0; font-size: 0.85rem; color: #c8c8e0; flex-wrap: wrap;">
+    </div>
+
+    <div class="control-panel">
+        <div class="control-group">
+            <label class="control-label">Pattern:
+                <span class="control-label-value">Circle</span>
+            </label>
+            <select id="lj-gallery-select"
+                    style="width: 100%; padding: 8px 12px; background: #1a1f3a; color: #c8c8e0; border: 1px solid #2a2f4a; border-radius: 6px; font-size: 0.85rem; cursor: pointer;">
+                <option value="line">Straight Line (1:1, &Delta;&phi;=0&deg;)</option>
+                <option value="circle" selected>Circle (1:1, &Delta;&phi;=90&deg;)</option>
+                <option value="ellipse">Ellipse (1:1, &Delta;&phi;=45&deg;)</option>
+                <option value="figure8">Figure-8 (1:2, &Delta;&phi;=0&deg;)</option>
+                <option value="bowtie">Bowtie (1:2, &Delta;&phi;=90&deg;)</option>
+                <option value="trefoil">Trefoil (2:3, &Delta;&phi;=0&deg;)</option>
+                <option value="star">Star (3:4, &Delta;&phi;=0&deg;)</option>
+            </select>
+        </div>
+        <div class="control-group">
+            <label class="control-label">Phase offset:
+                <span class="control-label-value">0&deg;</span>
+            </label>
+            <input type="range" class="slider" id="lj-gallery-phi-slider"
+                   min="0" max="6.283" step="0.05" value="0">
+        </div>
+        <div class="btn-group">
+            <button class="btn" onclick="resetGallery()">Reset</button>
+        </div>
+    </div>
+</div>
+
+<div class="info-box">
+    <div class="info-box-title">Key Insight</div>
+    <p>
+        The frequency ratio determines the <strong>number of lobes</strong>:
+        a 1:2 ratio gives 2 lobes (figure-8), a 2:3 ratio gives a trefoil with
+        3 tangent points on the right edge and 2 on the top.  The phase difference
+        controls the <strong>orientation</strong> and <strong>openness</strong>
+        of the figure.  At certain "magic" phases, the curve simplifies dramatically
+        (e.g., a parabola-like shape at 1:2 with \( \Delta\phi = 0 \)).
+        Try the Star (3:4) and sweep the phase to see how intricate the
+        patterns become at higher ratios.
+    </p>
+</div>
+
+<!-- Test Your Understanding #2 -->
+<div class="interactive-container question-section">
+    <div class="interactive-title">Test Your Understanding</div>
+
+    <p style="margin-bottom: var(--spacing-md); color: var(--text-secondary);">
+        Use the Pattern Gallery to answer these questions.
+    </p>
+
+    <div class="tabs">
+        <div class="tab-buttons">
+            <button class="tab-button active">Question 4</button>
+            <button class="tab-button">Question 5</button>
+            <button class="tab-button">Question 6</button>
+        </div>
+
+        <!-- Q4: MCQ -->
+        <div class="tab-content active">
+            <div class="question-container" data-type="mcq" data-answer="0">
+                <div class="question-text">
+                    Select "Straight Line" and sweep the phase offset from 0&deg;
+                    to 360&deg;.  What sequence of shapes do you see?
+                </div>
+                <div class="question-options">
+                    <label class="option">
+                        <input type="radio" name="lj-q4" value="0">
+                        <span>Line &rarr; ellipse &rarr; circle &rarr; ellipse &rarr; line (tilted the other way)</span>
+                    </label>
+                    <label class="option">
+                        <input type="radio" name="lj-q4" value="1">
+                        <span>Line &rarr; circle &rarr; line (same tilt)</span>
+                    </label>
+                    <label class="option">
+                        <input type="radio" name="lj-q4" value="2">
+                        <span>Circle &rarr; ellipse &rarr; circle</span>
+                    </label>
+                </div>
+                <div class="question-actions">
+                    <button class="btn-verify">Verify</button>
+                </div>
+                <div class="question-explanation" style="display: none;">
+                    <div class="question-explanation-title">Explanation</div>
+                    <div class="question-explanation-text">
+                        At \( \Delta\phi = 0° \), the oscillations are in phase and the
+                        trajectory is a diagonal line (\( y = x \)).  As phase increases,
+                        the line "opens up" into an ellipse, reaching a circle at 90&deg;,
+                        then narrowing back to a line at 180&deg; &mdash; but tilted the
+                        other way (\( y = -x \)).  The cycle repeats: 270&deg; gives another
+                        circle (opposite rotation), and 360&deg; returns to the original line.
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Q5: MCQ -->
+        <div class="tab-content">
+            <div class="question-container" data-type="mcq" data-answer="1">
+                <div class="question-text">
+                    Select "Figure-8" (1:2 ratio) and sweep the phase.
+                    At what phase offset does the figure become an open parabola-like curve?
+                </div>
+                <div class="question-options">
+                    <label class="option">
+                        <input type="radio" name="lj-q5" value="0">
+                        <span>0&deg;</span>
+                    </label>
+                    <label class="option">
+                        <input type="radio" name="lj-q5" value="1">
+                        <span>90&deg;</span>
+                    </label>
+                    <label class="option">
+                        <input type="radio" name="lj-q5" value="2">
+                        <span>180&deg;</span>
+                    </label>
+                    <label class="option">
+                        <input type="radio" name="lj-q5" value="3">
+                        <span>270&deg;</span>
+                    </label>
+                </div>
+                <div class="question-actions">
+                    <button class="btn-verify">Verify</button>
+                </div>
+                <div class="question-explanation" style="display: none;">
+                    <div class="question-explanation-title">Explanation</div>
+                    <div class="question-explanation-text">
+                        At 90&deg; phase offset (making the total \( \Delta\phi = 90° \)),
+                        the figure-8 opens into a "bowtie" or parabola-like shape.
+                        This is because at this phase, \( y \) reaches its extremes
+                        when \( x \) is at intermediate values, creating the characteristic
+                        open curve.  The preset "Bowtie" shows exactly this configuration.
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Q6: MSQ -->
+        <div class="tab-content">
+            <div class="question-container" data-type="msq" data-answer="0,2,3">
+                <div class="question-text">
+                    Which statements about Lissajous figures are correct?
+                    <strong>(Select all that apply)</strong>
+                </div>
+                <div class="question-options">
+                    <label class="option">
+                        <input type="checkbox" value="0">
+                        <span>A 1:1 frequency ratio always produces an ellipse (or its degenerate forms)</span>
+                    </label>
+                    <label class="option">
+                        <input type="checkbox" value="1">
+                        <span>Changing the phase rotates the figure without changing its shape</span>
+                    </label>
+                    <label class="option">
+                        <input type="checkbox" value="2">
+                        <span>Higher frequency ratios produce more complex patterns</span>
+                    </label>
+                    <label class="option">
+                        <input type="checkbox" value="3">
+                        <span>The number of tangent points on an edge reveals the frequency ratio</span>
+                    </label>
+                </div>
+                <div class="question-actions">
+                    <button class="btn-verify">Verify</button>
+                </div>
+                <div class="question-explanation" style="display: none;">
+                    <div class="question-explanation-title">Explanation</div>
+                    <div class="question-explanation-text">
+                        <ul>
+                            <li><strong>True:</strong> When \( \omega_x = \omega_y \), eliminating \( t \) gives
+                                the equation of an ellipse.  Lines and circles are special cases
+                                (degenerate ellipses).</li>
+                            <li><strong>False:</strong> Changing the phase <em>does</em> change the shape:
+                                a line becomes an ellipse becomes a circle.  Only for 1:1 ratio,
+                                rotation and shape change together.</li>
+                            <li><strong>True:</strong> A 3:4 ratio has more loops and crossings than
+                                a 1:2.  The number of crossings grows with the sum \( p + q \).</li>
+                            <li><strong>True:</strong> Count the tangent points on the right edge
+                                (\( = \omega_y/\gcd \)) and top edge (\( = \omega_x/\gcd \)) to
+                                read off the frequency ratio directly from the figure.</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<hr>
+
+<!-- ========== EXPLORER 3: RATIONAL VS IRRATIONAL ========== -->
+
+<h2>Closed or Open?</h2>
+
+<p>
+    The deepest question about Lissajous figures: <strong>does the curve
+    close?</strong>  If \( \omega_x/\omega_y \) is a <em>rational</em> number
+    (a ratio of integers), the curve eventually returns to its starting point
+    and closes.  If it's <em>irrational</em> (like \( \sqrt{2} \) or \( \pi \)),
+    the curve never closes &mdash; given enough time, it fills the entire
+    rectangle \( [-1,1] \times [-1,1] \).  This is called <strong>ergodic</strong>
+    behaviour: the trajectory explores all accessible space.
+</p>
+
+<div class="interactive-container" id="rational-explorer">
+    <div class="interactive-title">Interactive: Rational vs Irrational</div>
+
+    <div class="plot-container">
+        <div id="lj-rational-plot" style="width: 100%; height: 450px;"></div>
+    </div>
+
+    <div id="lj-rational-stats"
+         style="display: flex; justify-content: center; gap: 1.5rem; padding: 8px 0; font-size: 0.85rem; color: #c8c8e0; flex-wrap: wrap;">
+    </div>
+
+    <div class="control-panel">
+        <div class="control-group">
+            <label class="control-label">&omega;<sub>x</sub>/&omega;<sub>y</sub>:
+                <span class="control-label-value">1.41</span>
+            </label>
+            <input type="range" class="slider" id="lj-ratio-slider"
+                   min="0.5" max="3.0" step="0.01" value="1.41">
+        </div>
+        <div class="control-group">
+            <label class="control-label">Cycles:
+                <span class="control-label-value">10</span>
+            </label>
+            <input type="range" class="slider" id="lj-cycles-slider"
+                   min="2" max="50" step="1" value="10">
+        </div>
+        <div class="btn-group">
+            <button class="btn" id="lj-snap-btn" data-active="false"
+                    onclick="toggleSnap()">Snap: OFF</button>
+            <button class="btn" onclick="resetRational()">Reset</button>
+        </div>
+    </div>
+</div>
+
+<div class="info-box">
+    <div class="info-box-title">Key Insight</div>
+    <p>
+        Start with the default ratio \( \sqrt{2} \approx 1.414 \) (irrational)
+        and increase the cycles to 50.  The curve fills the rectangle more and
+        more densely &mdash; it never closes.  Now click <strong>Snap: ON</strong>
+        to round \( \sqrt{2} \) to the nearest simple fraction (probably 7/5 = 1.40).
+        Instantly the curve closes!  The green start dot and red end cross nearly
+        overlap.  This demonstrates the fundamental difference: rational ratios
+        give periodic, closed trajectories; irrational ratios give quasi-periodic,
+        space-filling ones.
+    </p>
+</div>
+
+<!-- Test Your Understanding #3 -->
+<div class="interactive-container question-section">
+    <div class="interactive-title">Test Your Understanding</div>
+
+    <p style="margin-bottom: var(--spacing-md); color: var(--text-secondary);">
+        Use the Rational vs Irrational explorer to answer these questions.
+    </p>
+
+    <div class="tabs">
+        <div class="tab-buttons">
+            <button class="tab-button active">Question 7</button>
+            <button class="tab-button">Question 8</button>
+            <button class="tab-button">Question 9</button>
+        </div>
+
+        <!-- Q7: MCQ -->
+        <div class="tab-content active">
+            <div class="question-container" data-type="mcq" data-answer="2">
+                <div class="question-text">
+                    Set the ratio to exactly 1.50 (which is 3/2).  About how many
+                    cycles does it take for the curve to close?
+                </div>
+                <div class="question-options">
+                    <label class="option">
+                        <input type="radio" name="lj-q7" value="0">
+                        <span>1 cycle</span>
+                    </label>
+                    <label class="option">
+                        <input type="radio" name="lj-q7" value="1">
+                        <span>3 cycles</span>
+                    </label>
+                    <label class="option">
+                        <input type="radio" name="lj-q7" value="2">
+                        <span>2 cycles (of the slower oscillation)</span>
+                    </label>
+                    <label class="option">
+                        <input type="radio" name="lj-q7" value="3">
+                        <span>It never closes</span>
+                    </label>
+                </div>
+                <div class="question-actions">
+                    <button class="btn-verify">Verify</button>
+                </div>
+                <div class="question-explanation" style="display: none;">
+                    <div class="question-explanation-title">Explanation</div>
+                    <div class="question-explanation-text">
+                        With a 3:2 ratio, after 2 cycles of \( \omega_y \) (the slower one),
+                        \( \omega_x \) has completed 3 cycles.  Both oscillations return to
+                        their starting values simultaneously, so the curve closes.  The closing
+                        time is the LCM of the two periods: \( T = \text{lcm}(T_x, T_y) \).
+                        Set cycles to 2 and watch the green and red markers meet.
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Q8: Fill -->
+        <div class="tab-content">
+            <div class="question-container" data-type="fill" data-answer="5[4.5,5.5]">
+                <div class="question-text">
+                    For a frequency ratio of 5/3, how many cycles of the slower
+                    oscillation are needed for the curve to close?
+                    <br><br>
+                    Cycles = <input type="text" class="fill-blank" placeholder="number">
+                </div>
+                <div class="question-actions">
+                    <button class="btn-verify">Verify</button>
+                </div>
+                <div class="question-explanation" style="display: none;">
+                    <div class="question-explanation-title">Explanation</div>
+                    <div class="question-explanation-text">
+                        If \( \omega_x/\omega_y = 5/3 \), the fast oscillation (\( \omega_x \))
+                        completes 5 cycles while the slow one (\( \omega_y \)) completes 3.
+                        But the curve needs \( q \) cycles of the slow oscillation and \( p \) of
+                        the fast one, where \( p/q = 5/3 \) in lowest terms.  So you need
+                        \( q = 3 \) slow cycles... Wait &mdash; actually, the slider counts
+                        \( \omega_y \)-cycles, so you need \( p = 5 \) cycles.  Set the ratio to
+                        1.667 (5/3), cycles to 5, and check if it closes.  The rule:
+                        you need the <strong>denominator</strong> of the ratio in lowest terms
+                        cycles of the reference (\( \omega_y \)) oscillation &mdash; that's
+                        3 cycles.  But since our cycle counter tracks \( \omega_y \), we need
+                        5 for the \( x \)-oscillation.  Try it!
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Q9: MSQ -->
+        <div class="tab-content">
+            <div class="question-container" data-type="msq" data-answer="1,2">
+                <div class="question-text">
+                    Which statements about rational vs irrational frequency ratios
+                    are correct? <strong>(Select all that apply)</strong>
+                </div>
+                <div class="question-options">
+                    <label class="option">
+                        <input type="checkbox" value="0">
+                        <span>Irrational ratios produce curves that eventually close if you wait long enough</span>
+                    </label>
+                    <label class="option">
+                        <input type="checkbox" value="1">
+                        <span>In statistical mechanics, ergodic systems explore all accessible states over time</span>
+                    </label>
+                    <label class="option">
+                        <input type="checkbox" value="2">
+                        <span>Any irrational ratio can be approximated arbitrarily closely by a rational one</span>
+                    </label>
+                    <label class="option">
+                        <input type="checkbox" value="3">
+                        <span>A 1:1 ratio with irrational phase gives an open curve</span>
+                    </label>
+                </div>
+                <div class="question-actions">
+                    <button class="btn-verify">Verify</button>
+                </div>
+                <div class="question-explanation" style="display: none;">
+                    <div class="question-explanation-title">Explanation</div>
+                    <div class="question-explanation-text">
+                        <ul>
+                            <li><strong>False:</strong> Irrational ratios <em>never</em> close.
+                                The trajectory is quasi-periodic and fills the rectangle
+                                densely (every point is approached but never exactly revisited).</li>
+                            <li><strong>True:</strong> This is the ergodic hypothesis.  The
+                                Lissajous figure with irrational ratio is a beautiful 2D
+                                example: the trajectory explores all of the accessible
+                                \( [-1,1] \times [-1,1] \) region, just as a gas molecule
+                                explores all of phase space.</li>
+                            <li><strong>True:</strong> Rational numbers are <em>dense</em> in the
+                                reals.  That's why the Snap button works: it finds a nearby
+                                rational approximation that closes.  The closer the approximation,
+                                the longer the closing time.</li>
+                            <li><strong>False:</strong> When \( \omega_x = \omega_y \), the
+                                trajectory is always an ellipse regardless of phase.  The
+                                phase determines the shape of the ellipse, but it always closes
+                                after one cycle.</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<hr>
+
+<!-- ========== PYTHON CODE ========== -->
+
+<h2>Python Code</h2>
+
+<p>Here's the Python equivalent for generating and exploring Lissajous figures.</p>
+
+<div class="tabs">
+    <div class="tab-buttons">
+        <button class="tab-button active">Lissajous Plot</button>
+        <button class="tab-button">Gallery</button>
+        <button class="tab-button">Prompt</button>
+    </div>
+
+    <!-- Tab 1: Basic Lissajous -->
+    <div class="tab-content active">
+        <div class="code-block-container">
+            <div class="code-header">
+                <span class="code-lang">Python</span>
+                <button class="copy-btn">Copy</button>
+            </div>
+            <pre><code class="language-python">import numpy as np
+import plotly.graph_objects as go
+from plotly.subplots import make_subplots
+
+t = np.linspace(0, 40*np.pi, 5000)
+wx, wy = 1, 2         # frequency ratio 1:2
+phi_x, phi_y = 0, 0   # phase difference = 0
+
+x = np.cos(wx*t + phi_x)
+y = np.cos(wy*t + phi_y)
+
+fig = make_subplots(rows=1, cols=2,
+    subplot_titles=['Lissajous Figure', 'Time Domain'])
+
+# Parametric plot
+fig.add_trace(go.Scatter(x=x, y=y, mode='lines',
+    line=dict(color='#00f3ff', width=1.5), showlegend=False), row=1, col=1)
+
+# Time domain
+fig.add_trace(go.Scatter(x=t[:500], y=x[:500], name='x(t)',
+    line=dict(color='#00f3ff', width=1.5)), row=1, col=2)
+fig.add_trace(go.Scatter(x=t[:500], y=y[:500], name='y(t)',
+    line=dict(color='#ff00ff', width=1.5)), row=1, col=2)
+
+fig.update_xaxes(gridcolor='#2a2f4a', zerolinecolor='#808080', linecolor='#808080')
+fig.update_yaxes(gridcolor='#2a2f4a', zerolinecolor='#808080', linecolor='#808080')
+fig.update_xaxes(scaleanchor='y', row=1, col=1)
+fig.update_layout(template='plotly_dark', height=450,
+    title=f'Lissajous: ωx:ωy = {wx}:{wy}, Δφ = {np.degrees(phi_y-phi_x):.0f}°')
+fig.show()</code></pre>
+        </div>
+    </div>
+
+    <!-- Tab 2: Gallery -->
+    <div class="tab-content">
+        <div class="code-block-container">
+            <div class="code-header">
+                <span class="code-lang">Python</span>
+                <button class="copy-btn">Copy</button>
+            </div>
+            <pre><code class="language-python">import numpy as np
+import plotly.graph_objects as go
+from plotly.subplots import make_subplots
+
+t = np.linspace(0, 40*np.pi, 5000)
+
+# Classic Lissajous patterns
+patterns = [
+    (1, 1, 0,        'Line (1:1, 0°)'),
+    (1, 1, np.pi/2,  'Circle (1:1, 90°)'),
+    (1, 2, 0,        'Figure-8 (1:2, 0°)'),
+    (2, 3, 0,        'Trefoil (2:3, 0°)'),
+    (3, 4, 0,        'Star (3:4, 0°)'),
+    (1, np.sqrt(2), np.pi/4, 'Irrational (1:√2)')
+]
+
+fig = make_subplots(rows=2, cols=3,
+    subplot_titles=[p[3] for p in patterns])
+
+for idx, (wx, wy, dphi, label) in enumerate(patterns):
+    r, c = idx // 3 + 1, idx % 3 + 1
+    x = np.cos(wx * t)
+    y = np.cos(wy * t + dphi)
+    fig.add_trace(go.Scatter(x=x, y=y, mode='lines',
+        line=dict(color='#00f3ff', width=1), showlegend=False), row=r, col=c)
+
+fig.update_xaxes(range=[-1.3, 1.3], scaleanchor='y',
+    gridcolor='#2a2f4a', zerolinecolor='#808080', linecolor='#808080')
+fig.update_yaxes(range=[-1.3, 1.3],
+    gridcolor='#2a2f4a', zerolinecolor='#808080', linecolor='#808080')
+fig.update_layout(template='plotly_dark', height=700,
+    title='Lissajous Pattern Gallery')
+fig.show()</code></pre>
+        </div>
+    </div>
+
+    <!-- Tab 3: Prompt -->
+    <div class="tab-content">
+        <div class="code-block-container">
+            <div class="code-header">
+                <span class="code-lang">Prompt for AI</span>
+                <button class="copy-btn">Copy</button>
+            </div>
+            <pre><code class="language-text">Explore Lissajous figures in Python:
+
+Tasks:
+1. Parametric plotting:
+   - x(t) = cos(ωx·t + φx), y(t) = cos(ωy·t + φy)
+   - Plot (x, y) and time-domain x(t), y(t) side by side
+   - Try ωx:ωy = 1:1, 1:2, 2:3, 3:4
+
+2. Phase sweep animation:
+   - Fix ωx:ωy = 1:1
+   - Sweep Δφ from 0° to 360° in steps of 15°
+   - Show how the ellipse rotates and degenerates
+
+3. Rational vs irrational:
+   - Compare ωx/ωy = 3/2 (rational) with ωx/ωy = √2 (irrational)
+   - For the rational ratio, show the curve closes
+   - For the irrational ratio, show it fills the square
+   - Increase t_max to 100π and see the difference
+
+4. Pattern identification:
+   - Given a frequency ratio p:q, predict:
+     - Number of tangent points on right edge = q
+     - Number of tangent points on top edge = p
+   - Verify for several ratios
+
+Use plotly_dark template. Gray axes (#808080). Equal axis scales.</code></pre>
+        </div>
+
+        <div class="info-box" style="margin-top: var(--spacing-md);">
+            <div class="info-box-title">Tips for Prompting</div>
+            <ul>
+                <li>Always use <code>scaleanchor='y'</code> so circles look circular</li>
+                <li>Use enough points (5000+) for smooth curves at higher ratios</li>
+                <li>Ask for a phase-sweep animation to see morphing in action</li>
+                <li>Try 3D Lissajous: add a third oscillation z(t) for stunning patterns</li>
+            </ul>
+        </div>
+    </div>
+</div>
+
+<hr>
+
+<!-- ========== EXERCISES ========== -->
+
+<h2>Exercises for Practice</h2>
+
+<div class="exercise-cards">
+    <div class="exercise-card">
+        <div class="exercise-card-header">
+            <span class="exercise-card-number">1.</span>
+            <span class="exercise-card-badge explore">Explore</span>
+        </div>
+        <div class="exercise-card-content">
+            In the Lissajous Generator, set &omega;<sub>x</sub> = 1, &omega;<sub>y</sub> = 1
+            and sweep &phi;<sub>y</sub> from 0&deg; to 360&deg;.  At what four
+            phase values is the figure a straight line?  At what two values is
+            it a circle?  Explain the symmetry.
+        </div>
+    </div>
+
+    <div class="exercise-card">
+        <div class="exercise-card-header">
+            <span class="exercise-card-number">2.</span>
+            <span class="exercise-card-badge coding">Coding</span>
+        </div>
+        <div class="exercise-card-content">
+            Write a Python script that creates a <strong>3D Lissajous figure</strong>
+            by adding a third oscillation: \( z(t) = \cos(\omega_z\, t + \phi_z) \).
+            Try \( \omega_x:\omega_y:\omega_z = 1:2:3 \) and plot the 3D parametric
+            curve using Plotly's <code>Scatter3d</code>.  How does the phase
+            difference affect the 3D shape?
+        </div>
+    </div>
+
+    <div class="exercise-card">
+        <div class="exercise-card-header">
+            <span class="exercise-card-number">3.</span>
+            <span class="exercise-card-badge think">Think</span>
+        </div>
+        <div class="exercise-card-content">
+            In the Rational vs Irrational explorer, set the ratio to
+            \( \pi/3 \approx 1.047 \) and increase cycles to 50.  Even though
+            \( \pi/3 \) is irrational, the curve <em>looks</em> almost closed
+            because \( \pi/3 \approx 1 \).  If you snap to the nearest rational
+            (1/1), the curve closes instantly.  How many cycles would you need
+            at the true \( \pi/3 \) ratio before the start-end gap is less than
+            0.01?  (Hint: think about how well rational approximations to \( \pi \)
+            work &mdash; try 22/7 vs 355/113.)
+        </div>
+    </div>
+</div>
+
+<hr>
+
+<!-- ========== NAVIGATION ========== -->
+
+<div class="btn-group mt-xl">
+    <button class="btn btn-magenta" onclick="navigateToSection('18-beats')">&larr; Previous: Beats</button>
+    <button class="btn" onclick="scrollToTop()">&uarr; Back to Top</button>
+    <button class="btn btn-secondary" onclick="navigateToSection('20-what-oscillates')">Next: What Makes Things Oscillate? &rarr;</button>
+</div>

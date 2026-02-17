@@ -91,6 +91,15 @@ function createPlot(elementId, data, layout = {}) {
 
     const mergedLayout = { ...defaultLayout, ...layout };
 
+    // Left-align title so it doesn't overlap Plotly toolbar on dual-panel plots
+    if (mergedLayout.title) {
+        if (typeof mergedLayout.title === 'string') {
+            mergedLayout.title = { text: mergedLayout.title };
+        }
+        if (!mergedLayout.title.x) mergedLayout.title.x = 0.02;
+        if (!mergedLayout.title.xanchor) mergedLayout.title.xanchor = 'left';
+    }
+
     const config = {
         responsive: true,
         displayModeBar: true,

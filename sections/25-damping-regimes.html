@@ -1,0 +1,834 @@
+<!-- Section 3.6: The Three Regimes of Damping -->
+<!-- Source: Module 5 - Damped Harmonic Oscillator.nb (Part 2) -->
+<!-- Core concept: Underdamped, critically damped, overdamped — three qualitatively different behaviors -->
+<!-- Time: ~25 minutes -->
+<!-- Prerequisites: Section 3.5 (damping equation, γ, energy decay) -->
+
+<h1>The Three Regimes of Damping</h1>
+
+<p>
+    In the previous section we saw that damping makes oscillations fade.  But
+    there's more to the story.  Increase the damping strength \( \gamma \) past
+    a critical threshold, and something dramatic happens: <strong>oscillation
+    ceases entirely</strong>.  The system simply oozes back to equilibrium
+    without ever crossing zero.
+</p>
+
+<p>
+    The mathematics reveals three qualitatively different regimes, each with
+    distinct physical behavior.  The boundary between them depends on a single
+    number: the discriminant \( \Delta = \gamma^2 - \omega_0^2 \).
+</p>
+
+<div class="info-box">
+    <div class="info-box-title">Learning Objectives</div>
+    <ul>
+        <li>Classify damped motion as underdamped, critically damped, or overdamped from the characteristic equation</li>
+        <li>Connect the discriminant \( \gamma^2 - \omega_0^2 \) to the nature of the roots (complex, repeated, real)</li>
+        <li>Explain why critical damping gives the <em>fastest</em> return to equilibrium without overshoot</li>
+        <li>Read a parameter space map and predict behavior from (\( \gamma, \omega_0 \))</li>
+    </ul>
+</div>
+
+<div class="equation-display">
+    <p><strong>The key formula</strong> (from solving the damped oscillator equation):</p>
+    $$ r = -\gamma \pm \sqrt{\gamma^2 - \omega_0^2} $$
+    <p>
+        Everything depends on what&rsquo;s under the square root.  Three cases:<br>
+        <strong>&gamma;&nbsp;&lt;&nbsp;&omega;<sub>0</sub></strong> (light damping):
+        the square root of a negative number gives oscillation &rarr;
+        <strong>underdamped</strong><br>
+        <strong>&gamma;&nbsp;=&nbsp;&omega;<sub>0</sub></strong> (boundary):
+        the square root is zero &rarr; <strong>critically damped</strong>
+        (fastest return without oscillating)<br>
+        <strong>&gamma;&nbsp;&gt;&nbsp;&omega;<sub>0</sub></strong> (heavy damping):
+        the square root is a real number &rarr; <strong>overdamped</strong>
+        (sluggish, no oscillation)
+    </p>
+</div>
+
+<hr>
+
+<!-- ========== EXPLORER 1: REGIME EXPLORER ========== -->
+
+<h2>Crossing the Boundary</h2>
+
+<p>
+    Drag the &gamma; slider and watch the system transition through all
+    three regimes.  The <strong>left panel</strong> shows the actual motion
+    &mdash; watch how it changes from oscillating (underdamped) to a smooth
+    return (critically damped) to a sluggish crawl (overdamped).
+    The <strong>right panel</strong> is a visual map of the two roots r from
+    the formula above.  When the system oscillates, the roots are complex
+    numbers (shown as dots above and below the horizontal axis).  When it
+    doesn&rsquo;t oscillate, both roots are ordinary real numbers (on the
+    axis).  At the boundary, they merge into one.
+</p>
+
+<div class="interactive-container" id="regime-explorer">
+    <div class="interactive-title">Explorer 1: Regime Explorer</div>
+
+    <div style="display: flex; gap: 0.5rem; flex-wrap: wrap;">
+        <div class="plot-container" style="flex: 1; min-width: 280px;">
+            <div id="rg-ex-plot" style="width: 100%; height: 380px;"></div>
+        </div>
+        <div class="plot-container" style="flex: 1; min-width: 280px;">
+            <div id="rg-ex-roots-plot" style="width: 100%; height: 380px;"></div>
+        </div>
+    </div>
+
+    <div id="rg-ex-stats"
+         style="display: flex; justify-content: center; gap: 1.5rem; padding: 8px 0; font-size: 0.85rem; color: #c8c8e0; flex-wrap: wrap;">
+    </div>
+
+    <div class="control-panel">
+        <div class="control-group">
+            <label class="control-label">Damping &gamma;:
+                <span class="control-label-value">1.00</span>
+            </label>
+            <input type="range" class="slider" id="rg-ex-gamma"
+                   min="0.10" max="6.00" step="0.01" value="1.00">
+        </div>
+        <div class="control-group">
+            <label class="control-label">Natural frequency &omega;<sub>0</sub>:
+                <span class="control-label-value">3.00</span>
+            </label>
+            <input type="range" class="slider" id="rg-ex-omega0"
+                   min="0.5" max="5.0" step="0.1" value="3.0">
+        </div>
+        <div class="btn-group">
+            <button class="btn" onclick="resetRegime()">Reset</button>
+        </div>
+    </div>
+</div>
+
+<div class="info-box">
+    <div class="info-box-title">Key Insight</div>
+    <p>
+        The position of the roots tells you the whole story.  If the roots
+        are off the horizontal axis (complex), the solution oscillates &mdash;
+        the height above the axis is the oscillation frequency &omega;<sub>d</sub>.
+        If the roots sit on the horizontal axis (real), there&rsquo;s no
+        oscillation &mdash; just smooth exponential decay.  In both cases,
+        how far left the roots sit determines how fast the motion dies out.
+    </p>
+</div>
+
+<!-- Test Your Understanding #1 -->
+<div class="interactive-container question-section">
+    <div class="interactive-title">Test Your Understanding</div>
+
+    <p style="margin-bottom: var(--spacing-md); color: var(--text-secondary);">
+        Use the Regime Explorer to answer these questions.
+    </p>
+
+    <div class="tabs">
+        <div class="tab-buttons">
+            <button class="tab-button active">Question 1</button>
+            <button class="tab-button">Question 2</button>
+            <button class="tab-button">Question 3</button>
+        </div>
+
+        <!-- Q1: MCQ -->
+        <div class="tab-content active">
+            <div class="question-container" data-type="mcq" data-answer="2">
+                <div class="question-text">
+                    Set \( \omega_0 = 3.0 \) and slowly increase \( \gamma \) from 0.1.
+                    At what value of \( \gamma \) do the roots first land on the
+                    real axis (oscillation stops)?
+                </div>
+                <div class="question-options">
+                    <label class="option">
+                        <input type="radio" name="rg-q1" value="0">
+                        <span>\( \gamma = 1.5 \)</span>
+                    </label>
+                    <label class="option">
+                        <input type="radio" name="rg-q1" value="1">
+                        <span>\( \gamma = 2.0 \)</span>
+                    </label>
+                    <label class="option">
+                        <input type="radio" name="rg-q1" value="2">
+                        <span>\( \gamma = 3.0 \) (equal to \( \omega_0 \))</span>
+                    </label>
+                    <label class="option">
+                        <input type="radio" name="rg-q1" value="3">
+                        <span>\( \gamma = 6.0 \)</span>
+                    </label>
+                </div>
+                <div class="question-actions">
+                    <button class="btn-verify">Verify</button>
+                </div>
+                <div class="question-explanation" style="display: none;">
+                    <div class="question-explanation-title">Explanation</div>
+                    <div class="question-explanation-text">
+                        The roots become real when \( \gamma^2 \geq \omega_0^2 \), i.e.,
+                        \( \gamma \geq \omega_0 = 3.0 \).  At exactly \( \gamma = 3.0 \),
+                        the two complex roots merge into one repeated real root
+                        \( r = -\gamma = -3 \).  Watch the root plot: the two dots
+                        converge to a single point on the real axis.
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Q2: MCQ -->
+        <div class="tab-content">
+            <div class="question-container" data-type="mcq" data-answer="1">
+                <div class="question-text">
+                    In the overdamped regime (\( \gamma = 5.0, \omega_0 = 3.0 \)),
+                    the displacement \( x(t) \) does which of the following?
+                </div>
+                <div class="question-options">
+                    <label class="option">
+                        <input type="radio" name="rg-q2" value="0">
+                        <span>Oscillates with growing amplitude</span>
+                    </label>
+                    <label class="option">
+                        <input type="radio" name="rg-q2" value="1">
+                        <span>Decays to zero without ever crossing zero</span>
+                    </label>
+                    <label class="option">
+                        <input type="radio" name="rg-q2" value="2">
+                        <span>Oscillates a few times then stops</span>
+                    </label>
+                    <label class="option">
+                        <input type="radio" name="rg-q2" value="3">
+                        <span>Stays at the initial displacement forever</span>
+                    </label>
+                </div>
+                <div class="question-actions">
+                    <button class="btn-verify">Verify</button>
+                </div>
+                <div class="question-explanation" style="display: none;">
+                    <div class="question-explanation-title">Explanation</div>
+                    <div class="question-explanation-text">
+                        With two negative real roots, the solution is a sum of two
+                        decaying exponentials: \( x(t) = C_1 e^{r_1 t} + C_2 e^{r_2 t} \).
+                        Both terms decay to zero, and neither oscillates.  The system
+                        approaches equilibrium from one side, never crossing zero.
+                        Set \( \gamma = 5.0 \) and watch the magenta curve.
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Q3: Fill -->
+        <div class="tab-content">
+            <div class="question-container" data-type="fill" data-answer="2.83[2.7,3.0]">
+                <div class="question-text">
+                    For \( \omega_0 = 3.0, \gamma = 1.0 \) (underdamped), the
+                    damped frequency is \( \omega_d = \sqrt{\omega_0^2 - \gamma^2} \).
+                    Calculate \( \omega_d \).
+                    <br><br>
+                    &omega;<sub>d</sub> = <input type="text" class="fill-blank" placeholder="rad/s"> rad/s
+                </div>
+                <div class="question-actions">
+                    <button class="btn-verify">Verify</button>
+                </div>
+                <div class="question-explanation" style="display: none;">
+                    <div class="question-explanation-title">Explanation</div>
+                    <div class="question-explanation-text">
+                        \( \omega_d = \sqrt{9 - 1} = \sqrt{8} = 2\sqrt{2} \approx 2.83 \) rad/s.
+                        Check the root plot: the imaginary part of the complex roots
+                        should read \( \pm 2.83 \).  The frequency has dropped slightly
+                        from \( \omega_0 = 3.0 \) due to damping.
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<hr>
+
+<!-- ========== EXPLORER 2: THREE-PANEL COMPARISON ========== -->
+
+<h2>Side-by-Side: The Three Behaviors</h2>
+
+<p>
+    To really see the difference, let's put all three regimes on the same plot.
+    At a given \( \omega_0 \), we pick three values of \( \gamma \):
+    one well below \( \omega_0 \) (underdamped, cyan), one equal (critical,
+    green), and one well above (overdamped, magenta).
+</p>
+
+<p>
+    The right panel shows the <strong>settling time</strong> &mdash; how long it
+    takes each system to get within 5% of equilibrium.  Notice anything special
+    about the critical case?
+</p>
+
+<div class="interactive-container" id="three-panel-comparison">
+    <div class="interactive-title">Explorer 2: Three-Regime Comparison</div>
+
+    <div style="display: flex; gap: 0.5rem; flex-wrap: wrap;">
+        <div class="plot-container" style="flex: 1; min-width: 280px;">
+            <div id="rg-cp-plot" style="width: 100%; height: 380px;"></div>
+        </div>
+        <div class="plot-container" style="flex: 1; min-width: 280px;">
+            <div id="rg-cp-settle-plot" style="width: 100%; height: 380px;"></div>
+        </div>
+    </div>
+
+    <div id="rg-cp-stats"
+         style="display: flex; justify-content: center; gap: 1.5rem; padding: 8px 0; font-size: 0.85rem; color: #c8c8e0; flex-wrap: wrap;">
+    </div>
+
+    <div class="control-panel">
+        <div class="control-group">
+            <label class="control-label">Natural frequency &omega;<sub>0</sub>:
+                <span class="control-label-value">3.0</span>
+            </label>
+            <input type="range" class="slider" id="rg-cp-omega0"
+                   min="1.0" max="5.0" step="0.1" value="3.0">
+        </div>
+        <div class="btn-group">
+            <button class="btn" onclick="resetComparison()">Reset</button>
+        </div>
+    </div>
+</div>
+
+<div class="info-box">
+    <div class="info-box-title">Key Insight</div>
+    <p>
+        Critical damping (\( \gamma = \omega_0 \)) is the sweet spot: it returns
+        to equilibrium <strong>faster than any other non-oscillatory path</strong>.
+        Underdamped systems overshoot (they cross zero), which wastes time.
+        Overdamped systems never overshoot but are sluggish &mdash; the damping
+        is so strong that the system barely moves.  Critical damping is the
+        boundary: maximum urgency without the ringing.
+    </p>
+</div>
+
+<!-- Test Your Understanding #2 -->
+<div class="interactive-container question-section">
+    <div class="interactive-title">Test Your Understanding</div>
+
+    <p style="margin-bottom: var(--spacing-md); color: var(--text-secondary);">
+        Use the Three-Regime Comparison to answer these questions.
+    </p>
+
+    <div class="tabs">
+        <div class="tab-buttons">
+            <button class="tab-button active">Question 4</button>
+            <button class="tab-button">Question 5</button>
+            <button class="tab-button">Question 6</button>
+        </div>
+
+        <!-- Q4: MCQ -->
+        <div class="tab-content active">
+            <div class="question-container" data-type="mcq" data-answer="1">
+                <div class="question-text">
+                    Looking at the settling time bar chart, which regime has the
+                    <em>shortest</em> settling time?
+                </div>
+                <div class="question-options">
+                    <label class="option">
+                        <input type="radio" name="rg-q4" value="0">
+                        <span>Underdamped (lowest \( \gamma \))</span>
+                    </label>
+                    <label class="option">
+                        <input type="radio" name="rg-q4" value="1">
+                        <span>Near critical damping (\( \gamma \approx \omega_0 \))</span>
+                    </label>
+                    <label class="option">
+                        <input type="radio" name="rg-q4" value="2">
+                        <span>Heavily overdamped (highest \( \gamma \))</span>
+                    </label>
+                    <label class="option">
+                        <input type="radio" name="rg-q4" value="3">
+                        <span>They all settle at the same time</span>
+                    </label>
+                </div>
+                <div class="question-actions">
+                    <button class="btn-verify">Verify</button>
+                </div>
+                <div class="question-explanation" style="display: none;">
+                    <div class="question-explanation-title">Explanation</div>
+                    <div class="question-explanation-text">
+                        The settling time bar chart shows a clear minimum near
+                        \( \gamma = \omega_0 \) (critical damping).  Underdamped systems
+                        waste time oscillating; overdamped systems waste time being
+                        sluggish.  Critical damping minimizes the settling time, which
+                        is why engineers deliberately choose it for systems that need
+                        to respond quickly without ringing.
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Q5: MCQ -->
+        <div class="tab-content">
+            <div class="question-container" data-type="mcq" data-answer="0">
+                <div class="question-text">
+                    The underdamped curve (cyan) crosses zero multiple times.
+                    What does each zero crossing represent physically?
+                </div>
+                <div class="question-options">
+                    <label class="option">
+                        <input type="radio" name="rg-q5" value="0">
+                        <span>The system passes through equilibrium with nonzero velocity</span>
+                    </label>
+                    <label class="option">
+                        <input type="radio" name="rg-q5" value="1">
+                        <span>Energy is completely lost at that instant</span>
+                    </label>
+                    <label class="option">
+                        <input type="radio" name="rg-q5" value="2">
+                        <span>The system has stopped momentarily</span>
+                    </label>
+                    <label class="option">
+                        <input type="radio" name="rg-q5" value="3">
+                        <span>The system switches from one regime to another</span>
+                    </label>
+                </div>
+                <div class="question-actions">
+                    <button class="btn-verify">Verify</button>
+                </div>
+                <div class="question-explanation" style="display: none;">
+                    <div class="question-explanation-title">Explanation</div>
+                    <div class="question-explanation-text">
+                        At each zero crossing, the displacement is zero (the system
+                        is at equilibrium) but the velocity is at a local maximum.
+                        The system overshoots equilibrium because of its inertia &mdash;
+                        it's moving so fast at the equilibrium point that it can't stop.
+                        Each overshoot is smaller than the last because damping removes
+                        energy on every swing.
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Q6: MCQ -->
+        <div class="tab-content">
+            <div class="question-container" data-type="mcq" data-answer="2">
+                <div class="question-text">
+                    As you increase \( \omega_0 \), keeping the three regimes at
+                    the same relative positions (\( 0.3\omega_0, \omega_0, 2\omega_0 \)),
+                    the settling times all:
+                </div>
+                <div class="question-options">
+                    <label class="option">
+                        <input type="radio" name="rg-q6" value="0">
+                        <span>Increase (slower oscillators settle slower)</span>
+                    </label>
+                    <label class="option">
+                        <input type="radio" name="rg-q6" value="1">
+                        <span>Stay the same (settling time is universal)</span>
+                    </label>
+                    <label class="option">
+                        <input type="radio" name="rg-q6" value="2">
+                        <span>Decrease (stiffer systems respond faster)</span>
+                    </label>
+                    <label class="option">
+                        <input type="radio" name="rg-q6" value="3">
+                        <span>Only the underdamped one changes</span>
+                    </label>
+                </div>
+                <div class="question-actions">
+                    <button class="btn-verify">Verify</button>
+                </div>
+                <div class="question-explanation" style="display: none;">
+                    <div class="question-explanation-title">Explanation</div>
+                    <div class="question-explanation-text">
+                        Higher \( \omega_0 \) means a stiffer restoring force, which
+                        drives the system back to equilibrium more urgently.  Since
+                        we scale \( \gamma \) proportionally, the damping keeps pace,
+                        and all settling times decrease.  Try sliding \( \omega_0 \)
+                        from 1 to 5 and watch the bar chart shrink.
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<hr>
+
+<!-- ========== EXPLORER 3: PARAMETER SPACE MAP ========== -->
+
+<h2>The Parameter Space Map</h2>
+
+<p>
+    Instead of looking at one system at a time, let's see the <em>entire</em>
+    landscape of possible behaviors.  Below, the horizontal axis is \( \gamma \)
+    and the vertical axis is \( \omega_0 \).  The color encodes <strong>settling
+    time</strong>: green means fast settling, red means slow.  The yellow dashed
+    line \( \gamma = \omega_0 \) separates the two regions.
+</p>
+
+<p>
+    Drag the white crosshair to explore any point in parameter space.  The
+    right panel shows the actual motion at that point.
+</p>
+
+<div class="interactive-container" id="parameter-space-map">
+    <div class="interactive-title">Explorer 3: Parameter Space Map</div>
+
+    <div style="display: flex; gap: 0.5rem; flex-wrap: wrap;">
+        <div class="plot-container" style="flex: 1; min-width: 280px;">
+            <div id="rg-ps-map-plot" style="width: 100%; height: 380px;"></div>
+        </div>
+        <div class="plot-container" style="flex: 1; min-width: 280px;">
+            <div id="rg-ps-motion-plot" style="width: 100%; height: 380px;"></div>
+        </div>
+    </div>
+
+    <div id="rg-ps-stats"
+         style="display: flex; justify-content: center; gap: 1.5rem; padding: 8px 0; font-size: 0.85rem; color: #c8c8e0; flex-wrap: wrap;">
+    </div>
+
+    <div class="control-panel">
+        <div class="control-group">
+            <label class="control-label">Probe &gamma;:
+                <span class="control-label-value">1.0</span>
+            </label>
+            <input type="range" class="slider" id="rg-ps-gamma"
+                   min="0.1" max="6.0" step="0.1" value="1.0">
+        </div>
+        <div class="control-group">
+            <label class="control-label">Probe &omega;<sub>0</sub>:
+                <span class="control-label-value">3.0</span>
+            </label>
+            <input type="range" class="slider" id="rg-ps-omega0"
+                   min="0.5" max="5.0" step="0.1" value="3.0">
+        </div>
+        <div class="btn-group">
+            <button class="btn" onclick="resetParamSpace()">Reset</button>
+        </div>
+    </div>
+</div>
+
+<div class="info-box">
+    <div class="info-box-title">Key Insight</div>
+    <p>
+        The yellow line \( \gamma = \omega_0 \) is a <strong>boundary</strong>
+        &mdash; cross it and the behavior changes dramatically (oscillatory
+        on one side, non-oscillatory on the other).  This idea of mapping
+        out a &ldquo;parameter space&rdquo; and finding where the behavior
+        changes is something you&rsquo;ll see again and again in physics
+        and engineering.  It&rsquo;s like a weather map: the boundary tells
+        you where conditions shift.
+    </p>
+</div>
+
+<!-- Test Your Understanding #3 -->
+<div class="interactive-container question-section">
+    <div class="interactive-title">Test Your Understanding</div>
+
+    <p style="margin-bottom: var(--spacing-md); color: var(--text-secondary);">
+        Use the Parameter Space Map to answer these questions.
+    </p>
+
+    <div class="tabs">
+        <div class="tab-buttons">
+            <button class="tab-button active">Question 7</button>
+            <button class="tab-button">Question 8</button>
+            <button class="tab-button">Question 9</button>
+        </div>
+
+        <!-- Q7: MCQ -->
+        <div class="tab-content active">
+            <div class="question-container" data-type="mcq" data-answer="0">
+                <div class="question-text">
+                    On the parameter space map, which region (relative to the
+                    yellow line) shows oscillatory behavior?
+                </div>
+                <div class="question-options">
+                    <label class="option">
+                        <input type="radio" name="rg-q7" value="0">
+                        <span>Above the line (\( \omega_0 > \gamma \)): upper-left region</span>
+                    </label>
+                    <label class="option">
+                        <input type="radio" name="rg-q7" value="1">
+                        <span>Below the line (\( \gamma > \omega_0 \)): lower-right region</span>
+                    </label>
+                    <label class="option">
+                        <input type="radio" name="rg-q7" value="2">
+                        <span>Exactly on the line only</span>
+                    </label>
+                    <label class="option">
+                        <input type="radio" name="rg-q7" value="3">
+                        <span>The entire map shows oscillation</span>
+                    </label>
+                </div>
+                <div class="question-actions">
+                    <button class="btn-verify">Verify</button>
+                </div>
+                <div class="question-explanation" style="display: none;">
+                    <div class="question-explanation-title">Explanation</div>
+                    <div class="question-explanation-text">
+                        Oscillation requires \( \gamma < \omega_0 \), which is the
+                        region above the yellow line (where \( \omega_0 \) is larger).
+                        Move the probe into this region and watch the motion plot show
+                        oscillation.  Below the line, you get pure exponential decay.
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Q8: MCQ -->
+        <div class="tab-content">
+            <div class="question-container" data-type="mcq" data-answer="2">
+                <div class="question-text">
+                    Move the probe along the yellow line (\( \gamma = \omega_0 \)).
+                    As you increase both parameters together, the motion:
+                </div>
+                <div class="question-options">
+                    <label class="option">
+                        <input type="radio" name="rg-q8" value="0">
+                        <span>Always looks the same</span>
+                    </label>
+                    <label class="option">
+                        <input type="radio" name="rg-q8" value="1">
+                        <span>Develops oscillations at high values</span>
+                    </label>
+                    <label class="option">
+                        <input type="radio" name="rg-q8" value="2">
+                        <span>Returns to equilibrium faster (steeper curve)</span>
+                    </label>
+                    <label class="option">
+                        <input type="radio" name="rg-q8" value="3">
+                        <span>Slows down and gets sluggish</span>
+                    </label>
+                </div>
+                <div class="question-actions">
+                    <button class="btn-verify">Verify</button>
+                </div>
+                <div class="question-explanation" style="display: none;">
+                    <div class="question-explanation-title">Explanation</div>
+                    <div class="question-explanation-text">
+                        Along the critical line, the solution is
+                        \( x(t) = A(1 + \gamma t)e^{-\gamma t} \).
+                        Larger \( \gamma \) (and \( \omega_0 \)) means faster decay:
+                        the exponential \( e^{-\gamma t} \) drops more steeply.
+                        The system is always critically damped (no oscillation), but
+                        it responds faster as the parameters increase.
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Q9: Fill -->
+        <div class="tab-content">
+            <div class="question-container" data-type="fill" data-answer="-1[-1.5,-0.5]">
+                <div class="question-text">
+                    For \( \omega_0 = 3.0, \gamma = 4.0 \) (overdamped), the two
+                    roots are \( r = -\gamma \pm \sqrt{\gamma^2 - \omega_0^2} \).
+                    The <em>less negative</em> root (slower decay) is:
+                    <br><br>
+                    r<sub>1</sub> = -4 + &radic;7 &approx; <input type="text" class="fill-blank" placeholder="value">
+                </div>
+                <div class="question-actions">
+                    <button class="btn-verify">Verify</button>
+                </div>
+                <div class="question-explanation" style="display: none;">
+                    <div class="question-explanation-title">Explanation</div>
+                    <div class="question-explanation-text">
+                        \( r_1 = -4 + \sqrt{16 - 9} = -4 + \sqrt{7} \approx -4 + 2.65 = -1.35 \).
+                        This is the "slow" root &mdash; it decays the slowest, so it
+                        dominates at long times.  The other root
+                        \( r_2 = -4 - \sqrt{7} \approx -6.65 \) decays much faster and
+                        becomes negligible quickly.  The long-time behavior is
+                        \( x(t) \sim e^{-1.35t} \).
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<hr>
+
+<!-- ========== CODE EXAMPLES ========== -->
+<h2>Code It Yourself</h2>
+
+<div class="tabs">
+    <div class="tab-buttons">
+        <button class="tab-button active">Three Regimes</button>
+        <button class="tab-button">Parameter Map</button>
+        <button class="tab-button">Prompt</button>
+    </div>
+
+    <div class="tab-content active">
+        <div class="code-block-container">
+            <div class="code-header">
+                <span class="code-lang">Python</span>
+                <button class="copy-btn">Copy</button>
+            </div>
+            <pre><code class="language-python">import numpy as np
+import plotly.graph_objects as go
+
+def damped(t, A, gamma, omega0):
+    disc = gamma**2 - omega0**2
+    if disc < 0:  # underdamped
+        wd = np.sqrt(-disc)
+        return A * np.exp(-gamma*t) * (np.cos(wd*t) + gamma/wd * np.sin(wd*t))
+    elif disc > 0:  # overdamped
+        s = np.sqrt(disc)
+        r1, r2 = -gamma + s, -gamma - s
+        return A/(r2-r1) * (r2*np.exp(r1*t) - r1*np.exp(r2*t))
+    else:  # critical
+        return A * (1 + gamma*t) * np.exp(-gamma*t)
+
+omega0 = 3.0
+t = np.linspace(0, 12, 600)
+
+fig = go.Figure()
+for gamma, name, color in [
+    (0.9, 'Underdamped', '#00f3ff'),
+    (3.0, 'Critical', '#00ff9f'),
+    (6.0, 'Overdamped', '#ff00ff')]:
+    fig.add_trace(go.Scatter(x=t, y=damped(t, 2, gamma, omega0),
+        name=f'{name} (γ={gamma})', line=dict(color=color, width=2)))
+
+fig.update_layout(template='plotly_dark',
+    title='Three Damping Regimes',
+    xaxis=dict(title='Time (s)', range=[0, 12],
+        gridcolor='#2a2f4a', zerolinecolor='#808080', linecolor='#808080'),
+    yaxis=dict(title='x(t)', range=[-1.5, 2.5],
+        gridcolor='#2a2f4a', zerolinecolor='#808080', linecolor='#808080'))
+fig.show()</code></pre>
+        </div>
+    </div>
+
+    <div class="tab-content">
+        <div class="code-block-container">
+            <div class="code-header">
+                <span class="code-lang">Python</span>
+                <button class="copy-btn">Copy</button>
+            </div>
+            <pre><code class="language-python">import numpy as np
+import plotly.graph_objects as go
+
+omega0 = 3.0
+n = 50
+gammas = np.linspace(0.1, 6, n)
+omega0s = np.linspace(0.5, 5, n)
+
+# Compute settling time for each (γ, ω₀)
+settle = np.zeros((n, n))
+for j, w in enumerate(omega0s):
+    for i, g in enumerate(gammas):
+        t = np.linspace(0, 20, 1000)
+        disc = g**2 - w**2
+        if disc < 0:
+            wd = np.sqrt(-disc)
+            x = 2*np.exp(-g*t)*(np.cos(wd*t) + g/wd*np.sin(wd*t))
+        elif disc > 0:
+            s = np.sqrt(disc)
+            r1, r2 = -g+s, -g-s
+            x = 2/(r2-r1)*(r2*np.exp(r1*t) - r1*np.exp(r2*t))
+        else:
+            x = 2*(1+g*t)*np.exp(-g*t)
+        idx = np.where(np.abs(x) < 0.1)[0]
+        settle[j,i] = t[idx[0]] if len(idx) > 0 else 20
+
+fig = go.Figure(go.Heatmap(x=gammas, y=omega0s, z=settle,
+    colorscale=[[0,'#00ff9f'],[0.3,'#00f3ff'],[0.6,'#ff00ff'],[1,'#ff6b6b']]))
+fig.add_trace(go.Scatter(x=[0.5,5], y=[0.5,5], mode='lines',
+    line=dict(color='yellow', dash='dash', width=2), name='γ=ω₀'))
+fig.update_layout(template='plotly_dark', title='Parameter Space Map',
+    xaxis=dict(title='γ'), yaxis=dict(title='ω₀'))
+fig.show()</code></pre>
+        </div>
+    </div>
+
+    <div class="tab-content">
+        <div class="code-block-container">
+            <div class="code-header">
+                <span class="code-lang">Prompt for AI</span>
+                <button class="copy-btn">Copy</button>
+            </div>
+            <pre><code class="language-text">Create a Python visualization of the three damping regimes.
+
+Part 1 - Three regimes on one plot:
+- Plot x(t) for underdamped (γ=0.9), critically damped (γ=3.0),
+  and overdamped (γ=6.0), all with ω₀=3.0
+- Initial conditions: x(0)=2, v(0)=0
+- Use correct solution formulas for each regime
+- Color: cyan=underdamped, green=critical, magenta=overdamped
+
+Part 2 - Parameter space heatmap:
+- Create a 2D grid of (γ, ω₀) from (0.1 to 6) × (0.5 to 5)
+- Color = settling time (time for |x| to drop below 5% of initial)
+- Draw γ=ω₀ line as the boundary between regimes
+- Label the underdamped and overdamped regions
+
+Part 3 - Root visualization:
+- Plot the roots r = -γ ± √(γ²-ω₀²) in the complex plane
+- Show how they move as γ increases from 0 to 6 at fixed ω₀=3
+- Mark the critical point where roots merge on the real axis
+
+Use Plotly dark theme, gray axes (#808080), fixed ranges.</code></pre>
+        </div>
+
+        <div class="info-box" style="margin-top: var(--spacing-md);">
+            <div class="info-box-title">Pro Tips for Prompting</div>
+            <ul>
+                <li>Specify the correct solution form for each regime (they're different!)</li>
+                <li>Ask for initial conditions x(0)=A, v(0)=0 to match our explorers</li>
+                <li>Request a parameter space heatmap for the "big picture" view</li>
+            </ul>
+        </div>
+    </div>
+</div>
+
+<hr>
+
+<!-- ========== EXERCISES ========== -->
+<h2>Exercises for Practice</h2>
+
+<div class="exercise-cards">
+    <div class="exercise-card">
+        <div class="exercise-card-header">
+            <span class="exercise-card-number">1.</span>
+            <span class="exercise-card-badge explore">Explore</span>
+        </div>
+        <div class="exercise-card-content">
+            In the Regime Explorer, set \( \omega_0 = 3.0 \) and slowly drag
+            \( \gamma \) from 0.5 to 5.5.  Watch the roots in the complex plane.
+            Describe the path they take: where do they start, where do they merge,
+            and where do they end up?  Why must both roots always have negative
+            real parts?
+        </div>
+    </div>
+
+    <div class="exercise-card">
+        <div class="exercise-card-header">
+            <span class="exercise-card-number">2.</span>
+            <span class="exercise-card-badge coding">Coding</span>
+        </div>
+        <div class="exercise-card-content">
+            Write a Python function that takes \( \gamma \) and \( \omega_0 \)
+            as input and returns: (1) the regime name, (2) the roots of the
+            characteristic equation, and (3) a prediction of how many zero
+            crossings will occur within the first 10 seconds.  Test it with
+            at least one example from each regime and verify against the explorer.
+        </div>
+    </div>
+
+    <div class="exercise-card">
+        <div class="exercise-card-header">
+            <span class="exercise-card-number">3.</span>
+            <span class="exercise-card-badge think">Think</span>
+        </div>
+        <div class="exercise-card-content">
+            The critically damped solution (with \( x(0) = A, v(0) = 0 \)) is
+            \( x(t) = A(1 + \gamma t)e^{-\gamma t} \).
+            Show that \( x(t) > 0 \) for all \( t > 0 \) (no zero crossings).
+            Compute \( \dot{x}(t) \) and show it's always non-positive.
+            What is \( \dot{x}(0) \)?  Physically, why does the system start
+            with zero velocity even though it's being pulled toward equilibrium?
+        </div>
+    </div>
+</div>
+
+<hr>
+
+<!-- ========== NAVIGATION ========== -->
+<div class="btn-group mt-xl">
+    <button class="btn btn-magenta" onclick="navigateToSection('24-introducing-damping')">&larr; Previous: Introducing Damping</button>
+    <button class="btn" onclick="scrollToTop()">&uarr; Back to Top</button>
+    <button class="btn btn-secondary" onclick="navigateToSection('26-critical-damping')">Next: Critical Damping in Engineering &rarr;</button>
+</div>

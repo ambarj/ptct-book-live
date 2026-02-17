@@ -1,0 +1,814 @@
+<!-- Section 3.5: Introducing Damping: Two Time Scales -->
+<!-- Source: Module 5 - Damped Harmonic Oscillator.nb (Part 1) -->
+<!-- Core concept: Damping as energy dissipation, two competing time scales -->
+<!-- Time: ~20 minutes -->
+<!-- Prerequisites: Sections 3.1-3.4 (SHO, energy, phase space, universality) -->
+
+<h1>Introducing Damping: Two Time Scales</h1>
+
+<p>
+    Every real oscillation eventually stops.  A guitar string falls silent, a
+    pendulum comes to rest, an LC circuit's current dies away.  Where does the
+    energy go?  It's lost to <strong>friction</strong>, <strong>air resistance</strong>,
+    or <strong>electrical resistance</strong> &mdash; all forms of
+    <em>damping</em> that convert orderly oscillation into heat.
+</p>
+
+<p>
+    The key insight is that damping introduces a <em>second time scale</em>.
+    Instead of one number (\( \omega_0 \)) describing the system, you now need
+    two: how fast it oscillates, and how fast it fades.  The competition
+    between these two time scales determines everything.
+</p>
+
+<div class="info-box">
+    <div class="info-box-title">Learning Objectives</div>
+    <ul>
+        <li>Write the damped oscillator equation \( \ddot{x} + 2\gamma\dot{x} + \omega_0^2 x = 0 \) and identify each term</li>
+        <li>Understand \( \gamma \) as a damping rate: amplitude decays as \( e^{-\gamma t} \)</li>
+        <li>Distinguish the oscillation time scale \( T_\text{osc} \) from the damping time scale \( \tau_\text{damp} = 1/\gamma \)</li>
+        <li>Estimate damping from observed motion: count oscillations before fading</li>
+    </ul>
+</div>
+
+<div class="equation-display">
+    <p><strong>The damped harmonic oscillator:</strong></p>
+    $$ \ddot{x} + 2\gamma\dot{x} + \omega_0^2 x = 0 $$
+    <p>
+        Three terms, each with a physical role:
+        \( \omega_0^2 x \) is the <strong>restoring force</strong> (pulls back),
+        \( 2\gamma\dot{x} \) is the <strong>damping force</strong> (opposes motion),
+        and \( \ddot{x} \) is the <strong>inertia</strong>.
+        The solution (for light damping, \( \gamma < \omega_0 \)):
+    </p>
+    $$ x(t) = A\,e^{-\gamma t}\cos(\omega_d t + \varphi), \qquad \omega_d = \sqrt{\omega_0^2 - \gamma^2} $$
+</div>
+
+<hr>
+
+<!-- ========== EXPLORER 1: DAMPING EXPLORER ========== -->
+
+<h2>Watching Energy Drain Away</h2>
+
+<p>
+    The left panel shows damped oscillation (cyan) with its exponential envelope
+    (red dashed) and a faint ghost of the undamped oscillation for comparison.
+    The right panel shows how the total energy decays &mdash; roughly as
+    \( E(t) \approx E_0\,e^{-2\gamma t} \) (the factor of 2 because energy
+    goes as amplitude <em>squared</em>).
+</p>
+
+<p>
+    Start with small \( \gamma \) and slowly increase it.  Watch the oscillation
+    fade faster, and the energy drain more quickly.
+</p>
+
+<div class="interactive-container" id="damping-explorer">
+    <div class="interactive-title">Explorer 1: Damping Explorer</div>
+
+    <div style="display: flex; gap: 0.5rem; flex-wrap: wrap;">
+        <div class="plot-container" style="flex: 1; min-width: 280px;">
+            <div id="dp-ex-plot" style="width: 100%; height: 380px;"></div>
+        </div>
+        <div class="plot-container" style="flex: 1; min-width: 280px;">
+            <div id="dp-ex-energy-plot" style="width: 100%; height: 380px;"></div>
+        </div>
+    </div>
+
+    <div id="dp-ex-stats"
+         style="display: flex; justify-content: center; gap: 1.5rem; padding: 8px 0; font-size: 0.85rem; color: #c8c8e0; flex-wrap: wrap;">
+    </div>
+
+    <div class="control-panel">
+        <div class="control-group">
+            <label class="control-label">Damping &gamma;:
+                <span class="control-label-value">0.10</span>
+            </label>
+            <input type="range" class="slider" id="dp-ex-gamma"
+                   min="0.00" max="3.00" step="0.01" value="0.10">
+        </div>
+        <div class="control-group">
+            <label class="control-label">Natural frequency &omega;<sub>0</sub>:
+                <span class="control-label-value">3.00</span>
+            </label>
+            <input type="range" class="slider" id="dp-ex-omega0"
+                   min="0.5" max="5.0" step="0.1" value="3.0">
+        </div>
+        <div class="control-group">
+            <label class="control-label">Amplitude A:
+                <span class="control-label-value">2.00</span>
+            </label>
+            <input type="range" class="slider" id="dp-ex-amp"
+                   min="0.5" max="3.0" step="0.1" value="2.0">
+        </div>
+        <div class="btn-group">
+            <button class="btn" onclick="resetDamping()">Reset</button>
+        </div>
+    </div>
+</div>
+
+<div class="info-box">
+    <div class="info-box-title">Key Insight</div>
+    <p>
+        The damping coefficient \( \gamma \) controls how fast the
+        oscillation dies out.  The <strong>damping time</strong>
+        \( \tau = 1/\gamma \) is the time it takes for the amplitude to
+        shrink to about 37% of its starting value (specifically, to
+        \( 1/e \) of the original).  Since energy depends on amplitude
+        squared, energy drops even faster &mdash; it falls as
+        \( e^{-2\gamma t} \), reaching 37% in half the time.
+    </p>
+</div>
+
+<!-- Test Your Understanding #1 -->
+<div class="interactive-container question-section">
+    <div class="interactive-title">Test Your Understanding</div>
+
+    <p style="margin-bottom: var(--spacing-md); color: var(--text-secondary);">
+        Use the Damping Explorer to answer these questions.
+    </p>
+
+    <div class="tabs">
+        <div class="tab-buttons">
+            <button class="tab-button active">Question 1</button>
+            <button class="tab-button">Question 2</button>
+            <button class="tab-button">Question 3</button>
+        </div>
+
+        <!-- Q1: MCQ -->
+        <div class="tab-content active">
+            <div class="question-container" data-type="mcq" data-answer="2">
+                <div class="question-text">
+                    As you increase \( \gamma \) from 0.1 to 1.0, the oscillation
+                    frequency (how fast it wiggles) appears to:
+                </div>
+                <div class="question-options">
+                    <label class="option">
+                        <input type="radio" name="dp-q1" value="0">
+                        <span>Increase significantly</span>
+                    </label>
+                    <label class="option">
+                        <input type="radio" name="dp-q1" value="1">
+                        <span>Stay exactly the same</span>
+                    </label>
+                    <label class="option">
+                        <input type="radio" name="dp-q1" value="2">
+                        <span>Decrease slightly (fewer wiggles in same time)</span>
+                    </label>
+                    <label class="option">
+                        <input type="radio" name="dp-q1" value="3">
+                        <span>Disappear entirely</span>
+                    </label>
+                </div>
+                <div class="question-actions">
+                    <button class="btn-verify">Verify</button>
+                </div>
+                <div class="question-explanation" style="display: none;">
+                    <div class="question-explanation-title">Explanation</div>
+                    <div class="question-explanation-text">
+                        The damped frequency is \( \omega_d = \sqrt{\omega_0^2 - \gamma^2} \),
+                        which is slightly <em>less</em> than \( \omega_0 \).  For light damping
+                        (\( \gamma \ll \omega_0 \)), the difference is negligible.  But as
+                        \( \gamma \) approaches \( \omega_0 \), the frequency drops noticeably.
+                        At \( \gamma = \omega_0 \), oscillation ceases entirely (critical damping).
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Q2: Fill -->
+        <div class="tab-content">
+            <div class="question-container" data-type="fill" data-answer="5[4.5,5.5]">
+                <div class="question-text">
+                    Set \( \gamma = 0.2 \) and \( \omega_0 = 3.0 \).
+                    The damping time scale is \( \tau = 1/\gamma \).
+                    How many seconds does it take for the amplitude to drop to
+                    \( A/e \approx 37\% \)?
+                    <br><br>
+                    &tau; = <input type="text" class="fill-blank" placeholder="seconds"> s
+                </div>
+                <div class="question-actions">
+                    <button class="btn-verify">Verify</button>
+                </div>
+                <div class="question-explanation" style="display: none;">
+                    <div class="question-explanation-title">Explanation</div>
+                    <div class="question-explanation-text">
+                        \( \tau = 1/\gamma = 1/0.2 = 5 \) seconds.
+                        Look at the envelope on the plot: at t = 5 s, the red dashed line
+                        should be at about 37% of the initial amplitude (roughly 0.74 if A = 2).
+                        The energy at this time has dropped to \( 1/e^2 \approx 13.5\% \).
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Q3: MCQ -->
+        <div class="tab-content">
+            <div class="question-container" data-type="mcq" data-answer="1">
+                <div class="question-text">
+                    Why does the energy decay as \( e^{-2\gamma t} \) while the
+                    amplitude decays as \( e^{-\gamma t} \)?
+                </div>
+                <div class="question-options">
+                    <label class="option">
+                        <input type="radio" name="dp-q3" value="0">
+                        <span>Energy is always twice the amplitude</span>
+                    </label>
+                    <label class="option">
+                        <input type="radio" name="dp-q3" value="1">
+                        <span>Energy is proportional to amplitude <em>squared</em>, so the exponent doubles</span>
+                    </label>
+                    <label class="option">
+                        <input type="radio" name="dp-q3" value="2">
+                        <span>The factor of 2 comes from the equation having \( 2\gamma \)</span>
+                    </label>
+                    <label class="option">
+                        <input type="radio" name="dp-q3" value="3">
+                        <span>Energy decays in both kinetic and potential forms (two channels)</span>
+                    </label>
+                </div>
+                <div class="question-actions">
+                    <button class="btn-verify">Verify</button>
+                </div>
+                <div class="question-explanation" style="display: none;">
+                    <div class="question-explanation-title">Explanation</div>
+                    <div class="question-explanation-text">
+                        Energy goes as \( E \propto A^2 \), and amplitude decays as
+                        \( A(t) = A_0 e^{-\gamma t} \), so
+                        \( E(t) \propto A_0^2 e^{-2\gamma t} \).  The factor of 2 in the
+                        exponent comes from squaring the amplitude, not from the coefficient
+                        in the equation.
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<hr>
+
+<!-- ========== EXPLORER 2: TWO TIME SCALES ========== -->
+
+<h2>The Two Time Scales</h2>
+
+<p>
+    The essential physics of damping is the competition between two time scales:
+</p>
+
+<div class="equation-display">
+    $$ T_\text{osc} = \frac{2\pi}{\omega_d} \quad \text{(how long one oscillation takes)} $$
+    $$ \tau_\text{damp} = \frac{1}{\gamma} \quad \text{(how long the envelope takes to decay)} $$
+</div>
+
+<p>
+    Their ratio \( \tau/T \) tells the whole story.  If \( \tau \gg T \), the
+    system completes many oscillations before the envelope noticeably shrinks
+    &mdash; this is <strong>light damping</strong>.  If \( \tau \approx T \),
+    you barely see one oscillation before it's gone &mdash; <strong>heavy damping</strong>.
+    The green and yellow lines on the plot mark these two time scales.
+</p>
+
+<div class="interactive-container" id="two-time-scales">
+    <div class="interactive-title">Explorer 2: Two Time Scales</div>
+
+    <div style="display: flex; gap: 0.5rem; flex-wrap: wrap;">
+        <div class="plot-container" style="flex: 1; min-width: 280px;">
+            <div id="dp-ts-plot" style="width: 100%; height: 380px;"></div>
+        </div>
+        <div class="plot-container" style="flex: 1; min-width: 280px;">
+            <div id="dp-ts-bar-plot" style="width: 100%; height: 380px;"></div>
+        </div>
+    </div>
+
+    <div id="dp-ts-stats"
+         style="display: flex; justify-content: center; gap: 1.5rem; padding: 8px 0; font-size: 0.85rem; color: #c8c8e0; flex-wrap: wrap;">
+    </div>
+
+    <div class="control-panel">
+        <div class="control-group">
+            <label class="control-label">Damping &gamma;:
+                <span class="control-label-value">0.15</span>
+            </label>
+            <input type="range" class="slider" id="dp-ts-gamma"
+                   min="0.01" max="3.00" step="0.01" value="0.15">
+        </div>
+        <div class="control-group">
+            <label class="control-label">Natural frequency &omega;<sub>0</sub>:
+                <span class="control-label-value">3.00</span>
+            </label>
+            <input type="range" class="slider" id="dp-ts-omega0"
+                   min="0.5" max="5.0" step="0.1" value="3.0">
+        </div>
+        <div class="btn-group">
+            <button class="btn" onclick="resetTimeScales()">Reset</button>
+        </div>
+    </div>
+</div>
+
+<div class="info-box">
+    <div class="info-box-title">Key Insight</div>
+    <p>
+        The <strong>quality factor</strong> \( Q = \omega_0/(2\gamma) \) is a
+        handy single number that tells you: <em>how many oscillations does the
+        system complete before the motion dies out?</em>  A tuning fork has
+        Q&nbsp;&asymp;&nbsp;1000 (it rings for a long time).  A car suspension
+        has Q&nbsp;&asymp;&nbsp;5 (it&rsquo;s designed to stop bouncing quickly).
+        You can read Q directly from the explorer: count how many full
+        oscillations are visible before the envelope drops below ~37%.
+    </p>
+</div>
+
+<!-- Test Your Understanding #2 -->
+<div class="interactive-container question-section">
+    <div class="interactive-title">Test Your Understanding</div>
+
+    <p style="margin-bottom: var(--spacing-md); color: var(--text-secondary);">
+        Use the Two Time Scales explorer to answer these questions.
+    </p>
+
+    <div class="tabs">
+        <div class="tab-buttons">
+            <button class="tab-button active">Question 4</button>
+            <button class="tab-button">Question 5</button>
+            <button class="tab-button">Question 6</button>
+        </div>
+
+        <!-- Q4: Fill -->
+        <div class="tab-content active">
+            <div class="question-container" data-type="fill" data-answer="10[9,11]">
+                <div class="question-text">
+                    Set \( \omega_0 = 3.0 \) and \( \gamma = 0.15 \).
+                    What is the quality factor \( Q = \omega_0/(2\gamma) \)?
+                    <br><br>
+                    Q = <input type="text" class="fill-blank" placeholder="number">
+                </div>
+                <div class="question-actions">
+                    <button class="btn-verify">Verify</button>
+                </div>
+                <div class="question-explanation" style="display: none;">
+                    <div class="question-explanation-title">Explanation</div>
+                    <div class="question-explanation-text">
+                        \( Q = 3.0/(2 \times 0.15) = 3.0/0.3 = 10 \).
+                        A Q of 10 means the system completes roughly 10 oscillations before
+                        the amplitude drops significantly.  Check the bar chart:
+                        \( \tau/T \) should be around 3, meaning about 3 full oscillations
+                        within one damping time (and about \( \pi Q \approx 31 \) oscillations
+                        total before the energy drops to 1%).
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Q5: MCQ -->
+        <div class="tab-content">
+            <div class="question-container" data-type="mcq" data-answer="0">
+                <div class="question-text">
+                    Slowly increase \( \gamma \) while watching the bar chart.
+                    At what approximate value of \( \gamma \) does
+                    \( \tau_\text{damp} \) become equal to \( T_\text{osc} \)?
+                </div>
+                <div class="question-options">
+                    <label class="option">
+                        <input type="radio" name="dp-q5" value="0">
+                        <span>Around \( \gamma \approx 0.45 \)</span>
+                    </label>
+                    <label class="option">
+                        <input type="radio" name="dp-q5" value="1">
+                        <span>Around \( \gamma \approx 1.5 \)</span>
+                    </label>
+                    <label class="option">
+                        <input type="radio" name="dp-q5" value="2">
+                        <span>Around \( \gamma = \omega_0 = 3.0 \)</span>
+                    </label>
+                    <label class="option">
+                        <input type="radio" name="dp-q5" value="3">
+                        <span>They can never be equal</span>
+                    </label>
+                </div>
+                <div class="question-actions">
+                    <button class="btn-verify">Verify</button>
+                </div>
+                <div class="question-explanation" style="display: none;">
+                    <div class="question-explanation-title">Explanation</div>
+                    <div class="question-explanation-text">
+                        Setting \( \tau = T \) means \( 1/\gamma = 2\pi/\omega_d \).
+                        For \( \omega_0 = 3.0 \), this happens around \( \gamma \approx 0.45 \)
+                        (verify by sliding the slider until the ratio bar reaches 1).
+                        When \( \tau = T \), the system barely completes one oscillation before
+                        the envelope decays significantly.
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Q6: MCQ -->
+        <div class="tab-content">
+            <div class="question-container" data-type="mcq" data-answer="2">
+                <div class="question-text">
+                    A quartz crystal oscillator has \( Q \approx 10{,}000 \).
+                    If its frequency is 32,768 Hz, roughly how long does it
+                    take for the amplitude to drop to \( 1/e \)?
+                </div>
+                <div class="question-options">
+                    <label class="option">
+                        <input type="radio" name="dp-q6" value="0">
+                        <span>About 0.01 seconds</span>
+                    </label>
+                    <label class="option">
+                        <input type="radio" name="dp-q6" value="1">
+                        <span>About 0.1 seconds</span>
+                    </label>
+                    <label class="option">
+                        <input type="radio" name="dp-q6" value="2">
+                        <span>About 0.1 seconds (roughly 3000 oscillations)</span>
+                    </label>
+                    <label class="option">
+                        <input type="radio" name="dp-q6" value="3">
+                        <span>About 10 seconds</span>
+                    </label>
+                </div>
+                <div class="question-actions">
+                    <button class="btn-verify">Verify</button>
+                </div>
+                <div class="question-explanation" style="display: none;">
+                    <div class="question-explanation-title">Explanation</div>
+                    <div class="question-explanation-text">
+                        \( Q = \omega_0/(2\gamma) \), so
+                        \( \gamma = \omega_0/(2Q) = 2\pi \times 32768 / (2 \times 10000) \approx 10.3 \) s\(^{-1}\).
+                        Thus \( \tau = 1/\gamma \approx 0.097 \) s, during which
+                        \( 0.097 \times 32768 \approx 3200 \) oscillations occur.
+                        That's the magic of high-Q: thousands of oscillations before noticeable decay.
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<hr>
+
+<!-- ========== EXPLORER 3: DAMPING DETECTOR ========== -->
+
+<h2>Can You Estimate the Damping?</h2>
+
+<p>
+    A physicist's skill: look at damped motion and estimate the damping
+    coefficient.  Below is a mystery oscillation with known
+    \( \omega_0 = 3.0 \) rad/s but <em>unknown</em> \( \gamma \).
+    Study how quickly it fades, count the visible oscillations, and
+    estimate \( \gamma \).
+</p>
+
+<p>
+    <strong>Hint:</strong> If the amplitude drops to about 37% in time \( \tau \),
+    then \( \gamma \approx 1/\tau \).  Count how many oscillations you see
+    (period \( T \approx 2 \) s since \( \omega_0 = 3 \)), then
+    estimate how many periods fit in one \( \tau \).
+</p>
+
+<div class="interactive-container" id="damping-detector">
+    <div class="interactive-title">Explorer 3: Damping Detector</div>
+
+    <div class="plot-container">
+        <div id="dp-det-plot" style="width: 100%; height: 380px;"></div>
+    </div>
+
+    <div id="dp-det-score"
+         style="text-align: center; padding: 6px 0; font-size: 0.9rem; color: #c8c8e0;">
+    </div>
+
+    <div class="control-panel">
+        <div class="control-group" style="flex: 2;">
+            <label class="control-label">Your estimate of &gamma;:</label>
+            <input type="text" id="dp-det-guess" class="fill-blank"
+                   placeholder="e.g. 0.25" style="width: 100%; max-width: 200px;">
+        </div>
+        <div class="btn-group">
+            <button class="btn" id="dp-det-check">Check</button>
+            <button class="btn btn-secondary" onclick="newMystery()">New Mystery</button>
+        </div>
+    </div>
+
+    <div id="dp-det-feedback"
+         style="text-align: center; padding: 8px 0; font-size: 0.9rem; min-height: 1.5em;">
+    </div>
+</div>
+
+<div class="info-box">
+    <div class="info-box-title">Key Insight</div>
+    <p>
+        Estimating damping from observation is a real experimental skill.
+        Here&rsquo;s the trick: measure two consecutive peak amplitudes
+        \( A_n \) and \( A_{n+1} \), then compute their ratio.  Since the
+        envelope decays exponentially, this ratio is the same for any two
+        consecutive peaks: \( A_n/A_{n+1} = e^{\gamma T} \).  Taking the
+        natural log gives \( \ln(A_n/A_{n+1}) = \gamma T \), and since you
+        can measure the period T, you get \( \gamma \) directly.
+    </p>
+</div>
+
+<!-- Test Your Understanding #3 -->
+<div class="interactive-container question-section">
+    <div class="interactive-title">Test Your Understanding</div>
+
+    <p style="margin-bottom: var(--spacing-md); color: var(--text-secondary);">
+        Think about damping in real systems.
+    </p>
+
+    <div class="tabs">
+        <div class="tab-buttons">
+            <button class="tab-button active">Question 7</button>
+            <button class="tab-button">Question 8</button>
+            <button class="tab-button">Question 9</button>
+        </div>
+
+        <!-- Q7: MCQ -->
+        <div class="tab-content active">
+            <div class="question-container" data-type="mcq" data-answer="0">
+                <div class="question-text">
+                    An oscillator has \( \omega_0 = 4 \) rad/s and \( \gamma = 0.1 \).
+                    About how many full oscillations will you see before the
+                    amplitude drops to \( 1/e \)?
+                </div>
+                <div class="question-options">
+                    <label class="option">
+                        <input type="radio" name="dp-q7" value="0">
+                        <span>About 6 oscillations</span>
+                    </label>
+                    <label class="option">
+                        <input type="radio" name="dp-q7" value="1">
+                        <span>About 1 oscillation</span>
+                    </label>
+                    <label class="option">
+                        <input type="radio" name="dp-q7" value="2">
+                        <span>About 40 oscillations</span>
+                    </label>
+                    <label class="option">
+                        <input type="radio" name="dp-q7" value="3">
+                        <span>About 100 oscillations</span>
+                    </label>
+                </div>
+                <div class="question-actions">
+                    <button class="btn-verify">Verify</button>
+                </div>
+                <div class="question-explanation" style="display: none;">
+                    <div class="question-explanation-title">Explanation</div>
+                    <div class="question-explanation-text">
+                        \( \tau = 1/\gamma = 10 \) s, and
+                        \( T = 2\pi/\omega_d \approx 2\pi/4 \approx 1.57 \) s.
+                        Number of oscillations in time \( \tau \):
+                        \( \tau/T \approx 10/1.57 \approx 6.4 \).
+                        So about 6 full oscillations.
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Q8: Fill -->
+        <div class="tab-content">
+            <div class="question-container" data-type="fill" data-answer="0.35[0.3,0.4]">
+                <div class="question-text">
+                    You observe a damped oscillation and measure that the first peak
+                    has amplitude 2.0 and the second peak (one period later) has
+                    amplitude 1.4.  Using the logarithmic decrement
+                    \( \delta = \ln(A_1/A_2) \) and period \( T = 1.0 \) s,
+                    estimate \( \gamma \).
+                    <br><br>
+                    &gamma; = <input type="text" class="fill-blank" placeholder="s&sup-1;"> s<sup>&minus;1</sup>
+                </div>
+                <div class="question-actions">
+                    <button class="btn-verify">Verify</button>
+                </div>
+                <div class="question-explanation" style="display: none;">
+                    <div class="question-explanation-title">Explanation</div>
+                    <div class="question-explanation-text">
+                        \( \delta = \ln(2.0/1.4) = \ln(1.43) \approx 0.357 \).
+                        Since \( \delta = \gamma T \) and \( T = 1.0 \) s,
+                        \( \gamma = \delta/T \approx 0.357 \) s\(^{-1}\).
+                        This is a practical method used in labs and engineering.
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Q9: MCQ -->
+        <div class="tab-content">
+            <div class="question-container" data-type="mcq" data-answer="3">
+                <div class="question-text">
+                    Which of these real systems has the <em>highest</em> quality factor Q?
+                </div>
+                <div class="question-options">
+                    <label class="option">
+                        <input type="radio" name="dp-q9" value="0">
+                        <span>A car's shock absorber</span>
+                    </label>
+                    <label class="option">
+                        <input type="radio" name="dp-q9" value="1">
+                        <span>A child's swing in air</span>
+                    </label>
+                    <label class="option">
+                        <input type="radio" name="dp-q9" value="2">
+                        <span>A plucked guitar string</span>
+                    </label>
+                    <label class="option">
+                        <input type="radio" name="dp-q9" value="3">
+                        <span>A quartz crystal in a watch</span>
+                    </label>
+                </div>
+                <div class="question-actions">
+                    <button class="btn-verify">Verify</button>
+                </div>
+                <div class="question-explanation" style="display: none;">
+                    <div class="question-explanation-title">Explanation</div>
+                    <div class="question-explanation-text">
+                        Quality factors: shock absorber Q &approx; 0.5 (deliberately
+                        overdamped), swing Q &approx; 50&ndash;100, guitar string
+                        Q &approx; 500&ndash;2000, quartz crystal Q &approx; 10,000&ndash;100,000.
+                        The quartz crystal wins by far &mdash; that's why quartz watches
+                        are so accurate: each oscillation is nearly perfect, and
+                        very little energy is lost per cycle.
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<hr>
+
+<!-- ========== CODE EXAMPLES ========== -->
+<h2>Code It Yourself</h2>
+
+<div class="tabs">
+    <div class="tab-buttons">
+        <button class="tab-button active">Damped Oscillator</button>
+        <button class="tab-button">Time Scales</button>
+        <button class="tab-button">Prompt</button>
+    </div>
+
+    <div class="tab-content active">
+        <div class="code-block-container">
+            <div class="code-header">
+                <span class="code-lang">Python</span>
+                <button class="copy-btn">Copy</button>
+            </div>
+            <pre><code class="language-python">import numpy as np
+import plotly.graph_objects as go
+
+A, omega0, gamma = 2.0, 3.0, 0.2
+omega_d = np.sqrt(omega0**2 - gamma**2)
+t = np.linspace(0, 20, 800)
+
+x = A * np.exp(-gamma * t) * np.cos(omega_d * t)
+env = A * np.exp(-gamma * t)
+
+fig = go.Figure()
+fig.add_trace(go.Scatter(x=t, y=x, name='Damped',
+    line=dict(color='#00f3ff', width=2)))
+fig.add_trace(go.Scatter(x=t, y=env, name='Envelope',
+    line=dict(color='#ff6b6b', width=1.5, dash='dash')))
+fig.add_trace(go.Scatter(x=t, y=-env, showlegend=False,
+    line=dict(color='#ff6b6b', width=1.5, dash='dash')))
+
+# Mark tau = 1/gamma
+tau = 1/gamma
+fig.add_vline(x=tau, line=dict(color='#ffff00', dash='dashdot'),
+    annotation_text=f'τ = {tau:.1f} s')
+
+fig.update_layout(template='plotly_dark',
+    title=f'Damped Oscillator: γ={gamma}, ω₀={omega0}',
+    xaxis=dict(title='Time (s)', range=[0, 20],
+        gridcolor='#2a2f4a', zerolinecolor='#808080', linecolor='#808080'),
+    yaxis=dict(title='x(t)', range=[-2.5, 2.5],
+        gridcolor='#2a2f4a', zerolinecolor='#808080', linecolor='#808080'))
+fig.show()</code></pre>
+        </div>
+    </div>
+
+    <div class="tab-content">
+        <div class="code-block-container">
+            <div class="code-header">
+                <span class="code-lang">Python</span>
+                <button class="copy-btn">Copy</button>
+            </div>
+            <pre><code class="language-python">import numpy as np
+import plotly.graph_objects as go
+
+omega0 = 3.0
+gammas = np.linspace(0.01, 2.5, 200)
+
+T_osc = 2 * np.pi / np.sqrt(np.maximum(omega0**2 - gammas**2, 0.01))
+tau_damp = 1.0 / gammas
+ratio = tau_damp / T_osc
+
+fig = go.Figure()
+fig.add_trace(go.Scatter(x=gammas, y=T_osc, name='T_osc',
+    line=dict(color='#00ff9f', width=2)))
+fig.add_trace(go.Scatter(x=gammas, y=tau_damp, name='τ_damp',
+    line=dict(color='#ffff00', width=2)))
+fig.add_hline(y=1, line=dict(color='#808080', dash='dot'))
+
+# Shade the crossover region
+fig.update_layout(template='plotly_dark',
+    title='Time Scales vs Damping',
+    xaxis=dict(title='γ (s⁻¹)', range=[0, 2.5],
+        gridcolor='#2a2f4a', zerolinecolor='#808080', linecolor='#808080'),
+    yaxis=dict(title='Time (s)', range=[0, 20], type='linear',
+        gridcolor='#2a2f4a', zerolinecolor='#808080', linecolor='#808080'))
+fig.show()</code></pre>
+        </div>
+    </div>
+
+    <div class="tab-content">
+        <div class="code-block-container">
+            <div class="code-header">
+                <span class="code-lang">Prompt for AI</span>
+                <button class="copy-btn">Copy</button>
+            </div>
+            <pre><code class="language-text">Create a Python visualization of damped harmonic oscillation.
+
+Part 1 - Damped oscillation:
+- Plot x(t) = A*exp(-γt)*cos(ωd*t) with ωd = sqrt(ω₀² - γ²)
+- Show the exponential envelope ±A*exp(-γt) as dashed lines
+- Mark τ = 1/γ with a vertical line and label
+- Use parameters: A=2, ω₀=3, γ=0.2
+
+Part 2 - Energy decay:
+- Plot E(t) = E₀*exp(-2γt) with fill-to-zero
+- Show E₀ = ½ω₀²A² as a dashed horizontal reference
+
+Part 3 - Time scale comparison:
+- Plot T_osc and τ_damp as functions of γ (sweep γ from 0.01 to 2.5)
+- Mark where they cross (transition from light to heavy damping)
+
+Use Plotly dark theme, gray axes (#808080), neon colors.
+Fixed axis ranges for educational clarity.</code></pre>
+        </div>
+
+        <div class="info-box" style="margin-top: var(--spacing-md);">
+            <div class="info-box-title">Pro Tips for Prompting</div>
+            <ul>
+                <li>Specify the damped frequency formula to avoid confusion with \( \omega_0 \)</li>
+                <li>Ask for the envelope separately so you can see the decay rate</li>
+                <li>Request the \( \tau = 1/\gamma \) marker for visual reference</li>
+            </ul>
+        </div>
+    </div>
+</div>
+
+<hr>
+
+<!-- ========== EXERCISES ========== -->
+<h2>Exercises for Practice</h2>
+
+<div class="exercise-cards">
+    <div class="exercise-card">
+        <div class="exercise-card-header">
+            <span class="exercise-card-number">1.</span>
+            <span class="exercise-card-badge explore">Explore</span>
+        </div>
+        <div class="exercise-card-content">
+            In the Damping Explorer, set \( \omega_0 = 3.0 \) and find the value
+            of \( \gamma \) where the damped frequency \( \omega_d \) is exactly
+            half of \( \omega_0 \).  What fraction of the original energy remains
+            after one full oscillation period at this damping level?
+        </div>
+    </div>
+
+    <div class="exercise-card">
+        <div class="exercise-card-header">
+            <span class="exercise-card-number">2.</span>
+            <span class="exercise-card-badge coding">Coding</span>
+        </div>
+        <div class="exercise-card-content">
+            Write a Python script that computes the logarithmic decrement
+            \( \delta = \ln(A_n/A_{n+1}) \) from simulated data.  Generate a
+            damped oscillation with known \( \gamma \), find successive peaks,
+            compute \( \delta \) for each pair, and verify that
+            \( \gamma = \delta/T \) recovers the correct value.
+        </div>
+    </div>
+
+    <div class="exercise-card">
+        <div class="exercise-card-header">
+            <span class="exercise-card-number">3.</span>
+            <span class="exercise-card-badge think">Think</span>
+        </div>
+        <div class="exercise-card-content">
+            The damped frequency is \( \omega_d = \sqrt{\omega_0^2 - \gamma^2} \).
+            This means the <em>period gets longer</em> as damping increases.
+            Is this physically intuitive?  Think about pushing a pendulum
+            through honey vs air.  Explain why stronger friction makes
+            oscillations slower, not just smaller.
+        </div>
+    </div>
+</div>
+
+<hr>
+
+<!-- ========== NAVIGATION ========== -->
+<div class="btn-group mt-xl">
+    <button class="btn btn-magenta" onclick="navigateToSection('23-one-equation-many-systems')">&larr; Previous: One Equation, Many Systems</button>
+    <button class="btn" onclick="scrollToTop()">&uarr; Back to Top</button>
+    <button class="btn btn-secondary" onclick="navigateToSection('25-damping-regimes')">Next: The Three Regimes of Damping &rarr;</button>
+</div>

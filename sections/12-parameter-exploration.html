@@ -1,0 +1,789 @@
+<!-- Section 2.6: Manual Parameter Exploration -->
+<!-- Source: Lecture2.nb (Part 2) -->
+<!-- Core concept: Exploring parameter space to build intuition before automation -->
+<!-- Time: ~20 minutes -->
+<!-- Prerequisites: Section 2.5 (χ² Criterion) -->
+
+<h1>Manual Parameter Exploration</h1>
+
+<p>
+    Before handing control to an algorithm, you should <em>feel</em> how parameters
+    affect the fit.  In this section you'll manually adjust a three-parameter model,
+    scan one parameter at a time, and even play "human optimizer" &mdash; searching
+    for the best fit by hand.  This builds the intuition that makes automated
+    fitting (next section) feel natural rather than magical.
+</p>
+
+<div class="info-box">
+    <div class="info-box-title">Learning Objectives</div>
+    <ul>
+        <li>Manually adjust model parameters and observe their effect on &chi;&sup2;</li>
+        <li>Understand parameter sensitivity: which parameters matter most?</li>
+        <li>Perform a 1D parameter sweep and read off the minimum</li>
+        <li>Use coordinate descent to iteratively approach the best fit</li>
+    </ul>
+</div>
+
+<div class="equation-display">
+    <p><strong>Three-parameter model:</strong></p>
+    $$ d(t) = a + b\,t + c\,t^2 $$
+    <p>
+        Here \( a \) is an offset (should be near 0), \( b \) is an initial velocity
+        (should be near 0 for a drop from rest), and \( c = g/2 \approx 4.9 \) captures
+        the gravitational acceleration.  With three parameters you can absorb systematic
+        effects, but you also risk overfitting &mdash; a theme we'll revisit.
+    </p>
+</div>
+
+<hr>
+
+<!-- ========== EXPLORER 1: PARAMETER PLAYGROUND ========== -->
+
+<h2>Hands-on: The Parameter Playground</h2>
+
+<p>
+    Drag the three sliders and watch the model curve respond in real time.
+    The left panel shows your curve against the data; the right panel
+    shows the live &chi;&sup2; value and how far you are from the best fit.
+    Can you get &chi;&sup2; close to its minimum by hand?
+</p>
+
+<div class="interactive-container" id="param-playground">
+    <div class="interactive-title">Interactive: Parameter Playground</div>
+
+    <div style="display: flex; gap: 0.5rem; flex-wrap: wrap;">
+        <div class="plot-container" style="flex: 1; min-width: 280px;">
+            <div id="pp-data-plot" style="width: 100%; height: 380px;"></div>
+        </div>
+        <div class="plot-container" style="flex: 1; min-width: 280px;">
+            <div id="pp-chi2-plot" style="width: 100%; height: 380px;"></div>
+        </div>
+    </div>
+
+    <div id="pp-stats"
+         style="display: flex; justify-content: center; gap: 1.5rem; padding: 8px 0; font-size: 0.85rem; color: #c8c8e0; flex-wrap: wrap;">
+    </div>
+
+    <div class="control-panel">
+        <div class="control-group">
+            <label class="control-label">Offset a:
+                <span class="control-label-value">0.0</span>
+            </label>
+            <input type="range" class="slider" id="pp-a-slider" min="-30" max="30" step="0.5" value="0">
+        </div>
+        <div class="control-group">
+            <label class="control-label">Velocity b:
+                <span class="control-label-value">0.0</span>
+            </label>
+            <input type="range" class="slider" id="pp-b-slider" min="-10" max="10" step="0.1" value="0">
+        </div>
+        <div class="control-group">
+            <label class="control-label">Acceleration c = g/2:
+                <span class="control-label-value">4.9</span>
+            </label>
+            <input type="range" class="slider" id="pp-c-slider" min="2" max="8" step="0.05" value="4.9">
+        </div>
+        <div class="btn-group">
+            <button class="btn" onclick="newPlaygroundData()">New Data</button>
+            <button class="btn" onclick="resetPlaygroundExplorer()">Reset</button>
+        </div>
+    </div>
+</div>
+
+<div class="info-box">
+    <div class="info-box-title">Key Insight</div>
+    <p>
+        Notice that <strong>c</strong> (the quadratic coefficient) affects &chi;&sup2; most
+        dramatically &mdash; a small change in \( c \) produces a large swing in &chi;&sup2;.
+        The offset \( a \) and velocity \( b \) matter less because the data spans
+        \( t = 1 \ldots 10 \), where the \( t^2 \) term dominates.  This is
+        <strong>parameter sensitivity</strong>: some parameters are tightly constrained
+        by the data, others are barely constrained at all.
+    </p>
+</div>
+
+<!-- Test Your Understanding #1 -->
+<div class="interactive-container question-section">
+    <div class="interactive-title">Test Your Understanding</div>
+
+    <p style="margin-bottom: var(--spacing-md); color: var(--text-secondary);">
+        Use the Parameter Playground to answer these questions.
+    </p>
+
+    <div class="tabs">
+        <div class="tab-buttons">
+            <button class="tab-button active">Question 1</button>
+            <button class="tab-button">Question 2</button>
+            <button class="tab-button">Question 3</button>
+        </div>
+
+        <!-- Q1: MCQ -->
+        <div class="tab-content active">
+            <div class="question-container" data-type="mcq" data-answer="2">
+                <div class="question-text">
+                    Which parameter has the greatest effect on &chi;&sup2; when changed
+                    by a small amount?
+                </div>
+                <div class="question-options">
+                    <label class="option">
+                        <input type="radio" name="pe-q1" value="0">
+                        <span>Offset \( a \) &mdash; it shifts the whole curve</span>
+                    </label>
+                    <label class="option">
+                        <input type="radio" name="pe-q1" value="1">
+                        <span>Velocity \( b \) &mdash; it tilts the curve</span>
+                    </label>
+                    <label class="option">
+                        <input type="radio" name="pe-q1" value="2">
+                        <span>Acceleration \( c \) &mdash; it controls the curvature</span>
+                    </label>
+                    <label class="option">
+                        <input type="radio" name="pe-q1" value="3">
+                        <span>All three affect &chi;&sup2; equally</span>
+                    </label>
+                </div>
+                <div class="question-actions">
+                    <button class="btn-verify">Verify</button>
+                </div>
+                <div class="question-explanation" style="display: none;">
+                    <div class="question-explanation-title">Explanation</div>
+                    <div class="question-explanation-text">
+                        The data extends to \( t = 10 \), so the \( c\,t^2 \) term reaches
+                        \( c \times 100 = 490 \).  A 1% change in \( c \) shifts the model by
+                        ~5 at \( t = 10 \).  In contrast, a 1-unit change in \( a \) shifts the
+                        model by just 1.  The quadratic term dominates, making \( c \) the most
+                        sensitive parameter.
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Q2: Fill -->
+        <div class="tab-content">
+            <div class="question-container" data-type="fill" data-answer="4.9[4.2,5.6]">
+                <div class="question-text">
+                    Set \( a = 0 \) and \( b = 0 \), then adjust \( c \) to minimise &chi;&sup2;.
+                    What best-fit value of \( c \) do you find?
+                    <br><br>
+                    \( c_{\text{best}} \approx \) <input type="text" class="fill-blank" placeholder="value">
+                </div>
+                <div class="question-actions">
+                    <button class="btn-verify">Verify</button>
+                </div>
+                <div class="question-explanation" style="display: none;">
+                    <div class="question-explanation-title">Explanation</div>
+                    <div class="question-explanation-text">
+                        The true value is \( c = g/2 = 4.9 \).  With noise in the data, your
+                        best-fit will be close but not exact.  Click "New Data" a few times to
+                        see how the best fit varies from dataset to dataset.
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Q3: MCQ -->
+        <div class="tab-content">
+            <div class="question-container" data-type="mcq" data-answer="1">
+                <div class="question-text">
+                    Try setting \( a = 10, b = -2 \).  Can you still find a good fit by
+                    adjusting \( c \)?  What does this tell you?
+                </div>
+                <div class="question-options">
+                    <label class="option">
+                        <input type="radio" name="pe-q3" value="0">
+                        <span>No &mdash; wrong \( a \) and \( b \) make a good fit impossible</span>
+                    </label>
+                    <label class="option">
+                        <input type="radio" name="pe-q3" value="1">
+                        <span>Yes &mdash; the parameters can partly compensate for each other</span>
+                    </label>
+                    <label class="option">
+                        <input type="radio" name="pe-q3" value="2">
+                        <span>Yes &mdash; only \( c \) matters, so \( a \) and \( b \) are irrelevant</span>
+                    </label>
+                </div>
+                <div class="question-actions">
+                    <button class="btn-verify">Verify</button>
+                </div>
+                <div class="question-explanation" style="display: none;">
+                    <div class="question-explanation-title">Explanation</div>
+                    <div class="question-explanation-text">
+                        When you set \( a = 10 \) and \( b = -2 \), the offset and linear terms
+                        partly cancel each other for intermediate \( t \), and the quadratic term
+                        can still be adjusted to approximate the data.  This is <strong>parameter
+                        correlation</strong> &mdash; different parameter combinations can produce
+                        similar curves, which is why the &chi;&sup2; contours are elliptical.
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<hr>
+
+<!-- ========== EXPLORER 2: PARAMETER SWEEP ========== -->
+
+<h2>Automated 1D Parameter Sweep</h2>
+
+<p>
+    Instead of dragging a slider, let the computer scan one parameter across its
+    full range while the other two stay fixed.  The result is a &chi;&sup2; curve
+    whose minimum gives the best value of that parameter (conditional on the fixed
+    values of the others).  Use the dropdown to choose which parameter to sweep.
+</p>
+
+<div class="interactive-container" id="param-sweep">
+    <div class="interactive-title">Interactive: Parameter Sweep</div>
+
+    <div class="plot-container">
+        <div id="ps-sweep-plot" style="width: 100%; height: 400px;"></div>
+    </div>
+
+    <div id="ps-stats"
+         style="display: flex; justify-content: center; gap: 1.5rem; padding: 8px 0; font-size: 0.85rem; color: #c8c8e0; flex-wrap: wrap;">
+    </div>
+
+    <div class="control-panel">
+        <div class="control-group">
+            <label class="control-label">Sweep parameter:
+                <span class="control-label-value">c (acceleration)</span>
+            </label>
+            <select id="ps-param-select"
+                    style="width: 100%; padding: 8px 12px; background: #1a1f3a; color: #c8c8e0; border: 1px solid #2a2f4a; border-radius: 6px; font-size: 0.85rem; cursor: pointer;">
+                <option value="a">a (offset)</option>
+                <option value="b">b (velocity)</option>
+                <option value="c" selected>c (acceleration)</option>
+            </select>
+        </div>
+        <div class="control-group">
+            <label class="control-label">Fixed a:
+                <span class="control-label-value">0.0</span>
+            </label>
+            <input type="range" class="slider" id="ps-fixed-a" min="-30" max="30" step="0.5" value="0">
+        </div>
+        <div class="control-group">
+            <label class="control-label">Fixed b:
+                <span class="control-label-value">0.0</span>
+            </label>
+            <input type="range" class="slider" id="ps-fixed-b" min="-10" max="10" step="0.1" value="0">
+        </div>
+        <div class="control-group">
+            <label class="control-label">Fixed c:
+                <span class="control-label-value">4.9</span>
+            </label>
+            <input type="range" class="slider" id="ps-fixed-c" min="2" max="8" step="0.05" value="4.9">
+        </div>
+        <div class="btn-group">
+            <button class="btn" onclick="newSweepData()">New Data</button>
+            <button class="btn" onclick="resetSweepExplorer()">Reset</button>
+        </div>
+    </div>
+</div>
+
+<div class="info-box">
+    <div class="info-box-title">Key Insight</div>
+    <p>
+        The width of the &chi;&sup2; parabola tells you how well that parameter is
+        constrained.  A <strong>narrow</strong> parabola (like for \( c \)) means the data pins
+        down that parameter tightly.  A <strong>wide, shallow</strong> parabola (like for \( a \))
+        means the data barely constrains it.  This is directly related to the parameter
+        uncertainty you'll compute in automated fitting.
+    </p>
+</div>
+
+<!-- Test Your Understanding #2 -->
+<div class="interactive-container question-section">
+    <div class="interactive-title">Test Your Understanding</div>
+
+    <p style="margin-bottom: var(--spacing-md); color: var(--text-secondary);">
+        Use the Parameter Sweep explorer to answer these questions.
+    </p>
+
+    <div class="tabs">
+        <div class="tab-buttons">
+            <button class="tab-button active">Question 4</button>
+            <button class="tab-button">Question 5</button>
+            <button class="tab-button">Question 6</button>
+        </div>
+
+        <!-- Q4: MCQ -->
+        <div class="tab-content active">
+            <div class="question-container" data-type="mcq" data-answer="0">
+                <div class="question-text">
+                    Sweep parameter \( c \) with \( a = 0, b = 0 \).  Then sweep \( a \)
+                    with \( b = 0, c = 4.9 \).  Which parabola is narrower?
+                </div>
+                <div class="question-options">
+                    <label class="option">
+                        <input type="radio" name="pe-q4" value="0">
+                        <span>The \( c \) sweep is much narrower &mdash; \( c \) is tightly constrained</span>
+                    </label>
+                    <label class="option">
+                        <input type="radio" name="pe-q4" value="1">
+                        <span>The \( a \) sweep is narrower &mdash; \( a \) is tightly constrained</span>
+                    </label>
+                    <label class="option">
+                        <input type="radio" name="pe-q4" value="2">
+                        <span>Both are equally wide</span>
+                    </label>
+                </div>
+                <div class="question-actions">
+                    <button class="btn-verify">Verify</button>
+                </div>
+                <div class="question-explanation" style="display: none;">
+                    <div class="question-explanation-title">Explanation</div>
+                    <div class="question-explanation-text">
+                        The \( c \) parabola is much narrower because the quadratic term
+                        \( c\,t^2 \) dominates the model at large \( t \).  Even a small
+                        change in \( c \) produces a large model deviation, so &chi;&sup2; rises
+                        steeply.  The offset \( a \) has much less leverage, giving a wide,
+                        shallow parabola and a larger uncertainty on \( a \).
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Q5: Fill -->
+        <div class="tab-content">
+            <div class="question-container" data-type="fill" data-answer="0[0,0]|0.0[0,0]">
+                <div class="question-text">
+                    Sweep \( b \) with \( a = 0, c = 4.9 \).  The minimum of the parabola
+                    should be near the true value \( b_{\text{true}} \).  What is this true value?
+                    <br><br>
+                    \( b_{\text{true}} = \) <input type="text" class="fill-blank" placeholder="value">
+                </div>
+                <div class="question-actions">
+                    <button class="btn-verify">Verify</button>
+                </div>
+                <div class="question-explanation" style="display: none;">
+                    <div class="question-explanation-title">Explanation</div>
+                    <div class="question-explanation-text">
+                        The Galileo model is \( d = \frac{1}{2}g\,t^2 \) with zero initial velocity,
+                        so \( b_{\text{true}} = 0 \).  The sweep minimum should be near zero, though
+                        noise may shift it slightly.  A nonzero best-fit \( b \) would suggest the
+                        ball had some initial velocity &mdash; which our simulation doesn't include.
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Q6: MCQ -->
+        <div class="tab-content">
+            <div class="question-container" data-type="mcq" data-answer="2">
+                <div class="question-text">
+                    Fix \( a = 10 \) (wrong value) and sweep \( c \).  Compare the minimum
+                    &chi;&sup2; to the case with \( a = 0 \).  What happens?
+                </div>
+                <div class="question-options">
+                    <label class="option">
+                        <input type="radio" name="pe-q6" value="0">
+                        <span>The minimum &chi;&sup2; is the same in both cases</span>
+                    </label>
+                    <label class="option">
+                        <input type="radio" name="pe-q6" value="1">
+                        <span>The minimum &chi;&sup2; drops to zero with \( a = 10 \)</span>
+                    </label>
+                    <label class="option">
+                        <input type="radio" name="pe-q6" value="2">
+                        <span>The minimum &chi;&sup2; is higher with \( a = 10 \) &mdash; forcing a wrong value worsens the fit</span>
+                    </label>
+                </div>
+                <div class="question-actions">
+                    <button class="btn-verify">Verify</button>
+                </div>
+                <div class="question-explanation" style="display: none;">
+                    <div class="question-explanation-title">Explanation</div>
+                    <div class="question-explanation-text">
+                        Fixing a parameter at a wrong value constrains the optimisation.
+                        The best fit with \( a = 10 \) can only adjust \( c \) to compensate,
+                        but a constant offset can't mimic a quadratic &mdash; the residual
+                        &chi;&sup2; is necessarily higher.  This is why automated fitting
+                        optimises all parameters simultaneously.
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<hr>
+
+<!-- ========== EXPLORER 3: ITERATIVE SEARCH ========== -->
+
+<h2>Playing Human Optimizer</h2>
+
+<p>
+    Here's a strategy that actually works: optimise one parameter at a time.
+    Fix \( a \) and \( b \), find the best \( c \).  Then fix \( a \) and \( c \),
+    find the best \( b \).  Then fix \( b \) and \( c \), find the best \( a \).
+    Repeat.  This is <strong>coordinate descent</strong> &mdash; simple but effective.
+    Click "Step" to perform one round, or "Auto-Run" to watch it converge.
+</p>
+
+<div class="interactive-container" id="iterative-search">
+    <div class="interactive-title">Interactive: Iterative Search (Coordinate Descent)</div>
+
+    <div style="display: flex; gap: 0.5rem; flex-wrap: wrap;">
+        <div class="plot-container" style="flex: 1; min-width: 280px;">
+            <div id="is-fit-plot" style="width: 100%; height: 380px;"></div>
+        </div>
+        <div class="plot-container" style="flex: 1; min-width: 280px;">
+            <div id="is-history-plot" style="width: 100%; height: 380px;"></div>
+        </div>
+    </div>
+
+    <div id="is-stats"
+         style="display: flex; justify-content: center; gap: 1.5rem; padding: 8px 0; font-size: 0.85rem; color: #c8c8e0; flex-wrap: wrap;">
+    </div>
+
+    <div class="control-panel">
+        <div class="control-group">
+            <label class="control-label">Start a:
+                <span class="control-label-value">15.0</span>
+            </label>
+            <input type="range" class="slider" id="is-start-a" min="-30" max="30" step="0.5" value="15">
+        </div>
+        <div class="control-group">
+            <label class="control-label">Start b:
+                <span class="control-label-value">-5.0</span>
+            </label>
+            <input type="range" class="slider" id="is-start-b" min="-10" max="10" step="0.1" value="-5">
+        </div>
+        <div class="control-group">
+            <label class="control-label">Start c:
+                <span class="control-label-value">3.0</span>
+            </label>
+            <input type="range" class="slider" id="is-start-c" min="2" max="8" step="0.05" value="3">
+        </div>
+        <div class="btn-group">
+            <button class="btn" onclick="stepCoordinateDescent()">Step</button>
+            <button class="btn" onclick="autoRunDescent()">Auto-Run</button>
+            <button class="btn" onclick="resetIterativeExplorer()">Reset</button>
+        </div>
+    </div>
+</div>
+
+<div class="info-box">
+    <div class="info-box-title">Key Insight</div>
+    <p>
+        Coordinate descent converges quickly when the parameters are nearly independent
+        (circular &chi;&sup2; contours) but slowly when they're correlated (elongated ellipses).
+        Watch the &chi;&sup2; history: it drops rapidly at first, then plateaus.
+        Automated algorithms like Levenberg&ndash;Marquardt (used by <code>curve_fit</code>)
+        move in <em>all</em> directions simultaneously, converging much faster.
+    </p>
+</div>
+
+<!-- Test Your Understanding #3 -->
+<div class="interactive-container question-section">
+    <div class="interactive-title">Test Your Understanding</div>
+
+    <p style="margin-bottom: var(--spacing-md); color: var(--text-secondary);">
+        Use the Iterative Search explorer to answer these questions.
+    </p>
+
+    <div class="tabs">
+        <div class="tab-buttons">
+            <button class="tab-button active">Question 7</button>
+            <button class="tab-button">Question 8</button>
+            <button class="tab-button">Question 9</button>
+        </div>
+
+        <!-- Q7: MCQ -->
+        <div class="tab-content active">
+            <div class="question-container" data-type="mcq" data-answer="1">
+                <div class="question-text">
+                    Click "Auto-Run".  How many rounds does coordinate descent typically
+                    take to converge (until &chi;&sup2; stops changing)?
+                </div>
+                <div class="question-options">
+                    <label class="option">
+                        <input type="radio" name="pe-q7" value="0">
+                        <span>Exactly 1 round &mdash; each parameter only needs one pass</span>
+                    </label>
+                    <label class="option">
+                        <input type="radio" name="pe-q7" value="1">
+                        <span>3&ndash;5 rounds &mdash; parameters interact and need refinement</span>
+                    </label>
+                    <label class="option">
+                        <input type="radio" name="pe-q7" value="2">
+                        <span>More than 20 rounds &mdash; it's a very slow algorithm</span>
+                    </label>
+                </div>
+                <div class="question-actions">
+                    <button class="btn-verify">Verify</button>
+                </div>
+                <div class="question-explanation" style="display: none;">
+                    <div class="question-explanation-title">Explanation</div>
+                    <div class="question-explanation-text">
+                        For this quadratic model, coordinate descent typically converges in
+                        3&ndash;5 rounds.  The first round gets you close; subsequent rounds
+                        refine as parameters adjust to each other's new values.
+                        Highly correlated parameters would require more rounds.
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Q8: Fill -->
+        <div class="tab-content">
+            <div class="question-container" data-type="fill" data-answer="4.9[4.2,5.6]">
+                <div class="question-text">
+                    After convergence, what is the final value of \( c \)?
+                    <br><br>
+                    \( c_{\text{final}} \approx \) <input type="text" class="fill-blank" placeholder="value">
+                </div>
+                <div class="question-actions">
+                    <button class="btn-verify">Verify</button>
+                </div>
+                <div class="question-explanation" style="display: none;">
+                    <div class="question-explanation-title">Explanation</div>
+                    <div class="question-explanation-text">
+                        Regardless of the starting point, coordinate descent converges to
+                        \( c \approx 4.9 \), the true value.  Try starting from a very
+                        different initial guess to verify that the answer doesn't depend
+                        on where you begin.
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Q9: MSQ -->
+        <div class="tab-content">
+            <div class="question-container" data-type="msq" data-answer="1,2">
+                <div class="question-text">
+                    What are the advantages of automated fitting algorithms over manual
+                    coordinate descent? (Select all that apply.)
+                </div>
+                <div class="question-options">
+                    <label class="option">
+                        <input type="checkbox" value="0">
+                        <span>They always find the global minimum (never get stuck)</span>
+                    </label>
+                    <label class="option">
+                        <input type="checkbox" value="1">
+                        <span>They move in all parameter directions simultaneously</span>
+                    </label>
+                    <label class="option">
+                        <input type="checkbox" value="2">
+                        <span>They automatically compute parameter uncertainties</span>
+                    </label>
+                    <label class="option">
+                        <input type="checkbox" value="3">
+                        <span>They don't require an initial guess</span>
+                    </label>
+                </div>
+                <div class="question-actions">
+                    <button class="btn-verify">Verify</button>
+                </div>
+                <div class="question-explanation" style="display: none;">
+                    <div class="question-explanation-title">Explanation</div>
+                    <div class="question-explanation-text">
+                        <ul>
+                            <li><strong>False:</strong> Most algorithms (including Levenberg&ndash;Marquardt) find <em>local</em> minima. For non-linear models, bad initial guesses can lead to wrong answers.</li>
+                            <li><strong>True:</strong> Algorithms like L&ndash;M use the gradient and curvature (Jacobian/Hessian) to step in the optimal direction, not just along one axis at a time.</li>
+                            <li><strong>True:</strong> The covariance matrix from the fit gives parameter uncertainties automatically &mdash; a huge practical advantage.</li>
+                            <li><strong>False:</strong> All iterative algorithms need an initial guess. Bad guesses can cause convergence failure, which is why building intuition manually is valuable.</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<hr>
+
+<!-- ========== PYTHON CODE ========== -->
+
+<h2>Python Code</h2>
+
+<p>Here's how to sweep parameters and implement coordinate descent in Python.</p>
+
+<div class="tabs">
+    <div class="tab-buttons">
+        <button class="tab-button active">Parameter Sweep</button>
+        <button class="tab-button">Coordinate Descent</button>
+        <button class="tab-button">Prompt</button>
+    </div>
+
+    <!-- Tab 1: Parameter Sweep -->
+    <div class="tab-content active">
+        <div class="code-block-container">
+            <div class="code-header">
+                <span class="code-lang">Python</span>
+                <button class="copy-btn">Copy</button>
+            </div>
+            <pre><code class="language-python">import numpy as np
+import plotly.graph_objects as go
+
+# Galileo's data: d = (g/2)t², g = 9.8
+g_true = 9.8
+times = np.arange(1, 11)
+d_true = 0.5 * g_true * times**2
+
+# Noisy measurements (5 trials, 15% noise)
+rng = np.random.default_rng(42)
+data = np.array([d_true + rng.normal(0, 0.15 * d_true)
+                 for _ in range(5)])
+means = data.mean(axis=0)
+errors = data.std(axis=0, ddof=1) / np.sqrt(4)
+
+# 1D sweep of parameter c (with a=0, b=0)
+c_values = np.linspace(2, 8, 500)
+chi2_c = [np.sum(((means - c * times**2) / errors)**2)
+          for c in c_values]
+
+# Find minimum
+c_best = c_values[np.argmin(chi2_c)]
+
+fig = go.Figure()
+fig.add_trace(go.Scatter(
+    x=c_values, y=chi2_c, mode='lines',
+    line=dict(color='#00f3ff', width=2),
+    name='χ²(c)'))
+fig.add_trace(go.Scatter(
+    x=[c_best], y=[min(chi2_c)], mode='markers',
+    marker=dict(size=12, color='#ffff00', symbol='star'),
+    name=f'Min: c = {c_best:.3f}'))
+fig.update_layout(
+    template='plotly_dark',
+    title=f'Parameter sweep — best c = {c_best:.3f}',
+    xaxis_title='Parameter c', yaxis_title='χ²')
+fig.show()</code></pre>
+        </div>
+    </div>
+
+    <!-- Tab 2: Coordinate Descent -->
+    <div class="tab-content">
+        <div class="code-block-container">
+            <div class="code-header">
+                <span class="code-lang">Python</span>
+                <button class="copy-btn">Copy</button>
+            </div>
+            <pre><code class="language-python">import numpy as np
+
+def chi2(a, b, c, means, errors, times):
+    model = a + b * times + c * times**2
+    return np.sum(((means - model) / errors)**2)
+
+def optimize_1d(param_idx, params, means, errors, times):
+    """Sweep one parameter, return its best value."""
+    sweep = np.linspace([-30, -10, 2][param_idx],
+                        [30, 10, 8][param_idx], 1000)
+    best_val, best_chi2 = params[param_idx], np.inf
+    for v in sweep:
+        p = list(params)
+        p[param_idx] = v
+        c2 = chi2(*p, means, errors, times)
+        if c2 < best_chi2:
+            best_chi2, best_val = c2, v
+    return best_val
+
+# Coordinate descent
+params = [15.0, -5.0, 3.0]  # bad initial guess
+for rnd in range(10):
+    for idx in range(3):
+        params[idx] = optimize_1d(idx, params, means, errors, times)
+    c2 = chi2(*params, means, errors, times)
+    print(f"Round {rnd+1}: a={params[0]:.2f}, "
+          f"b={params[1]:.2f}, c={params[2]:.3f}, χ²={c2:.1f}")
+    if rnd > 0 and abs(c2 - prev_chi2) < 0.01:
+        print("Converged!")
+        break
+    prev_chi2 = c2</code></pre>
+        </div>
+    </div>
+
+    <!-- Tab 3: Prompt -->
+    <div class="tab-content">
+        <div class="code-block-container">
+            <div class="code-header">
+                <span class="code-lang">Prompt for AI</span>
+                <button class="copy-btn">Copy</button>
+            </div>
+            <pre><code class="language-text">Build a parameter exploration tool in Python for the model d = a + bt + ct².
+
+Setup:
+- Generate Galileo's data: d = (g/2)t² at t = 1..10, 15% Gaussian noise, 5 trials
+- Compute means and standard errors
+
+Tasks:
+1. Sweep one parameter (e.g., c from 2 to 8) while fixing a=0, b=0
+   - Plot χ²(c) and find the minimum
+2. Implement coordinate descent: optimise a, b, c one at a time, repeat
+   - Start from a bad guess (a=15, b=-5, c=3)
+   - Print parameter values and χ² after each round
+   - Stop when χ² changes by less than 0.01
+
+Use plotly_dark template. Gray axes (#808080), cyan data (#00f3ff).</code></pre>
+        </div>
+
+        <div class="info-box" style="margin-top: var(--spacing-md);">
+            <div class="info-box-title">Tips for Prompting</div>
+            <ul>
+                <li>Specify the three-parameter model explicitly</li>
+                <li>Ask for convergence criteria (e.g., &Delta;&chi;&sup2; &lt; 0.01)</li>
+                <li>Request both visual output and numerical progress tables</li>
+                <li>Compare the coordinate descent result with the known true values</li>
+            </ul>
+        </div>
+    </div>
+</div>
+
+<hr>
+
+<!-- ========== EXERCISES ========== -->
+
+<h2>Exercises for Practice</h2>
+
+<div class="exercise-cards">
+    <div class="exercise-card">
+        <div class="exercise-card-header">
+            <span class="exercise-card-number">1.</span>
+            <span class="exercise-card-badge explore">Explore</span>
+        </div>
+        <div class="exercise-card-content">
+            In the Parameter Playground, set \( c = 4.9 \) (the true value) and try
+            different combinations of \( a \) and \( b \).  How large can you make
+            \( a \) and \( b \) before &chi;&sup2; increases noticeably?  Which
+            parameter is the model more sensitive to?
+        </div>
+    </div>
+
+    <div class="exercise-card">
+        <div class="exercise-card-header">
+            <span class="exercise-card-number">2.</span>
+            <span class="exercise-card-badge coding">Coding</span>
+        </div>
+        <div class="exercise-card-content">
+            Modify the coordinate descent code to track and plot the path
+            \( (a, c) \) over iterations on top of the &chi;&sup2; contour plot
+            from Section 2.5.  Does the path follow the valley of the ellipse?
+        </div>
+    </div>
+
+    <div class="exercise-card">
+        <div class="exercise-card-header">
+            <span class="exercise-card-number">3.</span>
+            <span class="exercise-card-badge think">Think</span>
+        </div>
+        <div class="exercise-card-content">
+            Coordinate descent optimises one parameter at a time.  Why might this be
+            slow for highly correlated parameters?  (Hint: think about what the
+            &chi;&sup2; contours look like for correlated parameters, and how
+            stepping along one axis at a time navigates a narrow diagonal valley.)
+        </div>
+    </div>
+</div>
+
+<hr>
+
+<!-- ========== NAVIGATION ========== -->
+
+<div class="btn-group mt-xl">
+    <button class="btn btn-magenta" onclick="navigateToSection('11-chi-squared')">&larr; Previous: The &chi;&sup2; Criterion</button>
+    <button class="btn" onclick="scrollToTop()">&uarr; Back to Top</button>
+    <button class="btn btn-secondary" onclick="navigateToSection('13-automated-fitting')">Next: Automated Fitting &rarr;</button>
+</div>

@@ -1,0 +1,799 @@
+<!-- Section 2.8: Model Selection — Simple vs Complex -->
+<!-- Source: Lecture2.nb (Part 4) -->
+<!-- Core concept: Choosing the right model complexity -->
+<!-- Time: ~20 minutes -->
+<!-- Prerequisites: Section 2.7 (Automated Fitting) -->
+
+<h1>Model Selection: Simple vs Complex</h1>
+
+<p>
+    You've seen that adding parameters always reduces &chi;&sup2; &mdash; a 5-parameter
+    model will <em>never</em> fit worse than a 3-parameter one.  So why not always
+    use the most complex model available?  Because extra parameters can fit
+    <strong>noise</strong>, not physics.  This section teaches you to choose the
+    simplest model that captures the real signal &mdash; no more, no less.
+</p>
+
+<div class="info-box">
+    <div class="info-box-title">Learning Objectives</div>
+    <ul>
+        <li>Understand why more parameters doesn't mean a better model</li>
+        <li>Recognise overfitting by comparing training and test performance</li>
+        <li>Use &chi;&sup2;/dof and the BIC to choose model complexity</li>
+        <li>Apply the parsimony principle: simplest model that fits the data</li>
+    </ul>
+</div>
+
+<div class="equation-display">
+    <p><strong>The model selection trade-off:</strong></p>
+    $$ \underbrace{\chi^2}_{\text{fit quality}} \;\;\text{vs}\;\;
+       \underbrace{k}_{\text{parameters}} $$
+    <p>
+        More parameters (\( k \)) always reduce &chi;&sup2;, but each new parameter
+        "uses up" a degree of freedom.  The reduced &chi;&sup2; = &chi;&sup2;/dof
+        (where dof = \( N - k \)) balances fit quality against model complexity.
+        A good model has &chi;&sup2;/dof &asymp; 1.
+    </p>
+</div>
+
+<hr>
+
+<!-- ========== EXPLORER 1: MODEL COMPARATOR ========== -->
+
+<h2>How Many Parameters Do You Need?</h2>
+
+<p>
+    The data comes from Galileo's experiment: \( d = \tfrac{1}{2}g\,t^2 \).
+    The <em>true</em> model has one shape parameter (the coefficient of \( t^2 \)).
+    Try fitting with 1 through 5 polynomial parameters and watch &chi;&sup2;/dof.
+    It starts high (underfitting), drops to &asymp; 1 (just right), and then
+    stays roughly there &mdash; the extra parameters aren't helping.
+</p>
+
+<div class="interactive-container" id="model-comparator">
+    <div class="interactive-title">Interactive: Model Comparator</div>
+
+    <div style="display: flex; gap: 0.5rem; flex-wrap: wrap;">
+        <div class="plot-container" style="flex: 1; min-width: 280px;">
+            <div id="ms-comp-data-plot" style="width: 100%; height: 380px;"></div>
+        </div>
+        <div class="plot-container" style="flex: 1; min-width: 280px;">
+            <div id="ms-comp-chi2-plot" style="width: 100%; height: 380px;"></div>
+        </div>
+    </div>
+
+    <div id="ms-comp-stats"
+         style="display: flex; justify-content: center; gap: 1.5rem; padding: 8px 0; font-size: 0.85rem; color: #c8c8e0; flex-wrap: wrap;">
+    </div>
+
+    <div class="control-panel">
+        <div class="control-group">
+            <label class="control-label">Model complexity:
+                <span class="control-label-value">a&#x2080; + a&#x2081;t + a&#x2082;t&sup2; (3-param)</span>
+            </label>
+            <select id="ms-comp-select"
+                    style="width: 100%; padding: 8px 12px; background: #1a1f3a; color: #c8c8e0; border: 1px solid #2a2f4a; border-radius: 6px; font-size: 0.85rem; cursor: pointer;">
+                <option value="1">a&#x2080; (1-param: constant)</option>
+                <option value="2">a&#x2080; + a&#x2081;t (2-param: linear)</option>
+                <option value="3" selected>a&#x2080; + a&#x2081;t + a&#x2082;t&sup2; (3-param)</option>
+                <option value="4">+ a&#x2083;t&sup3; (4-param: cubic)</option>
+                <option value="5">+ a&#x2084;t&#x2074; (5-param: quartic)</option>
+            </select>
+        </div>
+        <div class="btn-group">
+            <button class="btn" onclick="newComparatorData()">New Data</button>
+            <button class="btn" onclick="resetComparatorExplorer()">Reset</button>
+        </div>
+    </div>
+</div>
+
+<div class="info-box">
+    <div class="info-box-title">Key Insight</div>
+    <p>
+        A 1-parameter constant obviously can't fit a parabola &mdash;
+        &chi;&sup2;/dof is enormous.  Going from 1 to 3 parameters gives a
+        dramatic improvement.  But going from 3 to 5?  &chi;&sup2;/dof barely
+        changes because the extra terms (t&sup3;, t&#x2074;) are fitting
+        <em>noise fluctuations</em>, not real physics.  The green dashed line
+        marks &chi;&sup2;/dof = 1 &mdash; the sweet spot.
+    </p>
+</div>
+
+<!-- Test Your Understanding #1 -->
+<div class="interactive-container question-section">
+    <div class="interactive-title">Test Your Understanding</div>
+
+    <p style="margin-bottom: var(--spacing-md); color: var(--text-secondary);">
+        Use the Model Comparator to answer these questions.
+    </p>
+
+    <div class="tabs">
+        <div class="tab-buttons">
+            <button class="tab-button active">Question 1</button>
+            <button class="tab-button">Question 2</button>
+            <button class="tab-button">Question 3</button>
+        </div>
+
+        <!-- Q1: MCQ -->
+        <div class="tab-content active">
+            <div class="question-container" data-type="mcq" data-answer="2">
+                <div class="question-text">
+                    Which model gives &chi;&sup2;/dof closest to 1?
+                </div>
+                <div class="question-options">
+                    <label class="option">
+                        <input type="radio" name="ms-q1" value="0">
+                        <span>1-param (constant)</span>
+                    </label>
+                    <label class="option">
+                        <input type="radio" name="ms-q1" value="1">
+                        <span>2-param (linear)</span>
+                    </label>
+                    <label class="option">
+                        <input type="radio" name="ms-q1" value="2">
+                        <span>3-param (quadratic)</span>
+                    </label>
+                    <label class="option">
+                        <input type="radio" name="ms-q1" value="3">
+                        <span>5-param (quartic)</span>
+                    </label>
+                </div>
+                <div class="question-actions">
+                    <button class="btn-verify">Verify</button>
+                </div>
+                <div class="question-explanation" style="display: none;">
+                    <div class="question-explanation-title">Explanation</div>
+                    <div class="question-explanation-text">
+                        The true model is a pure quadratic \( d = \tfrac{1}{2}g\,t^2 \), which
+                        has three shape parameters in the general polynomial form
+                        \( a_0 + a_1 t + a_2 t^2 \) (even though \( a_0 \) and \( a_1 \) should
+                        be near zero).  The 3-param model typically gives &chi;&sup2;/dof
+                        closest to 1.  Simpler models underfit; more complex models waste
+                        degrees of freedom without improving the fit.
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Q2: MCQ -->
+        <div class="tab-content">
+            <div class="question-container" data-type="mcq" data-answer="0">
+                <div class="question-text">
+                    When you go from 3 to 5 parameters, what happens to &chi;&sup2;?
+                </div>
+                <div class="question-options">
+                    <label class="option">
+                        <input type="radio" name="ms-q2" value="0">
+                        <span>It decreases slightly (or stays the same)</span>
+                    </label>
+                    <label class="option">
+                        <input type="radio" name="ms-q2" value="1">
+                        <span>It increases significantly</span>
+                    </label>
+                    <label class="option">
+                        <input type="radio" name="ms-q2" value="2">
+                        <span>It drops to zero</span>
+                    </label>
+                </div>
+                <div class="question-actions">
+                    <button class="btn-verify">Verify</button>
+                </div>
+                <div class="question-explanation" style="display: none;">
+                    <div class="question-explanation-title">Explanation</div>
+                    <div class="question-explanation-text">
+                        Adding parameters can only decrease &chi;&sup2; (or leave it unchanged),
+                        because the simpler model is a special case of the more complex one.
+                        But the decrease from 3 to 5 parameters is tiny &mdash; those extra
+                        terms are fitting noise, not signal.  And &chi;&sup2;/dof may actually
+                        <em>increase</em> because you lose 2 degrees of freedom for negligible
+                        improvement in &chi;&sup2;.
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Q3: Fill -->
+        <div class="tab-content">
+            <div class="question-container" data-type="fill" data-answer="7[5,10]">
+                <div class="question-text">
+                    For the 3-parameter model with 10 data points, how many
+                    degrees of freedom are there?
+                    <br><br>
+                    dof = N &minus; k = <input type="text" class="fill-blank" placeholder="value">
+                </div>
+                <div class="question-actions">
+                    <button class="btn-verify">Verify</button>
+                </div>
+                <div class="question-explanation" style="display: none;">
+                    <div class="question-explanation-title">Explanation</div>
+                    <div class="question-explanation-text">
+                        With \( N = 10 \) data points and \( k = 3 \) fitted parameters,
+                        the degrees of freedom are \( \text{dof} = 10 - 3 = 7 \).
+                        Each fitted parameter "uses up" one degree of freedom.
+                        If you had 10 parameters for 10 data points, dof = 0 and
+                        &chi;&sup2; would be exactly zero &mdash; a perfect fit that
+                        means nothing.
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<hr>
+
+<!-- ========== EXPLORER 2: OVERFITTING DEMONSTRATOR ========== -->
+
+<h2>The Danger of Overfitting</h2>
+
+<p>
+    Overfitting means your model memorises the noise in your training data
+    instead of learning the underlying pattern.  The telltale sign: the model
+    fits the training data beautifully but <strong>predicts new data poorly</strong>.
+    Watch the cyan training curve drop as you increase the polynomial degree &mdash;
+    but the red test curve rises after the sweet spot.
+</p>
+
+<div class="interactive-container" id="overfitting-demo">
+    <div class="interactive-title">Interactive: Overfitting Demonstrator</div>
+
+    <div style="display: flex; gap: 0.5rem; flex-wrap: wrap;">
+        <div class="plot-container" style="flex: 1; min-width: 280px;">
+            <div id="ms-overfit-data-plot" style="width: 100%; height: 380px;"></div>
+        </div>
+        <div class="plot-container" style="flex: 1; min-width: 280px;">
+            <div id="ms-overfit-err-plot" style="width: 100%; height: 380px;"></div>
+        </div>
+    </div>
+
+    <div id="ms-overfit-stats"
+         style="display: flex; justify-content: center; gap: 1.5rem; padding: 8px 0; font-size: 0.85rem; color: #c8c8e0; flex-wrap: wrap;">
+    </div>
+
+    <div class="control-panel">
+        <div class="control-group">
+            <label class="control-label">Training points:
+                <span class="control-label-value">10</span>
+            </label>
+            <input type="range" class="slider" id="ms-npts-slider"
+                   min="6" max="20" step="1" value="10">
+        </div>
+        <div class="control-group">
+            <label class="control-label">Polynomial degree:
+                <span class="control-label-value">2</span>
+            </label>
+            <input type="range" class="slider" id="ms-degree-slider"
+                   min="1" max="8" step="1" value="2">
+        </div>
+        <div class="btn-group">
+            <button class="btn" onclick="newOverfitData()">New Data</button>
+            <button class="btn" onclick="resetOverfitExplorer()">Reset</button>
+        </div>
+    </div>
+</div>
+
+<div class="info-box">
+    <div class="info-box-title">Key Insight</div>
+    <p>
+        The right panel tells the whole story.  <strong>Training error</strong>
+        (cyan) always decreases with more parameters &mdash; more knobs to turn,
+        better fit.  <strong>Test error</strong> (red) initially decreases too,
+        but after degree 2 it starts to rise.  That's overfitting: the high-degree
+        polynomial wiggles through the training points but wildly misses new data.
+        The optimal model complexity is where test error is minimised &mdash;
+        typically degree 2 for our quadratic data.
+    </p>
+</div>
+
+<!-- Test Your Understanding #2 -->
+<div class="interactive-container question-section">
+    <div class="interactive-title">Test Your Understanding</div>
+
+    <p style="margin-bottom: var(--spacing-md); color: var(--text-secondary);">
+        Use the Overfitting Demonstrator to answer these questions.
+    </p>
+
+    <div class="tabs">
+        <div class="tab-buttons">
+            <button class="tab-button active">Question 4</button>
+            <button class="tab-button">Question 5</button>
+            <button class="tab-button">Question 6</button>
+        </div>
+
+        <!-- Q4: MCQ -->
+        <div class="tab-content active">
+            <div class="question-container" data-type="mcq" data-answer="2">
+                <div class="question-text">
+                    As you increase the polynomial degree from 2 to 7, the training
+                    &chi;&sup2;/dof:
+                </div>
+                <div class="question-options">
+                    <label class="option">
+                        <input type="radio" name="ms-q4" value="0">
+                        <span>Increases steadily</span>
+                    </label>
+                    <label class="option">
+                        <input type="radio" name="ms-q4" value="1">
+                        <span>Stays approximately constant</span>
+                    </label>
+                    <label class="option">
+                        <input type="radio" name="ms-q4" value="2">
+                        <span>Decreases toward zero</span>
+                    </label>
+                </div>
+                <div class="question-actions">
+                    <button class="btn-verify">Verify</button>
+                </div>
+                <div class="question-explanation" style="display: none;">
+                    <div class="question-explanation-title">Explanation</div>
+                    <div class="question-explanation-text">
+                        Training &chi;&sup2; always decreases with more parameters.  With
+                        a high enough degree, the polynomial passes through (or very near)
+                        every training point, making &chi;&sup2; approach zero.  But this
+                        is a <em>bad</em> thing &mdash; the model has memorised the noise.
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Q5: MCQ -->
+        <div class="tab-content">
+            <div class="question-container" data-type="mcq" data-answer="1">
+                <div class="question-text">
+                    At what degree does the test error (red curve) typically reach
+                    its minimum?
+                </div>
+                <div class="question-options">
+                    <label class="option">
+                        <input type="radio" name="ms-q5" value="0">
+                        <span>Degree 1 (linear)</span>
+                    </label>
+                    <label class="option">
+                        <input type="radio" name="ms-q5" value="1">
+                        <span>Degree 2 (quadratic)</span>
+                    </label>
+                    <label class="option">
+                        <input type="radio" name="ms-q5" value="2">
+                        <span>Degree 5 (quintic)</span>
+                    </label>
+                    <label class="option">
+                        <input type="radio" name="ms-q5" value="3">
+                        <span>The highest available degree</span>
+                    </label>
+                </div>
+                <div class="question-actions">
+                    <button class="btn-verify">Verify</button>
+                </div>
+                <div class="question-explanation" style="display: none;">
+                    <div class="question-explanation-title">Explanation</div>
+                    <div class="question-explanation-text">
+                        The true model is a degree-2 polynomial (\( d = \tfrac{1}{2}g\,t^2 \)).
+                        A degree-2 fit captures the real signal without fitting noise, so it
+                        predicts new data best.  Higher degrees overfit the training noise
+                        and predict poorly; lower degrees underfit and miss the curvature.
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Q6: MSQ -->
+        <div class="tab-content">
+            <div class="question-container" data-type="msq" data-answer="0,2">
+                <div class="question-text">
+                    Which are signs of overfitting?
+                    <strong>(Select all that apply)</strong>
+                </div>
+                <div class="question-options">
+                    <label class="option">
+                        <input type="checkbox" value="0">
+                        <span>The fit curve wiggles wildly between data points</span>
+                    </label>
+                    <label class="option">
+                        <input type="checkbox" value="1">
+                        <span>&chi;&sup2;/dof &asymp; 1</span>
+                    </label>
+                    <label class="option">
+                        <input type="checkbox" value="2">
+                        <span>Test error is much larger than training error</span>
+                    </label>
+                    <label class="option">
+                        <input type="checkbox" value="3">
+                        <span>The fitted curve follows the true model</span>
+                    </label>
+                </div>
+                <div class="question-actions">
+                    <button class="btn-verify">Verify</button>
+                </div>
+                <div class="question-explanation" style="display: none;">
+                    <div class="question-explanation-title">Explanation</div>
+                    <div class="question-explanation-text">
+                        <ul>
+                            <li><strong>True:</strong> Wild oscillations between points is the
+                                hallmark of overfitting &mdash; the polynomial contorts to hit
+                                each noisy point.</li>
+                            <li><strong>False:</strong> &chi;&sup2;/dof &asymp; 1 indicates a
+                                <em>good</em> fit, not overfitting.</li>
+                            <li><strong>True:</strong> A large gap between training and test
+                                performance is the defining feature of overfitting.</li>
+                            <li><strong>False:</strong> If the curve follows the true model,
+                                you have a good fit, not an overfit.</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<hr>
+
+<!-- ========== EXPLORER 3: PARSIMONY METER ========== -->
+
+<h2>The Parsimony Principle</h2>
+
+<p>
+    How do we formalise "simplest model that fits"?  Two tools:
+    <strong>&chi;&sup2;/dof</strong> (should be &asymp; 1) and the
+    <strong>Bayesian Information Criterion</strong> (BIC = &chi;&sup2; + k &middot; ln N),
+    which explicitly penalises extra parameters.  Lower BIC = better model.
+    Toggle the "Extra Signal" button to add a linear term \( bt \) to the
+    true model, and watch how BIC correctly adjusts its recommendation.
+</p>
+
+<div class="interactive-container" id="parsimony-meter">
+    <div class="interactive-title">Interactive: Parsimony Meter</div>
+
+    <div style="display: flex; gap: 0.5rem; flex-wrap: wrap;">
+        <div class="plot-container" style="flex: 1; min-width: 280px;">
+            <div id="ms-pars-chi2-plot" style="width: 100%; height: 380px;"></div>
+        </div>
+        <div class="plot-container" style="flex: 1; min-width: 280px;">
+            <div id="ms-pars-bic-plot" style="width: 100%; height: 380px;"></div>
+        </div>
+    </div>
+
+    <div id="ms-pars-stats"
+         style="display: flex; justify-content: center; gap: 1.5rem; padding: 8px 0; font-size: 0.85rem; color: #c8c8e0; flex-wrap: wrap;">
+    </div>
+
+    <div class="control-panel">
+        <div class="control-group">
+            <label class="control-label">Noise level (&sigma;%):
+                <span class="control-label-value">15</span>
+            </label>
+            <input type="range" class="slider" id="ms-pars-noise-slider"
+                   min="5" max="40" step="1" value="15">
+        </div>
+        <div class="btn-group">
+            <button class="btn" id="ms-extra-signal-btn"
+                    data-active="false"
+                    style="background: #2a2f4a; color: #c8c8e0; transition: all 0.2s;"
+                    onclick="toggleExtraSignal()">Extra Signal: OFF</button>
+            <button class="btn" onclick="newParsimonyData()">New Data</button>
+            <button class="btn" onclick="resetParsimonyExplorer()">Reset</button>
+        </div>
+    </div>
+</div>
+
+<div class="info-box">
+    <div class="info-box-title">Key Insight</div>
+    <p>
+        With "Extra Signal: OFF" the true model is \( d = ct^2 \).  BIC correctly
+        favours a simpler model (1&ndash;2 params).  Now turn it ON &mdash; the true
+        model becomes \( d = bt + ct^2 \).  BIC shifts to favour 2&ndash;3 params
+        because the linear term is <em>real signal</em>, not noise.  The penalty
+        \( k \cdot \ln N \) prevents BIC from rewarding unnecessary complexity but
+        allows it when the data genuinely needs more parameters.
+    </p>
+</div>
+
+<!-- Test Your Understanding #3 -->
+<div class="interactive-container question-section">
+    <div class="interactive-title">Test Your Understanding</div>
+
+    <p style="margin-bottom: var(--spacing-md); color: var(--text-secondary);">
+        Use the Parsimony Meter to answer these questions.
+    </p>
+
+    <div class="tabs">
+        <div class="tab-buttons">
+            <button class="tab-button active">Question 7</button>
+            <button class="tab-button">Question 8</button>
+            <button class="tab-button">Question 9</button>
+        </div>
+
+        <!-- Q7: MCQ -->
+        <div class="tab-content active">
+            <div class="question-container" data-type="mcq" data-answer="1">
+                <div class="question-text">
+                    With "Extra Signal: OFF", which model does BIC typically favour?
+                </div>
+                <div class="question-options">
+                    <label class="option">
+                        <input type="radio" name="ms-q7" value="0">
+                        <span>1-param (constant)</span>
+                    </label>
+                    <label class="option">
+                        <input type="radio" name="ms-q7" value="1">
+                        <span>1- or 2-param (depends on noise realisation)</span>
+                    </label>
+                    <label class="option">
+                        <input type="radio" name="ms-q7" value="2">
+                        <span>5-param (always the most complex)</span>
+                    </label>
+                </div>
+                <div class="question-actions">
+                    <button class="btn-verify">Verify</button>
+                </div>
+                <div class="question-explanation" style="display: none;">
+                    <div class="question-explanation-title">Explanation</div>
+                    <div class="question-explanation-text">
+                        The true model is \( d = ct^2 \), which is a 1-parameter family
+                        (only the \( t^2 \) coefficient).  BIC penalises extra parameters via
+                        \( k \cdot \ln N \), so it tends to pick the simplest adequate model.
+                        With noisy data, sometimes the 2-param model wins slightly, but
+                        BIC almost never selects the most complex model.  Click "New Data"
+                        several times to see the variation.
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Q8: MCQ -->
+        <div class="tab-content">
+            <div class="question-container" data-type="mcq" data-answer="2">
+                <div class="question-text">
+                    What does the BIC penalty term \( k \cdot \ln N \) do?
+                </div>
+                <div class="question-options">
+                    <label class="option">
+                        <input type="radio" name="ms-q8" value="0">
+                        <span>It always selects the simplest model</span>
+                    </label>
+                    <label class="option">
+                        <input type="radio" name="ms-q8" value="1">
+                        <span>It makes &chi;&sup2; larger</span>
+                    </label>
+                    <label class="option">
+                        <input type="radio" name="ms-q8" value="2">
+                        <span>It adds a cost for each extra parameter, preventing overfitting</span>
+                    </label>
+                </div>
+                <div class="question-actions">
+                    <button class="btn-verify">Verify</button>
+                </div>
+                <div class="question-explanation" style="display: none;">
+                    <div class="question-explanation-title">Explanation</div>
+                    <div class="question-explanation-text">
+                        BIC = &chi;&sup2; + k &middot; ln(N).  Each additional parameter adds
+                        ln(N) to the BIC score.  This means a more complex model must reduce
+                        &chi;&sup2; by at least ln(N) per parameter to be preferred.  It
+                        doesn't always pick the simplest model &mdash; if the data genuinely
+                        needs more parameters, the &chi;&sup2; reduction outweighs the penalty.
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Q9: Fill -->
+        <div class="tab-content">
+            <div class="question-container" data-type="fill" data-answer="2.3[1.5,3.0]">
+                <div class="question-text">
+                    For \( N = 10 \) data points, what is the BIC penalty per
+                    extra parameter?
+                    <br><br>
+                    ln(10) &asymp; <input type="text" class="fill-blank" placeholder="value">
+                </div>
+                <div class="question-actions">
+                    <button class="btn-verify">Verify</button>
+                </div>
+                <div class="question-explanation" style="display: none;">
+                    <div class="question-explanation-title">Explanation</div>
+                    <div class="question-explanation-text">
+                        \( \ln(10) \approx 2.30 \).  So adding one parameter to BIC costs
+                        about 2.3 units.  The model must reduce &chi;&sup2; by at least 2.3
+                        for BIC to consider the extra parameter worthwhile.  With more data
+                        points (larger \( N \)), the penalty grows &mdash; you need even
+                        stronger evidence to justify complexity.
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<hr>
+
+<!-- ========== PYTHON CODE ========== -->
+
+<h2>Python Code</h2>
+
+<p>Here's the Python equivalent for model selection analysis.</p>
+
+<div class="tabs">
+    <div class="tab-buttons">
+        <button class="tab-button active">Model Comparison</button>
+        <button class="tab-button">Overfitting Demo</button>
+        <button class="tab-button">Prompt</button>
+    </div>
+
+    <!-- Tab 1: Model comparison -->
+    <div class="tab-content active">
+        <div class="code-block-container">
+            <div class="code-header">
+                <span class="code-lang">Python</span>
+                <button class="copy-btn">Copy</button>
+            </div>
+            <pre><code class="language-python">import numpy as np
+from scipy.optimize import curve_fit
+
+# Galileo data with noise
+rng = np.random.default_rng(42)
+t = np.arange(1, 11, dtype=float)
+d_true = 0.5 * 9.8 * t**2
+noise = 0.15 * d_true
+d_obs = d_true + rng.normal(0, noise)
+
+# Define models of increasing complexity
+models = {
+    'Linear':    lambda t, a, b: a + b*t,
+    'Quadratic': lambda t, a, b, c: a + b*t + c*t**2,
+    'Cubic':     lambda t, a, b, c, d: a + b*t + c*t**2 + d*t**3,
+}
+
+N = len(t)
+for name, func in models.items():
+    popt, pcov = curve_fit(func, t, d_obs, sigma=noise,
+                           absolute_sigma=True)
+    k = len(popt)
+    residuals = d_obs - func(t, *popt)
+    chi2 = np.sum((residuals / noise)**2)
+    dof = N - k
+    bic = chi2 + k * np.log(N)
+
+    print(f"{name:10s}  k={k}  chi2/dof={chi2/dof:.2f}  BIC={bic:.1f}")</code></pre>
+        </div>
+    </div>
+
+    <!-- Tab 2: Overfitting demo -->
+    <div class="tab-content">
+        <div class="code-block-container">
+            <div class="code-header">
+                <span class="code-lang">Python</span>
+                <button class="copy-btn">Copy</button>
+            </div>
+            <pre><code class="language-python">import numpy as np
+import plotly.graph_objects as go
+from plotly.subplots import make_subplots
+
+rng = np.random.default_rng(0)
+t_train = np.sort(rng.uniform(0.5, 10.5, 10))
+d_true = 0.5 * 9.8 * t_train**2
+noise = 0.15 * d_true
+d_train = d_true + rng.normal(0, noise)
+
+# Hold-out test set
+t_test = np.array([2.5, 4.5, 6.5, 8.5, 10.0])
+d_test = 0.5*9.8*t_test**2 + rng.normal(0, 0.15*0.5*9.8*t_test**2)
+
+train_err, test_err, degrees = [], [], []
+for deg in range(1, 9):
+    coeffs = np.polyfit(t_train, d_train, deg, w=1/noise)
+    poly = np.poly1d(coeffs)
+    train_chi2 = np.sum(((d_train - poly(t_train))/noise)**2)
+    test_chi2 = np.sum(((d_test - poly(t_test))/(0.15*0.5*9.8*t_test**2))**2)
+    dof = len(t_train) - (deg+1)
+    degrees.append(deg)
+    train_err.append(train_chi2/max(dof,1))
+    test_err.append(test_chi2/len(t_test))
+
+fig = go.Figure()
+fig.add_trace(go.Scatter(x=degrees, y=train_err, name='Train chi2/dof'))
+fig.add_trace(go.Scatter(x=degrees, y=test_err, name='Test chi2/pt'))
+fig.add_hline(y=1, line_dash='dash', line_color='green')
+fig.update_layout(template='plotly_dark',
+    xaxis_title='Polynomial Degree', yaxis_title='chi2 / point')
+fig.show()</code></pre>
+        </div>
+    </div>
+
+    <!-- Tab 3: Prompt -->
+    <div class="tab-content">
+        <div class="code-block-container">
+            <div class="code-header">
+                <span class="code-lang">Prompt for AI</span>
+                <button class="copy-btn">Copy</button>
+            </div>
+            <pre><code class="language-text">Build a model selection analysis in Python:
+
+Setup:
+- Galileo's data: d = (g/2)t² at t = 1..10, 15% relative Gaussian noise
+- 5 trials per time point, compute mean and standard error
+
+Tasks:
+1. Fit polynomial models from degree 0 to degree 7
+   - For each: compute χ², χ²/dof, and BIC = χ² + k·ln(N)
+   - Print a comparison table
+
+2. Create a train/test split (80/20)
+   - Plot training error and test error vs polynomial degree
+   - Identify the optimal degree (minimum test error)
+   - Show the classic overfitting curve
+
+3. For the optimal model, plot:
+   - Data with error bars + fit curve
+   - Residuals (should be random)
+   - Print the extracted g ± δg
+
+Use plotly_dark template. Gray axes (#808080).
+Mark the optimal model with a different color.</code></pre>
+        </div>
+
+        <div class="info-box" style="margin-top: var(--spacing-md);">
+            <div class="info-box-title">Tips for Prompting</div>
+            <ul>
+                <li>Always compare at least 3 model complexities</li>
+                <li>Ask for both &chi;&sup2;/dof and BIC &mdash; they sometimes disagree</li>
+                <li>Request a train/test split to see overfitting directly</li>
+                <li>Ask the AI to explain <em>why</em> it chose a particular model</li>
+            </ul>
+        </div>
+    </div>
+</div>
+
+<hr>
+
+<!-- ========== EXERCISES ========== -->
+
+<h2>Exercises for Practice</h2>
+
+<div class="exercise-cards">
+    <div class="exercise-card">
+        <div class="exercise-card-header">
+            <span class="exercise-card-number">1.</span>
+            <span class="exercise-card-badge explore">Explore</span>
+        </div>
+        <div class="exercise-card-content">
+            In the Overfitting Demonstrator, set training points to 6 and increase
+            the degree to 5.  What happens to the fit curve between the data points?
+            Now increase to 20 training points and try degree 5 again.  Why is
+            overfitting less severe with more data?
+        </div>
+    </div>
+
+    <div class="exercise-card">
+        <div class="exercise-card-header">
+            <span class="exercise-card-number">2.</span>
+            <span class="exercise-card-badge coding">Coding</span>
+        </div>
+        <div class="exercise-card-content">
+            Write a Python script that fits Galileo data with polynomial degrees
+            0 through 8 and plots BIC vs degree.  Repeat for 3 different noise
+            realisations.  Does BIC consistently pick the right model?
+        </div>
+    </div>
+
+    <div class="exercise-card">
+        <div class="exercise-card-header">
+            <span class="exercise-card-number">3.</span>
+            <span class="exercise-card-badge think">Think</span>
+        </div>
+        <div class="exercise-card-content">
+            In the Parsimony Meter, toggle "Extra Signal" ON and OFF while
+            watching the BIC panel.  Explain in your own words why BIC picks
+            a different model in each case.  What would happen if you had
+            100 data points instead of 10 &mdash; would BIC become more or
+            less decisive?
+        </div>
+    </div>
+</div>
+
+<hr>
+
+<!-- ========== NAVIGATION ========== -->
+
+<div class="btn-group mt-xl">
+    <button class="btn btn-magenta" onclick="navigateToSection('13-automated-fitting')">&larr; Previous: Automated Fitting</button>
+    <button class="btn" onclick="scrollToTop()">&uarr; Back to Top</button>
+    <button class="btn btn-secondary" onclick="navigateToSection('15-fitting-uncertainties')">Next: Error Bars in Fitting &rarr;</button>
+</div>

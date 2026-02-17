@@ -1,0 +1,801 @@
+<!-- Section 2.3: From Samples to Populations — Error Bars -->
+<!-- Source: Lecture1.nb (Part 3) -->
+<!-- Core concept: Computing and interpreting error bars -->
+<!-- Time: ~20 minutes -->
+<!-- Prerequisites: Section 2.2 (Random Variables) -->
+
+<h1>From Samples to Populations: Error Bars</h1>
+
+<p>
+    You measure the acceleration due to gravity and get \( g = 9.7 \; \text{m/s}^2 \).
+    Is that good? Bad? Meaningless &mdash; without an error bar, there's no way to tell.
+    An error bar transforms a number into a <em>statement about the world</em>: "my measurement
+    says \( g \) is probably between 9.5 and 9.9." This section teaches you how to compute
+    that range from your data, honestly and correctly.
+</p>
+
+<div class="info-box">
+    <div class="info-box-title">Learning Objectives</div>
+    <ul>
+        <li>Compute the sample mean \( \bar{X} \) and sample standard deviation \( s \) from data</li>
+        <li>Understand why we divide by \( N-1 \) instead of \( N \) (Bessel's correction)</li>
+        <li>Calculate the standard error: \( s/\sqrt{N-1} \)</li>
+        <li>Use error bars to judge whether two measurements agree</li>
+    </ul>
+</div>
+
+<hr>
+
+<!-- ========== EXPLORER 1: ERROR BAR BUILDER ========== -->
+
+<h2>Building an Error Bar from Scratch</h2>
+
+<p>
+    Imagine measuring \( g \) by timing a falling ball. Each measurement gives a slightly different
+    answer because of reaction time, air currents, and other random noise. The explorer below
+    simulates this: it generates \( N \) "measurements" of \( g = 9.8 \; \text{m/s}^2 \)
+    with controllable noise, then computes the error bar. Watch how the yellow band shrinks
+    as you collect more data.
+</p>
+
+<div class="interactive-container" id="error-bar-builder">
+    <div class="interactive-title">Interactive: Error Bar Builder</div>
+
+    <div class="plot-container">
+        <div id="eb-builder-plot" style="width: 100%; height: 400px;"></div>
+    </div>
+
+    <div id="eb-builder-stats"
+         style="display: flex; justify-content: center; gap: 1.5rem; padding: 8px 0; font-size: 0.85rem; color: #c8c8e0; flex-wrap: wrap;">
+    </div>
+
+    <div class="control-panel">
+        <div class="control-group">
+            <label class="control-label">
+                N (measurements):
+                <span class="control-label-value">10</span>
+            </label>
+            <input type="range" class="slider" id="eb-n-slider"
+                   min="2" max="100" step="1" value="10">
+        </div>
+
+        <div class="control-group">
+            <label class="control-label">
+                Noise &sigma;:
+                <span class="control-label-value">1.00</span>
+            </label>
+            <input type="range" class="slider" id="eb-sigma-slider"
+                   min="0.1" max="2.0" step="0.1" value="1.0">
+        </div>
+
+        <div class="btn-group">
+            <button class="btn" onclick="newBuilderDraw()">New Measurements</button>
+            <button class="btn" onclick="resetBuilderExplorer()">Reset</button>
+        </div>
+    </div>
+</div>
+
+<p>
+    The practical formula that every physicist uses:
+</p>
+
+<p style="text-align: center; margin: 1rem 0;">
+    \[ \text{Result} = \bar{X} \pm \frac{s}{\sqrt{N-1}} \]
+</p>
+
+<p>
+    where \( \bar{X} \) is the sample mean, \( s = \sqrt{\frac{1}{N}\sum(x_i - \bar{X})^2} \)
+    is the sample standard deviation, and \( N \) is the number of measurements.
+    The quantity \( s/\sqrt{N-1} \) is the <strong>standard error of the mean</strong> &mdash;
+    it tells you how precisely you've pinned down the true value.
+</p>
+
+<div class="info-box">
+    <div class="info-box-title">Key Insight</div>
+    <p>
+        The <strong>yellow band</strong> is the error bar: the region \( \bar{X} \pm s/\sqrt{N-1} \).
+        The <strong>magenta line</strong> is the true value \( g = 9.8 \).
+        Click "New Measurements" several times &mdash; the true value falls inside the error bar
+        roughly 68% of the time. That's what a "one-sigma" error bar means: it captures the truth
+        about two-thirds of the time.
+    </p>
+</div>
+
+<!-- Test Your Understanding #1 -->
+<div class="interactive-container question-section">
+    <div class="interactive-title">Test Your Understanding</div>
+
+    <p style="margin-bottom: var(--spacing-md); color: var(--text-secondary);">
+        Use the error bar builder to answer these questions.
+    </p>
+
+    <div class="tabs">
+        <div class="tab-buttons">
+            <button class="tab-button active">Question 1</button>
+            <button class="tab-button">Question 2</button>
+            <button class="tab-button">Question 3</button>
+        </div>
+
+        <!-- Q1: MCQ -->
+        <div class="tab-content active">
+            <div class="question-container" data-type="mcq" data-answer="1">
+                <div class="question-text">
+                    Set N=10, &sigma;=1.0. Click "New Measurements" about 10 times.
+                    Roughly how often does the true value (magenta line) fall
+                    inside the yellow error band?
+                </div>
+                <div class="question-options">
+                    <label class="option">
+                        <input type="radio" name="eb-q1" value="0">
+                        <span>Always (100% of the time)</span>
+                    </label>
+                    <label class="option">
+                        <input type="radio" name="eb-q1" value="1">
+                        <span>Most of the time (~68%)</span>
+                    </label>
+                    <label class="option">
+                        <input type="radio" name="eb-q1" value="2">
+                        <span>About half the time</span>
+                    </label>
+                    <label class="option">
+                        <input type="radio" name="eb-q1" value="3">
+                        <span>Rarely (~10%)</span>
+                    </label>
+                </div>
+                <div class="question-actions">
+                    <button class="btn-verify">Verify</button>
+                </div>
+                <div class="question-explanation" style="display: none;">
+                    <div class="question-explanation-title">Explanation</div>
+                    <div class="question-explanation-text">
+                        A one-sigma error bar (\( \bar{X} \pm \sigma_{\bar{X}} \)) captures the true value
+                        about 68% of the time &mdash; roughly two out of three experiments. This is a
+                        fundamental property of the Gaussian distribution. If you want 95% coverage,
+                        you use a two-sigma bar: \( \bar{X} \pm 2\sigma_{\bar{X}} \).
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Q2: Fill -->
+        <div class="tab-content">
+            <div class="question-container" data-type="fill" data-answer="0.1[0.05,0.15]">
+                <div class="question-text">
+                    Set &sigma;=1.0 and N=100. Read the error \( s/\sqrt{N-1} \) from the stats readout.
+                    It should be approximately:
+                    <br><br>
+                    Error &asymp; <input type="text" class="fill-blank" placeholder="?">
+                </div>
+                <div class="question-actions">
+                    <button class="btn-verify">Verify</button>
+                </div>
+                <div class="question-explanation" style="display: none;">
+                    <div class="question-explanation-title">Explanation</div>
+                    <div class="question-explanation-text">
+                        With \( \sigma = 1.0 \) and \( N = 100 \):
+                        \( s/\sqrt{N-1} \approx 1.0/\sqrt{99} \approx 0.10 \).
+                        From a measurement with \( \sigma = 1 \) m/s&sup2;, averaging 100 measurements
+                        gives you a result precise to about \( \pm 0.1 \) m/s&sup2;. That's a 10&times;
+                        improvement over a single measurement, consistent with the \( 1/\sqrt{N} \) scaling
+                        you learned in Section 2.2.
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Q3: MSQ -->
+        <div class="tab-content">
+            <div class="question-container" data-type="msq" data-answer="1,2">
+                <div class="question-text">
+                    Which of the following will halve the error bar \( s/\sqrt{N-1} \)?
+                    <strong>(Select all that apply)</strong>
+                </div>
+                <div class="question-options">
+                    <label class="option">
+                        <input type="checkbox" value="0">
+                        <span>Double the number of measurements</span>
+                    </label>
+                    <label class="option">
+                        <input type="checkbox" value="1">
+                        <span>Quadruple the number of measurements</span>
+                    </label>
+                    <label class="option">
+                        <input type="checkbox" value="2">
+                        <span>Halve the measurement noise &sigma;</span>
+                    </label>
+                    <label class="option">
+                        <input type="checkbox" value="3">
+                        <span>Use only every other data point</span>
+                    </label>
+                </div>
+                <div class="question-actions">
+                    <button class="btn-verify">Verify</button>
+                </div>
+                <div class="question-explanation" style="display: none;">
+                    <div class="question-explanation-title">Explanation</div>
+                    <div class="question-explanation-text">
+                        <ul>
+                            <li><strong>Double N:</strong> Error scales as \( 1/\sqrt{N} \), so doubling N reduces
+                                error by \( 1/\sqrt{2} \approx 0.71 \) &mdash; helpful, but not a factor of 2.</li>
+                            <li><strong>Quadruple N:</strong> Reduces error by \( 1/\sqrt{4} = 1/2 \). Yes!</li>
+                            <li><strong>Halve &sigma;:</strong> Since \( s \propto \sigma \), halving the noise
+                                directly halves the error. Yes!</li>
+                            <li><strong>Use every other point:</strong> This <em>reduces</em> N, making the error
+                                <em>larger</em>. Never throw away good data.</li>
+                        </ul>
+                        Try both approaches in the explorer to verify.
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<hr>
+
+<!-- ========== EXPLORER 2: BESSEL'S CORRECTION ========== -->
+
+<h2>Why N&minus;1? Bessel's Correction</h2>
+
+<p>
+    Here's a subtle trap. When you compute the sample variance \( s^2 = \frac{1}{N}\sum(x_i - \bar{X})^2 \),
+    you're dividing by \( N \). But this <em>systematically underestimates</em> the true variance.
+    Why? Because you're measuring deviations from \( \bar{X} \) (your estimate) instead of from
+    \( \mu \) (the true mean) &mdash; and \( \bar{X} \) is always closer to the data than \( \mu \) is.
+    The fix is simple: divide by \( N-1 \) instead of \( N \).
+</p>
+
+<div class="interactive-container" id="bessel-correction">
+    <div class="interactive-title">Interactive: Bessel's Correction</div>
+
+    <div class="plot-container">
+        <div id="eb-bessel-plot" style="width: 100%; height: 400px;"></div>
+    </div>
+
+    <div id="eb-bessel-stats"
+         style="display: flex; justify-content: center; gap: 1.5rem; padding: 8px 0; font-size: 0.85rem; color: #c8c8e0; flex-wrap: wrap;">
+    </div>
+
+    <div class="control-panel">
+        <div class="control-group">
+            <label class="control-label">
+                N (samples per experiment):
+                <span class="control-label-value">5</span>
+            </label>
+            <input type="range" class="slider" id="eb-bessel-n-slider"
+                   min="2" max="50" step="1" value="5">
+        </div>
+
+        <div class="btn-group">
+            <button class="btn" onclick="newBesselDraw()">New Experiments</button>
+            <button class="btn" onclick="resetBesselExplorer()">Reset</button>
+        </div>
+    </div>
+</div>
+
+<p style="text-align: center; margin: 1rem 0;">
+    \[ \hat{\sigma}^2 = \frac{1}{N-1}\sum_{i=1}^{N}(x_i - \bar{X})^2 = \frac{N}{N-1}\,s^2 \]
+</p>
+
+<div class="info-box">
+    <div class="info-box-title">Key Insight</div>
+    <p>
+        The <strong>cyan histogram</strong> (dividing by \( N \)) is systematically shifted left &mdash;
+        it underestimates the true variance \( \sigma^2 = 4 \). The <strong>green histogram</strong>
+        (dividing by \( N-1 \)) is centered correctly on the true value. The bias is worst at small
+        \( N \): try N=2 vs N=50 to see how the correction becomes negligible for large samples.
+    </p>
+</div>
+
+<!-- Test Your Understanding #2 -->
+<div class="interactive-container question-section">
+    <div class="interactive-title">Test Your Understanding</div>
+
+    <p style="margin-bottom: var(--spacing-md); color: var(--text-secondary);">
+        Use the Bessel explorer to answer these questions.
+    </p>
+
+    <div class="tabs">
+        <div class="tab-buttons">
+            <button class="tab-button active">Question 1</button>
+            <button class="tab-button">Question 2</button>
+            <button class="tab-button">Question 3</button>
+        </div>
+
+        <!-- Q4: MCQ -->
+        <div class="tab-content active">
+            <div class="question-container" data-type="mcq" data-answer="1">
+                <div class="question-text">
+                    Set N=3. Which variance estimate has its histogram centered on
+                    the true value \( \sigma^2 = 4 \)?
+                </div>
+                <div class="question-options">
+                    <label class="option">
+                        <input type="radio" name="eb-q4" value="0">
+                        <span>Biased (&divide;N) &mdash; centered below 4</span>
+                    </label>
+                    <label class="option">
+                        <input type="radio" name="eb-q4" value="1">
+                        <span>Unbiased (&divide;(N&minus;1)) &mdash; centered at 4</span>
+                    </label>
+                    <label class="option">
+                        <input type="radio" name="eb-q4" value="2">
+                        <span>Both are equally accurate</span>
+                    </label>
+                    <label class="option">
+                        <input type="radio" name="eb-q4" value="3">
+                        <span>Neither is close to 4</span>
+                    </label>
+                </div>
+                <div class="question-actions">
+                    <button class="btn-verify">Verify</button>
+                </div>
+                <div class="question-explanation" style="display: none;">
+                    <div class="question-explanation-title">Explanation</div>
+                    <div class="question-explanation-text">
+                        With N=3, the biased estimate (&divide;N) averages to
+                        \( \sigma^2 \times (N-1)/N = 4 \times 2/3 \approx 2.67 \) &mdash; systematically
+                        too low. The unbiased estimate (&divide;(N-1)) averages to the true value 4.
+                        Check the stats readout to verify.
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Q5: Fill -->
+        <div class="tab-content">
+            <div class="question-container" data-type="fill" data-answer="2.67[2.2,3.2]">
+                <div class="question-text">
+                    With N=3, the biased estimate systematically averages to
+                    \( \sigma^2 \times (N-1)/N = 4 \times 2/3 \). This equals approximately:
+                    <br><br>
+                    Mean biased estimate &asymp; <input type="text" class="fill-blank" placeholder="?">
+                </div>
+                <div class="question-actions">
+                    <button class="btn-verify">Verify</button>
+                </div>
+                <div class="question-explanation" style="display: none;">
+                    <div class="question-explanation-title">Explanation</div>
+                    <div class="question-explanation-text">
+                        \( 4 \times 2/3 = 8/3 \approx 2.67 \). The biased estimate misses the true variance
+                        by a factor of \( (N-1)/N = 2/3 \) on average. With only 3 samples, that's a 33% underestimate!
+                        Bessel's correction (multiplying by \( N/(N-1) \)) exactly fixes this bias.
+                        Verify by reading the "Mean biased" value in the stats readout.
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Q6: MCQ -->
+        <div class="tab-content">
+            <div class="question-container" data-type="mcq" data-answer="2">
+                <div class="question-text">
+                    Increase N from 3 to 50. What happens to the difference between the
+                    biased and unbiased estimates?
+                </div>
+                <div class="question-options">
+                    <label class="option">
+                        <input type="radio" name="eb-q6" value="0">
+                        <span>The difference grows larger</span>
+                    </label>
+                    <label class="option">
+                        <input type="radio" name="eb-q6" value="1">
+                        <span>The difference stays the same</span>
+                    </label>
+                    <label class="option">
+                        <input type="radio" name="eb-q6" value="2">
+                        <span>They converge &mdash; the correction becomes negligible</span>
+                    </label>
+                    <label class="option">
+                        <input type="radio" name="eb-q6" value="3">
+                        <span>The biased estimate becomes more accurate</span>
+                    </label>
+                </div>
+                <div class="question-actions">
+                    <button class="btn-verify">Verify</button>
+                </div>
+                <div class="question-explanation" style="display: none;">
+                    <div class="question-explanation-title">Explanation</div>
+                    <div class="question-explanation-text">
+                        At N=50, the correction factor is \( N/(N-1) = 50/49 \approx 1.02 \) &mdash;
+                        a mere 2% difference. The histograms nearly overlap. Bessel's correction matters
+                        most for small samples. For N &gt; 30, the difference is usually negligible in practice.
+                        But for N=2 or N=3, it's crucial.
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<hr>
+
+<!-- ========== EXPLORER 3: MEASUREMENT COMPARISON ========== -->
+
+<h2>Do These Measurements Agree?</h2>
+
+<p>
+    Two labs both measure the speed of light. Lab A gets \( 2.998 \times 10^8 \pm 0.003 \) m/s;
+    Lab B gets \( 2.994 \times 10^8 \pm 0.004 \) m/s. Do they agree? The physicist's quick
+    heuristic: if the error bars overlap, the measurements are consistent. If they don't,
+    something interesting might be going on. The explorer below lets you test this intuition.
+</p>
+
+<div class="interactive-container" id="measurement-comparison">
+    <div class="interactive-title">Interactive: Do These Measurements Agree?</div>
+
+    <div class="plot-container">
+        <div id="eb-comp-plot" style="width: 100%; height: 380px;"></div>
+    </div>
+
+    <div id="eb-comp-stats"
+         style="display: flex; justify-content: center; gap: 1.5rem; padding: 8px 0; font-size: 0.85rem; color: #c8c8e0; flex-wrap: wrap;">
+    </div>
+
+    <div class="control-panel">
+        <div class="control-group">
+            <label class="control-label">
+                N (Lab A):
+                <span class="control-label-value">10</span>
+            </label>
+            <input type="range" class="slider" id="eb-comp-n1-slider"
+                   min="5" max="50" step="1" value="10">
+        </div>
+
+        <div class="control-group">
+            <label class="control-label">
+                N (Lab B):
+                <span class="control-label-value">10</span>
+            </label>
+            <input type="range" class="slider" id="eb-comp-n2-slider"
+                   min="5" max="50" step="1" value="10">
+        </div>
+
+        <div class="control-group">
+            <label class="control-label">
+                Noise &sigma;:
+                <span class="control-label-value">1.50</span>
+            </label>
+            <input type="range" class="slider" id="eb-comp-sigma-slider"
+                   min="0.5" max="3.0" step="0.1" value="1.5">
+        </div>
+
+        <div class="control-group">
+            <label class="control-label">
+                True value offset:
+                <span class="control-label-value">0.00</span>
+            </label>
+            <input type="range" class="slider" id="eb-comp-offset-slider"
+                   min="0" max="3.0" step="0.1" value="0">
+        </div>
+
+        <div class="btn-group">
+            <button class="btn" onclick="newCompDraw()">New Measurements</button>
+            <button class="btn" onclick="resetCompExplorer()">Reset</button>
+        </div>
+    </div>
+</div>
+
+<div class="info-box">
+    <div class="info-box-title">Key Insight</div>
+    <p>
+        When offset = 0, both labs measure the <em>same</em> quantity &mdash; their error bars should
+        usually overlap. Increase the offset and watch the error bars separate. The combined
+        uncertainty in the difference is \( \sqrt{\sigma_A^2 + \sigma_B^2} \). Physicists consider
+        measurements "significantly discrepant" when they differ by more than about 2&ndash;3 combined
+        uncertainties.
+    </p>
+</div>
+
+<!-- Test Your Understanding #3 -->
+<div class="interactive-container question-section">
+    <div class="interactive-title">Test Your Understanding</div>
+
+    <p style="margin-bottom: var(--spacing-md); color: var(--text-secondary);">
+        Experiment with the comparison explorer, then answer these.
+    </p>
+
+    <div class="tabs">
+        <div class="tab-buttons">
+            <button class="tab-button active">Question 1</button>
+            <button class="tab-button">Question 2</button>
+            <button class="tab-button">Question 3</button>
+        </div>
+
+        <!-- Q7: MCQ -->
+        <div class="tab-content active">
+            <div class="question-container" data-type="mcq" data-answer="0">
+                <div class="question-text">
+                    Set offset=0, N<sub>A</sub>=N<sub>B</sub>=10, &sigma;=1.5.
+                    Click "New Measurements" 10 times. Do the error bars usually overlap?
+                </div>
+                <div class="question-options">
+                    <label class="option">
+                        <input type="radio" name="eb-q7" value="0">
+                        <span>Yes &mdash; they overlap most of the time</span>
+                    </label>
+                    <label class="option">
+                        <input type="radio" name="eb-q7" value="1">
+                        <span>They overlap about half the time</span>
+                    </label>
+                    <label class="option">
+                        <input type="radio" name="eb-q7" value="2">
+                        <span>They rarely overlap</span>
+                    </label>
+                </div>
+                <div class="question-actions">
+                    <button class="btn-verify">Verify</button>
+                </div>
+                <div class="question-explanation" style="display: none;">
+                    <div class="question-explanation-title">Explanation</div>
+                    <div class="question-explanation-text">
+                        When both labs measure the same quantity (offset=0), their error bars overlap
+                        the vast majority of the time. Occasional non-overlap is expected &mdash; it
+                        doesn't mean someone made an error. It just means the random fluctuations
+                        happened to push both labs in opposite directions. That's statistics!
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Q8: Fill -->
+        <div class="tab-content">
+            <div class="question-container" data-type="fill" data-answer="0.5[0.45,0.55]">
+                <div class="question-text">
+                    Lab A reports \( \bar{X}_A = 10.2 \pm 0.3 \).
+                    Lab B reports \( \bar{X}_B = 9.5 \pm 0.4 \).
+                    The combined uncertainty in the difference is
+                    \( \sqrt{0.3^2 + 0.4^2} \) = :
+                    <br><br>
+                    Combined uncertainty = <input type="text" class="fill-blank" placeholder="?">
+                </div>
+                <div class="question-actions">
+                    <button class="btn-verify">Verify</button>
+                </div>
+                <div class="question-explanation" style="display: none;">
+                    <div class="question-explanation-title">Explanation</div>
+                    <div class="question-explanation-text">
+                        \( \sqrt{0.3^2 + 0.4^2} = \sqrt{0.09 + 0.16} = \sqrt{0.25} = 0.5 \).
+                        This is the famous 3-4-5 right triangle! The uncertainties add in quadrature
+                        (not linearly) because the errors are independent &mdash; the same rule as
+                        \( \text{Var}(A - B) = \text{Var}(A) + \text{Var}(B) \) from Section 2.2.
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Q9: MCQ -->
+        <div class="tab-content">
+            <div class="question-container" data-type="mcq" data-answer="0">
+                <div class="question-text">
+                    From Q8: the difference is \( |10.2 - 9.5| = 0.7 \), and the combined
+                    uncertainty is 0.5. The ratio 0.7/0.5 = 1.4. In physics, measurements are
+                    considered "significantly discrepant" when this ratio exceeds ~2&ndash;3.
+                    Are these measurements consistent?
+                </div>
+                <div class="question-options">
+                    <label class="option">
+                        <input type="radio" name="eb-q9" value="0">
+                        <span>Yes &mdash; 1.4&sigma; is below the ~2&sigma; threshold for concern</span>
+                    </label>
+                    <label class="option">
+                        <input type="radio" name="eb-q9" value="1">
+                        <span>No &mdash; any nonzero difference means they disagree</span>
+                    </label>
+                    <label class="option">
+                        <input type="radio" name="eb-q9" value="2">
+                        <span>No &mdash; 1.4&sigma; is already a significant discrepancy</span>
+                    </label>
+                    <label class="option">
+                        <input type="radio" name="eb-q9" value="3">
+                        <span>Cannot be determined without knowing the true value</span>
+                    </label>
+                </div>
+                <div class="question-actions">
+                    <button class="btn-verify">Verify</button>
+                </div>
+                <div class="question-explanation" style="display: none;">
+                    <div class="question-explanation-title">Explanation</div>
+                    <div class="question-explanation-text">
+                        A 1.4&sigma; discrepancy occurs by chance about 16% of the time &mdash;
+                        unremarkable. In particle physics, the convention is: 2&sigma; is "interesting,"
+                        3&sigma; is "evidence," and 5&sigma; is "discovery." A 1.4&sigma; difference
+                        is well within the range of normal statistical fluctuation. The measurements
+                        are consistent.
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<hr>
+
+<!-- ========== PYTHON CODE EXAMPLES ========== -->
+
+<h2>Python Code Examples</h2>
+
+<p>
+    Here's the Python code for computing error bars and comparing measurements.
+</p>
+
+<div class="tabs">
+    <div class="tab-buttons">
+        <button class="tab-button active">Computing Error Bars</button>
+        <button class="tab-button">Bessel's Correction</button>
+        <button class="tab-button">Prompt</button>
+    </div>
+
+    <!-- Tab 1: Computing Error Bars -->
+    <div class="tab-content active">
+        <div class="code-block-container">
+            <div class="code-header">
+                <span class="code-lang">Python</span>
+                <button class="copy-btn">Copy</button>
+            </div>
+            <pre><code class="language-python">import numpy as np
+import plotly.graph_objects as go
+
+# Simulate N measurements of g with noise
+true_g = 9.8
+sigma = 0.5     # measurement noise
+N = 20
+
+measurements = np.random.normal(true_g, sigma, N)
+x_bar = np.mean(measurements)
+s = np.std(measurements, ddof=0)      # biased sample std
+error = s / np.sqrt(N - 1)            # standard error of mean
+
+print(f"Sample mean:  X̄ = {x_bar:.3f} m/s²")
+print(f"Sample std:    s = {s:.3f}")
+print(f"Error bar:     s/√(N-1) = {error:.3f}")
+print(f"Result:        g = {x_bar:.2f} ± {error:.2f} m/s²")
+
+# Plot measurements with error bar
+fig = go.Figure()
+fig.add_trace(go.Scatter(
+    x=list(range(1, N+1)), y=measurements,
+    mode='markers', name='Measurements',
+    marker=dict(color='#00f3ff', size=8)))
+
+# Mean line and error band
+fig.add_hline(y=x_bar, line_dash='dash',
+    line_color='#ffff00', annotation_text=f'X̄={x_bar:.2f}')
+fig.add_hrect(y0=x_bar-error, y1=x_bar+error,
+    fillcolor='rgba(255,255,0,0.1)', line_width=0)
+fig.add_hline(y=true_g, line_dash='dot',
+    line_color='#ff00ff', annotation_text='True g')
+
+fig.update_layout(
+    template='plotly_dark',
+    title=f'g = {x_bar:.2f} ± {error:.2f} m/s²',
+    xaxis_title='Measurement #', yaxis_title='g (m/s²)')
+fig.show()</code></pre>
+        </div>
+    </div>
+
+    <!-- Tab 2: Bessel's Correction -->
+    <div class="tab-content">
+        <div class="code-block-container">
+            <div class="code-header">
+                <span class="code-lang">Python</span>
+                <button class="copy-btn">Copy</button>
+            </div>
+            <pre><code class="language-python">import numpy as np
+
+# Verify Bessel's correction with simulation
+N = 5
+n_experiments = 10000
+true_sigma_sq = 4.0   # σ² for Gaussian(μ=10, σ=2)
+
+biased = []
+unbiased = []
+for _ in range(n_experiments):
+    data = np.random.normal(10, 2, N)
+    biased.append(np.var(data, ddof=0))    # ÷N
+    unbiased.append(np.var(data, ddof=1))  # ÷(N-1)
+
+print(f"True σ²          = {true_sigma_sq}")
+print(f"Mean biased  (÷N)   = {np.mean(biased):.3f}")
+print(f"Mean unbiased (÷N-1) = {np.mean(unbiased):.3f}")
+print(f"Theory for biased    = {true_sigma_sq * (N-1)/N:.3f}")
+print()
+print("Bessel's correction works: ÷(N-1) gives the right answer!")
+print(f"Bias at N={N}: {(1 - (N-1)/N)*100:.0f}% underestimate")</code></pre>
+        </div>
+    </div>
+
+    <!-- Tab 3: Prompt -->
+    <div class="tab-content">
+        <div class="code-block-container">
+            <div class="code-header">
+                <span class="code-lang">Prompt for AI</span>
+                <button class="copy-btn">Copy</button>
+            </div>
+            <pre><code class="language-text">Create a Python script using NumPy and Plotly to demonstrate error bars:
+
+1. Simulate 20 measurements of g = 9.8 m/s² with Gaussian noise (σ=0.5).
+2. Compute the sample mean, sample std (ddof=0), and the standard error
+   s/√(N-1).
+3. Plot the measurements as scatter points with a horizontal mean line,
+   a shaded error band (X̄ ± error), and a reference line at the true
+   value g=9.8.
+4. Print the result in the form "g = X̄ ± error m/s²".
+
+Then verify Bessel's correction:
+5. Run 10,000 experiments of N=5 samples from Gaussian(10, 2).
+6. For each, compute both the biased (÷N) and unbiased (÷(N-1)) variance.
+7. Print the mean of each and compare to the true σ²=4.
+
+Use plotly_dark template with #00f3ff for data, #ffff00 for mean,
+#ff00ff for true value.</code></pre>
+        </div>
+
+        <div class="info-box" style="margin-top: var(--spacing-md);">
+            <div class="info-box-title">Tips for Prompting</div>
+            <ul>
+                <li>Specify <code>ddof=0</code> vs <code>ddof=1</code> explicitly &mdash; the default varies by library</li>
+                <li>Ask for both visual output and numerical verification</li>
+                <li>Describe the physics context, not just the math</li>
+                <li>Request comparison with theoretical predictions</li>
+            </ul>
+        </div>
+    </div>
+</div>
+
+<hr>
+
+<!-- ========== EXERCISES ========== -->
+
+<h2>Exercises for Practice</h2>
+
+<div class="exercise-cards">
+    <div class="exercise-card">
+        <div class="exercise-card-header">
+            <span class="exercise-card-number">1.</span>
+            <span class="exercise-card-badge explore">Explore</span>
+        </div>
+        <div class="exercise-card-content">
+            In the Error Bar Builder, set &sigma;=1.0 and try N = 5, 20, and 80.
+            Record the error bar width for each. Plot error vs \( 1/\sqrt{N-1} \)
+            &mdash; does it fall on a straight line through the origin?
+        </div>
+    </div>
+
+    <div class="exercise-card">
+        <div class="exercise-card-header">
+            <span class="exercise-card-number">2.</span>
+            <span class="exercise-card-badge coding">Coding</span>
+        </div>
+        <div class="exercise-card-content">
+            Write a Python script that generates 50 measurements of a known quantity
+            (your choice), computes \( \bar{X} \pm s/\sqrt{N-1} \), and checks whether
+            the true value falls inside the error bar. Repeat this 1000 times.
+            What fraction of the time does the true value land inside? Compare with 68%.
+        </div>
+    </div>
+
+    <div class="exercise-card">
+        <div class="exercise-card-header">
+            <span class="exercise-card-number">3.</span>
+            <span class="exercise-card-badge think">Think</span>
+        </div>
+        <div class="exercise-card-content">
+            Bessel's correction divides by \( N-1 \) instead of \( N \). This is sometimes
+            explained as "you lose one degree of freedom because you estimated the mean from the
+            same data." Explain in your own words why measuring deviations from \( \bar{X} \)
+            instead of \( \mu \) causes the sample variance to be biased low.
+            (Hint: can any data point be farther from \( \bar{X} \) than from a random other value?)
+        </div>
+    </div>
+</div>
+
+<hr>
+
+<!-- ========== NAVIGATION ========== -->
+
+<div class="btn-group mt-xl">
+    <button class="btn btn-magenta" onclick="navigateToSection('08-random-variables')">&larr; Previous: Random Variables</button>
+    <button class="btn" onclick="scrollToTop()">&uarr; Back to Top</button>
+    <button class="btn btn-secondary" onclick="navigateToSection('10-galileo-workflow')">Next: Galileo's Experiment &rarr;</button>
+</div>

@@ -1,0 +1,786 @@
+<!-- Section 2.7: Automated Fitting — From Data to Physics -->
+<!-- Source: Lecture2.nb (Part 3) -->
+<!-- Core concept: Using automated fitting to extract physical constants -->
+<!-- Time: ~20 minutes -->
+<!-- Prerequisites: Section 2.6 (Manual Parameter Exploration) -->
+
+<h1>Automated Fitting: From Data to Physics</h1>
+
+<p>
+    You've dragged sliders, swept parameters, and even played human optimizer.
+    Now it's time to let the computer do the work.  Automated fitting takes your
+    data and model, minimises &chi;&sup2; in one shot, and hands you the best-fit
+    parameters <em>with uncertainties</em>.  This is the workhorse of experimental
+    physics: from data to a number like \( g = 9.81 \pm 0.03 \; \text{m/s}^2 \).
+</p>
+
+<div class="info-box">
+    <div class="info-box-title">Learning Objectives</div>
+    <ul>
+        <li>Run an automated fit and interpret the output (parameters + uncertainties)</li>
+        <li>Extract a physical constant (\( g \)) from a fit coefficient</li>
+        <li>Understand what parameter uncertainties mean through repeated experiments</li>
+        <li>Use residual analysis to check whether a model is adequate</li>
+    </ul>
+</div>
+
+<div class="equation-display">
+    <p><strong>The fitting workflow:</strong></p>
+    $$ \text{Data} \; (t_i, d_i \pm \sigma_i) \;\xrightarrow{\text{minimise } \chi^2}\;
+       \text{Parameters} \; (a \pm \delta a, \; b \pm \delta b, \; c \pm \delta c)
+       \;\xrightarrow{\text{physics}}\; g = 2c \pm 2\delta c $$
+    <p>
+        The fitting algorithm finds the parameters that minimise &chi;&sup2;.
+        The covariance matrix gives uncertainties \( \delta a, \delta b, \delta c \).
+        Physics maps the fit coefficient \( c \) to the acceleration \( g = 2c \).
+    </p>
+</div>
+
+<hr>
+
+<!-- ========== EXPLORER 1: FIT WIZARD ========== -->
+
+<h2>One-Click Fitting</h2>
+
+<p>
+    Choose a model from the dropdown and watch the fit appear instantly.
+    The left panel shows data versus the fitted curve; the right panel compares
+    &chi;&sup2; across all three model complexities.  Notice how &chi;&sup2;
+    decreases (or stays the same) as you add parameters &mdash; but does the
+    improvement justify the extra complexity?
+</p>
+
+<div class="interactive-container" id="fit-wizard">
+    <div class="interactive-title">Interactive: Fit Wizard</div>
+
+    <div style="display: flex; gap: 0.5rem; flex-wrap: wrap;">
+        <div class="plot-container" style="flex: 1; min-width: 280px;">
+            <div id="af-data-plot" style="width: 100%; height: 380px;"></div>
+        </div>
+        <div class="plot-container" style="flex: 1; min-width: 280px;">
+            <div id="af-chi2-plot" style="width: 100%; height: 380px;"></div>
+        </div>
+    </div>
+
+    <div id="af-wiz-stats"
+         style="display: flex; justify-content: center; gap: 1.5rem; padding: 8px 0; font-size: 0.85rem; color: #c8c8e0; flex-wrap: wrap;">
+    </div>
+
+    <div class="control-panel">
+        <div class="control-group">
+            <label class="control-label">Model:
+                <span class="control-label-value">a + bt + ct&sup2; (3-param)</span>
+            </label>
+            <select id="af-model-select"
+                    style="width: 100%; padding: 8px 12px; background: #1a1f3a; color: #c8c8e0; border: 1px solid #2a2f4a; border-radius: 6px; font-size: 0.85rem; cursor: pointer;">
+                <option value="1">ct&sup2; (1-param)</option>
+                <option value="2">bt + ct&sup2; (2-param)</option>
+                <option value="3" selected>a + bt + ct&sup2; (3-param)</option>
+            </select>
+        </div>
+        <div class="btn-group">
+            <button class="btn" onclick="newWizardData()">New Data</button>
+            <button class="btn" onclick="resetWizardExplorer()">Reset</button>
+        </div>
+    </div>
+</div>
+
+<div class="info-box">
+    <div class="info-box-title">Key Insight</div>
+    <p>
+        Adding parameters <strong>always</strong> reduces &chi;&sup2; (or leaves it unchanged),
+        because the simpler model is a special case of the more complex one (with extra
+        parameters set to zero).  But the improvement may be tiny.  If going from 1-param
+        to 3-param barely changes &chi;&sup2;, the extra parameters aren't justified &mdash;
+        they're just fitting noise.  We'll formalise this in Section 2.8 (Model Selection).
+    </p>
+</div>
+
+<!-- Test Your Understanding #1 -->
+<div class="interactive-container question-section">
+    <div class="interactive-title">Test Your Understanding</div>
+
+    <p style="margin-bottom: var(--spacing-md); color: var(--text-secondary);">
+        Use the Fit Wizard to answer these questions.
+    </p>
+
+    <div class="tabs">
+        <div class="tab-buttons">
+            <button class="tab-button active">Question 1</button>
+            <button class="tab-button">Question 2</button>
+            <button class="tab-button">Question 3</button>
+        </div>
+
+        <!-- Q1: MCQ -->
+        <div class="tab-content active">
+            <div class="question-container" data-type="mcq" data-answer="2">
+                <div class="question-text">
+                    Switch between the three models.  What happens to &chi;&sup2;?
+                </div>
+                <div class="question-options">
+                    <label class="option">
+                        <input type="radio" name="af-q1" value="0">
+                        <span>It increases as you add parameters</span>
+                    </label>
+                    <label class="option">
+                        <input type="radio" name="af-q1" value="1">
+                        <span>It stays exactly the same</span>
+                    </label>
+                    <label class="option">
+                        <input type="radio" name="af-q1" value="2">
+                        <span>It decreases or stays the same</span>
+                    </label>
+                    <label class="option">
+                        <input type="radio" name="af-q1" value="3">
+                        <span>It first decreases, then increases</span>
+                    </label>
+                </div>
+                <div class="question-actions">
+                    <button class="btn-verify">Verify</button>
+                </div>
+                <div class="question-explanation" style="display: none;">
+                    <div class="question-explanation-title">Explanation</div>
+                    <div class="question-explanation-text">
+                        More parameters means more freedom to fit the data, so &chi;&sup2;
+                        can only decrease or stay the same.  The 1-param model is a special
+                        case of the 3-param model (with \( a = 0, b = 0 \)).  The optimiser
+                        always does at least as well as this special case.
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Q2: Fill -->
+        <div class="tab-content">
+            <div class="question-container" data-type="fill" data-answer="4.9[4.2,5.6]">
+                <div class="question-text">
+                    Select the 3-param model and read the fitted value of \( c \) from
+                    the stats.  It should be approximately:
+                    <br><br>
+                    \( c_{\text{fit}} \approx \) <input type="text" class="fill-blank" placeholder="value">
+                </div>
+                <div class="question-actions">
+                    <button class="btn-verify">Verify</button>
+                </div>
+                <div class="question-explanation" style="display: none;">
+                    <div class="question-explanation-title">Explanation</div>
+                    <div class="question-explanation-text">
+                        The true value is \( c = g/2 = 4.9 \).  The fitted value should be
+                        close, typically within the uncertainty \( \delta c \).
+                        Click "New Data" several times to see how it varies.
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Q3: MSQ -->
+        <div class="tab-content">
+            <div class="question-container" data-type="msq" data-answer="0,1">
+                <div class="question-text">
+                    If &chi;&sup2;/dof &gg; 1, which could explain this?
+                    <strong>(Select all that apply)</strong>
+                </div>
+                <div class="question-options">
+                    <label class="option">
+                        <input type="checkbox" value="0">
+                        <span>The model is a poor description of the data</span>
+                    </label>
+                    <label class="option">
+                        <input type="checkbox" value="1">
+                        <span>The error bars are underestimated</span>
+                    </label>
+                    <label class="option">
+                        <input type="checkbox" value="2">
+                        <span>The fit is excellent</span>
+                    </label>
+                    <label class="option">
+                        <input type="checkbox" value="3">
+                        <span>You have too many parameters</span>
+                    </label>
+                </div>
+                <div class="question-actions">
+                    <button class="btn-verify">Verify</button>
+                </div>
+                <div class="question-explanation" style="display: none;">
+                    <div class="question-explanation-title">Explanation</div>
+                    <div class="question-explanation-text">
+                        <ul>
+                            <li><strong>True:</strong> If the model can't capture the data's behaviour,
+                                residuals will be large and &chi;&sup2; inflated.</li>
+                            <li><strong>True:</strong> If \( \sigma_i \) are too small, even small residuals
+                                produce large \( (r_i/\sigma_i)^2 \) terms.</li>
+                            <li><strong>False:</strong> An excellent fit has &chi;&sup2;/dof &asymp; 1, not &gg; 1.</li>
+                            <li><strong>False:</strong> More parameters reduce &chi;&sup2;. Too <em>few</em>
+                                parameters cause &chi;&sup2;/dof &gg; 1.</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<hr>
+
+<!-- ========== EXPLORER 2: PHYSICS EXTRACTOR ========== -->
+
+<h2>From Fit Coefficient to Physical Constant</h2>
+
+<p>
+    The fit gives \( c \pm \delta c \).  Physics says \( g = 2c \), so
+    \( g = 2c \pm 2\delta c \).  But what does the uncertainty \( \delta g \)
+    actually <em>mean</em>?  This explorer runs many independent experiments,
+    fits each one, and builds a histogram of extracted \( g \) values.
+    The spread of the histogram should match the uncertainty from a single fit.
+</p>
+
+<div class="interactive-container" id="physics-extractor">
+    <div class="interactive-title">Interactive: Extracting g from Many Experiments</div>
+
+    <div class="plot-container">
+        <div id="af-hist-plot" style="width: 100%; height: 400px;"></div>
+    </div>
+
+    <div id="af-ext-stats"
+         style="display: flex; justify-content: center; gap: 1.5rem; padding: 8px 0; font-size: 0.85rem; color: #c8c8e0; flex-wrap: wrap;">
+    </div>
+
+    <div class="control-panel">
+        <div class="control-group">
+            <label class="control-label">Noise level (&sigma;%):
+                <span class="control-label-value">15</span>
+            </label>
+            <input type="range" class="slider" id="af-noise-slider"
+                   min="5" max="40" step="1" value="15">
+        </div>
+        <div class="control-group">
+            <label class="control-label">Number of experiments:
+                <span class="control-label-value">100</span>
+            </label>
+            <input type="range" class="slider" id="af-nexp-slider"
+                   min="20" max="200" step="10" value="100">
+        </div>
+        <div class="btn-group">
+            <button class="btn" onclick="newExtractorData()">New Experiments</button>
+            <button class="btn" onclick="resetExtractorExplorer()">Reset</button>
+        </div>
+    </div>
+</div>
+
+<div class="info-box">
+    <div class="info-box-title">Key Insight</div>
+    <p>
+        Compare <strong>std(g)</strong> (the actual scatter of extracted values) with
+        <strong>Typical &delta;g</strong> (the uncertainty from a single fit's covariance matrix).
+        They should be approximately equal.  This is the deep meaning of "uncertainty":
+        if you report \( g = 9.8 \pm 0.3 \), it means that repeating the experiment many
+        times would give values scattered with a standard deviation of about 0.3.
+    </p>
+</div>
+
+<!-- Test Your Understanding #2 -->
+<div class="interactive-container question-section">
+    <div class="interactive-title">Test Your Understanding</div>
+
+    <p style="margin-bottom: var(--spacing-md); color: var(--text-secondary);">
+        Use the Physics Extractor to answer these questions.
+    </p>
+
+    <div class="tabs">
+        <div class="tab-buttons">
+            <button class="tab-button active">Question 4</button>
+            <button class="tab-button">Question 5</button>
+            <button class="tab-button">Question 6</button>
+        </div>
+
+        <!-- Q4: MCQ -->
+        <div class="tab-content active">
+            <div class="question-container" data-type="mcq" data-answer="1">
+                <div class="question-text">
+                    What does the width of the \( g \) histogram represent?
+                </div>
+                <div class="question-options">
+                    <label class="option">
+                        <input type="radio" name="af-q4" value="0">
+                        <span>The true value of \( g \)</span>
+                    </label>
+                    <label class="option">
+                        <input type="radio" name="af-q4" value="1">
+                        <span>The typical uncertainty on \( g \) from a single experiment</span>
+                    </label>
+                    <label class="option">
+                        <input type="radio" name="af-q4" value="2">
+                        <span>The number of experiments</span>
+                    </label>
+                    <label class="option">
+                        <input type="radio" name="af-q4" value="3">
+                        <span>The noise level &sigma;</span>
+                    </label>
+                </div>
+                <div class="question-actions">
+                    <button class="btn-verify">Verify</button>
+                </div>
+                <div class="question-explanation" style="display: none;">
+                    <div class="question-explanation-title">Explanation</div>
+                    <div class="question-explanation-text">
+                        Each bar in the histogram is the \( g \) extracted from one independent
+                        experiment.  The spread (standard deviation) of this histogram equals the
+                        typical single-experiment uncertainty \( \delta g \).  The centre is the
+                        true value.
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Q5: Fill -->
+        <div class="tab-content">
+            <div class="question-container" data-type="fill" data-answer="9.8[8.5,11.0]">
+                <div class="question-text">
+                    With 15% noise and 100 experiments, the mean of extracted \( g \) values
+                    should be close to:
+                    <br><br>
+                    \( \langle g \rangle \approx \) <input type="text" class="fill-blank" placeholder="value">
+                </div>
+                <div class="question-actions">
+                    <button class="btn-verify">Verify</button>
+                </div>
+                <div class="question-explanation" style="display: none;">
+                    <div class="question-explanation-title">Explanation</div>
+                    <div class="question-explanation-text">
+                        The weighted least-squares estimator is unbiased, so the average of
+                        many experiments converges to the true value \( g = 9.8 \).  With 100
+                        experiments, \( \langle g \rangle \) should be within a few percent of 9.8.
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Q6: MSQ -->
+        <div class="tab-content">
+            <div class="question-container" data-type="msq" data-answer="0,2">
+                <div class="question-text">
+                    Which will make the \( g \) histogram narrower (more precise)?
+                    <strong>(Select all that apply)</strong>
+                </div>
+                <div class="question-options">
+                    <label class="option">
+                        <input type="checkbox" value="0">
+                        <span>More trials per time point (increasing N from 5 to 20)</span>
+                    </label>
+                    <label class="option">
+                        <input type="checkbox" value="1">
+                        <span>Higher noise level (increasing &sigma;% from 15 to 40)</span>
+                    </label>
+                    <label class="option">
+                        <input type="checkbox" value="2">
+                        <span>Lower noise level (decreasing &sigma;% from 15 to 5)</span>
+                    </label>
+                    <label class="option">
+                        <input type="checkbox" value="3">
+                        <span>Fewer total experiments (decreasing from 100 to 20)</span>
+                    </label>
+                </div>
+                <div class="question-actions">
+                    <button class="btn-verify">Verify</button>
+                </div>
+                <div class="question-explanation" style="display: none;">
+                    <div class="question-explanation-title">Explanation</div>
+                    <div class="question-explanation-text">
+                        <ul>
+                            <li><strong>True:</strong> More trials reduce the standard error at each
+                                time point, tightening the fit.</li>
+                            <li><strong>False:</strong> Higher noise makes each measurement less precise,
+                                <em>widening</em> the histogram.</li>
+                            <li><strong>True:</strong> Lower noise &rarr; smaller error bars &rarr; tighter
+                                fit &rarr; narrower histogram. Try 5% vs 40% to see.</li>
+                            <li><strong>False:</strong> Fewer experiments means fewer bars in the histogram,
+                                but each individual fit's precision is unchanged.</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<hr>
+
+<!-- ========== EXPLORER 3: RESIDUAL INSPECTOR ========== -->
+
+<h2>Are the Residuals Random?</h2>
+
+<p>
+    After fitting, always check the <strong>residuals</strong>: the differences
+    \( r_i = d_i - f(t_i) \) between data and model.  If the fit is good,
+    residuals should scatter randomly around zero with no systematic pattern.
+    If you see a trend &mdash; the model is missing something.  Use the offset
+    slider to add a "hidden" constant to the data and watch how a too-simple
+    model produces patterned residuals.
+</p>
+
+<div class="interactive-container" id="residual-inspector">
+    <div class="interactive-title">Interactive: Residual Inspector</div>
+
+    <div style="display: flex; gap: 0.5rem; flex-wrap: wrap;">
+        <div class="plot-container" style="flex: 1; min-width: 280px;">
+            <div id="af-fit-plot" style="width: 100%; height: 380px;"></div>
+        </div>
+        <div class="plot-container" style="flex: 1; min-width: 280px;">
+            <div id="af-resid-plot" style="width: 100%; height: 380px;"></div>
+        </div>
+    </div>
+
+    <div id="af-res-stats"
+         style="display: flex; justify-content: center; gap: 1.5rem; padding: 8px 0; font-size: 0.85rem; color: #c8c8e0; flex-wrap: wrap;">
+    </div>
+
+    <div class="control-panel">
+        <div class="control-group">
+            <label class="control-label">Model:
+                <span class="control-label-value">a + bt + ct&sup2; (3-param)</span>
+            </label>
+            <select id="af-res-model-select"
+                    style="width: 100%; padding: 8px 12px; background: #1a1f3a; color: #c8c8e0; border: 1px solid #2a2f4a; border-radius: 6px; font-size: 0.85rem; cursor: pointer;">
+                <option value="1">ct&sup2; (1-param)</option>
+                <option value="2">bt + ct&sup2; (2-param)</option>
+                <option value="3" selected>a + bt + ct&sup2; (3-param)</option>
+            </select>
+        </div>
+        <div class="control-group">
+            <label class="control-label">True offset a&sub0;:
+                <span class="control-label-value">0</span>
+            </label>
+            <input type="range" class="slider" id="af-offset-slider"
+                   min="0" max="20" step="1" value="0">
+        </div>
+        <div class="btn-group">
+            <button class="btn" onclick="newResidualData()">New Data</button>
+            <button class="btn" onclick="resetResidualExplorer()">Reset</button>
+        </div>
+    </div>
+</div>
+
+<div class="info-box">
+    <div class="info-box-title">Key Insight</div>
+    <p>
+        With offset = 0 and the 1-param model, residuals are random &mdash; the model is correct.
+        Now set offset = 15 and keep the 1-param model.  The residuals show a clear
+        systematic pattern (positive at early times, negative at late times) because
+        \( d = ct^2 \) can't capture a constant offset.  Switch to the 3-param model and
+        the pattern vanishes: the model now has \( a \) to absorb the offset.
+        <strong>Always check residuals before trusting a fit.</strong>
+    </p>
+</div>
+
+<!-- Test Your Understanding #3 -->
+<div class="interactive-container question-section">
+    <div class="interactive-title">Test Your Understanding</div>
+
+    <p style="margin-bottom: var(--spacing-md); color: var(--text-secondary);">
+        Use the Residual Inspector to answer these questions.
+    </p>
+
+    <div class="tabs">
+        <div class="tab-buttons">
+            <button class="tab-button active">Question 7</button>
+            <button class="tab-button">Question 8</button>
+            <button class="tab-button">Question 9</button>
+        </div>
+
+        <!-- Q7: MCQ -->
+        <div class="tab-content active">
+            <div class="question-container" data-type="mcq" data-answer="1">
+                <div class="question-text">
+                    Set offset = 0 and use the 1-param model (ct&sup2;).
+                    Do the residuals show a systematic pattern?
+                </div>
+                <div class="question-options">
+                    <label class="option">
+                        <input type="radio" name="af-q7" value="0">
+                        <span>Yes &mdash; clear U-shape</span>
+                    </label>
+                    <label class="option">
+                        <input type="radio" name="af-q7" value="1">
+                        <span>No &mdash; random scatter around zero</span>
+                    </label>
+                    <label class="option">
+                        <input type="radio" name="af-q7" value="2">
+                        <span>Yes &mdash; all positive</span>
+                    </label>
+                </div>
+                <div class="question-actions">
+                    <button class="btn-verify">Verify</button>
+                </div>
+                <div class="question-explanation" style="display: none;">
+                    <div class="question-explanation-title">Explanation</div>
+                    <div class="question-explanation-text">
+                        When offset = 0, the true model <em>is</em> \( d = ct^2 \), so
+                        the 1-param model is correct.  Residuals are just noise &mdash;
+                        randomly scattered around zero.  No systematic pattern.
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Q8: MCQ -->
+        <div class="tab-content">
+            <div class="question-container" data-type="mcq" data-answer="1">
+                <div class="question-text">
+                    Set offset = 15 and keep the 1-param model (ct&sup2;).
+                    Now what do the residuals look like?
+                </div>
+                <div class="question-options">
+                    <label class="option">
+                        <input type="radio" name="af-q8" value="0">
+                        <span>Still random &mdash; the fit absorbs the offset</span>
+                    </label>
+                    <label class="option">
+                        <input type="radio" name="af-q8" value="1">
+                        <span>Systematic &mdash; positive at early times, negative at late times</span>
+                    </label>
+                    <label class="option">
+                        <input type="radio" name="af-q8" value="2">
+                        <span>All residuals become positive</span>
+                    </label>
+                    <label class="option">
+                        <input type="radio" name="af-q8" value="3">
+                        <span>The residuals don't change at all</span>
+                    </label>
+                </div>
+                <div class="question-actions">
+                    <button class="btn-verify">Verify</button>
+                </div>
+                <div class="question-explanation" style="display: none;">
+                    <div class="question-explanation-title">Explanation</div>
+                    <div class="question-explanation-text">
+                        The model \( d = ct^2 \) has no way to capture the constant offset of 15.
+                        The optimiser adjusts \( c \) to compensate, but a quadratic can't mimic
+                        a constant.  At early times (small \( t \)), the offset dominates and
+                        residuals are positive.  At late times (large \( t \)), the over-adjusted
+                        \( c \) makes the model too large and residuals go negative.
+                        Switch to the 3-param model to see the pattern disappear.
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Q9: Fill -->
+        <div class="tab-content">
+            <div class="question-container" data-type="fill" data-answer="1[0.5,2.0]">
+                <div class="question-text">
+                    For a good fit (correct model, correct error bars),
+                    &chi;&sup2;/dof should be approximately:
+                    <br><br>
+                    &chi;&sup2;/dof &asymp; <input type="text" class="fill-blank" placeholder="value">
+                </div>
+                <div class="question-actions">
+                    <button class="btn-verify">Verify</button>
+                </div>
+                <div class="question-explanation" style="display: none;">
+                    <div class="question-explanation-title">Explanation</div>
+                    <div class="question-explanation-text">
+                        Each term \( (r_i/\sigma_i)^2 \) has an expected value of about 1 if
+                        the model is correct and errors are Gaussian.  Summing \( N \) terms
+                        and subtracting the number of fitted parameters gives
+                        \( \langle\chi^2\rangle = N_{\text{dof}} \), so
+                        \( \chi^2/N_{\text{dof}} \approx 1 \).  Values much larger than 1
+                        signal a bad fit or underestimated errors.
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<hr>
+
+<!-- ========== PYTHON CODE ========== -->
+
+<h2>Python Code</h2>
+
+<p>Here's the Python equivalent using <code>scipy.optimize.curve_fit</code>.</p>
+
+<div class="tabs">
+    <div class="tab-buttons">
+        <button class="tab-button active">curve_fit Basics</button>
+        <button class="tab-button">Extracting g</button>
+        <button class="tab-button">Prompt</button>
+    </div>
+
+    <!-- Tab 1: curve_fit basics -->
+    <div class="tab-content active">
+        <div class="code-block-container">
+            <div class="code-header">
+                <span class="code-lang">Python</span>
+                <button class="copy-btn">Copy</button>
+            </div>
+            <pre><code class="language-python">import numpy as np
+from scipy.optimize import curve_fit
+import plotly.graph_objects as go
+
+# Galileo's data
+g_true = 9.8
+times = np.arange(1, 11, dtype=float)
+d_true = 0.5 * g_true * times**2
+
+# Noisy measurements (5 trials, 15% relative noise)
+rng = np.random.default_rng(42)
+data = np.array([d_true + rng.normal(0, 0.15*d_true)
+                 for _ in range(5)])
+means = data.mean(axis=0)
+errors = data.std(axis=0, ddof=1) / np.sqrt(4)
+
+# Define the model
+def model(t, a, b, c):
+    return a + b*t + c*t**2
+
+# Fit with curve_fit (sigma = standard errors)
+popt, pcov = curve_fit(model, times, means,
+                       sigma=errors, absolute_sigma=True)
+perr = np.sqrt(np.diag(pcov))
+
+print("Fit results:")
+print(f"  a = {popt[0]:.2f} ± {perr[0]:.2f}")
+print(f"  b = {popt[1]:.3f} ± {perr[1]:.3f}")
+print(f"  c = {popt[2]:.4f} ± {perr[2]:.4f}")
+print(f"  g = 2c = {2*popt[2]:.2f} ± {2*perr[2]:.2f}")
+
+# Compute χ²
+residuals = means - model(times, *popt)
+chi2 = np.sum((residuals / errors)**2)
+dof = len(times) - 3
+print(f"  χ²/dof = {chi2:.1f}/{dof} = {chi2/dof:.2f}")</code></pre>
+        </div>
+    </div>
+
+    <!-- Tab 2: Extracting g -->
+    <div class="tab-content">
+        <div class="code-block-container">
+            <div class="code-header">
+                <span class="code-lang">Python</span>
+                <button class="copy-btn">Copy</button>
+            </div>
+            <pre><code class="language-python">import numpy as np
+from scipy.optimize import curve_fit
+
+# Run 200 independent experiments
+g_values = []
+for _ in range(200):
+    data = np.array([0.5*9.8*t**2 + np.random.normal(0, 0.15*0.5*9.8*t**2)
+                     for t in range(1, 11)])
+    # Single-trial: error = noise level
+    errs = 0.15 * 0.5 * 9.8 * np.arange(1,11)**2
+
+    def quad(t, a, b, c):
+        return a + b*t + c*t**2
+
+    popt, pcov = curve_fit(quad, np.arange(1,11, dtype=float),
+                           data, sigma=errs, absolute_sigma=True)
+    g_values.append(2 * popt[2])
+
+g_arr = np.array(g_values)
+print(f"True g:     {9.8}")
+print(f"Mean g:     {g_arr.mean():.3f}")
+print(f"Std(g):     {g_arr.std():.3f}")
+print(f"Expected δg: ~{2*np.sqrt(pcov[2,2]):.3f}")
+print(f"Std ≈ δg?   {'Yes!' if abs(g_arr.std() - 2*np.sqrt(pcov[2,2])) < 0.5 else 'Close'}")</code></pre>
+        </div>
+    </div>
+
+    <!-- Tab 3: Prompt -->
+    <div class="tab-content">
+        <div class="code-block-container">
+            <div class="code-header">
+                <span class="code-lang">Prompt for AI</span>
+                <button class="copy-btn">Copy</button>
+            </div>
+            <pre><code class="language-text">Build an automated fitting pipeline in Python:
+
+Setup:
+- Galileo's data: d = (g/2)t² at t = 1..10, 15% relative Gaussian noise
+- 5 trials per time point, compute mean and standard error
+
+Tasks:
+1. Use scipy.optimize.curve_fit to fit d = a + bt + ct²
+   - Pass sigma=errors, absolute_sigma=True
+   - Print a, b, c with uncertainties from covariance matrix
+   - Compute and print χ²/dof
+
+2. Extract g = 2c ± 2δc and compare with g_true = 9.8
+
+3. Run 200 independent experiments, extract g each time
+   - Plot histogram of g values
+   - Compare std(g) with single-fit δg
+   - Verify they match (meaning of "uncertainty")
+
+Use plotly_dark template. Gray axes (#808080).</code></pre>
+        </div>
+
+        <div class="info-box" style="margin-top: var(--spacing-md);">
+            <div class="info-box-title">Tips for Prompting</div>
+            <ul>
+                <li>Always specify <code>absolute_sigma=True</code> &mdash; without it,
+                    <code>curve_fit</code> rescales errors and uncertainties are wrong</li>
+                <li>Ask for both the fit results and a residual plot</li>
+                <li>Request the covariance matrix explicitly if you want correlations</li>
+                <li>Compare single-fit uncertainty with repeated-experiment scatter</li>
+            </ul>
+        </div>
+    </div>
+</div>
+
+<hr>
+
+<!-- ========== EXERCISES ========== -->
+
+<h2>Exercises for Practice</h2>
+
+<div class="exercise-cards">
+    <div class="exercise-card">
+        <div class="exercise-card-header">
+            <span class="exercise-card-number">1.</span>
+            <span class="exercise-card-badge explore">Explore</span>
+        </div>
+        <div class="exercise-card-content">
+            In the Residual Inspector, set offset = 10 and try all three models.
+            For which model do the residuals first become random?
+            What is &chi;&sup2;/dof for each model?
+        </div>
+    </div>
+
+    <div class="exercise-card">
+        <div class="exercise-card-header">
+            <span class="exercise-card-number">2.</span>
+            <span class="exercise-card-badge coding">Coding</span>
+        </div>
+        <div class="exercise-card-content">
+            Use <code>curve_fit</code> to fit the model \( d = \frac{1}{2}g\,t^2 \)
+            directly (one parameter: \( g \)).  Compare the uncertainty \( \delta g \)
+            with what you get from fitting \( d = a + bt + ct^2 \) and computing
+            \( \delta g = 2\delta c \).  Which gives a smaller uncertainty?  Why?
+        </div>
+    </div>
+
+    <div class="exercise-card">
+        <div class="exercise-card-header">
+            <span class="exercise-card-number">3.</span>
+            <span class="exercise-card-badge think">Think</span>
+        </div>
+        <div class="exercise-card-content">
+            The covariance matrix from <code>curve_fit</code> has off-diagonal elements.
+            What do they represent physically?  If \( \text{Cov}(a, c) < 0 \),
+            what does that tell you about the relationship between the fitted
+            offset and the fitted acceleration?
+        </div>
+    </div>
+</div>
+
+<hr>
+
+<!-- ========== NAVIGATION ========== -->
+
+<div class="btn-group mt-xl">
+    <button class="btn btn-magenta" onclick="navigateToSection('12-parameter-exploration')">&larr; Previous: Manual Parameter Exploration</button>
+    <button class="btn" onclick="scrollToTop()">&uarr; Back to Top</button>
+    <button class="btn btn-secondary" onclick="navigateToSection('14-model-selection')">Next: Model Selection &rarr;</button>
+</div>

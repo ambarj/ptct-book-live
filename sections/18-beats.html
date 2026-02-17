@@ -1,0 +1,838 @@
+<!-- Section 2.12: Beats: Near-Resonance Behavior -->
+<!-- Source: Lecture3.nb (Part 3) -->
+<!-- Core concept: Beat phenomenon from near-frequency superposition -->
+<!-- Time: ~25 minutes -->
+<!-- Prerequisites: Same-frequency interference (Section 2.11) -->
+
+<h1>Beats: Near-Resonance Behavior</h1>
+
+<p>
+    What happens when you add two waves at <em>slightly different</em>
+    frequencies?  Something new: the sum doesn't oscillate at a single
+    amplitude.  Instead, the amplitude itself slowly rises and falls &mdash;
+    a phenomenon called <strong>beats</strong>.  If you've ever heard two
+    guitar strings slightly out of tune, that pulsing "wah-wah-wah" is beats.
+    Piano tuners use them every day: when the beats slow down, the strings
+    are getting closer to the same pitch.  When the beats vanish, the tuning
+    is perfect.
+</p>
+
+<div class="info-box">
+    <div class="info-box-title">Learning Objectives</div>
+    <ul>
+        <li>Derive the beat frequency formula from the product-to-sum identity</li>
+        <li>Distinguish the carrier frequency from the envelope frequency</li>
+        <li>Explain why the beat frequency is twice the envelope frequency</li>
+        <li>Predict the beat frequency and period from two given frequencies</li>
+    </ul>
+</div>
+
+<div class="equation-display">
+    <p><strong>The product-to-sum identity:</strong></p>
+    $$ \cos(\omega_1 t) + \cos(\omega_2 t) = 2\cos\!\left(\frac{\omega_1 + \omega_2}{2}\,t\right)\cos\!\left(\frac{\omega_1 - \omega_2}{2}\,t\right) $$
+    <p>
+        The sum of two cosines becomes a <strong>product</strong> of a fast oscillation
+        at the average frequency \( \bar{\omega} = (\omega_1 + \omega_2)/2 \) and
+        a slow modulation at half the difference \( \Delta\omega/2 = (\omega_1 - \omega_2)/2 \).
+        Since the ear perceives two amplitude peaks per envelope cycle, the
+        <strong>beat frequency</strong> is \( f_{\text{beat}} = |f_1 - f_2| \).
+    </p>
+</div>
+
+<hr>
+
+<!-- ========== EXPLORER 1: BEAT GENERATOR ========== -->
+
+<h2>Hearing (and Seeing) Beats</h2>
+
+<p>
+    Bring the two frequencies close together and watch the beat pattern emerge.
+    The yellow sum wave swells and fades rhythmically.  The red dashed
+    envelope shows the amplitude modulation.  When \( f_1 = f_2 \) exactly,
+    the beats disappear and you're back to ordinary constructive interference.
+</p>
+
+<div class="interactive-container" id="beat-generator">
+    <div class="interactive-title">Interactive: Beat Generator</div>
+
+    <div class="plot-container">
+        <div id="bt-beat-plot" style="width: 100%; height: 400px;"></div>
+    </div>
+
+    <div id="bt-beat-stats"
+         style="display: flex; justify-content: center; gap: 1.5rem; padding: 8px 0; font-size: 0.85rem; color: #c8c8e0; flex-wrap: wrap;">
+    </div>
+
+    <div class="control-panel">
+        <div class="control-group">
+            <label class="control-label">f&sub1;:
+                <span class="control-label-value">5.0 Hz</span>
+            </label>
+            <input type="range" class="slider" id="bt-f1-slider"
+                   min="1" max="10" step="0.1" value="5.0">
+        </div>
+        <div class="control-group">
+            <label class="control-label">f&sub2;:
+                <span class="control-label-value">5.5 Hz</span>
+            </label>
+            <input type="range" class="slider" id="bt-f2-slider"
+                   min="1" max="10" step="0.1" value="5.5">
+        </div>
+        <div class="control-group">
+            <label class="control-label">A&sub1;:
+                <span class="control-label-value">1.0</span>
+            </label>
+            <input type="range" class="slider" id="bt-a1-slider"
+                   min="0" max="2" step="0.1" value="1.0">
+        </div>
+        <div class="control-group">
+            <label class="control-label">A&sub2;:
+                <span class="control-label-value">1.0</span>
+            </label>
+            <input type="range" class="slider" id="bt-a2-slider"
+                   min="0" max="2" step="0.1" value="1.0">
+        </div>
+        <div class="btn-group">
+            <button class="btn" onclick="resetBeats()">Reset</button>
+        </div>
+    </div>
+</div>
+
+<div class="info-box">
+    <div class="info-box-title">Key Insight</div>
+    <p>
+        Start with f&sub1; = 5.0 Hz and f&sub2; = 5.5 Hz.  The beat frequency is
+        \( |5.0 - 5.5| = 0.5 \) Hz, so the amplitude swells once every 2 seconds.
+        Now bring f&sub2; closer to 5.0 Hz: the beats slow down.  At f&sub2; = 5.1 Hz,
+        one beat takes 10 seconds.  At f&sub2; = 5.0 Hz exactly, the beats are
+        infinitely slow &mdash; they vanish, and you get steady constructive interference.
+        This is why piano tuners listen for the beat rate to approach zero.
+    </p>
+</div>
+
+<!-- Test Your Understanding #1 -->
+<div class="interactive-container question-section">
+    <div class="interactive-title">Test Your Understanding</div>
+
+    <p style="margin-bottom: var(--spacing-md); color: var(--text-secondary);">
+        Use the Beat Generator to answer these questions.
+    </p>
+
+    <div class="tabs">
+        <div class="tab-buttons">
+            <button class="tab-button active">Question 1</button>
+            <button class="tab-button">Question 2</button>
+            <button class="tab-button">Question 3</button>
+        </div>
+
+        <!-- Q1: Fill -->
+        <div class="tab-content active">
+            <div class="question-container" data-type="fill" data-answer="2[1.8,2.2]">
+                <div class="question-text">
+                    Set f&sub1; = 5 Hz and f&sub2; = 7 Hz.  The beat frequency is:
+                    <br><br>
+                    f<sub>beat</sub> = <input type="text" class="fill-blank" placeholder="Hz"> Hz
+                </div>
+                <div class="question-actions">
+                    <button class="btn-verify">Verify</button>
+                </div>
+                <div class="question-explanation" style="display: none;">
+                    <div class="question-explanation-title">Explanation</div>
+                    <div class="question-explanation-text">
+                        \( f_{\text{beat}} = |f_1 - f_2| = |5 - 7| = 2 \) Hz.  The amplitude
+                        oscillates twice per second.  You can count the peaks in the envelope
+                        on the plot: there should be 2 per second.
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Q2: MCQ -->
+        <div class="tab-content">
+            <div class="question-container" data-type="mcq" data-answer="2">
+                <div class="question-text">
+                    With f&sub1; = 5 Hz and f&sub2; = 5.5 Hz, what is the beat period
+                    (time between successive amplitude maxima)?
+                </div>
+                <div class="question-options">
+                    <label class="option">
+                        <input type="radio" name="bt-q2" value="0">
+                        <span>0.5 s</span>
+                    </label>
+                    <label class="option">
+                        <input type="radio" name="bt-q2" value="1">
+                        <span>1 s</span>
+                    </label>
+                    <label class="option">
+                        <input type="radio" name="bt-q2" value="2">
+                        <span>2 s</span>
+                    </label>
+                    <label class="option">
+                        <input type="radio" name="bt-q2" value="3">
+                        <span>5 s</span>
+                    </label>
+                </div>
+                <div class="question-actions">
+                    <button class="btn-verify">Verify</button>
+                </div>
+                <div class="question-explanation" style="display: none;">
+                    <div class="question-explanation-title">Explanation</div>
+                    <div class="question-explanation-text">
+                        \( T_{\text{beat}} = 1/f_{\text{beat}} = 1/|5.0 - 5.5| = 1/0.5 = 2 \) seconds.
+                        Look at the plot: the envelope peaks are spaced 2 seconds apart.
+                        Don't confuse the beat period with the carrier period
+                        (\( T_{\text{carrier}} \approx 1/5.25 \approx 0.19 \) s).
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Q3: MCQ -->
+        <div class="tab-content">
+            <div class="question-container" data-type="mcq" data-answer="1">
+                <div class="question-text">
+                    Set A&sub1; = 1.5 and A&sub2; = 0.5.  Does the sum ever reach
+                    zero amplitude?
+                </div>
+                <div class="question-options">
+                    <label class="option">
+                        <input type="radio" name="bt-q3" value="0">
+                        <span>Yes, the sum crosses zero regularly</span>
+                    </label>
+                    <label class="option">
+                        <input type="radio" name="bt-q3" value="1">
+                        <span>No &mdash; the envelope minimum is |A&sub1; &minus; A&sub2;| = 1.0, never zero</span>
+                    </label>
+                    <label class="option">
+                        <input type="radio" name="bt-q3" value="2">
+                        <span>Yes, but only at specific phase differences</span>
+                    </label>
+                </div>
+                <div class="question-actions">
+                    <button class="btn-verify">Verify</button>
+                </div>
+                <div class="question-explanation" style="display: none;">
+                    <div class="question-explanation-title">Explanation</div>
+                    <div class="question-explanation-text">
+                        With unequal amplitudes, complete cancellation never occurs.  The
+                        instantaneous amplitude oscillates between \( A_1 + A_2 = 2.0 \) and
+                        \( |A_1 - A_2| = 1.0 \) &mdash; the signal fades but never fully
+                        dies.  (The individual oscillation does cross zero, but the
+                        <em>envelope</em> never reaches zero.)  Complete beats (full
+                        fade-out) only happen when \( A_1 = A_2 \).
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<hr>
+
+<!-- ========== EXPLORER 2: ANATOMY OF A BEAT ========== -->
+
+<h2>Anatomy of a Beat</h2>
+
+<p>
+    The product-to-sum identity reveals the two components hidden inside
+    a beat pattern:
+</p>
+<ul>
+    <li><strong>Carrier</strong> (cyan): the fast oscillation at the average frequency
+        \( \bar{f} = (f_1 + f_2)/2 \).  This is the pitch you hear.</li>
+    <li><strong>Envelope</strong> (red): the slow modulation at
+        \( f_{\text{env}} = |f_1 - f_2|/2 \).  This controls the loudness.</li>
+</ul>
+<p>
+    The beat frequency is <strong>twice</strong> the envelope frequency because
+    your ear hears two loudness peaks per envelope cycle &mdash; one on the
+    positive swing and one on the negative.
+</p>
+
+<div class="interactive-container" id="beat-anatomy">
+    <div class="interactive-title">Interactive: Anatomy of a Beat</div>
+
+    <div style="display: flex; gap: 0.5rem; flex-wrap: wrap;">
+        <div class="plot-container" style="flex: 1; min-width: 280px;">
+            <div id="bt-anatomy-sum-plot" style="width: 100%; height: 380px;"></div>
+        </div>
+        <div class="plot-container" style="flex: 1; min-width: 280px;">
+            <div id="bt-anatomy-comp-plot" style="width: 100%; height: 380px;"></div>
+        </div>
+    </div>
+
+    <div id="bt-anatomy-stats"
+         style="display: flex; justify-content: center; gap: 1.5rem; padding: 8px 0; font-size: 0.85rem; color: #c8c8e0; flex-wrap: wrap;">
+    </div>
+
+    <div class="control-panel">
+        <div class="control-group">
+            <label class="control-label">f&sub1;:
+                <span class="control-label-value">5.0 Hz</span>
+            </label>
+            <input type="range" class="slider" id="bt-an-f1-slider"
+                   min="1" max="10" step="0.1" value="5.0">
+        </div>
+        <div class="control-group">
+            <label class="control-label">f&sub2;:
+                <span class="control-label-value">5.5 Hz</span>
+            </label>
+            <input type="range" class="slider" id="bt-an-f2-slider"
+                   min="1" max="10" step="0.1" value="5.5">
+        </div>
+        <div class="btn-group">
+            <button class="btn" onclick="resetAnatomy()">Reset</button>
+        </div>
+    </div>
+</div>
+
+<div class="info-box">
+    <div class="info-box-title">Key Insight</div>
+    <p>
+        The red &times; markers on the right panel show the <strong>beat nodes</strong>
+        &mdash; instants where the envelope passes through zero and the sum momentarily
+        vanishes.  Count the distance between successive nodes: that's half the beat
+        period, because the envelope goes positive-zero-negative-zero in one full cycle.
+        This is why \( f_{\text{beat}} = 2 \times f_{\text{envelope}} = |f_1 - f_2| \).
+        Try widening the frequency gap and watch the nodes crowd together.
+    </p>
+</div>
+
+<!-- Test Your Understanding #2 -->
+<div class="interactive-container question-section">
+    <div class="interactive-title">Test Your Understanding</div>
+
+    <p style="margin-bottom: var(--spacing-md); color: var(--text-secondary);">
+        Use the Anatomy explorer to answer these questions.
+    </p>
+
+    <div class="tabs">
+        <div class="tab-buttons">
+            <button class="tab-button active">Question 4</button>
+            <button class="tab-button">Question 5</button>
+            <button class="tab-button">Question 6</button>
+        </div>
+
+        <!-- Q4: Fill -->
+        <div class="tab-content active">
+            <div class="question-container" data-type="fill" data-answer="5.25[5.15,5.35]">
+                <div class="question-text">
+                    With f&sub1; = 5.0 Hz and f&sub2; = 5.5 Hz, the carrier frequency is:
+                    <br><br>
+                    f<sub>carrier</sub> = <input type="text" class="fill-blank" placeholder="Hz"> Hz
+                </div>
+                <div class="question-actions">
+                    <button class="btn-verify">Verify</button>
+                </div>
+                <div class="question-explanation" style="display: none;">
+                    <div class="question-explanation-title">Explanation</div>
+                    <div class="question-explanation-text">
+                        \( f_{\text{carrier}} = (f_1 + f_2)/2 = (5.0 + 5.5)/2 = 5.25 \) Hz.
+                        This is the frequency of the fast oscillation you see in the left
+                        panel.  It's the average of the two input frequencies &mdash; the
+                        pitch you'd hear is approximately 5.25 Hz.
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Q5: MCQ -->
+        <div class="tab-content">
+            <div class="question-container" data-type="mcq" data-answer="1">
+                <div class="question-text">
+                    Why is the beat frequency <strong>twice</strong> the envelope frequency?
+                </div>
+                <div class="question-options">
+                    <label class="option">
+                        <input type="radio" name="bt-q5" value="0">
+                        <span>Because there are two waves</span>
+                    </label>
+                    <label class="option">
+                        <input type="radio" name="bt-q5" value="1">
+                        <span>Because the ear detects loudness peaks on both the positive and negative swings of the envelope</span>
+                    </label>
+                    <label class="option">
+                        <input type="radio" name="bt-q5" value="2">
+                        <span>Because we take the absolute value of the frequency difference</span>
+                    </label>
+                </div>
+                <div class="question-actions">
+                    <button class="btn-verify">Verify</button>
+                </div>
+                <div class="question-explanation" style="display: none;">
+                    <div class="question-explanation-title">Explanation</div>
+                    <div class="question-explanation-text">
+                        The envelope oscillates as \( \cos(\Delta\omega\, t/2) \), going
+                        from +1 to &minus;1 and back.  But <em>loudness</em> depends on
+                        the absolute value of the envelope: both the positive peak and
+                        the negative peak produce a loud moment.  So you hear two
+                        loudness peaks per envelope cycle: \( f_{\text{beat}} = 2 \times
+                        f_{\text{envelope}} = |f_1 - f_2| \).
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Q6: MSQ -->
+        <div class="tab-content">
+            <div class="question-container" data-type="msq" data-answer="0,2">
+                <div class="question-text">
+                    Which statements about beats are correct?
+                    <strong>(Select all that apply)</strong>
+                </div>
+                <div class="question-options">
+                    <label class="option">
+                        <input type="checkbox" value="0">
+                        <span>Beats are a direct consequence of superposition (linearity)</span>
+                    </label>
+                    <label class="option">
+                        <input type="checkbox" value="1">
+                        <span>The carrier frequency equals the frequency difference</span>
+                    </label>
+                    <label class="option">
+                        <input type="checkbox" value="2">
+                        <span>As f&sub1; &rarr; f&sub2;, the beats slow down and eventually vanish</span>
+                    </label>
+                    <label class="option">
+                        <input type="checkbox" value="3">
+                        <span>Beats only occur with sound waves, not light</span>
+                    </label>
+                </div>
+                <div class="question-actions">
+                    <button class="btn-verify">Verify</button>
+                </div>
+                <div class="question-explanation" style="display: none;">
+                    <div class="question-explanation-title">Explanation</div>
+                    <div class="question-explanation-text">
+                        <ul>
+                            <li><strong>True:</strong> Beats arise from adding two signals &mdash;
+                                pure superposition.  No nonlinearity is needed.</li>
+                            <li><strong>False:</strong> The carrier is the <em>average</em>
+                                \( (f_1+f_2)/2 \), not the difference.  The difference gives
+                                the beat frequency.</li>
+                            <li><strong>True:</strong> As \( f_1 \to f_2 \), \( f_{\text{beat}} \to 0 \)
+                                and the beat period \( \to \infty \).  In the limit,
+                                both waves are identical and the sum is just a steady wave
+                                at double amplitude.</li>
+                            <li><strong>False:</strong> Beats occur in any wave system.  In optics,
+                                beating between two laser frequencies produces measurable
+                                intensity modulation (heterodyne detection).  Radio receivers
+                                use the same principle.</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<hr>
+
+<!-- ========== EXPLORER 3: BEAT FREQUENCY PREDICTOR ========== -->
+
+<h2>Predict the Beat</h2>
+
+<p>
+    Time to put the formula to work.  You're given two frequencies
+    and asked to predict the beat frequency \( f_{\text{beat}} = |f_1 - f_2| \)
+    and the beat period \( T_{\text{beat}} = 1/f_{\text{beat}} \).  Calculate
+    first, then submit to check.
+</p>
+
+<div class="interactive-container" id="beat-predictor">
+    <div class="interactive-title">Interactive: Beat Frequency Predictor</div>
+
+    <div id="bt-pred-prompt"
+         style="padding: 12px 16px; background: rgba(255,107,107,0.1); border-left: 3px solid #ff6b6b; border-radius: 0 6px 6px 0; margin-bottom: 12px; font-size: 0.9rem; color: #c8c8e0;">
+    </div>
+
+    <div class="plot-container">
+        <div id="bt-pred-plot" style="width: 100%; height: 400px;"></div>
+    </div>
+
+    <div id="bt-pred-feedback"
+         style="padding: 8px 0; font-size: 0.9rem; text-align: center;">
+    </div>
+
+    <div class="control-panel">
+        <div class="control-group">
+            <label class="control-label">Your f<sub>beat</sub> guess (Hz):</label>
+            <input type="number" id="bt-pred-fbeat"
+                   min="0" max="10" step="0.1" placeholder="e.g. 0.5"
+                   style="width: 100%; padding: 8px 12px; background: #1a1f3a; color: #c8c8e0; border: 1px solid #2a2f4a; border-radius: 6px; font-size: 0.95rem;">
+        </div>
+        <div class="control-group">
+            <label class="control-label">Your T<sub>beat</sub> guess (s):</label>
+            <input type="number" id="bt-pred-tbeat"
+                   min="0" max="100" step="0.01" placeholder="e.g. 2.0"
+                   style="width: 100%; padding: 8px 12px; background: #1a1f3a; color: #c8c8e0; border: 1px solid #2a2f4a; border-radius: 6px; font-size: 0.95rem;">
+        </div>
+        <div class="btn-group">
+            <button class="btn" onclick="submitPrediction()">Submit</button>
+            <button class="btn" onclick="nextPrediction()">Next Challenge</button>
+            <button class="btn" onclick="resetPredictor()">Reset Score</button>
+        </div>
+    </div>
+</div>
+
+<div class="info-box">
+    <div class="info-box-title">Key Insight</div>
+    <p>
+        The formulas are simple:
+        \( f_{\text{beat}} = |f_1 - f_2| \) and
+        \( T_{\text{beat}} = 1/f_{\text{beat}} \).
+        But watch out &mdash; the <em>envelope</em> frequency is only half the
+        beat frequency!  If you count envelope oscillations, remember to double.
+        After submitting, the plot reveals the envelope and marks the beat period
+        with green dashed lines so you can visually verify your answer.
+    </p>
+</div>
+
+<!-- Test Your Understanding #3 -->
+<div class="interactive-container question-section">
+    <div class="interactive-title">Test Your Understanding</div>
+
+    <p style="margin-bottom: var(--spacing-md); color: var(--text-secondary);">
+        Use the Beat Predictor and the formula to answer these questions.
+    </p>
+
+    <div class="tabs">
+        <div class="tab-buttons">
+            <button class="tab-button active">Question 7</button>
+            <button class="tab-button">Question 8</button>
+            <button class="tab-button">Question 9</button>
+        </div>
+
+        <!-- Q7: Fill -->
+        <div class="tab-content active">
+            <div class="question-container" data-type="fill" data-answer="0.25[0.2,0.3]">
+                <div class="question-text">
+                    The envelope frequency for f&sub1; = 5 Hz, f&sub2; = 5.5 Hz is:
+                    <br><br>
+                    f<sub>envelope</sub> = <input type="text" class="fill-blank" placeholder="Hz"> Hz
+                </div>
+                <div class="question-actions">
+                    <button class="btn-verify">Verify</button>
+                </div>
+                <div class="question-explanation" style="display: none;">
+                    <div class="question-explanation-title">Explanation</div>
+                    <div class="question-explanation-text">
+                        \( f_{\text{envelope}} = |f_1 - f_2|/2 = 0.5/2 = 0.25 \) Hz.
+                        The envelope makes one full cycle every 4 seconds.  But the
+                        <em>beat</em> frequency is 0.5 Hz (two loudness peaks per envelope
+                        cycle), so the beat period is 2 s.  Always be clear about which
+                        frequency you mean!
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Q8: MCQ -->
+        <div class="tab-content">
+            <div class="question-container" data-type="mcq" data-answer="2">
+                <div class="question-text">
+                    A piano tuner strikes a 440 Hz tuning fork and a piano string
+                    simultaneously.  She hears 3 beats per second.  What are the
+                    possible frequencies of the string?
+                </div>
+                <div class="question-options">
+                    <label class="option">
+                        <input type="radio" name="bt-q8" value="0">
+                        <span>440 Hz only</span>
+                    </label>
+                    <label class="option">
+                        <input type="radio" name="bt-q8" value="1">
+                        <span>443 Hz only</span>
+                    </label>
+                    <label class="option">
+                        <input type="radio" name="bt-q8" value="2">
+                        <span>437 Hz or 443 Hz</span>
+                    </label>
+                    <label class="option">
+                        <input type="radio" name="bt-q8" value="3">
+                        <span>220 Hz or 880 Hz</span>
+                    </label>
+                </div>
+                <div class="question-actions">
+                    <button class="btn-verify">Verify</button>
+                </div>
+                <div class="question-explanation" style="display: none;">
+                    <div class="question-explanation-title">Explanation</div>
+                    <div class="question-explanation-text">
+                        3 beats per second means \( |f_{\text{string}} - 440| = 3 \), so
+                        \( f_{\text{string}} = 437 \) or \( 443 \) Hz.  The beat frequency
+                        tells you how far off the string is, but not which direction.
+                        To determine if it's sharp or flat, the tuner adds a small piece
+                        of tape to the fork (lowering its frequency slightly): if the beats
+                        speed up, the string is flat; if they slow down, it's sharp.
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Q9: MSQ -->
+        <div class="tab-content">
+            <div class="question-container" data-type="msq" data-answer="1,3">
+                <div class="question-text">
+                    Which are true about the product-to-sum decomposition?
+                    <strong>(Select all that apply)</strong>
+                </div>
+                <div class="question-options">
+                    <label class="option">
+                        <input type="checkbox" value="0">
+                        <span>It only works when A&sub1; = A&sub2;</span>
+                    </label>
+                    <label class="option">
+                        <input type="checkbox" value="1">
+                        <span>The carrier frequency is always between f&sub1; and f&sub2;</span>
+                    </label>
+                    <label class="option">
+                        <input type="checkbox" value="2">
+                        <span>The decomposition creates new frequencies not present in the original signals</span>
+                    </label>
+                    <label class="option">
+                        <input type="checkbox" value="3">
+                        <span>It's a trigonometric identity, valid for all frequencies</span>
+                    </label>
+                </div>
+                <div class="question-actions">
+                    <button class="btn-verify">Verify</button>
+                </div>
+                <div class="question-explanation" style="display: none;">
+                    <div class="question-explanation-title">Explanation</div>
+                    <div class="question-explanation-text">
+                        <ul>
+                            <li><strong>False:</strong> The product-to-sum identity
+                                \( \cos\alpha + \cos\beta = 2\cos\frac{\alpha+\beta}{2}\cos\frac{\alpha-\beta}{2} \)
+                                is exact for equal amplitudes.  For unequal amplitudes,
+                                you can still decompose but the algebra is different.</li>
+                            <li><strong>True:</strong> \( \bar{f} = (f_1+f_2)/2 \) is the
+                                arithmetic mean, which always lies between \( f_1 \) and \( f_2 \).</li>
+                            <li><strong>False:</strong> This is a linear operation &mdash; no new
+                                frequencies are created.  The carrier and envelope frequencies
+                                are just different <em>combinations</em> of the original two.
+                                (New frequencies appear only in nonlinear systems.)</li>
+                            <li><strong>True:</strong> It's a purely mathematical identity,
+                                valid for any two cosines regardless of their frequencies.</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<hr>
+
+<!-- ========== PYTHON CODE ========== -->
+
+<h2>Python Code</h2>
+
+<p>Here's the Python equivalent for beat simulations and analysis.</p>
+
+<div class="tabs">
+    <div class="tab-buttons">
+        <button class="tab-button active">Beat Pattern</button>
+        <button class="tab-button">Decomposition</button>
+        <button class="tab-button">Prompt</button>
+    </div>
+
+    <!-- Tab 1: Beat pattern -->
+    <div class="tab-content active">
+        <div class="code-block-container">
+            <div class="code-header">
+                <span class="code-lang">Python</span>
+                <button class="copy-btn">Copy</button>
+            </div>
+            <pre><code class="language-python">import numpy as np
+import plotly.graph_objects as go
+
+f1, f2 = 5.0, 5.5  # Hz
+omega1, omega2 = 2*np.pi*f1, 2*np.pi*f2
+
+f_beat = abs(f1 - f2)
+T_beat = 1 / f_beat
+t = np.linspace(0, 4*T_beat, 4000)  # show 4 beat cycles
+
+x1 = np.cos(omega1 * t)
+x2 = np.cos(omega2 * t)
+x_sum = x1 + x2
+
+# Envelope: 2|cos(Δω·t/2)|
+envelope = 2 * np.abs(np.cos((omega1-omega2)*t/2))
+
+fig = go.Figure()
+fig.add_trace(go.Scatter(x=t, y=x_sum, name='Sum',
+    line=dict(color='#ffff00', width=1.5)))
+fig.add_trace(go.Scatter(x=t, y=envelope, name='Envelope',
+    line=dict(color='#ff6b6b', width=2, dash='dash')))
+fig.add_trace(go.Scatter(x=t, y=-envelope, showlegend=False,
+    line=dict(color='#ff6b6b', width=2, dash='dash')))
+
+fig.update_layout(template='plotly_dark',
+    title=f'Beats: f₁={f1} Hz, f₂={f2} Hz → f_beat={f_beat} Hz',
+    xaxis=dict(title='Time (s)', gridcolor='#2a2f4a',
+               zerolinecolor='#808080', linecolor='#808080'),
+    yaxis=dict(title='x(t)', range=[-2.5, 2.5], gridcolor='#2a2f4a',
+               zerolinecolor='#808080', linecolor='#808080'))
+fig.show()
+print(f"f_beat = {f_beat} Hz, T_beat = {T_beat} s")
+print(f"f_carrier = {(f1+f2)/2} Hz")</code></pre>
+        </div>
+    </div>
+
+    <!-- Tab 2: Decomposition -->
+    <div class="tab-content">
+        <div class="code-block-container">
+            <div class="code-header">
+                <span class="code-lang">Python</span>
+                <button class="copy-btn">Copy</button>
+            </div>
+            <pre><code class="language-python">import numpy as np
+import plotly.graph_objects as go
+from plotly.subplots import make_subplots
+
+f1, f2 = 5.0, 5.5  # Hz
+omega1, omega2 = 2*np.pi*f1, 2*np.pi*f2
+omega_avg = (omega1 + omega2) / 2
+omega_diff = (omega1 - omega2) / 2
+
+t = np.linspace(0, 8, 4000)
+
+# Product-to-sum: cos(ω₁t) + cos(ω₂t) = 2cos(ω_avg·t)cos(Δω·t/2)
+carrier = np.cos(omega_avg * t)
+envelope = np.cos(omega_diff * t)
+product = 2 * carrier * envelope
+direct_sum = np.cos(omega1*t) + np.cos(omega2*t)
+
+# Verify they match
+print(f"Max difference: {np.max(np.abs(product - direct_sum)):.2e}")
+
+fig = make_subplots(rows=2, cols=1, shared_xaxes=True,
+    subplot_titles=['Sum (carrier × envelope)',
+                    'Separated Components'])
+
+fig.add_trace(go.Scatter(x=t, y=direct_sum, name='Sum',
+    line=dict(color='#ffff00', width=1.5)), row=1, col=1)
+fig.add_trace(go.Scatter(x=t, y=2*envelope, name='Envelope',
+    line=dict(color='#ff6b6b', width=2, dash='dash')), row=1, col=1)
+
+fig.add_trace(go.Scatter(x=t, y=carrier, name='Carrier',
+    line=dict(color='#00f3ff', width=1.5)), row=2, col=1)
+fig.add_trace(go.Scatter(x=t, y=envelope, name='Envelope (norm)',
+    line=dict(color='#ff6b6b', width=2.5)), row=2, col=1)
+
+fig.update_layout(template='plotly_dark', height=600)
+fig.update_xaxes(title='Time (s)', gridcolor='#2a2f4a',
+    zerolinecolor='#808080', linecolor='#808080')
+fig.update_yaxes(gridcolor='#2a2f4a',
+    zerolinecolor='#808080', linecolor='#808080')
+fig.show()</code></pre>
+        </div>
+    </div>
+
+    <!-- Tab 3: Prompt -->
+    <div class="tab-content">
+        <div class="code-block-container">
+            <div class="code-header">
+                <span class="code-lang">Prompt for AI</span>
+                <button class="copy-btn">Copy</button>
+            </div>
+            <pre><code class="language-text">Explore the beat phenomenon in Python:
+
+Tasks:
+1. Beat pattern:
+   - Add two cosines: cos(2π·f₁·t) + cos(2π·f₂·t) with f₁=5 Hz, f₂=5.5 Hz
+   - Plot the sum and its envelope over 4 beat cycles
+   - Verify: f_beat = |f₁-f₂| = 0.5 Hz, T_beat = 2 s
+
+2. Product-to-sum decomposition:
+   - Compute carrier = cos(ω_avg·t), envelope = cos(Δω·t/2)
+   - Show that 2·carrier·envelope matches the direct sum
+   - Plot carrier and envelope separately
+
+3. Sweep experiment:
+   - Fix f₁=5 Hz, sweep f₂ from 5.0 to 8.0 Hz
+   - For each f₂, plot the beat pattern
+   - Show how the beat frequency increases with the gap
+
+4. Unequal amplitudes:
+   - Repeat with A₁=1.5, A₂=0.5
+   - Show that the envelope minimum is |A₁-A₂|, not zero
+   - Explain why complete cancellation requires A₁=A₂
+
+Use plotly_dark template. Gray axes (#808080).</code></pre>
+        </div>
+
+        <div class="info-box" style="margin-top: var(--spacing-md);">
+            <div class="info-box-title">Tips for Prompting</div>
+            <ul>
+                <li>Ask for the product-to-sum verification to build trust in the formula</li>
+                <li>Request both time-domain and frequency-domain (FFT) plots</li>
+                <li>Try f&sub2; far from f&sub1; to see when "beats" stop being recognisable</li>
+                <li>Extend to three frequencies for a more complex beat pattern</li>
+            </ul>
+        </div>
+    </div>
+</div>
+
+<hr>
+
+<!-- ========== EXERCISES ========== -->
+
+<h2>Exercises for Practice</h2>
+
+<div class="exercise-cards">
+    <div class="exercise-card">
+        <div class="exercise-card-header">
+            <span class="exercise-card-number">1.</span>
+            <span class="exercise-card-badge explore">Explore</span>
+        </div>
+        <div class="exercise-card-content">
+            In the Beat Generator, set f&sub1; = 5 Hz and sweep f&sub2; from 5.0
+            to 10.0 Hz.  At what frequency difference do the "beats" stop
+            looking like amplitude modulation and start looking like two
+            separate oscillations?  (Hint: it's roughly when \( f_{\text{beat}} \)
+            exceeds \( f_{\text{carrier}} \).)
+        </div>
+    </div>
+
+    <div class="exercise-card">
+        <div class="exercise-card-header">
+            <span class="exercise-card-number">2.</span>
+            <span class="exercise-card-badge coding">Coding</span>
+        </div>
+        <div class="exercise-card-content">
+            Write a Python script that simulates a piano tuner's workflow.
+            Start with a 440 Hz reference and a string at 445 Hz.  Gradually
+            adjust the string frequency toward 440 Hz in steps of 0.5 Hz.
+            For each step, compute and plot the beat pattern.  Show how the
+            beat period increases as the string approaches the correct pitch.
+        </div>
+    </div>
+
+    <div class="exercise-card">
+        <div class="exercise-card-header">
+            <span class="exercise-card-number">3.</span>
+            <span class="exercise-card-badge think">Think</span>
+        </div>
+        <div class="exercise-card-content">
+            In the Anatomy explorer, set f&sub1; = 5 Hz and f&sub2; = 6 Hz.
+            The envelope frequency is 0.5 Hz, but the beat frequency is 1 Hz.
+            Now imagine you could only see the <em>intensity</em> (proportional
+            to \( x^2 \)) rather than the displacement \( x \).  Would you
+            measure one or two intensity peaks per envelope cycle?  Use
+            the identity \( \cos^2\theta = (1 + \cos 2\theta)/2 \) to explain.
+        </div>
+    </div>
+</div>
+
+<hr>
+
+<!-- ========== NAVIGATION ========== -->
+
+<div class="btn-group mt-xl">
+    <button class="btn btn-magenta" onclick="navigateToSection('17-interference')">&larr; Previous: Same Frequency Interference</button>
+    <button class="btn" onclick="scrollToTop()">&uarr; Back to Top</button>
+    <button class="btn btn-secondary" onclick="navigateToSection('19-lissajous')">Next: Lissajous Figures &rarr;</button>
+</div>

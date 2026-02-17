@@ -1,0 +1,706 @@
+<!-- Section 3.3: Energy and Phase Space
+     Source: Physics fundamentals (energy conservation in SHO)
+     Concept: Understand oscillations through energy flow and phase portraits
+     Time: 20 minutes
+     Prerequisites: Section 3.2 (SHO equation, x/v/a relationships)
+-->
+
+<div class="section-content">
+
+    <!-- ==================== INTRODUCTION ==================== -->
+    <h1>3.3 Energy and Phase Space</h1>
+
+    <div class="info-box">
+        <div class="info-icon">💡</div>
+        <div class="info-content">
+            <strong>Learning Objectives:</strong>
+            <ul>
+                <li>Understand how kinetic and potential energy continuously exchange in SHM</li>
+                <li>Read phase portraits — the (x, v) plot that captures an oscillation's complete story</li>
+                <li>Connect orbit size in phase space to total energy and amplitude</li>
+            </ul>
+        </div>
+    </div>
+
+    <p>
+        So far we've described oscillations through position, velocity, and acceleration as functions of time. But there's a deeper perspective: <strong>energy</strong>. In simple harmonic motion, no energy is gained or lost — it simply flows back and forth between kinetic and potential forms. And there's a beautiful way to see this at a glance: the <strong>phase portrait</strong>.
+    </p>
+
+    <!-- ==================== EXPLORER 1: Energy Tracker ==================== -->
+    <h2>The Energy Seesaw</h2>
+
+    <p>
+        For a unit-mass oscillator with \( x(t) = A\cos(\omega t) \):
+    </p>
+    <div class="equation-display">
+        $$ \text{PE} = \tfrac{1}{2}\omega^2 x^2 \qquad \text{KE} = \tfrac{1}{2}v^2 \qquad E = \text{KE} + \text{PE} = \tfrac{1}{2}\omega^2 A^2 $$
+        <p>The total energy \( E \) depends only on amplitude and frequency — it's <em>constant</em> throughout the motion.</p>
+    </div>
+    <p>
+        Watch the left panel for position and the right panel for energy. When \( x \) is at a peak (maximum displacement), all energy is potential. When \( x \) crosses zero (maximum speed), all energy is kinetic. The yellow dashed line — total energy — never changes.
+    </p>
+
+    <div class="interactive-container" id="energy-tracker">
+        <div class="interactive-title">Explorer 1: Energy Tracker</div>
+
+        <div style="display: flex; gap: 0.5rem; flex-wrap: wrap;">
+            <div class="plot-container" style="flex: 1; min-width: 280px;">
+                <div id="ps-en-motion-plot" style="width: 100%; height: 380px;"></div>
+            </div>
+            <div class="plot-container" style="flex: 1; min-width: 280px;">
+                <div id="ps-en-energy-plot" style="width: 100%; height: 380px;"></div>
+            </div>
+        </div>
+
+        <div id="ps-en-stats"
+             style="display: flex; justify-content: center; gap: 1.5rem; padding: 8px 0; font-size: 0.85rem; color: #c8c8e0; flex-wrap: wrap;">
+        </div>
+
+        <div class="control-panel">
+            <div class="control-group">
+                <label class="control-label">Amplitude A:
+                    <span class="control-label-value">2.0</span>
+                </label>
+                <input type="range" id="ps-en-amp" class="slider" min="0.5" max="3.0" step="0.1" value="2.0">
+            </div>
+            <div class="control-group">
+                <label class="control-label">&omega; (rad/s):
+                    <span class="control-label-value">2.0</span>
+                </label>
+                <input type="range" id="ps-en-omega" class="slider" min="0.5" max="5.0" step="0.1" value="2.0">
+            </div>
+            <div class="btn-group">
+                <button class="btn" onclick="resetEnergy()">Reset</button>
+            </div>
+        </div>
+    </div>
+
+    <div class="info-box">
+        <div class="info-box-title">Key Insight</div>
+        <div class="info-content">
+            <p>Energy scales as \( E = \frac{1}{2}\omega^2 A^2 \). Doubling the amplitude <strong>quadruples</strong> the energy. Doubling the frequency also quadruples it. Try sliding each to see: at \( A = 3, \omega = 5 \), the energy reaches \( E = 112.5 \) — the yellow line shoots to the top of the panel.</p>
+        </div>
+    </div>
+
+    <!-- ==================== QUESTIONS 1 ==================== -->
+    <div class="interactive-container question-section">
+        <div class="interactive-title">Test Your Understanding</div>
+
+        <p style="margin-bottom: var(--spacing-md); color: var(--text-secondary);">
+            Use the Energy Tracker above to answer these questions.
+        </p>
+
+        <div class="tabs">
+            <div class="tab-buttons">
+                <button class="tab-button active">Question 1</button>
+                <button class="tab-button">Question 2</button>
+                <button class="tab-button">Question 3</button>
+            </div>
+
+            <!-- Q1: MCQ -->
+            <div class="tab-content active">
+                <div class="question-container" data-type="mcq" data-answer="1">
+                    <div class="question-text">
+                        At what position is the kinetic energy maximum?
+                    </div>
+                    <div class="question-options">
+                        <label class="option">
+                            <input type="radio" name="ps-q1" value="0">
+                            <span>At \( x = \pm A \) (maximum displacement)</span>
+                        </label>
+                        <label class="option">
+                            <input type="radio" name="ps-q1" value="1">
+                            <span>At \( x = 0 \) (equilibrium)</span>
+                        </label>
+                        <label class="option">
+                            <input type="radio" name="ps-q1" value="2">
+                            <span>At \( x = A/2 \)</span>
+                        </label>
+                        <label class="option">
+                            <input type="radio" name="ps-q1" value="3">
+                            <span>KE is constant throughout the motion</span>
+                        </label>
+                    </div>
+                    <div class="question-actions">
+                        <button class="btn-verify">Verify</button>
+                    </div>
+                    <div class="question-explanation" style="display:none;">
+                        <div class="question-explanation-title">Explanation</div>
+                        <div class="question-explanation-text">
+                            KE is maximum at \( x = 0 \) because that's where the object moves fastest (\( v = \pm A\omega \)). At the turning points \( x = \pm A \), the velocity is zero so KE = 0. Watch the green curve (KE) in the explorer — it peaks every time the cyan curve (x) crosses zero.
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Q2: Fill -->
+            <div class="tab-content">
+                <div class="question-container" data-type="fill" data-answer="8[7.5,8.5]">
+                    <div class="question-text">
+                        Set \( A = 2.0 \) and \( \omega = 2.0 \). The total energy \( E = \frac{1}{2}\omega^2 A^2 \) equals: <input type="text" class="fill-blank" placeholder="?">
+                    </div>
+                    <div class="question-actions">
+                        <button class="btn-verify">Verify</button>
+                    </div>
+                    <div class="question-explanation" style="display:none;">
+                        <div class="question-explanation-title">Explanation</div>
+                        <div class="question-explanation-text">
+                            \( E = \frac{1}{2}(2.0)^2(2.0)^2 = \frac{1}{2} \times 4 \times 4 = 8.0 \). Now try doubling just the amplitude to \( A = 4 \)... wait, the slider only goes to 3. Set \( A = 3 \): \( E = \frac{1}{2}(4)(9) = 18 \). The energy more than doubled!
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Q3: MSQ -->
+            <div class="tab-content">
+                <div class="question-container" data-type="msq" data-answer="0,3">
+                    <div class="question-text">
+                        Which statements about energy in SHM are true? (Select all that apply)
+                    </div>
+                    <div class="question-options">
+                        <label class="option">
+                            <input type="checkbox" value="0">
+                            <span>KE and PE oscillate at twice the frequency of x(t)</span>
+                        </label>
+                        <label class="option">
+                            <input type="checkbox" value="1">
+                            <span>KE and PE are always equal to each other</span>
+                        </label>
+                        <label class="option">
+                            <input type="checkbox" value="2">
+                            <span>Total energy depends on the phase \( \varphi \)</span>
+                        </label>
+                        <label class="option">
+                            <input type="checkbox" value="3">
+                            <span>PE = KE exactly when \( x = \pm A/\sqrt{2} \)</span>
+                        </label>
+                    </div>
+                    <div class="question-actions">
+                        <button class="btn-verify">Verify</button>
+                    </div>
+                    <div class="question-explanation" style="display:none;">
+                        <div class="question-explanation-title">Explanation</div>
+                        <div class="question-explanation-text">
+                            <ul>
+                                <li><strong>Twice the frequency:</strong> True! Since \( \text{PE} \propto \cos^2(\omega t) = \frac{1}{2}(1 + \cos 2\omega t) \), the energy terms oscillate at \( 2\omega \). Count the PE peaks in one period of x(t) — there are two.</li>
+                                <li><strong>Always equal:</strong> False — they're only equal at specific instants. Most of the time one dominates.</li>
+                                <li><strong>Depends on phase:</strong> False — \( E = \frac{1}{2}\omega^2 A^2 \) has no \( \varphi \) dependence. Phase shifts when things happen, not the total energy.</li>
+                                <li><strong>PE = KE at \( A/\sqrt{2} \):</strong> True! When PE = KE = E/2, we need \( \frac{1}{2}\omega^2 x^2 = \frac{1}{2}E = \frac{1}{4}\omega^2 A^2 \), giving \( x = \pm A/\sqrt{2} \).</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ==================== EXPLORER 2: Phase Space Explorer ==================== -->
+    <h2>Phase Space: The Complete Picture</h2>
+
+    <p>
+        So far we&rsquo;ve been plotting position vs time.  But there&rsquo;s a
+        more powerful way to look at an oscillator: plot position on one axis
+        and velocity on the other.  This is called <strong>phase space</strong>.
+    </p>
+
+    <p>
+        For simple harmonic motion, the phase-space trajectory is a closed loop
+        &mdash; an <strong>ellipse</strong>.  The left panel shows this ellipse
+        (x&nbsp;vs&nbsp;v).  The right panel rescales the velocity axis by
+        dividing by &omega;, which turns the ellipse into a perfect
+        <strong>circle</strong> of radius A.
+    </p>
+
+    <div class="equation-display">
+        $$ \frac{x^2}{A^2} + \frac{v^2}{(A\omega)^2} = 1 $$
+        <p>This is the equation of an ellipse (just like \( x^2/a^2 + y^2/b^2 = 1 \) from algebra).
+        If we rescale by dividing v by &omega;: \(\; x^2 + (v/\omega)^2 = A^2 \;\) &mdash;
+        a circle whose radius equals the amplitude.</p>
+    </div>
+
+    <div class="interactive-container" id="phase-space-explorer">
+        <div class="interactive-title">Explorer 2: Phase Space Explorer</div>
+
+        <div style="display: flex; gap: 0.5rem; flex-wrap: wrap;">
+            <div class="plot-container" style="flex: 1; min-width: 280px;">
+                <div id="ps-ph-plot" style="width: 100%; height: 380px;"></div>
+            </div>
+            <div class="plot-container" style="flex: 1; min-width: 280px;">
+                <div id="ps-ph-scaled-plot" style="width: 100%; height: 380px;"></div>
+            </div>
+        </div>
+
+        <div id="ps-ph-stats"
+             style="display: flex; justify-content: center; gap: 1.5rem; padding: 8px 0; font-size: 0.85rem; color: #c8c8e0; flex-wrap: wrap;">
+        </div>
+
+        <div class="control-panel">
+            <div class="control-group">
+                <label class="control-label">Amplitude A:
+                    <span class="control-label-value">2.0</span>
+                </label>
+                <input type="range" id="ps-ph-amp" class="slider" min="0.5" max="3.0" step="0.1" value="2.0">
+            </div>
+            <div class="control-group">
+                <label class="control-label">&omega; (rad/s):
+                    <span class="control-label-value">2.0</span>
+                </label>
+                <input type="range" id="ps-ph-omega" class="slider" min="0.5" max="5.0" step="0.1" value="2.0">
+            </div>
+            <div class="btn-group">
+                <button class="btn" onclick="resetPhase()">Reset</button>
+            </div>
+        </div>
+    </div>
+
+    <div class="info-box">
+        <div class="info-box-title">Key Insight</div>
+        <div class="info-content">
+            <p>The phase portrait tells you the <strong>entire history</strong> of the oscillation at a glance. Every point on the ellipse is a state (position + velocity). The orbit is traversed <strong>clockwise</strong>: from the rightmost point (max x, v = 0), the object speeds up leftward (v becomes negative), reaches maximum speed at x = 0, then decelerates, reaching the leftmost point (min x, v = 0), and returns.</p>
+        </div>
+    </div>
+
+    <div class="warning-box">
+        <div class="warning-icon">&#9888;&#65039;</div>
+        <div class="warning-content">
+            <strong>Why clockwise?</strong>
+            <p>Think about what happens when the object is at the far right
+            (x&nbsp;&gt;&nbsp;0, v&nbsp;=&nbsp;0).  The restoring force pulls
+            it left, so v becomes negative &mdash; the trajectory moves
+            <em>downward</em>.  Following this logic around the loop, the orbit
+            traces out clockwise.  (Some textbooks plot momentum p&nbsp;=&nbsp;mv
+            instead of v, which flips the convention &mdash; always check the
+            axis labels!)</p>
+        </div>
+    </div>
+
+    <!-- ==================== QUESTIONS 2 ==================== -->
+    <div class="interactive-container question-section">
+        <div class="interactive-title">Test Your Understanding</div>
+
+        <p style="margin-bottom: var(--spacing-md); color: var(--text-secondary);">
+            Use the Phase Space Explorer above to answer these questions.
+        </p>
+
+        <div class="tabs">
+            <div class="tab-buttons">
+                <button class="tab-button active">Question 4</button>
+                <button class="tab-button">Question 5</button>
+                <button class="tab-button">Question 6</button>
+            </div>
+
+            <!-- Q4: MCQ -->
+            <div class="tab-content active">
+                <div class="question-container" data-type="mcq" data-answer="2">
+                    <div class="question-text">
+                        In the left panel (x, v), what happens to the ellipse shape when you increase \( \omega \) while keeping \( A \) fixed?
+                    </div>
+                    <div class="question-options">
+                        <label class="option">
+                            <input type="radio" name="ps-q4" value="0">
+                            <span>The ellipse gets wider (stretches horizontally)</span>
+                        </label>
+                        <label class="option">
+                            <input type="radio" name="ps-q4" value="1">
+                            <span>The ellipse shrinks in both directions</span>
+                        </label>
+                        <label class="option">
+                            <input type="radio" name="ps-q4" value="2">
+                            <span>The ellipse gets taller (stretches vertically)</span>
+                        </label>
+                        <label class="option">
+                            <input type="radio" name="ps-q4" value="3">
+                            <span>The ellipse stays the same shape</span>
+                        </label>
+                    </div>
+                    <div class="question-actions">
+                        <button class="btn-verify">Verify</button>
+                    </div>
+                    <div class="question-explanation" style="display:none;">
+                        <div class="question-explanation-title">Explanation</div>
+                        <div class="question-explanation-text">
+                            The horizontal extent is \( \pm A \) (unchanged), but the vertical extent is \( \pm A\omega \). Increasing \( \omega \) stretches the ellipse vertically because the object reaches higher speeds. In the scaled plot (right), the circle stays the same size since the \( \omega \) factor is divided out.
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Q5: Fill -->
+            <div class="tab-content">
+                <div class="question-container" data-type="fill" data-answer="2[1.8,2.2]">
+                    <div class="question-text">
+                        In the right panel (scaled phase space), the orbit is always a circle. Its radius equals the: <input type="text" class="fill-blank" placeholder="?"> (read from the plot with A=2.0)
+                    </div>
+                    <div class="question-actions">
+                        <button class="btn-verify">Verify</button>
+                    </div>
+                    <div class="question-explanation" style="display:none;">
+                        <div class="question-explanation-title">Explanation</div>
+                        <div class="question-explanation-text">
+                            The circle's radius equals the amplitude \( A = 2.0 \). Since \( x^2 + (v/\omega)^2 = A^2 \), the radius of the circle in scaled phase space is always exactly \( A \), regardless of \( \omega \). This is why the scaled representation is so useful — amplitude is directly visible as a geometric quantity.
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Q6: MCQ -->
+            <div class="tab-content">
+                <div class="question-container" data-type="mcq" data-answer="3">
+                    <div class="question-text">
+                        A phase space orbit passes through the point \( (x=0, v=-6) \) with \( \omega = 2 \). What is the amplitude \( A \)?
+                    </div>
+                    <div class="question-options">
+                        <label class="option">
+                            <input type="radio" name="ps-q6" value="0">
+                            <span>\( A = 6 \)</span>
+                        </label>
+                        <label class="option">
+                            <input type="radio" name="ps-q6" value="1">
+                            <span>\( A = 12 \)</span>
+                        </label>
+                        <label class="option">
+                            <input type="radio" name="ps-q6" value="2">
+                            <span>\( A = 2 \)</span>
+                        </label>
+                        <label class="option">
+                            <input type="radio" name="ps-q6" value="3">
+                            <span>\( A = 3 \)</span>
+                        </label>
+                    </div>
+                    <div class="question-actions">
+                        <button class="btn-verify">Verify</button>
+                    </div>
+                    <div class="question-explanation" style="display:none;">
+                        <div class="question-explanation-title">Explanation</div>
+                        <div class="question-explanation-text">
+                            At \( x = 0 \), all energy is kinetic: \( |v| = A\omega \). So \( A = |v|/\omega = 6/2 = 3 \). You can verify: set A=3, \( \omega \)=2 in the explorer and check that the ellipse crosses the v-axis at \( \pm 6 \).
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ==================== EXPLORER 3: Portrait Gallery ==================== -->
+    <h2>The Portrait Gallery</h2>
+
+    <p>
+        A single phase portrait with <em>multiple orbits</em> reveals the structure of the oscillator at all energies. Each concentric ellipse corresponds to a different amplitude (and therefore a different energy). The left panel shows the nested orbits; the right panel shows the corresponding energy levels as bars.
+    </p>
+
+    <div class="interactive-container" id="portrait-gallery">
+        <div class="interactive-title">Explorer 3: Portrait Gallery</div>
+
+        <div style="display: flex; gap: 0.5rem; flex-wrap: wrap;">
+            <div class="plot-container" style="flex: 1; min-width: 280px;">
+                <div id="ps-gl-plot" style="width: 100%; height: 380px;"></div>
+            </div>
+            <div class="plot-container" style="flex: 1; min-width: 280px;">
+                <div id="ps-gl-energy-plot" style="width: 100%; height: 380px;"></div>
+            </div>
+        </div>
+
+        <div id="ps-gl-stats"
+             style="display: flex; justify-content: center; gap: 1.5rem; padding: 8px 0; font-size: 0.85rem; color: #c8c8e0; flex-wrap: wrap;">
+        </div>
+
+        <div class="control-panel">
+            <div class="control-group">
+                <label class="control-label">&omega; (rad/s):
+                    <span class="control-label-value">2.0</span>
+                </label>
+                <input type="range" id="ps-gl-omega" class="slider" min="0.5" max="5.0" step="0.1" value="2.0">
+            </div>
+            <div class="control-group">
+                <label class="control-label">Number of orbits:
+                    <span class="control-label-value">4</span>
+                </label>
+                <input type="range" id="ps-gl-count" class="slider" min="1" max="6" step="1" value="4">
+            </div>
+            <div class="btn-group">
+                <button class="btn" onclick="resetGallery()">Reset</button>
+            </div>
+        </div>
+    </div>
+
+    <div class="info-box">
+        <div class="info-box-title">Key Insight</div>
+        <div class="info-content">
+            <p>The energy bars grow <strong>quadratically</strong>: doubling the amplitude quadruples the energy. This is why the bar heights don't grow evenly — they follow the pattern 1, 4, 9, 16... (ratios of \( A^2 \)). Each orbit is a <em>contour of constant energy</em>, just like contour lines on a topographic map represent constant altitude.</p>
+        </div>
+    </div>
+
+    <!-- ==================== QUESTIONS 3 ==================== -->
+    <div class="interactive-container question-section">
+        <div class="interactive-title">Test Your Understanding</div>
+
+        <p style="margin-bottom: var(--spacing-md); color: var(--text-secondary);">
+            Use the Portrait Gallery above to answer these questions.
+        </p>
+
+        <div class="tabs">
+            <div class="tab-buttons">
+                <button class="tab-button active">Question 7</button>
+                <button class="tab-button">Question 8</button>
+                <button class="tab-button">Question 9</button>
+            </div>
+
+            <!-- Q7: MCQ -->
+            <div class="tab-content active">
+                <div class="question-container" data-type="mcq" data-answer="0">
+                    <div class="question-text">
+                        Looking at the phase portrait, can two different orbits ever cross each other?
+                    </div>
+                    <div class="question-options">
+                        <label class="option">
+                            <input type="radio" name="ps-q7" value="0">
+                            <span>No — each point in phase space belongs to exactly one orbit</span>
+                        </label>
+                        <label class="option">
+                            <input type="radio" name="ps-q7" value="1">
+                            <span>Yes — orbits can cross at high energies</span>
+                        </label>
+                        <label class="option">
+                            <input type="radio" name="ps-q7" value="2">
+                            <span>Yes — orbits cross at the origin</span>
+                        </label>
+                    </div>
+                    <div class="question-actions">
+                        <button class="btn-verify">Verify</button>
+                    </div>
+                    <div class="question-explanation" style="display:none;">
+                        <div class="question-explanation-title">Explanation</div>
+                        <div class="question-explanation-text">
+                            Orbits never cross!  Here&rsquo;s why: a point in phase space specifies both position and velocity.  If you know both of those, physics completely determines what happens next.  So two different orbits can&rsquo;t pass through the same point &mdash; that would mean two different futures from the same starting state, which contradicts the laws of motion.
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Q8: Fill -->
+            <div class="tab-content">
+                <div class="question-container" data-type="fill" data-answer="4[3.5,4.5]">
+                    <div class="question-text">
+                        Set \( \omega = 2.0 \) and look at the energy bars. The orbit with \( A = 1.0 \) has energy \( E = 2.0 \). The orbit with \( A = 2.0 \) has energy \( E = \) <input type="text" class="fill-blank" placeholder="?">. By what factor did it increase?
+                    </div>
+                    <div class="question-actions">
+                        <button class="btn-verify">Verify</button>
+                    </div>
+                    <div class="question-explanation" style="display:none;">
+                        <div class="question-explanation-title">Explanation</div>
+                        <div class="question-explanation-text">
+                            At \( A = 2, \omega = 2 \): \( E = \frac{1}{2}(4)(4) = 8 \). That's 4x the energy of the \( A = 1 \) orbit. Doubling the amplitude quadrupled the energy because \( E \propto A^2 \). This quadratic scaling is visible in the bar chart — the bars don't grow linearly, they accelerate.
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Q9: MSQ -->
+            <div class="tab-content">
+                <div class="question-container" data-type="msq" data-answer="1,2">
+                    <div class="question-text">
+                        What can you determine from a phase portrait alone, without knowing the time? (Select all that apply)
+                    </div>
+                    <div class="question-options">
+                        <label class="option">
+                            <input type="checkbox" value="0">
+                            <span>The exact time at which the object passes through a point</span>
+                        </label>
+                        <label class="option">
+                            <input type="checkbox" value="1">
+                            <span>The amplitude of the oscillation</span>
+                        </label>
+                        <label class="option">
+                            <input type="checkbox" value="2">
+                            <span>The total energy of the system</span>
+                        </label>
+                        <label class="option">
+                            <input type="checkbox" value="3">
+                            <span>The phase angle \( \varphi \) of the oscillation</span>
+                        </label>
+                    </div>
+                    <div class="question-actions">
+                        <button class="btn-verify">Verify</button>
+                    </div>
+                    <div class="question-explanation" style="display:none;">
+                        <div class="question-explanation-title">Explanation</div>
+                        <div class="question-explanation-text">
+                            <ul>
+                                <li><strong>Exact time:</strong> No — the phase portrait removes time information. All points on the orbit are visited, but you can't tell when.</li>
+                                <li><strong>Amplitude:</strong> Yes — it's the horizontal extent of the orbit (\( x_{\text{max}} = A \)).</li>
+                                <li><strong>Total energy:</strong> Yes — the orbit size encodes energy. Larger orbit = more energy.</li>
+                                <li><strong>Phase angle:</strong> No — \( \varphi \) only determines where on the orbit you start at \( t = 0 \). All starting points trace the same orbit.</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ==================== CODE EXAMPLES ==================== -->
+    <h2>Code It Yourself</h2>
+
+    <div class="tabs">
+        <div class="tab-buttons">
+            <button class="tab-button active">Energy Plot</button>
+            <button class="tab-button">Phase Portrait</button>
+            <button class="tab-button">Prompt</button>
+        </div>
+
+        <div class="tab-content active">
+            <div class="code-block-container">
+                <div class="code-header">
+                    <span class="code-lang">Python</span>
+                    <button class="copy-btn">Copy</button>
+                </div>
+                <pre><code class="language-python">import numpy as np
+import plotly.graph_objects as go
+
+A, omega = 2.0, 3.0
+t = np.linspace(0, 4*np.pi/omega, 500)
+
+x = A * np.cos(omega * t)
+v = -A * omega * np.sin(omega * t)
+KE = 0.5 * v**2
+PE = 0.5 * omega**2 * x**2
+E = 0.5 * omega**2 * A**2
+
+fig = go.Figure()
+fig.add_trace(go.Scatter(x=t, y=PE, fill='tozeroy', name='PE',
+    line=dict(color='#ff00ff'), fillcolor='rgba(255,0,255,0.15)'))
+fig.add_trace(go.Scatter(x=t, y=KE, fill='tozeroy', name='KE',
+    line=dict(color='#00ff9f'), fillcolor='rgba(0,255,159,0.15)'))
+fig.add_trace(go.Scatter(x=t, y=np.full_like(t, E), name=f'E = {E:.1f}',
+    line=dict(color='#ffff00', dash='dash', width=2)))
+
+fig.update_layout(
+    template='plotly_dark', title='Energy in SHM',
+    xaxis=dict(title='Time (s)', gridcolor='#2a2f4a',
+               zerolinecolor='#808080', linecolor='#808080'),
+    yaxis=dict(title='Energy', range=[0, E*1.3],
+               gridcolor='#2a2f4a', zerolinecolor='#808080',
+               linecolor='#808080')
+)
+fig.show()</code></pre>
+            </div>
+        </div>
+
+        <div class="tab-content">
+            <div class="code-block-container">
+                <div class="code-header">
+                    <span class="code-lang">Python</span>
+                    <button class="copy-btn">Copy</button>
+                </div>
+                <pre><code class="language-python">import numpy as np
+import plotly.graph_objects as go
+
+omega = 2.0
+theta = np.linspace(0, 2*np.pi, 500)
+
+fig = go.Figure()
+colors = ['#00f3ff','#ff00ff','#ffff00','#00ff9f','#ff6b6b']
+
+for i, A in enumerate([0.5, 1.0, 1.5, 2.0, 2.5]):
+    x = A * np.cos(theta)
+    v = -A * omega * np.sin(theta)
+    E = 0.5 * omega**2 * A**2
+    fig.add_trace(go.Scatter(x=x, y=v, mode='lines',
+        name=f'A={A:.1f}, E={E:.1f}',
+        line=dict(color=colors[i], width=2)))
+
+fig.update_layout(
+    template='plotly_dark',
+    title='Phase Portrait: Nested Orbits',
+    xaxis=dict(title='Position x', range=[-3, 3],
+               gridcolor='#2a2f4a', zerolinecolor='#808080',
+               linecolor='#808080'),
+    yaxis=dict(title='Velocity v', range=[-6, 6],
+               gridcolor='#2a2f4a', zerolinecolor='#808080',
+               linecolor='#808080')
+)
+fig.show()</code></pre>
+            </div>
+        </div>
+
+        <div class="tab-content">
+            <div class="code-block-container">
+                <div class="code-header">
+                    <span class="code-lang">Prompt for AI</span>
+                    <button class="copy-btn">Copy</button>
+                </div>
+                <pre><code class="language-text">Create a Python visualization of energy and phase space for a simple
+harmonic oscillator.
+
+Part 1 - Energy plot:
+- Plot KE, PE, and total E vs time for x(t) = A cos(ωt)
+- Use fill-to-zero for KE (green) and PE (magenta)
+- Show total energy as dashed yellow horizontal line
+- Verify KE + PE = E at all times
+
+Part 2 - Phase portrait:
+- Plot 5 nested orbits with A = 0.5, 1.0, 1.5, 2.0, 2.5
+- Each orbit is parametric: x = A cos(θ), v = -Aω sin(θ)
+- Label each orbit with its energy E = ½ω²A²
+- Use different neon colors for each orbit
+
+Use Plotly dark theme, gray axes (#808080), fixed ranges.</code></pre>
+            </div>
+
+            <div class="info-box" style="margin-top: var(--spacing-md);">
+                <div class="info-icon">💡</div>
+                <div class="info-content">
+                    <strong>Pro Tips for Prompting:</strong>
+                    <ul>
+                        <li>Ask for both energy and phase space in one script</li>
+                        <li>Specify parametric plotting for phase portraits</li>
+                        <li>Request numerical verification (KE + PE = E)</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ==================== EXERCISES ==================== -->
+    <h2>Exercises for Practice</h2>
+
+    <div class="exercise-cards">
+        <div class="exercise-card">
+            <div class="exercise-card-header">
+                <span class="exercise-card-number">1.</span>
+                <span class="exercise-card-badge explore">Explore</span>
+            </div>
+            <div class="exercise-card-content">
+                An oscillator has \( \omega = 4 \) rad/s and amplitude \( A = 1.5 \). Calculate its total energy \( E = \frac{1}{2}\omega^2 A^2 \). At what displacement \( x \) are KE and PE equal?
+            </div>
+        </div>
+
+        <div class="exercise-card">
+            <div class="exercise-card-header">
+                <span class="exercise-card-number">2.</span>
+                <span class="exercise-card-badge think">Think</span>
+            </div>
+            <div class="exercise-card-content">
+                Starting from \( x(t) = A\cos(\omega t + \varphi) \), show that the phase space trajectory satisfies \( x^2/A^2 + v^2/(A\omega)^2 = 1 \). What type of curve is this? What are the semi-major and semi-minor axes?
+            </div>
+        </div>
+
+        <div class="exercise-card">
+            <div class="exercise-card-header">
+                <span class="exercise-card-number">3.</span>
+                <span class="exercise-card-badge think">Think</span>
+            </div>
+            <div class="exercise-card-content">
+                Phase portrait orbits never cross. Use this fact to argue that a damped oscillator (which loses energy over time) must spiral <em>inward</em> toward the origin, not outward. What would an outward spiral imply about energy?
+            </div>
+        </div>
+    </div>
+
+    <!-- ==================== NAVIGATION ==================== -->
+    <div class="btn-group mt-xl">
+        <button class="btn btn-magenta" onclick="navigateToSection('21-sho-equation')">← Previous: The Math Behind the Motion</button>
+        <button class="btn" onclick="scrollToTop()">↑ Back to Top</button>
+        <button class="btn btn-secondary" onclick="navigateToSection('23-one-equation-many-systems')">Next: One Equation, Many Systems →</button>
+    </div>
+
+</div>

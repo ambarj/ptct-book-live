@@ -1,0 +1,835 @@
+<!-- Section 2.1: Hello Data: Reading, Plotting, Saving -->
+<!-- Source: Lecture1.nb (Part 1) -->
+<!-- Core concept: Data I/O workflow and visualization basics -->
+<!-- Time: ~20 minutes -->
+<!-- Prerequisites: Basic Python (Appendix B) -->
+
+<h1>Hello Data: Reading, Plotting, Saving</h1>
+
+<p>
+    Every physics experiment begins and ends with data. Before you can extract the acceleration due to gravity
+    from a falling ball or measure the half-life of a radioactive sample, you need to know how to handle numbers:
+    generate them, visualize them, and save them for later. This section builds those foundational skills.
+</p>
+
+<div class="info-box">
+    <div class="info-box-title">Learning Objectives</div>
+    <ul>
+        <li>Understand how continuous functions become discrete data through sampling</li>
+        <li>See how noise affects data and how more samples help</li>
+        <li>Learn when to use linear vs logarithmic scales</li>
+        <li>Master the basic workflow: generate &rarr; plot &rarr; analyze &rarr; save</li>
+    </ul>
+</div>
+
+<hr>
+
+<!-- ========== EXPLORER 1: FROM FUNCTIONS TO DATA ========== -->
+
+<h2>From Functions to Data</h2>
+
+<p>
+    A photograph captures continuous reality as discrete pixels. Data works the same way &mdash;
+    it's a continuous function sampled at specific points. How many samples do you need before
+    the data faithfully represents the underlying function? Let's find out.
+</p>
+
+<div class="interactive-container" id="function-to-data">
+    <div class="interactive-title">Interactive: From Function to Data</div>
+
+    <div class="plot-container">
+        <div id="dataIO-function-plot" style="width: 100%; height: 400px;"></div>
+    </div>
+
+    <div class="control-panel">
+        <div class="control-group">
+            <label class="control-label">Function:</label>
+            <select id="dataIO-func-select"
+                    style="width: 100%; padding: 8px 12px; background: #1a1f3a; color: #c8c8e0; border: 1px solid #2a2f4a; border-radius: 6px; font-size: 0.85rem; cursor: pointer;">
+                <option value="gaussian">Gaussian: exp(-x&sup2;)</option>
+                <option value="sine">Sine: sin(x)</option>
+                <option value="cubic">Cubic: x&sup3; - 3x</option>
+                <option value="decay">Exp. Decay: 5&middot;exp(-x/2)</option>
+            </select>
+        </div>
+
+        <div class="control-group">
+            <label class="control-label">
+                Sample Points:
+                <span class="control-label-value">20</span>
+            </label>
+            <input type="range" class="slider" id="dataIO-npoints-slider"
+                   min="1" max="40" step="1" value="20">
+        </div>
+
+        <div class="btn-group">
+            <button class="btn" onclick="resetFunctionExplorer()">Reset</button>
+        </div>
+    </div>
+</div>
+
+<div class="info-box">
+    <div class="info-box-title">Key Insight</div>
+    <p>
+        The gray dashed line is the "truth" &mdash; the continuous function. The cyan dots are what you'd actually
+        measure in an experiment. With too few samples, the data can be misleading. With enough samples,
+        the data tells the whole story. This tension between continuous reality and discrete measurement
+        is at the heart of experimental physics.
+    </p>
+</div>
+
+<!-- Test Your Understanding #1 -->
+<div class="interactive-container question-section">
+    <div class="interactive-title">Test Your Understanding</div>
+
+    <p style="margin-bottom: var(--spacing-md); color: var(--text-secondary);">
+        Use the explorer above to answer these questions.
+    </p>
+
+    <div class="tabs">
+        <div class="tab-buttons">
+            <button class="tab-button active">Question 1</button>
+            <button class="tab-button">Question 2</button>
+            <button class="tab-button">Question 3</button>
+        </div>
+
+        <!-- Q1: MCQ -->
+        <div class="tab-content active">
+            <div class="question-container" data-type="mcq" data-answer="1">
+                <div class="question-text">
+                    Set the function to <strong>Sine</strong> and use only <strong>5 sample points</strong>.
+                    What do you see?
+                </div>
+                <div class="question-options">
+                    <label class="option">
+                        <input type="radio" name="dio-q1" value="0">
+                        <span>A smooth sine wave</span>
+                    </label>
+                    <label class="option">
+                        <input type="radio" name="dio-q1" value="1">
+                        <span>A few scattered dots &mdash; the sine shape is barely recognizable</span>
+                    </label>
+                    <label class="option">
+                        <input type="radio" name="dio-q1" value="2">
+                        <span>A perfect straight line</span>
+                    </label>
+                    <label class="option">
+                        <input type="radio" name="dio-q1" value="3">
+                        <span>A parabola</span>
+                    </label>
+                </div>
+                <div class="question-actions">
+                    <button class="btn-verify">Verify</button>
+                </div>
+                <div class="question-explanation" style="display: none;">
+                    <div class="question-explanation-title">Explanation</div>
+                    <div class="question-explanation-text">
+                        With only 5 points spread over the range [0, 10], the sine wave's oscillations
+                        are barely captured. The dots jump up and down but don't clearly trace out a smooth wave.
+                        This is a fundamental limitation of discrete sampling &mdash; you need enough points
+                        to capture the function's features.
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Q2: Fill -->
+        <div class="tab-content">
+            <div class="question-container" data-type="fill" data-answer="15[8,25]">
+                <div class="question-text">
+                    With the <strong>Gaussian</strong> selected, gradually increase the number of sample points.
+                    What is approximately the minimum number needed to clearly see the bell-curve shape?
+                    <br><br>
+                    Minimum points needed: <input type="text" class="fill-blank" placeholder="?">
+                </div>
+                <div class="question-actions">
+                    <button class="btn-verify">Verify</button>
+                </div>
+                <div class="question-explanation" style="display: none;">
+                    <div class="question-explanation-title">Explanation</div>
+                    <div class="question-explanation-text">
+                        Around 10&ndash;20 points are enough to see the Gaussian's bell shape clearly.
+                        The Gaussian is a smooth, slowly varying function, so it doesn't need many samples.
+                        Contrast this with the sine function, which oscillates and needs more points.
+                        The rule of thumb: the faster a function varies, the more samples you need.
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Q3: MCQ -->
+        <div class="tab-content">
+            <div class="question-container" data-type="mcq" data-answer="1">
+                <div class="question-text">
+                    Which function requires the <strong>most</strong> sample points to faithfully represent?
+                    Try each one and compare.
+                </div>
+                <div class="question-options">
+                    <label class="option">
+                        <input type="radio" name="dio-q3" value="0">
+                        <span>Gaussian (single smooth bump)</span>
+                    </label>
+                    <label class="option">
+                        <input type="radio" name="dio-q3" value="1">
+                        <span>Sine (oscillates up and down)</span>
+                    </label>
+                    <label class="option">
+                        <input type="radio" name="dio-q3" value="2">
+                        <span>Exponential decay (monotonically decreasing)</span>
+                    </label>
+                    <label class="option">
+                        <input type="radio" name="dio-q3" value="3">
+                        <span>All functions need the same number of points</span>
+                    </label>
+                </div>
+                <div class="question-actions">
+                    <button class="btn-verify">Verify</button>
+                </div>
+                <div class="question-explanation" style="display: none;">
+                    <div class="question-explanation-title">Explanation</div>
+                    <div class="question-explanation-text">
+                        The sine function oscillates, meaning it changes direction multiple times across the range.
+                        Each oscillation needs several sample points to be captured. The Gaussian and exponential
+                        are smooth, single-featured functions that need far fewer points.
+                        This connects to a deep idea in signal processing: the <em>Nyquist theorem</em> says you need
+                        at least two samples per oscillation period to reconstruct a signal.
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<hr>
+
+<!-- ========== EXPLORER 2: NOISE ========== -->
+
+<h2>Real Data Is Noisy</h2>
+
+<p>
+    No measurement is perfect. Every sensor adds noise, every experiment has fluctuations.
+    The question isn't <em>whether</em> your data is noisy &mdash; it's whether you can still
+    see the signal through the noise. How much noise can you tolerate? How does the number of
+    data points help?
+</p>
+
+<div class="interactive-container" id="noise-explorer">
+    <div class="interactive-title">Interactive: Noise Explorer</div>
+
+    <div class="plot-container">
+        <div id="dataIO-noise-plot" style="width: 100%; height: 400px;"></div>
+    </div>
+
+    <div class="control-panel">
+        <div class="control-group">
+            <label class="control-label">Function:</label>
+            <select id="dataIO-noise-func-select"
+                    style="width: 100%; padding: 8px 12px; background: #1a1f3a; color: #c8c8e0; border: 1px solid #2a2f4a; border-radius: 6px; font-size: 0.85rem; cursor: pointer;">
+                <option value="gaussian">Gaussian: exp(-x&sup2;)</option>
+                <option value="sine">Sine: sin(x)</option>
+                <option value="cubic">Cubic: x&sup3; - 3x</option>
+                <option value="decay">Exp. Decay: 5&middot;exp(-x/2)</option>
+            </select>
+        </div>
+
+        <div class="control-group">
+            <label class="control-label">
+                Sample Points:
+                <span class="control-label-value">50</span>
+            </label>
+            <input type="range" class="slider" id="dataIO-noise-npoints-slider"
+                   min="5" max="200" step="1" value="50">
+        </div>
+
+        <div class="control-group">
+            <label class="control-label">
+                Noise Level:
+                <span class="control-label-value">20%</span>
+            </label>
+            <input type="range" class="slider" id="dataIO-noise-level-slider"
+                   min="0" max="50" step="1" value="20">
+        </div>
+
+        <div class="btn-group">
+            <button class="btn" onclick="newNoiseSample()">New Sample</button>
+            <button class="btn" onclick="resetNoiseExplorer()">Reset</button>
+        </div>
+    </div>
+</div>
+
+<div class="info-box">
+    <div class="info-box-title">Key Insight</div>
+    <p>
+        Notice how increasing the number of data points makes the underlying function shape emerge
+        even through heavy noise. This is the essence of <strong>statistics</strong>: individual measurements
+        are unreliable, but patterns appear when you collect enough of them. In Chapter 2.3, we'll
+        quantify this precisely with error bars.
+    </p>
+</div>
+
+<!-- Test Your Understanding #2 -->
+<div class="interactive-container question-section">
+    <div class="interactive-title">Test Your Understanding</div>
+
+    <p style="margin-bottom: var(--spacing-md); color: var(--text-secondary);">
+        Experiment with the noise explorer to answer these questions.
+    </p>
+
+    <div class="tabs">
+        <div class="tab-buttons">
+            <button class="tab-button active">Question 1</button>
+            <button class="tab-button">Question 2</button>
+            <button class="tab-button">Question 3</button>
+        </div>
+
+        <!-- Q4: MCQ -->
+        <div class="tab-content active">
+            <div class="question-container" data-type="mcq" data-answer="2">
+                <div class="question-text">
+                    Set the Gaussian function with <strong>10 data points</strong> and <strong>50% noise</strong>.
+                    Can you tell which function generated the data?
+                </div>
+                <div class="question-options">
+                    <label class="option">
+                        <input type="radio" name="dio-q4" value="0">
+                        <span>Yes, the bell curve is perfectly clear</span>
+                    </label>
+                    <label class="option">
+                        <input type="radio" name="dio-q4" value="1">
+                        <span>Somewhat &mdash; you can guess it might be a bump</span>
+                    </label>
+                    <label class="option">
+                        <input type="radio" name="dio-q4" value="2">
+                        <span>Nearly impossible &mdash; the points look random</span>
+                    </label>
+                </div>
+                <div class="question-actions">
+                    <button class="btn-verify">Verify</button>
+                </div>
+                <div class="question-explanation" style="display: none;">
+                    <div class="question-explanation-title">Explanation</div>
+                    <div class="question-explanation-text">
+                        With only 10 points and 50% noise, the data is dominated by random fluctuations.
+                        Without the gray reference curve, you'd be hard-pressed to identify the underlying function.
+                        This is a realistic scenario &mdash; many experiments produce data that looks like this!
+                        The challenge of data analysis is extracting signal from this kind of mess.
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Q5: MSQ -->
+        <div class="tab-content">
+            <div class="question-container" data-type="msq" data-answer="0,1,3">
+                <div class="question-text">
+                    Which of the following help you "see through" noisy data?
+                    <strong>(Select all that apply)</strong>
+                </div>
+                <div class="question-options">
+                    <label class="option">
+                        <input type="checkbox" value="0">
+                        <span>Collecting more data points</span>
+                    </label>
+                    <label class="option">
+                        <input type="checkbox" value="1">
+                        <span>Reducing the noise in the measurement apparatus</span>
+                    </label>
+                    <label class="option">
+                        <input type="checkbox" value="2">
+                        <span>Changing the color of the plot markers</span>
+                    </label>
+                    <label class="option">
+                        <input type="checkbox" value="3">
+                        <span>Knowing (or guessing) the expected function shape</span>
+                    </label>
+                </div>
+                <div class="question-actions">
+                    <button class="btn-verify">Verify</button>
+                </div>
+                <div class="question-explanation" style="display: none;">
+                    <div class="question-explanation-title">Explanation</div>
+                    <div class="question-explanation-text">
+                        <ul>
+                            <li><strong>More data points:</strong> Yes! Try increasing from 10 to 200 at 50% noise &mdash;
+                                the shape emerges. This is the power of statistics.</li>
+                            <li><strong>Reducing noise:</strong> Obviously helps, but you can't always control this
+                                in a real experiment.</li>
+                            <li><strong>Changing colors:</strong> No. Presentation changes don't affect the information
+                                in the data.</li>
+                            <li><strong>Knowing the expected shape:</strong> Yes! If you have a theoretical model
+                                (like "this should be Gaussian"), you can fit that model to noisy data.
+                                This is the idea behind <em>curve fitting</em>, which we'll explore in Section 2.5.</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Q6: MCQ -->
+        <div class="tab-content">
+            <div class="question-container" data-type="mcq" data-answer="1">
+                <div class="question-text">
+                    You have 10 data points with 40% noise and need to see the function shape more clearly.
+                    You can either collect <strong>10&times; more data</strong> or reduce noise to <strong>10%</strong>.
+                    Both cost the same effort. Which is generally more effective?
+                </div>
+                <div class="question-options">
+                    <label class="option">
+                        <input type="radio" name="dio-q6" value="0">
+                        <span>Collect more data (100 points at 40% noise)</span>
+                    </label>
+                    <label class="option">
+                        <input type="radio" name="dio-q6" value="1">
+                        <span>Reduce noise (10 points at 10% noise)</span>
+                    </label>
+                    <label class="option">
+                        <input type="radio" name="dio-q6" value="2">
+                        <span>Both are equally effective</span>
+                    </label>
+                </div>
+                <div class="question-actions">
+                    <button class="btn-verify">Verify</button>
+                </div>
+                <div class="question-explanation" style="display: none;">
+                    <div class="question-explanation-title">Explanation</div>
+                    <div class="question-explanation-text">
+                        Try both in the explorer! With 100 points at 40% noise, the shape is visible but fuzzy.
+                        With 10 points at 10% noise, the shape is much cleaner.
+                        Reducing noise is generally more powerful because statistical averaging only reduces
+                        uncertainty as \( 1/\sqrt{N} \) &mdash; you need 16&times; more data to halve the noise.
+                        But improving the apparatus cuts noise directly. In practice, you do both.
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<hr>
+
+<!-- ========== EXPLORER 3: LINEAR VS LOG SCALE ========== -->
+
+<h2>Choosing the Right Scale</h2>
+
+<p>
+    Sometimes the most important thing you can do with data is choose the right way to <em>look</em> at it.
+    A plot that seems featureless on a linear scale can reveal beautiful structure on a logarithmic scale.
+    Physicists switch between scales constantly &mdash; it's one of the most practical tricks in the toolbox.
+</p>
+
+<div class="interactive-container" id="scale-explorer">
+    <div class="interactive-title">Interactive: Linear vs Log Scale</div>
+
+    <div class="plot-container">
+        <div id="dataIO-scale-plot" style="width: 100%; height: 420px;"></div>
+    </div>
+
+    <div class="control-panel">
+        <div class="control-group">
+            <label class="control-label">Function:</label>
+            <select id="dataIO-scale-func-select"
+                    style="width: 100%; padding: 8px 12px; background: #1a1f3a; color: #c8c8e0; border: 1px solid #2a2f4a; border-radius: 6px; font-size: 0.85rem; cursor: pointer;">
+                <option value="exponential">Exp. Decay: 10&middot;exp(-0.3x)</option>
+                <option value="powerlaw">Power Law: 10 &times; x^1.5</option>
+                <option value="gaussian_pos">Gaussian: 10&middot;exp(-x&sup2;/4)</option>
+            </select>
+        </div>
+
+        <div class="control-group">
+            <label class="control-label">Scale:</label>
+            <div style="display: flex; gap: 6px; margin-top: 4px;">
+                <button class="btn" id="dataIO-linear-btn" onclick="setScaleType('linear')">Linear</button>
+                <button class="btn" id="dataIO-semilog-btn" onclick="setScaleType('semilog')">Semi-log</button>
+                <button class="btn" id="dataIO-loglog-btn" onclick="setScaleType('loglog')">Log-log</button>
+            </div>
+        </div>
+
+        <div class="btn-group">
+            <button class="btn" onclick="resetScaleExplorer()">Reset</button>
+        </div>
+    </div>
+</div>
+
+<div class="info-box">
+    <div class="info-box-title">Key Insight</div>
+    <p>
+        <strong>Exponential</strong> functions become straight lines on a semi-log plot (log y vs. linear x). <br>
+        <strong>Power law</strong> functions become straight lines on a log-log plot (log y vs. log x). <br>
+        This is incredibly useful: if you plot your data and it looks like a straight line on one of these scales,
+        you've identified the functional form. We'll use this trick repeatedly when fitting data in Section 2.5.
+    </p>
+</div>
+
+<!-- Test Your Understanding #3 -->
+<div class="interactive-container question-section">
+    <div class="interactive-title">Test Your Understanding</div>
+
+    <p style="margin-bottom: var(--spacing-md); color: var(--text-secondary);">
+        Switch between scales for each function to answer these questions.
+    </p>
+
+    <div class="tabs">
+        <div class="tab-buttons">
+            <button class="tab-button active">Question 1</button>
+            <button class="tab-button">Question 2</button>
+            <button class="tab-button">Question 3</button>
+        </div>
+
+        <!-- Q7: MCQ -->
+        <div class="tab-content active">
+            <div class="question-container" data-type="mcq" data-answer="1">
+                <div class="question-text">
+                    Select <strong>Exp. Decay</strong> and try all three scales.
+                    On which scale does the data appear as a straight line?
+                </div>
+                <div class="question-options">
+                    <label class="option">
+                        <input type="radio" name="dio-q7" value="0">
+                        <span>Linear</span>
+                    </label>
+                    <label class="option">
+                        <input type="radio" name="dio-q7" value="1">
+                        <span>Semi-log (linear x, log y)</span>
+                    </label>
+                    <label class="option">
+                        <input type="radio" name="dio-q7" value="2">
+                        <span>Log-log (log x, log y)</span>
+                    </label>
+                    <label class="option">
+                        <input type="radio" name="dio-q7" value="3">
+                        <span>None &mdash; it's always curved</span>
+                    </label>
+                </div>
+                <div class="question-actions">
+                    <button class="btn-verify">Verify</button>
+                </div>
+                <div class="question-explanation" style="display: none;">
+                    <div class="question-explanation-title">Explanation</div>
+                    <div class="question-explanation-text">
+                        The exponential \( y = 10 \, e^{-0.3x} \) becomes a straight line on a semi-log plot.
+                        Why? Taking the log: \( \ln y = \ln 10 - 0.3x \), which is linear in \( x \).
+                        The slope of this line gives the decay constant (0.3), and the y-intercept gives
+                        the amplitude (ln 10 &asymp; 2.3). This is how physicists extract decay rates
+                        from experimental data.
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Q8: MCQ -->
+        <div class="tab-content">
+            <div class="question-container" data-type="mcq" data-answer="2">
+                <div class="question-text">
+                    A dataset, when plotted on a log-log scale, appears as a straight line.
+                    This means the underlying relationship is:
+                </div>
+                <div class="question-options">
+                    <label class="option">
+                        <input type="radio" name="dio-q8" value="0">
+                        <span>Linear: \( y = ax + b \)</span>
+                    </label>
+                    <label class="option">
+                        <input type="radio" name="dio-q8" value="1">
+                        <span>Exponential: \( y = A \, e^{kx} \)</span>
+                    </label>
+                    <label class="option">
+                        <input type="radio" name="dio-q8" value="2">
+                        <span>Power law: \( y = A \, x^n \)</span>
+                    </label>
+                    <label class="option">
+                        <input type="radio" name="dio-q8" value="3">
+                        <span>Gaussian: \( y = A \, e^{-x^2} \)</span>
+                    </label>
+                </div>
+                <div class="question-actions">
+                    <button class="btn-verify">Verify</button>
+                </div>
+                <div class="question-explanation" style="display: none;">
+                    <div class="question-explanation-title">Explanation</div>
+                    <div class="question-explanation-text">
+                        For a power law \( y = A x^n \), taking the log of both sides:
+                        \( \log y = \log A + n \log x \). This is linear in \( \log x \) with slope \( n \)
+                        and intercept \( \log A \). Verify this by selecting "Power Law" and switching to log-log!
+                        The slope tells you the exponent directly.
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Q9: Fill (graph reading with mixed dropdowns + numerical) -->
+        <div class="tab-content">
+            <div class="question-container" data-type="fill" data-answer="downward|10[8,12]|0.5[0.3,0.8]">
+                <div class="question-text">
+                    Select <strong>Exp. Decay</strong> and switch to <strong>Semi-log</strong> scale.
+                    Read the plot carefully:
+                    <br><br>
+                    The line slopes
+                    <select class="fill-blank-select">
+                        <option value=""></option>
+                        <option value="upward">upward</option>
+                        <option value="downward">downward</option>
+                        <option value="flat">flat (horizontal)</option>
+                    </select>
+                    <br><br>
+                    At \( x = 0 \), the y-value is approximately
+                    <input type="text" class="fill-blank" placeholder="?">
+                    <br><br>
+                    At \( x = 10 \), the y-value is approximately
+                    <input type="text" class="fill-blank" placeholder="?">
+                </div>
+                <div class="question-actions">
+                    <button class="btn-verify">Verify</button>
+                </div>
+                <div class="question-explanation" style="display: none;">
+                    <div class="question-explanation-title">Explanation</div>
+                    <div class="question-explanation-text">
+                        On a semi-log plot, the exponential \( y = 10 \, e^{-0.3x} \) appears as a
+                        straight line sloping <strong>downward</strong> (since the exponent is negative).
+                        <br><br>
+                        At \( x = 0 \): \( y = 10 \, e^{0} = 10 \).
+                        At \( x = 10 \): \( y = 10 \, e^{-3} \approx 0.50 \).
+                        <br><br>
+                        The function has decayed by a factor of \( 10 / 0.5 = 20 \) over this range.
+                        Being able to read values off a log-scale plot is an essential experimental skill &mdash;
+                        notice how the log scale spreads out the small values, making 0.5 easy to read
+                        even though it would be squished near zero on a linear plot.
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<hr>
+
+<!-- ========== PYTHON CODE EXAMPLES ========== -->
+
+<h2>Python Code Examples</h2>
+
+<p>
+    Here's the Python code that reproduces what the explorers above do. Run these in a Jupyter notebook
+    to build your own data workflows.
+</p>
+
+<div class="tabs">
+    <div class="tab-buttons">
+        <button class="tab-button active">Generate &amp; Plot</button>
+        <button class="tab-button">Adding Noise</button>
+        <button class="tab-button">Log Scale</button>
+        <button class="tab-button">Prompt</button>
+    </div>
+
+    <!-- Tab 1: Generate & Plot -->
+    <div class="tab-content active">
+        <div class="code-block-container">
+            <div class="code-header">
+                <span class="code-lang">Python</span>
+                <button class="copy-btn">Copy</button>
+            </div>
+            <pre><code class="language-python">import numpy as np
+import plotly.graph_objects as go
+
+# The "true" function (continuous)
+x_smooth = np.linspace(-3, 3, 200)
+y_smooth = np.exp(-x_smooth**2)    # Gaussian
+
+# Sample it at discrete points (like real data)
+n_points = 20
+x_data = np.linspace(-3, 3, n_points)
+y_data = np.exp(-x_data**2)
+
+# Plot both
+fig = go.Figure()
+fig.add_trace(go.Scatter(
+    x=x_smooth, y=y_smooth, mode='lines',
+    name='True function',
+    line=dict(color='gray', dash='dot', width=1)))
+fig.add_trace(go.Scatter(
+    x=x_data, y=y_data, mode='markers',
+    name=f'Data ({n_points} points)',
+    marker=dict(color='#00f3ff', size=8)))
+
+fig.update_layout(
+    template='plotly_dark',
+    title='From Function to Data',
+    xaxis_title='x', yaxis_title='f(x)',
+    xaxis=dict(range=[-3.5, 3.5], zerolinecolor='#808080'),
+    yaxis=dict(range=[-0.2, 1.3], zerolinecolor='#808080'))
+fig.show()</code></pre>
+        </div>
+    </div>
+
+    <!-- Tab 2: Adding Noise -->
+    <div class="tab-content">
+        <div class="code-block-container">
+            <div class="code-header">
+                <span class="code-lang">Python</span>
+                <button class="copy-btn">Copy</button>
+            </div>
+            <pre><code class="language-python">import numpy as np
+import plotly.graph_objects as go
+
+# Generate clean data
+n_points = 50
+x = np.linspace(-3, 3, n_points)
+y_clean = np.exp(-x**2)
+
+# Add noise: 20% of the function's amplitude
+noise_level = 0.20
+amplitude = y_clean.max() - y_clean.min()
+noise = noise_level * amplitude * np.random.uniform(-1, 1, size=n_points)
+y_noisy = y_clean + noise
+
+# Reference curve
+x_ref = np.linspace(-3, 3, 200)
+y_ref = np.exp(-x_ref**2)
+
+fig = go.Figure()
+fig.add_trace(go.Scatter(
+    x=x_ref, y=y_ref, mode='lines',
+    name='True function',
+    line=dict(color='gray', dash='dot', width=1)))
+fig.add_trace(go.Scatter(
+    x=x, y=y_noisy, mode='markers',
+    name=f'{int(noise_level*100)}% noise',
+    marker=dict(color='#ff00ff', size=7)))
+
+fig.update_layout(
+    template='plotly_dark',
+    title=f'Gaussian with {int(noise_level*100)}% Noise ({n_points} points)',
+    xaxis_title='x', yaxis_title='f(x)',
+    xaxis=dict(range=[-3.5, 3.5], zerolinecolor='#808080'),
+    yaxis=dict(range=[-0.8, 1.8], zerolinecolor='#808080'))
+fig.show()</code></pre>
+        </div>
+    </div>
+
+    <!-- Tab 3: Log Scale -->
+    <div class="tab-content">
+        <div class="code-block-container">
+            <div class="code-header">
+                <span class="code-lang">Python</span>
+                <button class="copy-btn">Copy</button>
+            </div>
+            <pre><code class="language-python">import numpy as np
+import plotly.graph_objects as go
+from plotly.subplots import make_subplots
+
+# Exponential decay
+x = np.linspace(0.1, 15, 80)
+y = 10 * np.exp(-0.3 * x)
+
+# Side-by-side: linear vs semi-log
+fig = make_subplots(rows=1, cols=2,
+    subplot_titles=['Linear Scale', 'Semi-log Scale'])
+
+for col in [1, 2]:
+    fig.add_trace(go.Scatter(
+        x=x, y=y, mode='lines+markers',
+        line=dict(color='#00f3ff', width=2),
+        marker=dict(size=4), showlegend=False),
+        row=1, col=col)
+
+fig.update_yaxes(type='log', row=1, col=2)
+fig.update_layout(
+    template='plotly_dark',
+    title='Exponential Decay: Linear vs Semi-log',
+    height=400)
+fig.show()
+
+# Key insight: on semi-log, exponential = straight line
+# slope = -0.3 (the decay constant)
+# y-intercept = ln(10) ≈ 2.3</code></pre>
+        </div>
+    </div>
+
+    <!-- Tab 4: Prompt -->
+    <div class="tab-content">
+        <div class="code-block-container">
+            <div class="code-header">
+                <span class="code-lang">Prompt for AI</span>
+                <button class="copy-btn">Copy</button>
+            </div>
+            <pre><code class="language-text">Create a Python script using Plotly to demonstrate the data analysis workflow:
+
+1. Generate a Gaussian function exp(-x²) sampled at 50 discrete points
+   from x = -3 to 3.
+2. Add random noise at 20% of the signal amplitude using
+   numpy.random.uniform.
+3. Plot the clean function (gray dashed line) and noisy data (colored
+   markers) on the same figure.
+4. Use the plotly_dark template with gray (#808080) zero lines.
+
+Then create a second figure showing exponential decay (10*exp(-0.3x))
+plotted side by side on linear and semi-log scales, demonstrating that
+exponential decay becomes a straight line on a semi-log plot.
+
+Use fixed axis ranges appropriate for each function.</code></pre>
+        </div>
+
+        <div class="info-box" style="margin-top: var(--spacing-md);">
+            <div class="info-box-title">Tips for Prompting</div>
+            <ul>
+                <li>Be specific about libraries: "use Plotly, not matplotlib"</li>
+                <li>Specify colors, ranges, and template for consistency</li>
+                <li>Describe the <em>physics</em> you want to visualize, not just the code</li>
+                <li>Always run the output and verify it matches your expectations</li>
+            </ul>
+        </div>
+    </div>
+</div>
+
+<hr>
+
+<!-- ========== EXERCISES ========== -->
+
+<h2>Exercises for Practice</h2>
+
+<div class="exercise-cards">
+    <div class="exercise-card">
+        <div class="exercise-card-header">
+            <span class="exercise-card-number">1.</span>
+            <span class="exercise-card-badge explore">Explore</span>
+        </div>
+        <div class="exercise-card-content">
+            Find or create a CSV file with two columns of numerical data (any source: weather, stock prices,
+            a physics experiment). Load it into Python using <code>numpy.loadtxt()</code> or
+            <code>pandas.read_csv()</code>, and plot the data using Plotly. Try both linear and log scales.
+            Does either scale reveal a pattern?
+        </div>
+    </div>
+
+    <div class="exercise-card">
+        <div class="exercise-card-header">
+            <span class="exercise-card-number">2.</span>
+            <span class="exercise-card-badge coding">Coding</span>
+        </div>
+        <div class="exercise-card-content">
+            Write a Python script that generates data for \( y = 3x^{-2} \) with 10% additive noise,
+            then plots it on linear, semi-log, and log-log scales. On which scale is the power law obvious?
+            Extract the exponent from the log-log slope.
+        </div>
+    </div>
+
+    <div class="exercise-card">
+        <div class="exercise-card-header">
+            <span class="exercise-card-number">3.</span>
+            <span class="exercise-card-badge think">Think</span>
+        </div>
+        <div class="exercise-card-content">
+            Why does an exponential function \( y = A e^{kx} \) appear as a straight line on a semi-log plot?
+            Write out the mathematical derivation. What do the slope and y-intercept represent?
+            Now do the same for a power law \( y = A x^n \) on a log-log plot.
+        </div>
+    </div>
+</div>
+
+<hr>
+
+<!-- ========== NAVIGATION ========== -->
+
+<div class="btn-group mt-xl">
+    <button class="btn btn-magenta" onclick="navigateToSection('06-nondimensionalization')">&larr; Previous: Non-Dimensionalization</button>
+    <button class="btn" onclick="scrollToTop()">&uarr; Back to Top</button>
+    <button class="btn btn-secondary" onclick="navigateToSection('08-random-variables')">Next: Random Variables &amp; Combinations &rarr;</button>
+</div>

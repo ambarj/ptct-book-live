@@ -1,0 +1,794 @@
+<!-- Section 2.9: Error Bars in Fitting (Optional/Advanced) -->
+<!-- Source: Lecture2.nb (Part 5), advanced material -->
+<!-- Core concept: Understanding and reporting parameter uncertainties -->
+<!-- Time: ~20 minutes -->
+<!-- Prerequisites: Section 2.7 (Automated Fitting), Section 2.8 (Model Selection) -->
+
+<h1>Error Bars in Fitting: Where Do They Come From?</h1>
+
+<p>
+    You've used <code>curve_fit</code> and seen results like
+    \( c = 4.91 \pm 0.03 \).  But where does that \( \pm 0.03 \) come from?
+    It's not magic &mdash; it comes from the <strong>covariance matrix</strong>,
+    which encodes how uncertain each parameter is and how they're correlated.
+    This section opens the hood on fitting uncertainties.
+</p>
+
+<div class="info-box">
+    <div class="info-box-title">Learning Objectives</div>
+    <ul>
+        <li>Read and interpret the covariance matrix from a fit</li>
+        <li>Understand parameter correlations and confidence ellipses</li>
+        <li>Propagate fit uncertainties to derived quantities (\( g = 2c \pm 2\delta c \))</li>
+        <li>Use bootstrap resampling as an independent check on uncertainties</li>
+    </ul>
+</div>
+
+<div class="equation-display">
+    <p><strong>The covariance matrix:</strong></p>
+    $$ \text{Cov} = \begin{pmatrix}
+        \sigma_a^2 & \text{Cov}(a,b) & \text{Cov}(a,c) \\
+        \text{Cov}(b,a) & \sigma_b^2 & \text{Cov}(b,c) \\
+        \text{Cov}(c,a) & \text{Cov}(c,b) & \sigma_c^2
+    \end{pmatrix} $$
+    <p>
+        The diagonal gives parameter variances: \( \delta a = \sqrt{\sigma_a^2} \).
+        Off-diagonal elements reveal <strong>correlations</strong>: if
+        \( \text{Cov}(a,c) < 0 \), increasing \( a \) tends to decrease \( c \).
+    </p>
+</div>
+
+<hr>
+
+<!-- ========== EXPLORER 1: COVARIANCE EXPLORER ========== -->
+
+<h2>Inside the Covariance Matrix</h2>
+
+<p>
+    The left panel shows the raw covariance matrix &mdash; numbers are hard to
+    interpret, so the right panel shows the <strong>correlation matrix</strong>
+    \( \rho_{ij} = \text{Cov}(i,j) / (\sigma_i \sigma_j) \), which ranges
+    from &minus;1 (perfectly anti-correlated) to +1 (perfectly correlated).
+    Toggle <code>absolute_sigma</code> to see what happens when you let
+    <code>curve_fit</code> rescale the error bars.
+</p>
+
+<div class="interactive-container" id="covariance-explorer">
+    <div class="interactive-title">Interactive: Covariance Explorer</div>
+
+    <div style="display: flex; gap: 0.5rem; flex-wrap: wrap;">
+        <div class="plot-container" style="flex: 1; min-width: 280px;">
+            <div id="fu-cov-plot" style="width: 100%; height: 380px;"></div>
+        </div>
+        <div class="plot-container" style="flex: 1; min-width: 280px;">
+            <div id="fu-corr-plot" style="width: 100%; height: 380px;"></div>
+        </div>
+    </div>
+
+    <div id="fu-cov-stats"
+         style="display: flex; justify-content: center; gap: 1.5rem; padding: 8px 0; font-size: 0.85rem; color: #c8c8e0; flex-wrap: wrap;">
+    </div>
+
+    <div class="control-panel">
+        <div class="btn-group">
+            <button class="btn" id="fu-abs-sigma-btn"
+                    data-active="true"
+                    style="background: #00ff9f; color: #0d1117; transition: all 0.2s;"
+                    onclick="toggleAbsSigma()">absolute_sigma: ON</button>
+            <button class="btn" onclick="newCovarianceData()">New Data</button>
+            <button class="btn" onclick="resetCovarianceExplorer()">Reset</button>
+        </div>
+    </div>
+</div>
+
+<div class="info-box">
+    <div class="info-box-title">Key Insight</div>
+    <p>
+        With <code>absolute_sigma=True</code> (the correct setting when you
+        trust your error bars), the covariance matrix comes from inverting the
+        normal equations matrix: Cov = M<sup>&minus;1</sup>.  With
+        <code>absolute_sigma=False</code>, Python rescales by &chi;&sup2;/dof,
+        which means it <em>ignores</em> your error bars and estimates
+        uncertainties from the scatter alone.  Always use
+        <code>absolute_sigma=True</code> when you have genuine error estimates.
+    </p>
+</div>
+
+<!-- Test Your Understanding #1 -->
+<div class="interactive-container question-section">
+    <div class="interactive-title">Test Your Understanding</div>
+
+    <p style="margin-bottom: var(--spacing-md); color: var(--text-secondary);">
+        Use the Covariance Explorer to answer these questions.
+    </p>
+
+    <div class="tabs">
+        <div class="tab-buttons">
+            <button class="tab-button active">Question 1</button>
+            <button class="tab-button">Question 2</button>
+            <button class="tab-button">Question 3</button>
+        </div>
+
+        <!-- Q1: MCQ -->
+        <div class="tab-content active">
+            <div class="question-container" data-type="mcq" data-answer="2">
+                <div class="question-text">
+                    Look at the correlation matrix.  The correlation \( \rho(b,c) \)
+                    between the linear and quadratic coefficients is typically:
+                </div>
+                <div class="question-options">
+                    <label class="option">
+                        <input type="radio" name="fu-q1" value="0">
+                        <span>Close to +1 (strongly positive)</span>
+                    </label>
+                    <label class="option">
+                        <input type="radio" name="fu-q1" value="1">
+                        <span>Close to 0 (uncorrelated)</span>
+                    </label>
+                    <label class="option">
+                        <input type="radio" name="fu-q1" value="2">
+                        <span>Strongly negative (close to &minus;1)</span>
+                    </label>
+                </div>
+                <div class="question-actions">
+                    <button class="btn-verify">Verify</button>
+                </div>
+                <div class="question-explanation" style="display: none;">
+                    <div class="question-explanation-title">Explanation</div>
+                    <div class="question-explanation-text">
+                        \( b \) and \( c \) are strongly anti-correlated because the fit
+                        can trade off between the linear and quadratic terms.  If the data
+                        pushes \( c \) up slightly, \( b \) decreases to compensate, keeping
+                        the overall curve shape similar.  Click "New Data" to see that
+                        \( \rho(b,c) \) stays consistently negative.
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Q2: MCQ -->
+        <div class="tab-content">
+            <div class="question-container" data-type="mcq" data-answer="1">
+                <div class="question-text">
+                    Toggle <code>absolute_sigma</code> from ON to OFF.
+                    What happens to the parameter uncertainties?
+                </div>
+                <div class="question-options">
+                    <label class="option">
+                        <input type="radio" name="fu-q2" value="0">
+                        <span>They always increase</span>
+                    </label>
+                    <label class="option">
+                        <input type="radio" name="fu-q2" value="1">
+                        <span>They change &mdash; the covariance matrix is rescaled by &chi;&sup2;/dof</span>
+                    </label>
+                    <label class="option">
+                        <input type="radio" name="fu-q2" value="2">
+                        <span>They stay exactly the same</span>
+                    </label>
+                </div>
+                <div class="question-actions">
+                    <button class="btn-verify">Verify</button>
+                </div>
+                <div class="question-explanation" style="display: none;">
+                    <div class="question-explanation-title">Explanation</div>
+                    <div class="question-explanation-text">
+                        With <code>absolute_sigma=False</code>, <code>curve_fit</code>
+                        multiplies the covariance matrix by &chi;&sup2;/dof.  If your fit
+                        is good (&chi;&sup2;/dof &asymp; 1), the change is small.  But if
+                        your error bars are wrong, the uncertainties change significantly.
+                        The title shows "(rescaled)" to remind you.
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Q3: Fill -->
+        <div class="tab-content">
+            <div class="question-container" data-type="fill" data-answer="1[0.5,1.5]">
+                <div class="question-text">
+                    On the diagonal of the correlation matrix, every entry should
+                    equal:
+                    <br><br>
+                    \( \rho(x,x) = \) <input type="text" class="fill-blank" placeholder="value">
+                </div>
+                <div class="question-actions">
+                    <button class="btn-verify">Verify</button>
+                </div>
+                <div class="question-explanation" style="display: none;">
+                    <div class="question-explanation-title">Explanation</div>
+                    <div class="question-explanation-text">
+                        By definition, \( \rho(x,x) = \text{Cov}(x,x) / (\sigma_x \cdot \sigma_x)
+                        = \sigma_x^2 / \sigma_x^2 = 1 \).  Every variable is perfectly
+                        correlated with itself.  The diagonal of the correlation matrix is
+                        always 1.000 &mdash; it's the off-diagonal entries that carry
+                        information.
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<hr>
+
+<!-- ========== EXPLORER 2: CONFIDENCE ELLIPSE ========== -->
+
+<h2>Confidence Regions in Parameter Space</h2>
+
+<p>
+    Parameter uncertainties are not independent &mdash; the covariance matrix
+    defines an <strong>ellipse</strong> in parameter space.  The left panel
+    shows the 1&sigma; and 2&sigma; confidence ellipses for \( (b, c) \).
+    If the ellipse is tilted, the parameters are correlated.  Yellow dots are
+    results from repeated independent experiments &mdash; about 39% should fall
+    inside the 1&sigma; ellipse (it's a 2D region, so 39% not 68%).
+</p>
+
+<div class="interactive-container" id="confidence-ellipse">
+    <div class="interactive-title">Interactive: Confidence Ellipse</div>
+
+    <div style="display: flex; gap: 0.5rem; flex-wrap: wrap;">
+        <div class="plot-container" style="flex: 1; min-width: 280px;">
+            <div id="fu-ellipse-plot" style="width: 100%; height: 380px;"></div>
+        </div>
+        <div class="plot-container" style="flex: 1; min-width: 280px;">
+            <div id="fu-fit-plot" style="width: 100%; height: 380px;"></div>
+        </div>
+    </div>
+
+    <div id="fu-ell-stats"
+         style="display: flex; justify-content: center; gap: 1.5rem; padding: 8px 0; font-size: 0.85rem; color: #c8c8e0; flex-wrap: wrap;">
+    </div>
+
+    <div class="control-panel">
+        <div class="control-group">
+            <label class="control-label">Repeated experiments:
+                <span class="control-label-value">50</span>
+            </label>
+            <input type="range" class="slider" id="fu-nexp-slider"
+                   min="10" max="200" step="10" value="50">
+        </div>
+        <div class="btn-group">
+            <button class="btn" onclick="newEllipseData()">New Data</button>
+            <button class="btn" onclick="resetEllipseExplorer()">Reset</button>
+        </div>
+    </div>
+</div>
+
+<div class="info-box">
+    <div class="info-box-title">Key Insight</div>
+    <p>
+        The ellipse is tilted because \( b \) and \( c \) are
+        <strong>anti-correlated</strong>.  If the noise pushes \( c \) up,
+        the fit compensates by pulling \( b \) down (and vice versa).
+        This is why reporting \( \delta b \) and \( \delta c \) separately
+        <em>overstates</em> the uncertainty &mdash; the parameters can't
+        vary independently.  The ellipse captures the full picture.  Note
+        that &sim;39% of yellow dots fall in the 1&sigma; ellipse, not 68%
+        &mdash; for a 2D Gaussian, the 1&sigma; ellipse contains
+        \( 1 - e^{-1/2} \approx 39\% \) of the probability.
+    </p>
+</div>
+
+<!-- Test Your Understanding #2 -->
+<div class="interactive-container question-section">
+    <div class="interactive-title">Test Your Understanding</div>
+
+    <p style="margin-bottom: var(--spacing-md); color: var(--text-secondary);">
+        Use the Confidence Ellipse explorer to answer these questions.
+    </p>
+
+    <div class="tabs">
+        <div class="tab-buttons">
+            <button class="tab-button active">Question 4</button>
+            <button class="tab-button">Question 5</button>
+            <button class="tab-button">Question 6</button>
+        </div>
+
+        <!-- Q4: MCQ -->
+        <div class="tab-content active">
+            <div class="question-container" data-type="mcq" data-answer="1">
+                <div class="question-text">
+                    The confidence ellipse is tilted at an angle.  What does
+                    this tilt mean physically?
+                </div>
+                <div class="question-options">
+                    <label class="option">
+                        <input type="radio" name="fu-q4" value="0">
+                        <span>The parameters are independent</span>
+                    </label>
+                    <label class="option">
+                        <input type="radio" name="fu-q4" value="1">
+                        <span>The parameters are correlated &mdash; changing one affects the best value of the other</span>
+                    </label>
+                    <label class="option">
+                        <input type="radio" name="fu-q4" value="2">
+                        <span>The fit is poor</span>
+                    </label>
+                </div>
+                <div class="question-actions">
+                    <button class="btn-verify">Verify</button>
+                </div>
+                <div class="question-explanation" style="display: none;">
+                    <div class="question-explanation-title">Explanation</div>
+                    <div class="question-explanation-text">
+                        A tilted ellipse means the parameters are correlated.  If the ellipse
+                        axes were aligned with the coordinate axes, the parameters would be
+                        independent.  The tilt direction shows the correlation sign: a
+                        negatively-sloped tilt (upper-left to lower-right) means anti-correlation
+                        &mdash; one goes up as the other goes down.
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Q5: Fill -->
+        <div class="tab-content">
+            <div class="question-container" data-type="fill" data-answer="39[30,50]">
+                <div class="question-text">
+                    For a 2D Gaussian, what percentage of samples fall inside the
+                    1&sigma; ellipse?
+                    <br><br>
+                    Approximately <input type="text" class="fill-blank" placeholder="%"> %
+                </div>
+                <div class="question-actions">
+                    <button class="btn-verify">Verify</button>
+                </div>
+                <div class="question-explanation" style="display: none;">
+                    <div class="question-explanation-title">Explanation</div>
+                    <div class="question-explanation-text">
+                        In 1D, the 1&sigma; interval contains 68% of the probability.
+                        In 2D, the 1&sigma; ellipse contains \( 1 - e^{-1/2} \approx 39\% \).
+                        For 68% coverage in 2D, you need the \( \sqrt{2.3} \approx 1.52\sigma \)
+                        ellipse.  This often surprises people &mdash; "1 sigma" means
+                        different things in different dimensions!
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Q6: MSQ -->
+        <div class="tab-content">
+            <div class="question-container" data-type="msq" data-answer="1,2">
+                <div class="question-text">
+                    Which would make the confidence ellipse <em>smaller</em>?
+                    <strong>(Select all that apply)</strong>
+                </div>
+                <div class="question-options">
+                    <label class="option">
+                        <input type="checkbox" value="0">
+                        <span>Adding more fitted parameters</span>
+                    </label>
+                    <label class="option">
+                        <input type="checkbox" value="1">
+                        <span>Reducing the noise level</span>
+                    </label>
+                    <label class="option">
+                        <input type="checkbox" value="2">
+                        <span>Taking more measurements (more data points)</span>
+                    </label>
+                    <label class="option">
+                        <input type="checkbox" value="3">
+                        <span>Switching to a different model</span>
+                    </label>
+                </div>
+                <div class="question-actions">
+                    <button class="btn-verify">Verify</button>
+                </div>
+                <div class="question-explanation" style="display: none;">
+                    <div class="question-explanation-title">Explanation</div>
+                    <div class="question-explanation-text">
+                        <ul>
+                            <li><strong>False:</strong> More parameters generally
+                                <em>increases</em> uncertainties (more unknowns to constrain).</li>
+                            <li><strong>True:</strong> Smaller error bars mean each data point
+                                constrains the fit more tightly, shrinking the ellipse.</li>
+                            <li><strong>True:</strong> More data = more constraints = smaller
+                                uncertainty = smaller ellipse.</li>
+                            <li><strong>False:</strong> Switching models changes the shape and
+                                orientation of the ellipse but doesn't systematically shrink it.</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<hr>
+
+<!-- ========== EXPLORER 3: BOOTSTRAP SIMULATOR ========== -->
+
+<h2>Bootstrap: A Second Opinion on Uncertainties</h2>
+
+<p>
+    The covariance matrix assumes your model is correct and errors are Gaussian.
+    <strong>Bootstrapping</strong> is a model-free alternative: resample your
+    data with replacement, refit each resample, and look at the scatter of
+    fitted parameters.  The bootstrap standard deviation should match the
+    covariance matrix uncertainty &mdash; if it doesn't, something is wrong
+    with your assumptions.
+</p>
+
+<div class="interactive-container" id="bootstrap-simulator">
+    <div class="interactive-title">Interactive: Bootstrap Simulator</div>
+
+    <div style="display: flex; gap: 0.5rem; flex-wrap: wrap;">
+        <div class="plot-container" style="flex: 1; min-width: 280px;">
+            <div id="fu-boot-hist-plot" style="width: 100%; height: 380px;"></div>
+        </div>
+        <div class="plot-container" style="flex: 1; min-width: 280px;">
+            <div id="fu-boot-curves-plot" style="width: 100%; height: 380px;"></div>
+        </div>
+    </div>
+
+    <div id="fu-boot-stats"
+         style="display: flex; justify-content: center; gap: 1.5rem; padding: 8px 0; font-size: 0.85rem; color: #c8c8e0; flex-wrap: wrap;">
+    </div>
+
+    <div class="control-panel">
+        <div class="control-group">
+            <label class="control-label">Bootstrap resamples:
+                <span class="control-label-value">200</span>
+            </label>
+            <input type="range" class="slider" id="fu-nboot-slider"
+                   min="50" max="500" step="50" value="200">
+        </div>
+        <div class="control-group">
+            <label class="control-label">Show parameter:
+                <span class="control-label-value">c (quadratic)</span>
+            </label>
+            <select id="fu-boot-param-select"
+                    style="width: 100%; padding: 8px 12px; background: #1a1f3a; color: #c8c8e0; border: 1px solid #2a2f4a; border-radius: 6px; font-size: 0.85rem; cursor: pointer;">
+                <option value="a">a (offset)</option>
+                <option value="b">b (linear)</option>
+                <option value="c" selected>c (quadratic)</option>
+            </select>
+        </div>
+        <div class="btn-group">
+            <button class="btn" onclick="newBootstrapData()">New Data</button>
+            <button class="btn" onclick="resetBootstrapExplorer()">Reset</button>
+        </div>
+    </div>
+</div>
+
+<div class="info-box">
+    <div class="info-box-title">Key Insight</div>
+    <p>
+        Compare <strong>Covariance &delta;</strong> (from the matrix) with
+        <strong>Bootstrap &delta;</strong> (from resampling).  When they agree,
+        both methods are reliable.  When they disagree, the covariance matrix
+        assumptions (Gaussian errors, correct model) may be violated.
+        The right panel shows all bootstrap fit curves overlaid &mdash; the
+        "spaghetti" of curves gives you a visceral sense of the uncertainty.
+        Narrower spaghetti = more precise measurement.
+    </p>
+</div>
+
+<!-- Test Your Understanding #3 -->
+<div class="interactive-container question-section">
+    <div class="interactive-title">Test Your Understanding</div>
+
+    <p style="margin-bottom: var(--spacing-md); color: var(--text-secondary);">
+        Use the Bootstrap Simulator to answer these questions.
+    </p>
+
+    <div class="tabs">
+        <div class="tab-buttons">
+            <button class="tab-button active">Question 7</button>
+            <button class="tab-button">Question 8</button>
+            <button class="tab-button">Question 9</button>
+        </div>
+
+        <!-- Q7: MCQ -->
+        <div class="tab-content active">
+            <div class="question-container" data-type="mcq" data-answer="2">
+                <div class="question-text">
+                    What does "resample with replacement" mean in bootstrapping?
+                </div>
+                <div class="question-options">
+                    <label class="option">
+                        <input type="radio" name="fu-q7" value="0">
+                        <span>Collect new experimental data</span>
+                    </label>
+                    <label class="option">
+                        <input type="radio" name="fu-q7" value="1">
+                        <span>Randomly remove some data points</span>
+                    </label>
+                    <label class="option">
+                        <input type="radio" name="fu-q7" value="2">
+                        <span>Draw N points from the original N, allowing repeats (some points used twice, others not at all)</span>
+                    </label>
+                </div>
+                <div class="question-actions">
+                    <button class="btn-verify">Verify</button>
+                </div>
+                <div class="question-explanation" style="display: none;">
+                    <div class="question-explanation-title">Explanation</div>
+                    <div class="question-explanation-text">
+                        Bootstrapping draws N data points from the original N, with
+                        replacement.  This means some original points appear multiple times
+                        in a resample while others are missing.  Each resample is the same
+                        size as the original dataset but has a different composition.
+                        Fitting each resample gives a different set of parameters, and
+                        the scatter of these parameters estimates the uncertainty.
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Q8: MCQ -->
+        <div class="tab-content">
+            <div class="question-container" data-type="mcq" data-answer="1">
+                <div class="question-text">
+                    The stats show "Covariance &delta;" and "Bootstrap &delta;".
+                    When do these two methods agree?
+                </div>
+                <div class="question-options">
+                    <label class="option">
+                        <input type="radio" name="fu-q8" value="0">
+                        <span>Only when you have thousands of data points</span>
+                    </label>
+                    <label class="option">
+                        <input type="radio" name="fu-q8" value="1">
+                        <span>When the model is correct and errors are roughly Gaussian</span>
+                    </label>
+                    <label class="option">
+                        <input type="radio" name="fu-q8" value="2">
+                        <span>They never agree &mdash; they measure different things</span>
+                    </label>
+                </div>
+                <div class="question-actions">
+                    <button class="btn-verify">Verify</button>
+                </div>
+                <div class="question-explanation" style="display: none;">
+                    <div class="question-explanation-title">Explanation</div>
+                    <div class="question-explanation-text">
+                        The covariance matrix assumes the model is correct and errors are
+                        Gaussian.  Bootstrapping makes no such assumptions.  When both
+                        give similar uncertainties, it means the covariance matrix assumptions
+                        are satisfied.  If bootstrap gives much larger uncertainties, the
+                        model may be wrong (systematic errors) or the error bars may be
+                        underestimated.
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Q9: Fill -->
+        <div class="tab-content">
+            <div class="question-container" data-type="fill" data-answer="9.8[8.5,11.0]">
+                <div class="question-text">
+                    Select parameter \( c \) and read the histogram.  From the fit,
+                    \( g = 2c \).  What value does \( g \) converge to?
+                    <br><br>
+                    \( g \approx \) <input type="text" class="fill-blank" placeholder="value">
+                </div>
+                <div class="question-actions">
+                    <button class="btn-verify">Verify</button>
+                </div>
+                <div class="question-explanation" style="display: none;">
+                    <div class="question-explanation-title">Explanation</div>
+                    <div class="question-explanation-text">
+                        The bootstrap histogram for \( c \) is centred near 4.9, so
+                        \( g = 2c \approx 9.8 \).  The width of the histogram gives
+                        \( \delta c \), and propagation gives \( \delta g = 2\delta c \).
+                        This is exactly the error propagation rule for a simple
+                        multiplicative factor.
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<hr>
+
+<!-- ========== PYTHON CODE ========== -->
+
+<h2>Python Code</h2>
+
+<p>Here's the Python equivalent for covariance analysis and bootstrapping.</p>
+
+<div class="tabs">
+    <div class="tab-buttons">
+        <button class="tab-button active">Covariance Matrix</button>
+        <button class="tab-button">Bootstrap</button>
+        <button class="tab-button">Prompt</button>
+    </div>
+
+    <!-- Tab 1: Covariance matrix -->
+    <div class="tab-content active">
+        <div class="code-block-container">
+            <div class="code-header">
+                <span class="code-lang">Python</span>
+                <button class="copy-btn">Copy</button>
+            </div>
+            <pre><code class="language-python">import numpy as np
+from scipy.optimize import curve_fit
+
+# Galileo data
+rng = np.random.default_rng(42)
+t = np.arange(1, 11, dtype=float)
+d_true = 0.5 * 9.8 * t**2
+noise = 0.15 * d_true
+data = np.array([d_true + rng.normal(0, noise) for _ in range(5)])
+means = data.mean(axis=0)
+errors = data.std(axis=0, ddof=1) / np.sqrt(4)
+
+def model(t, a, b, c):
+    return a + b*t + c*t**2
+
+# Fit with absolute_sigma=True
+popt, pcov = curve_fit(model, t, means,
+                       sigma=errors, absolute_sigma=True)
+
+print("Covariance matrix:")
+print(np.array2string(pcov, precision=4))
+
+# Correlation matrix
+perr = np.sqrt(np.diag(pcov))
+corr = pcov / np.outer(perr, perr)
+print("\nCorrelation matrix:")
+print(np.array2string(corr, precision=3))
+
+# Parameter uncertainties
+print(f"\na = {popt[0]:.2f} ± {perr[0]:.2f}")
+print(f"b = {popt[1]:.3f} ± {perr[1]:.3f}")
+print(f"c = {popt[2]:.4f} ± {perr[2]:.4f}")
+print(f"g = {2*popt[2]:.2f} ± {2*perr[2]:.2f}")</code></pre>
+        </div>
+    </div>
+
+    <!-- Tab 2: Bootstrap -->
+    <div class="tab-content">
+        <div class="code-block-container">
+            <div class="code-header">
+                <span class="code-lang">Python</span>
+                <button class="copy-btn">Copy</button>
+            </div>
+            <pre><code class="language-python">import numpy as np
+from scipy.optimize import curve_fit
+
+# Setup (same data as above)
+rng = np.random.default_rng(42)
+t = np.arange(1, 11, dtype=float)
+d_true = 0.5 * 9.8 * t**2
+noise = 0.15 * d_true
+data = np.array([d_true + rng.normal(0, noise) for _ in range(5)])
+means = data.mean(axis=0)
+errors = data.std(axis=0, ddof=1) / np.sqrt(4)
+
+def model(t, a, b, c):
+    return a + b*t + c*t**2
+
+# Original fit
+popt, pcov = curve_fit(model, t, means,
+                       sigma=errors, absolute_sigma=True)
+perr = np.sqrt(np.diag(pcov))
+
+# Bootstrap: resample with replacement
+n_boot = 500
+boot_params = []
+for _ in range(n_boot):
+    idx = rng.choice(len(t), size=len(t), replace=True)
+    t_boot = t[idx]
+    m_boot = means[idx]
+    e_boot = errors[idx]
+    try:
+        p, _ = curve_fit(model, t_boot, m_boot,
+                         sigma=e_boot, absolute_sigma=True)
+        boot_params.append(p)
+    except RuntimeError:
+        pass
+
+boot_params = np.array(boot_params)
+boot_std = boot_params.std(axis=0)
+
+print("          Covariance  Bootstrap")
+for i, name in enumerate(['a', 'b', 'c']):
+    print(f"  δ{name}:   {perr[i]:.4f}      {boot_std[i]:.4f}")
+print(f"\n  δg:   {2*perr[2]:.4f}      {2*boot_std[2]:.4f}")</code></pre>
+        </div>
+    </div>
+
+    <!-- Tab 3: Prompt -->
+    <div class="tab-content">
+        <div class="code-block-container">
+            <div class="code-header">
+                <span class="code-lang">Prompt for AI</span>
+                <button class="copy-btn">Copy</button>
+            </div>
+            <pre><code class="language-text">Analyse fitting uncertainties in Python:
+
+Setup:
+- Galileo's data: d = (g/2)t² at t = 1..10, 15% relative noise
+- 5 trials per time point, compute mean and standard error
+- Fit d = a + bt + ct² using curve_fit with absolute_sigma=True
+
+Tasks:
+1. Print the full covariance matrix and correlation matrix
+   - Show parameter uncertainties: a ± δa, b ± δb, c ± δc
+   - Propagate to g = 2c ± 2δc
+
+2. Plot the 1σ and 2σ confidence ellipses in (b, c) space
+   - Compute eigenvalues/eigenvectors of the 2x2 sub-covariance matrix
+   - Overlay 100 repeated-experiment fits as scatter points
+
+3. Bootstrap analysis (500 resamples)
+   - Resample data with replacement, refit each
+   - Compare bootstrap std with covariance uncertainties
+   - Plot histogram of bootstrapped c values
+
+Use plotly_dark template. Gray axes (#808080).</code></pre>
+        </div>
+
+        <div class="info-box" style="margin-top: var(--spacing-md);">
+            <div class="info-box-title">Tips for Prompting</div>
+            <ul>
+                <li>Always specify <code>absolute_sigma=True</code> for correct uncertainties</li>
+                <li>Ask for both covariance and correlation matrices</li>
+                <li>Request bootstrap as a cross-check on the covariance method</li>
+                <li>Ask for confidence ellipses, not just error bars</li>
+            </ul>
+        </div>
+    </div>
+</div>
+
+<hr>
+
+<!-- ========== EXERCISES ========== -->
+
+<h2>Exercises for Practice</h2>
+
+<div class="exercise-cards">
+    <div class="exercise-card">
+        <div class="exercise-card-header">
+            <span class="exercise-card-number">1.</span>
+            <span class="exercise-card-badge explore">Explore</span>
+        </div>
+        <div class="exercise-card-content">
+            In the Confidence Ellipse explorer, set repeated experiments to 200.
+            Count (roughly) how many yellow dots fall inside the cyan 1&sigma;
+            ellipse.  Is it close to 39%?  Why is it 39% and not 68%?
+        </div>
+    </div>
+
+    <div class="exercise-card">
+        <div class="exercise-card-header">
+            <span class="exercise-card-number">2.</span>
+            <span class="exercise-card-badge coding">Coding</span>
+        </div>
+        <div class="exercise-card-content">
+            Write a Python script that fits Galileo data with the 1-parameter
+            model \( d = ct^2 \) and the 3-parameter model \( d = a + bt + ct^2 \).
+            Compare \( \delta c \) from each fit.  Which gives a smaller
+            uncertainty on \( c \)?  Explain why using the covariance matrix.
+        </div>
+    </div>
+
+    <div class="exercise-card">
+        <div class="exercise-card-header">
+            <span class="exercise-card-number">3.</span>
+            <span class="exercise-card-badge think">Think</span>
+        </div>
+        <div class="exercise-card-content">
+            In the Bootstrap Simulator, the right panel shows "spaghetti"
+            curves.  If you could reduce the noise to 5%, what would happen
+            to the spaghetti?  What if you had 100 time points instead of 10?
+            How does each change affect both the covariance and bootstrap
+            uncertainties?
+        </div>
+    </div>
+</div>
+
+<hr>
+
+<!-- ========== NAVIGATION ========== -->
+
+<div class="btn-group mt-xl">
+    <button class="btn btn-magenta" onclick="navigateToSection('14-model-selection')">&larr; Previous: Model Selection</button>
+    <button class="btn" onclick="scrollToTop()">&uarr; Back to Top</button>
+    <button class="btn btn-secondary" onclick="navigateToSection('16-superposition-intro')">Next: The Superposition Principle &rarr;</button>
+</div>

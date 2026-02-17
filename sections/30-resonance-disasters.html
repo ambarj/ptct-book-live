@@ -1,0 +1,690 @@
+<!-- Section 3.11: Resonance Disasters and Designs -->
+<!-- Source: Lecture4.nb (Part 4), engineering applications -->
+<!-- Core concept: Real-world resonance — when to avoid and when to exploit -->
+<!-- Time: ~20 minutes -->
+<!-- Prerequisites: Section 3.9 (resonance, Q factor), Section 3.10 (beats) -->
+
+<h1>Resonance Disasters and Designs</h1>
+
+<p>
+    Resonance is not just a textbook curiosity &mdash; it can bring down bridges
+    or let you tune in to your favourite radio station.  The same physics that
+    makes a wine glass shatter also lets an MRI machine image your brain.
+    In this section we explore <strong>both sides of resonance</strong>:
+    catastrophic failures when it strikes where you don&rsquo;t want it, and
+    elegant designs that harness it on purpose.
+</p>
+
+<p>
+    The key insight is always the same: a small periodic force, applied at
+    the right frequency, can produce an enormous response.  Whether that&rsquo;s
+    a disaster or a triumph depends entirely on whether you planned for it.
+</p>
+
+<div class="info-box">
+    <div class="info-box-title">Learning Objectives</div>
+    <ul>
+        <li>Explain why resonance can be destructive (bridges, buildings) or useful (radio, MRI)</li>
+        <li>Design a tuned mass damper (TMD) to suppress unwanted resonance</li>
+        <li>Use the Q factor and bandwidth to select a specific frequency from a mixture</li>
+        <li>Apply the &ldquo;avoid or exploit?&rdquo; decision framework to new engineering problems</li>
+    </ul>
+</div>
+
+<div class="equation-display">
+    <p><strong>The resonance amplification factor:</strong></p>
+    $$ A(\omega_d) = \frac{F_0/m}{\sqrt{(\omega_0^2 - \omega_d^2)^2 + (2\gamma\omega_d)^2}} $$
+    <p>
+        At resonance (\( \omega_d \approx \omega_0 \)), the denominator simplifies and
+        the peak amplitude becomes
+        \( A_{\text{peak}} \approx F_0 / (2m\gamma\omega_0) \).
+        Since \( Q = \omega_0/(2\gamma) \), this is the same as
+        \( Q \cdot F_0/(m\omega_0^2) \) &mdash; the response is amplified by a factor of Q.
+        High Q means huge amplification: <strong>great for sensors, terrible for structures</strong>.
+    </p>
+</div>
+
+<hr>
+
+<!-- ========== EXPLORER 1: BRIDGE STRESS SIMULATOR ========== -->
+
+<h2>When Resonance Attacks: The Bridge Simulator</h2>
+
+<p>
+    In 1831, a column of British soldiers marching in step across the Broughton
+    Suspension Bridge caused it to collapse.  The lesson: even small,
+    perfectly timed forces can drive a structure past its breaking point.
+    Since then, armies break step on bridges.
+</p>
+
+<p>
+    The left panel shows a bridge&rsquo;s displacement as you drive it at
+    frequency \( \omega_d \).  The dashed red line tracks the <strong>peak
+    stress</strong> reached so far.  When it crosses the danger threshold,
+    the structure fails.  The right panel shows the full amplitude response
+    &mdash; the resonance peak is where danger lurks.  Try sweeping
+    \( \omega_d \) through the natural frequency \( \omega_0 = 3.0 \)
+    and watch the disaster unfold.
+</p>
+
+<div class="interactive-container" id="bridge-stress-simulator">
+    <div class="interactive-title">Explorer 1: Bridge Stress Simulator</div>
+
+    <div style="display: flex; gap: 0.5rem; flex-wrap: wrap;">
+        <div class="plot-container" style="flex: 1; min-width: 280px;">
+            <div id="rd-br-plot" style="width: 100%; height: 380px;"></div>
+        </div>
+        <div class="plot-container" style="flex: 1; min-width: 280px;">
+            <div id="rd-br-amp-plot" style="width: 100%; height: 380px;"></div>
+        </div>
+    </div>
+
+    <div id="rd-br-stats"
+         style="display: flex; justify-content: center; gap: 1.5rem; padding: 8px 0; font-size: 0.85rem; color: #c8c8e0; flex-wrap: wrap;">
+    </div>
+
+    <div class="control-panel">
+        <div class="control-group">
+            <label class="control-label">Driving frequency &omega;<sub>d</sub>:
+                <span class="control-label-value">1.00</span> rad/s
+            </label>
+            <input type="range" class="slider" id="rd-br-wd" min="0.50" max="5.50" step="0.02" value="1.00">
+        </div>
+        <div class="control-group">
+            <label class="control-label">Damping &gamma;:
+                <span class="control-label-value">0.10</span>
+            </label>
+            <input type="range" class="slider" id="rd-br-gamma" min="0.02" max="1.00" step="0.02" value="0.10">
+        </div>
+        <button class="btn btn-sm" onclick="resetBridge()">Reset</button>
+    </div>
+</div>
+
+<!-- Questions Group 1 -->
+<div class="interactive-container question-section">
+    <div class="interactive-title">Test Your Understanding</div>
+    <p style="margin-bottom: var(--spacing-md); color: var(--text-secondary);">
+        Use the Bridge Stress Simulator above to answer these questions.
+    </p>
+    <div class="tabs">
+        <div class="tab-buttons">
+            <button class="tab-button active">Question 1</button>
+            <button class="tab-button">Question 2</button>
+            <button class="tab-button">Question 3</button>
+        </div>
+
+        <div class="tab-content active">
+            <div class="question-container" data-type="mcq" data-answer="2">
+                <div class="question-text">
+                    With \( \gamma = 0.10 \), at what driving frequency does the bridge
+                    cross the danger threshold (amplitude &gt; 3)?
+                </div>
+                <div class="question-options">
+                    <label class="option"><input type="radio" name="rd-q1" value="0"><span>\( \omega_d = 1.0 \) rad/s &mdash; well below resonance</span></label>
+                    <label class="option"><input type="radio" name="rd-q1" value="1"><span>\( \omega_d = 2.0 \) rad/s &mdash; halfway to resonance</span></label>
+                    <label class="option"><input type="radio" name="rd-q1" value="2"><span>\( \omega_d \approx 3.0 \) rad/s &mdash; near the natural frequency</span></label>
+                    <label class="option"><input type="radio" name="rd-q1" value="3"><span>\( \omega_d = 5.0 \) rad/s &mdash; well above resonance</span></label>
+                </div>
+                <div class="question-actions"><button class="btn-verify">Verify</button></div>
+                <div class="question-explanation" style="display:none;">
+                    <strong>Explanation:</strong>
+                    The danger threshold is crossed only near \( \omega_d \approx \omega_0 = 3.0 \) rad/s,
+                    where resonance amplifies the response.  At \( \gamma = 0.10 \), the peak amplitude
+                    is \( A_{\text{peak}} = 1/(2 \times 0.10 \times 3.0) \approx 1.67 \) &mdash; below
+                    the threshold.  But decrease \( \gamma \) to 0.05 and you get
+                    \( A_{\text{peak}} \approx 3.33 \), crossing the danger line.
+                    The point: resonance is where danger lurks, even if safe damping can prevent it.
+                </div>
+            </div>
+        </div>
+
+        <div class="tab-content">
+            <div class="question-container" data-type="fill" data-answer="1.67[1.5,1.9]">
+                <div class="question-text">
+                    With \( \gamma = 0.10 \) and \( \omega_d = 3.0 \), the steady-state amplitude
+                    is approximately \( A_{\text{ss}} \approx \)
+                    <input type="text" class="fill-blank" placeholder="?">
+                    (Read from the stats bar.)
+                </div>
+                <div class="question-actions"><button class="btn-verify">Verify</button></div>
+                <div class="question-explanation" style="display:none;">
+                    <strong>Explanation:</strong>
+                    At exact resonance \( \omega_d = \omega_0 = 3.0 \):
+                    $$ A = \frac{F_0/m}{2\gamma\omega_0} = \frac{1}{2 \times 0.10 \times 3.0} = \frac{1}{0.6} \approx 1.67 $$
+                    With this light damping the amplitude is large but still below the danger
+                    threshold of 3.  Try reducing \( \gamma \) to 0.05 and you&rsquo;ll see
+                    \( A_{\text{peak}} \approx 3.33 \), which crosses the threshold.
+                </div>
+            </div>
+        </div>
+
+        <div class="tab-content">
+            <div class="question-container" data-type="mcq" data-answer="1">
+                <div class="question-text">
+                    If you increase \( \gamma \) from 0.10 to 0.50, what happens to the
+                    danger zone on the amplitude response curve?
+                </div>
+                <div class="question-options">
+                    <label class="option"><input type="radio" name="rd-q3" value="0"><span>The peak shifts to a lower frequency</span></label>
+                    <label class="option"><input type="radio" name="rd-q3" value="1"><span>The peak drops below the danger threshold &mdash; the bridge is safe at all frequencies</span></label>
+                    <label class="option"><input type="radio" name="rd-q3" value="2"><span>The danger zone widens to cover more frequencies</span></label>
+                    <label class="option"><input type="radio" name="rd-q3" value="3"><span>Nothing changes &mdash; resonance amplitude is independent of damping</span></label>
+                </div>
+                <div class="question-actions"><button class="btn-verify">Verify</button></div>
+                <div class="question-explanation" style="display:none;">
+                    <strong>Explanation:</strong>
+                    Increasing damping reduces the peak amplitude:
+                    \( A_{\text{peak}} \approx 1/(2\gamma\omega_0) \).
+                    At \( \gamma = 0.50 \): \( A_{\text{peak}} \approx 1/(2 \times 0.50 \times 3.0) = 0.33 \),
+                    well below the danger threshold of 3.  More damping = smaller resonance peak = safer.
+                    This is exactly why engineers add damping to structures.
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="info-box">
+    <div class="info-box-title">The Engineering Lesson</div>
+    <p>
+        Every structure has a natural frequency.  If an external periodic force
+        happens to match that frequency, the response grows dangerously.
+        <strong>Strategy 1: Add damping</strong> (lower Q, reduce the peak).
+        <strong>Strategy 2: Shift the frequency</strong> (change mass or stiffness
+        so \( \omega_0 \) moves away from the driving frequency).
+        <strong>Strategy 3: Attach a tuned mass damper</strong> (see Explorer 2).
+    </p>
+</div>
+
+<hr>
+
+<!-- ========== EXPLORER 2: TMD DESIGNER ========== -->
+
+<h2>Rescue the Bridge: Tuned Mass Dampers</h2>
+
+<p>
+    A <strong>tuned mass damper</strong> (TMD) is a secondary oscillator bolted
+    to the primary structure, tuned to the same natural frequency.  When the
+    structure starts vibrating, the TMD absorbs energy and converts the single
+    resonance peak into two smaller peaks &mdash; like splitting a dangerous
+    mountain road into two gentle hills.  The Taipei 101 skyscraper uses a
+    730-tonne TMD to survive typhoons and earthquakes.
+</p>
+
+<p>
+    Adjust the <strong>mass ratio</strong> \( \mu = m_{\text{TMD}} / m_{\text{structure}} \)
+    and the TMD damping \( \gamma_{\text{TMD}} \).  Watch how the single
+    resonance peak splits and shrinks.  The bar chart shows the reduction factor.
+</p>
+
+<div class="interactive-container" id="tmd-designer">
+    <div class="interactive-title">Explorer 2: Rescue the Bridge &mdash; TMD Designer</div>
+
+    <div style="display: flex; gap: 0.5rem; flex-wrap: wrap;">
+        <div class="plot-container" style="flex: 1; min-width: 280px;">
+            <div id="rd-tmd-plot" style="width: 100%; height: 380px;"></div>
+        </div>
+        <div class="plot-container" style="flex: 1; min-width: 280px;">
+            <div id="rd-tmd-bar-plot" style="width: 100%; height: 380px;"></div>
+        </div>
+    </div>
+
+    <div id="rd-tmd-stats"
+         style="display: flex; justify-content: center; gap: 1.5rem; padding: 8px 0; font-size: 0.85rem; color: #c8c8e0; flex-wrap: wrap;">
+    </div>
+
+    <div class="control-panel">
+        <div class="control-group">
+            <label class="control-label">Mass ratio &mu; = m<sub>TMD</sub>/m<sub>struct</sub>:
+                <span class="control-label-value">0.05</span>
+            </label>
+            <input type="range" class="slider" id="rd-tmd-mu" min="0.01" max="0.20" step="0.01" value="0.05">
+        </div>
+        <div class="control-group">
+            <label class="control-label">TMD damping &gamma;<sub>TMD</sub>:
+                <span class="control-label-value">0.20</span>
+            </label>
+            <input type="range" class="slider" id="rd-tmd-gamma2" min="0.05" max="1.00" step="0.05" value="0.20">
+        </div>
+        <button class="btn btn-sm" onclick="resetTMD()">Reset</button>
+    </div>
+</div>
+
+<!-- Questions Group 2 -->
+<div class="interactive-container question-section">
+    <div class="interactive-title">Test Your Understanding</div>
+    <p style="margin-bottom: var(--spacing-md); color: var(--text-secondary);">
+        Use the TMD Designer above to answer these questions.
+    </p>
+    <div class="tabs">
+        <div class="tab-buttons">
+            <button class="tab-button active">Question 4</button>
+            <button class="tab-button">Question 5</button>
+            <button class="tab-button">Question 6</button>
+        </div>
+
+        <div class="tab-content active">
+            <div class="question-container" data-type="mcq" data-answer="1">
+                <div class="question-text">
+                    What happens to the amplitude response curve when you attach a TMD
+                    (with \( \mu = 0.05 \))?
+                </div>
+                <div class="question-options">
+                    <label class="option"><input type="radio" name="rd-q4" value="0"><span>The single peak disappears entirely</span></label>
+                    <label class="option"><input type="radio" name="rd-q4" value="1"><span>The single peak splits into two smaller peaks</span></label>
+                    <label class="option"><input type="radio" name="rd-q4" value="2"><span>The peak shifts to a much higher frequency</span></label>
+                    <label class="option"><input type="radio" name="rd-q4" value="3"><span>The peak gets taller but narrower</span></label>
+                </div>
+                <div class="question-actions"><button class="btn-verify">Verify</button></div>
+                <div class="question-explanation" style="display:none;">
+                    <strong>Explanation:</strong>
+                    A TMD converts the single-DOF resonance into a two-DOF system with two
+                    resonance peaks flanking the original frequency.  The original dangerous
+                    peak is replaced by two smaller, manageable ones.  This is the fundamental
+                    mechanism: energy that used to pile up at one frequency is now distributed.
+                </div>
+            </div>
+        </div>
+
+        <div class="tab-content">
+            <div class="question-container" data-type="msq" data-answer="0,2">
+                <div class="question-text">
+                    Which of these are true about TMD design? (Select all that apply)
+                </div>
+                <div class="question-options">
+                    <label class="option"><input type="checkbox" value="0"><span>Increasing the mass ratio \( \mu \) separates the two peaks further</span></label>
+                    <label class="option"><input type="checkbox" value="1"><span>The TMD frequency should be very different from the structure&rsquo;s natural frequency</span></label>
+                    <label class="option"><input type="checkbox" value="2"><span>TMD damping controls how deep the valley between the two peaks is</span></label>
+                    <label class="option"><input type="checkbox" value="3"><span>A TMD works by adding stiffness to the primary structure</span></label>
+                </div>
+                <div class="question-actions"><button class="btn-verify">Verify</button></div>
+                <div class="question-explanation" style="display:none;">
+                    <strong>Explanation:</strong>
+                    <ul>
+                        <li><strong>Statement 1 (True):</strong> Larger \( \mu \) means more coupling, which pushes the two peaks further apart.</li>
+                        <li><strong>Statement 2 (False):</strong> The TMD must be <em>tuned</em> to the structure&rsquo;s natural frequency &mdash; that&rsquo;s why it&rsquo;s called a <em>tuned</em> mass damper.</li>
+                        <li><strong>Statement 3 (True):</strong> TMD damping \( \gamma_{\text{TMD}} \) controls the shape between the peaks.  Low damping gives a deep notch at \( \omega_0 \); high damping fills it in but also raises the peaks.</li>
+                        <li><strong>Statement 4 (False):</strong> A TMD works by absorbing energy through its own oscillation, not by stiffening the structure.</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <div class="tab-content">
+            <div class="question-container" data-type="fill" data-answer="79[70,88]">
+                <div class="question-text">
+                    With \( \mu = 0.10 \) and \( \gamma_{\text{TMD}} = 0.30 \), the peak
+                    amplitude reduction is approximately
+                    <input type="text" class="fill-blank" placeholder="?">%
+                    (Read from the stats bar.)
+                </div>
+                <div class="question-actions"><button class="btn-verify">Verify</button></div>
+                <div class="question-explanation" style="display:none;">
+                    <strong>Explanation:</strong>
+                    With \( \mu = 0.10 \) and \( \gamma_{\text{TMD}} = 0.30 \), the TMD
+                    reduces the peak amplitude from about 3.3 (no TMD) to about 0.7,
+                    a reduction of roughly 79%.  The TMD is remarkably effective: even
+                    a mass only 10% of the structure eliminates most of the resonance danger.
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<hr>
+
+<!-- ========== EXPLORER 3: RADIO TUNER ========== -->
+
+<h2>When Resonance is Your Friend: The Radio Tuner</h2>
+
+<p>
+    Not all resonance is bad.  A radio receiver uses an LC circuit whose
+    resonant frequency \( \omega_0 = 1/\sqrt{LC} \) is tunable.  When you
+    &ldquo;turn the dial,&rdquo; you&rsquo;re adjusting \( \omega_0 \) to match
+    the station&rsquo;s broadcast frequency.  The circuit&rsquo;s sharp
+    resonance peak amplifies the desired signal while rejecting nearby
+    frequencies &mdash; the higher the Q, the better the selectivity.
+</p>
+
+<p>
+    Three stations broadcast at different frequencies.  Adjust \( \omega_0 \)
+    to &ldquo;tune in&rdquo; to each one.  Increase Q to sharpen the response
+    curve and reject neighboring stations more effectively.
+</p>
+
+<div class="interactive-container" id="radio-tuner">
+    <div class="interactive-title">Explorer 3: Radio Tuner</div>
+
+    <div style="display: flex; gap: 0.5rem; flex-wrap: wrap;">
+        <div class="plot-container" style="flex: 1; min-width: 280px;">
+            <div id="rd-ra-plot" style="width: 100%; height: 380px;"></div>
+        </div>
+        <div class="plot-container" style="flex: 1; min-width: 280px;">
+            <div id="rd-ra-bar-plot" style="width: 100%; height: 380px;"></div>
+        </div>
+    </div>
+
+    <div id="rd-ra-stats"
+         style="display: flex; justify-content: center; gap: 1.5rem; padding: 8px 0; font-size: 0.85rem; color: #c8c8e0; flex-wrap: wrap;">
+    </div>
+
+    <div class="control-panel">
+        <div class="control-group">
+            <label class="control-label">Tuned frequency &omega;<sub>0</sub>:
+                <span class="control-label-value">2.00</span> rad/s
+            </label>
+            <input type="range" class="slider" id="rd-ra-w0" min="1.00" max="6.00" step="0.02" value="2.00">
+        </div>
+        <div class="control-group">
+            <label class="control-label">Quality factor Q:
+                <span class="control-label-value">10</span>
+            </label>
+            <input type="range" class="slider" id="rd-ra-q" min="2" max="50" step="1" value="10">
+        </div>
+        <button class="btn btn-sm" onclick="resetRadio()">Reset</button>
+    </div>
+</div>
+
+<!-- Questions Group 3 -->
+<div class="interactive-container question-section">
+    <div class="interactive-title">Test Your Understanding</div>
+    <p style="margin-bottom: var(--spacing-md); color: var(--text-secondary);">
+        Use the Radio Tuner above to answer these questions.
+    </p>
+    <div class="tabs">
+        <div class="tab-buttons">
+            <button class="tab-button active">Question 7</button>
+            <button class="tab-button">Question 8</button>
+            <button class="tab-button">Question 9</button>
+        </div>
+
+        <div class="tab-content active">
+            <div class="question-container" data-type="mcq" data-answer="0">
+                <div class="question-text">
+                    To tune in to Station B at \( \omega = 3.5 \) rad/s, you should set
+                    the receiver&rsquo;s \( \omega_0 \) to approximately:
+                </div>
+                <div class="question-options">
+                    <label class="option"><input type="radio" name="rd-q7" value="0"><span>3.5 rad/s &mdash; match the station&rsquo;s frequency</span></label>
+                    <label class="option"><input type="radio" name="rd-q7" value="1"><span>7.0 rad/s &mdash; double the station&rsquo;s frequency</span></label>
+                    <label class="option"><input type="radio" name="rd-q7" value="2"><span>1.75 rad/s &mdash; half the station&rsquo;s frequency</span></label>
+                    <label class="option"><input type="radio" name="rd-q7" value="3"><span>It doesn&rsquo;t matter &mdash; all stations come through equally</span></label>
+                </div>
+                <div class="question-actions"><button class="btn-verify">Verify</button></div>
+                <div class="question-explanation" style="display:none;">
+                    <strong>Explanation:</strong>
+                    The receiver amplifies signals at \( \omega_d \approx \omega_0 \).
+                    To select Station B at 3.5 rad/s, set \( \omega_0 = 3.5 \) so the
+                    resonance peak aligns with that station.  Try it &mdash; the bar chart
+                    should show Station B with the tallest bar.
+                </div>
+            </div>
+        </div>
+
+        <div class="tab-content">
+            <div class="question-container" data-type="msq" data-answer="0,2">
+                <div class="question-text">
+                    What happens when you increase Q from 5 to 40?
+                    (Select all that apply)
+                </div>
+                <div class="question-options">
+                    <label class="option"><input type="checkbox" value="0"><span>The response peak becomes narrower (sharper selectivity)</span></label>
+                    <label class="option"><input type="checkbox" value="1"><span>All three stations receive equal signal strength</span></label>
+                    <label class="option"><input type="checkbox" value="2"><span>Neighboring stations are rejected more effectively</span></label>
+                    <label class="option"><input type="checkbox" value="3"><span>The tuned frequency \( \omega_0 \) shifts to a higher value</span></label>
+                </div>
+                <div class="question-actions"><button class="btn-verify">Verify</button></div>
+                <div class="question-explanation" style="display:none;">
+                    <strong>Explanation:</strong>
+                    <ul>
+                        <li><strong>Statement 1 (True):</strong> Higher Q means narrower bandwidth
+                            \( \Delta\omega = \omega_0 / Q \).  The peak sharpens.</li>
+                        <li><strong>Statement 2 (False):</strong> Higher Q makes the receiver <em>more</em>
+                            selective, amplifying one station while rejecting others.</li>
+                        <li><strong>Statement 3 (True):</strong> A narrower peak means off-resonance signals
+                            are attenuated more.  This is exactly what selectivity means.</li>
+                        <li><strong>Statement 4 (False):</strong> Q affects the peak width, not its position.
+                            \( \omega_0 \) is set by the slider, not by Q.</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <div class="tab-content">
+            <div class="question-container" data-type="fill" data-answer="0.70[0.50,0.90]">
+                <div class="question-text">
+                    Set \( \omega_0 = 3.50 \) and \( Q = 5 \).  The bandwidth is
+                    \( \Delta\omega = \omega_0 / Q = 3.50 / 5 = \) <input type="text" class="fill-blank" placeholder="?"> rad/s.
+                    Now increase Q to 25.  Does Station A&rsquo;s bar shrink significantly?
+                </div>
+                <div class="question-actions"><button class="btn-verify">Verify</button></div>
+                <div class="question-explanation" style="display:none;">
+                    <strong>Explanation:</strong>
+                    \( \Delta\omega = 3.50 / 5 = 0.70 \) rad/s.  This bandwidth is wide
+                    enough that Station A (at 2.0 rad/s, only 1.5 away) still gets some
+                    response.  At Q = 25: \( \Delta\omega = 0.14 \), much narrower, and
+                    Station A&rsquo;s signal drops dramatically in the bar chart.
+                    High Q = sharp tuning = better selectivity.
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="info-box">
+    <div class="info-box-title">Avoid or Exploit? The Decision Framework</div>
+    <p>When you encounter resonance in the wild, ask two questions:</p>
+    <ul>
+        <li><strong>Is resonance helpful?</strong>  (Radio tuning, musical instruments, MRI, clocks.)
+            &rarr; Maximize Q, tune \( \omega_0 \) precisely.</li>
+        <li><strong>Is resonance harmful?</strong>  (Bridges, buildings, aircraft wings, washing machines.)
+            &rarr; Add damping, install TMDs, or redesign to shift \( \omega_0 \) away from
+            expected driving frequencies.</li>
+    </ul>
+</div>
+
+<hr>
+
+<!-- ========== CODE EXAMPLES ========== -->
+
+<h2>Code Examples</h2>
+
+<div class="tabs">
+    <div class="tab-buttons">
+        <button class="tab-button active">Bridge Simulator</button>
+        <button class="tab-button">TMD Design</button>
+        <button class="tab-button">Prompt</button>
+    </div>
+
+    <div class="tab-content active">
+        <div class="code-block-container">
+            <div class="code-header">
+                <span class="code-lang">Python</span>
+                <button class="copy-btn">Copy</button>
+            </div>
+            <pre><code class="language-python">import numpy as np
+import plotly.graph_objects as go
+from plotly.subplots import make_subplots
+
+omega0, F0m = 3.0, 1.0
+gammas = [0.05, 0.10, 0.30, 0.50]
+omega_d = np.linspace(0.1, 6, 500)
+
+fig = make_subplots(rows=1, cols=2,
+    subplot_titles=['Amplitude Response', 'Peak vs Damping'])
+
+colors = ['#ff6b6b', '#00f3ff', '#00ff9f', '#ffff00']
+peaks = []
+
+for gamma, color in zip(gammas, colors):
+    denom = np.sqrt((omega0**2 - omega_d**2)**2 + (2*gamma*omega_d)**2)
+    A = F0m / denom
+    peak = F0m / (2*gamma*omega0)
+    peaks.append(peak)
+    fig.add_trace(go.Scatter(x=omega_d, y=A, mode='lines',
+        line=dict(color=color, width=2),
+        name=f'γ={gamma}'), row=1, col=1)
+
+# Danger threshold
+fig.add_hline(y=3.0, line_dash='dot', line_color='#ff4444',
+    annotation_text='Danger', row=1, col=1)
+
+# Peak amplitude vs damping
+fig.add_trace(go.Bar(x=[f'γ={g}' for g in gammas], y=peaks,
+    marker_color=colors), row=1, col=2)
+fig.add_hline(y=3.0, line_dash='dot', line_color='#ff4444', row=1, col=2)
+
+fig.update_layout(template='plotly_dark', showlegend=True,
+    legend=dict(x=0.02, y=0.98))
+fig.update_xaxes(title_text='ω_d (rad/s)', row=1, col=1,
+    gridcolor='#2a2f4a', zerolinecolor='#808080', linecolor='#808080')
+fig.update_yaxes(title_text='Amplitude', range=[0, 15], row=1, col=1,
+    gridcolor='#2a2f4a', zerolinecolor='#808080', linecolor='#808080')
+fig.update_yaxes(title_text='Peak amplitude', row=1, col=2,
+    gridcolor='#2a2f4a', zerolinecolor='#808080', linecolor='#808080')
+fig.show()</code></pre>
+        </div>
+    </div>
+
+    <div class="tab-content">
+        <div class="code-block-container">
+            <div class="code-header">
+                <span class="code-lang">Python</span>
+                <button class="copy-btn">Copy</button>
+            </div>
+            <pre><code class="language-python">import numpy as np
+import plotly.graph_objects as go
+
+omega0 = 3.0
+F0m = 1.0
+g1 = 0.05  # primary damping
+omega_d = np.linspace(0.1, 6, 500)
+
+def tmd_response(omega_d, mu, g2):
+    """Two-DOF amplitude with tuned mass damper."""
+    w2 = omega_d**2
+    w02 = omega0**2
+    wt2 = omega0**2  # TMD tuned to primary
+    numR = wt2 - w2
+    numI = 2 * g2 * omega_d
+    num2 = numR**2 + numI**2
+    DR = (w02 - w2)*(wt2 - w2) - mu*wt2*w2 - 4*g1*g2*w2
+    DI = 2*omega_d*(g2*(w02 - w2) + g1*(wt2 - w2) + mu*g2*w2)
+    D2 = DR**2 + DI**2
+    return F0m * np.sqrt(num2 / np.maximum(D2, 1e-20))
+
+# No TMD
+A_no_tmd = F0m / np.sqrt((omega0**2 - omega_d**2)**2 + (2*g1*omega_d)**2)
+
+fig = go.Figure()
+fig.add_trace(go.Scatter(x=omega_d, y=A_no_tmd, mode='lines',
+    line=dict(color='#ff6b6b', width=2, dash='dash'), name='No TMD'))
+
+for mu, color in [(0.02, '#ffff00'), (0.05, '#00f3ff'), (0.10, '#00ff9f')]:
+    A_tmd = tmd_response(omega_d, mu, g2=0.2)
+    fig.add_trace(go.Scatter(x=omega_d, y=A_tmd, mode='lines',
+        line=dict(color=color, width=2), name=f'TMD μ={mu}'))
+
+fig.update_layout(template='plotly_dark',
+    title='TMD Effect on Resonance Peak',
+    xaxis=dict(title='ω_d (rad/s)', range=[0, 6],
+        gridcolor='#2a2f4a', zerolinecolor='#808080', linecolor='#808080'),
+    yaxis=dict(title='Amplitude', range=[0, 15],
+        gridcolor='#2a2f4a', zerolinecolor='#808080', linecolor='#808080'),
+    legend=dict(x=0.6, y=0.98, bgcolor='rgba(0,0,0,0.3)'))
+fig.show()</code></pre>
+        </div>
+    </div>
+
+    <div class="tab-content">
+        <div class="code-block-container">
+            <div class="code-header">
+                <span class="code-lang">Prompt for AI</span>
+                <button class="copy-btn">Copy</button>
+            </div>
+            <pre><code class="language-text">Create a Python script using Plotly to simulate resonance in engineering.
+
+Part 1 — Bridge Stress Simulator:
+- Driven damped oscillator with ω₀ = 3.0, F₀/m = 1.0
+- Plot amplitude response A(ω_d) for γ = 0.05, 0.10, 0.30, 0.50
+- Add a horizontal "danger threshold" line at A = 3
+- Show which damping values keep the bridge safe
+
+Part 2 — Tuned Mass Damper:
+- Two-DOF coupled system: primary (ω₀=3, γ=0.05) + TMD (tuned to ω₀)
+- Plot amplitude with and without TMD for mass ratios μ = 0.02, 0.05, 0.10
+- TMD damping γ_TMD = 0.2
+- Show how the single peak splits into two smaller peaks
+
+Use dark theme, gray axes (#808080), fixed axis ranges.
+Compare the no-TMD and with-TMD responses on the same plot.</code></pre>
+        </div>
+
+        <div class="info-box" style="margin-top: var(--spacing-md);">
+            <div class="info-box-title">Pro Tips for Prompting</div>
+            <ul>
+                <li>Specify the two-DOF transfer function explicitly &mdash; AI may use a simplified model</li>
+                <li>Ask for both the no-TMD baseline and with-TMD curves on the same plot</li>
+                <li>Include a danger threshold line to visualize the engineering constraint</li>
+            </ul>
+        </div>
+    </div>
+</div>
+
+<hr>
+
+<!-- ========== EXERCISES ========== -->
+<h2>Exercises for Practice</h2>
+
+<div class="exercise-cards">
+    <div class="exercise-card">
+        <div class="exercise-card-header">
+            <span class="exercise-card-number">1.</span>
+            <span class="exercise-card-badge explore">Explore</span>
+        </div>
+        <div class="exercise-card-content">
+            In the Bridge Stress Simulator, find the minimum \( \gamma \) needed
+            to keep the peak amplitude below the danger threshold (A &lt; 3) for
+            <em>all</em> driving frequencies.  (Hint: use the formula
+            \( A_{\text{peak}} = F_0/(2m\gamma\omega_0) \) and set it equal to 3.)
+            Verify your answer with the explorer.
+        </div>
+    </div>
+
+    <div class="exercise-card">
+        <div class="exercise-card-header">
+            <span class="exercise-card-number">2.</span>
+            <span class="exercise-card-badge coding">Coding</span>
+        </div>
+        <div class="exercise-card-content">
+            Write a Python function that takes a target peak reduction (e.g., 60%)
+            and returns the optimal mass ratio \( \mu \) for a TMD.  Sweep
+            \( \mu \) from 0.01 to 0.20 and plot peak amplitude vs \( \mu \).
+            Where does diminishing returns set in?
+        </div>
+    </div>
+
+    <div class="exercise-card">
+        <div class="exercise-card-header">
+            <span class="exercise-card-number">3.</span>
+            <span class="exercise-card-badge think">Think</span>
+        </div>
+        <div class="exercise-card-content">
+            A building sways at \( \omega_0 = 2\pi/8 \approx 0.785 \) rad/s
+            (period = 8 s).  An earthquake has energy concentrated between 0.5
+            and 1.0 rad/s.  Is this building at risk?  Would you recommend
+            (a) adding damping, (b) installing a TMD, or (c) stiffening the
+            structure to raise \( \omega_0 \)?  Justify your choice using the
+            concepts from this section.
+        </div>
+    </div>
+</div>
+
+<hr>
+
+<!-- ========== NAVIGATION ========== -->
+<div class="btn-group mt-xl">
+    <button class="btn btn-magenta" onclick="navigateToSection('29-beats-resonance')">&larr; Previous: Beats and Near-Resonance</button>
+    <button class="btn" onclick="scrollToTop()">&uarr; Back to Top</button>
+    <button class="btn btn-secondary" onclick="navigateToSection('31-euler-first-steps')">Next: Numerical Methods &rarr;</button>
+</div>

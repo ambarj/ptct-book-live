@@ -1,0 +1,855 @@
+<!-- Section 3.1: What Makes Things Oscillate? -->
+<!-- Source: Module 4 - Review of Oscillations.nb (Part 1) -->
+<!-- Core concept: Restoring forces, A/ω/φ parameters, universality of SHO -->
+<!-- Time: ~20 minutes -->
+<!-- Prerequisites: Basic calculus, trigonometric functions -->
+
+<h1>What Makes Things Oscillate?</h1>
+
+<p>
+    A child on a swing, a guitar string, a current in an electrical circuit,
+    atoms in a crystal &mdash; what do these have in common?  They all
+    <strong>oscillate</strong>: displaced from rest, they overshoot, reverse,
+    overshoot again, and repeat.  The remarkable fact is that <em>every</em>
+    small oscillation around a stable equilibrium looks the same mathematically.
+    In this section you'll discover why, and learn to read the three numbers
+    that fully describe any simple harmonic motion.
+</p>
+
+<div class="info-box">
+    <div class="info-box-title">Learning Objectives</div>
+    <ul>
+        <li>Identify the three parameters of simple harmonic motion: amplitude \( A \), angular frequency \( \omega \), and phase \( \phi \)</li>
+        <li>Read \( A \), \( T \), and \( x(0) \) directly from an oscillation graph</li>
+        <li>Explain why a restoring force produces oscillation</li>
+        <li>Show that any potential energy minimum gives approximately harmonic motion for small displacements</li>
+    </ul>
+</div>
+
+<div class="equation-display">
+    <p><strong>Simple harmonic motion:</strong></p>
+    $$ x(t) = A\cos(\omega t + \phi) $$
+    <p>
+        Three numbers tell the whole story:
+        <strong>amplitude</strong> \( A \) (how far),
+        <strong>angular frequency</strong> \( \omega \) (how fast, with period \( T = 2\pi/\omega \)),
+        and <strong>phase</strong> \( \phi \) (where it starts).
+    </p>
+</div>
+
+<hr>
+
+<!-- ========== EXPLORER 1: PARAMETER EXPLORER ========== -->
+
+<h2>The Three Parameters</h2>
+
+<p>
+    Every simple harmonic oscillation is completely described by three numbers.
+    Adjust them below and build intuition for what each one controls.
+    Watch the green markers showing the period \( T \), the dashed yellow
+    lines showing the amplitude \( A \), and the yellow dot showing the
+    initial displacement \( x(0) = A\cos\phi \).
+</p>
+
+<div class="interactive-container" id="parameter-explorer">
+    <div class="interactive-title">Interactive: Parameter Explorer</div>
+
+    <div class="plot-container">
+        <div id="os-param-plot" style="width: 100%; height: 400px;"></div>
+    </div>
+
+    <div id="os-param-stats"
+         style="display: flex; justify-content: center; gap: 1.5rem; padding: 8px 0; font-size: 0.85rem; color: #c8c8e0; flex-wrap: wrap;">
+    </div>
+
+    <div class="control-panel">
+        <div class="control-group">
+            <label class="control-label">Amplitude A:
+                <span class="control-label-value">2.0</span>
+            </label>
+            <input type="range" class="slider" id="os-amp-slider"
+                   min="0.1" max="3.0" step="0.1" value="2.0">
+        </div>
+        <div class="control-group">
+            <label class="control-label">Frequency &omega;:
+                <span class="control-label-value">2.0</span>
+            </label>
+            <input type="range" class="slider" id="os-omega-slider"
+                   min="0.5" max="6.0" step="0.1" value="2.0">
+        </div>
+        <div class="control-group">
+            <label class="control-label">Phase &phi;:
+                <span class="control-label-value">0&deg;</span>
+            </label>
+            <input type="range" class="slider" id="os-phi-slider"
+                   min="0" max="6.283" step="0.05" value="0">
+        </div>
+        <div class="btn-group">
+            <button class="btn" onclick="resetParams()">Reset</button>
+        </div>
+    </div>
+</div>
+
+<div class="info-box">
+    <div class="info-box-title">Key Insight</div>
+    <p>
+        Amplitude \( A \) controls <em>how far</em> from equilibrium the object
+        swings.  Angular frequency \( \omega \) controls <em>how fast</em> it
+        oscillates (with period \( T = 2\pi/\omega \) and frequency
+        \( f = \omega/2\pi \)).  Phase \( \phi \) controls <em>where it starts</em>
+        at \( t = 0 \): when \( \phi = 0 \), the oscillation begins at its
+        maximum; when \( \phi = 90° \), it begins crossing zero (going negative).
+        Crucially, \( \omega \) depends on the system (spring stiffness, pendulum
+        length), not on how hard you push &mdash; that's what makes it a
+        <em>natural frequency</em>.
+    </p>
+</div>
+
+<!-- Test Your Understanding #1 -->
+<div class="interactive-container question-section">
+    <div class="interactive-title">Test Your Understanding</div>
+
+    <p style="margin-bottom: var(--spacing-md); color: var(--text-secondary);">
+        Use the Parameter Explorer to answer these questions.
+    </p>
+
+    <div class="tabs">
+        <div class="tab-buttons">
+            <button class="tab-button active">Question 1</button>
+            <button class="tab-button">Question 2</button>
+            <button class="tab-button">Question 3</button>
+        </div>
+
+        <!-- Q1: MCQ -->
+        <div class="tab-content active">
+            <div class="question-container" data-type="mcq" data-answer="2">
+                <div class="question-text">
+                    If you double the amplitude from A = 1 to A = 2, what
+                    happens to the period T?
+                </div>
+                <div class="question-options">
+                    <label class="option">
+                        <input type="radio" name="os-q1" value="0">
+                        <span>T doubles</span>
+                    </label>
+                    <label class="option">
+                        <input type="radio" name="os-q1" value="1">
+                        <span>T halves</span>
+                    </label>
+                    <label class="option">
+                        <input type="radio" name="os-q1" value="2">
+                        <span>T stays the same</span>
+                    </label>
+                    <label class="option">
+                        <input type="radio" name="os-q1" value="3">
+                        <span>T increases by \( \sqrt{2} \)</span>
+                    </label>
+                </div>
+                <div class="question-actions">
+                    <button class="btn-verify">Verify</button>
+                </div>
+                <div class="question-explanation" style="display: none;">
+                    <div class="question-explanation-title">Explanation</div>
+                    <div class="question-explanation-text">
+                        The period \( T = 2\pi/\omega \) depends only on \( \omega \),
+                        not on \( A \).  Doubling the amplitude makes the oscillation
+                        swing wider, but it swings <em>faster</em> at the centre to
+                        compensate, keeping the period unchanged.  This is a defining
+                        property of simple harmonic motion &mdash; the period is
+                        <strong>independent of amplitude</strong>.  Try it!
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Q2: Fill -->
+        <div class="tab-content">
+            <div class="question-container" data-type="fill" data-answer="3.14[2.9,3.4]">
+                <div class="question-text">
+                    Set &omega; = 2 rad/s.  What is the period T?
+                    <br><br>
+                    T = <input type="text" class="fill-blank" placeholder="seconds"> s
+                </div>
+                <div class="question-actions">
+                    <button class="btn-verify">Verify</button>
+                </div>
+                <div class="question-explanation" style="display: none;">
+                    <div class="question-explanation-title">Explanation</div>
+                    <div class="question-explanation-text">
+                        \( T = 2\pi/\omega = 2\pi/2 = \pi \approx 3.14 \) seconds.
+                        You can verify this on the plot: the green markers showing
+                        one complete period should be spaced about 3.14 seconds apart.
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Q3: MCQ -->
+        <div class="tab-content">
+            <div class="question-container" data-type="mcq" data-answer="1">
+                <div class="question-text">
+                    Set &phi; = 90&deg;.  What is x(0)?
+                </div>
+                <div class="question-options">
+                    <label class="option">
+                        <input type="radio" name="os-q3" value="0">
+                        <span>x(0) = A</span>
+                    </label>
+                    <label class="option">
+                        <input type="radio" name="os-q3" value="1">
+                        <span>x(0) = 0</span>
+                    </label>
+                    <label class="option">
+                        <input type="radio" name="os-q3" value="2">
+                        <span>x(0) = -A</span>
+                    </label>
+                    <label class="option">
+                        <input type="radio" name="os-q3" value="3">
+                        <span>x(0) = A/2</span>
+                    </label>
+                </div>
+                <div class="question-actions">
+                    <button class="btn-verify">Verify</button>
+                </div>
+                <div class="question-explanation" style="display: none;">
+                    <div class="question-explanation-title">Explanation</div>
+                    <div class="question-explanation-text">
+                        \( x(0) = A\cos(\phi) = A\cos(90°) = 0 \).  At \( \phi = 90° \),
+                        the cosine starts at zero and heads negative &mdash; the object
+                        begins at equilibrium, moving in the negative direction.  This is
+                        the same as \( x(t) = -A\sin(\omega t) \).  Watch the yellow
+                        dot sit right on the x-axis at \( t = 0 \).
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<hr>
+
+<!-- ========== EXPLORER 2: RESTORING FORCE LAB ========== -->
+
+<h2>Why Things Oscillate: The Restoring Force</h2>
+
+<p>
+    Oscillation requires a <strong>restoring force</strong> &mdash; a force that
+    always pushes back toward equilibrium.  Displace a spring to the right, and
+    the spring pulls left.  Displace a pendulum, and gravity pulls it back.
+    The left panel shows the <strong>potential energy</strong> \( U(x) \), which
+    has a minimum at equilibrium.  The right panel shows the <strong>force</strong>
+    \( F = -dU/dx \), which is negative for positive displacement and positive
+    for negative displacement &mdash; always restoring.
+</p>
+
+<div class="interactive-container" id="restoring-force-lab">
+    <div class="interactive-title">Interactive: Restoring Force Lab</div>
+
+    <div style="display: flex; gap: 0.5rem; flex-wrap: wrap;">
+        <div class="plot-container" style="flex: 1; min-width: 280px;">
+            <div id="os-potential-plot" style="width: 100%; height: 380px;"></div>
+        </div>
+        <div class="plot-container" style="flex: 1; min-width: 280px;">
+            <div id="os-force-plot" style="width: 100%; height: 380px;"></div>
+        </div>
+    </div>
+
+    <div id="os-restoring-stats"
+         style="display: flex; justify-content: center; gap: 1.5rem; padding: 8px 0; font-size: 0.85rem; color: #c8c8e0; flex-wrap: wrap;">
+    </div>
+
+    <div class="control-panel">
+        <div class="control-group">
+            <label class="control-label">System:
+                <span class="control-label-value">Spring</span>
+            </label>
+            <select id="os-sys-select"
+                    style="width: 100%; padding: 8px 12px; background: #1a1f3a; color: #c8c8e0; border: 1px solid #2a2f4a; border-radius: 6px; font-size: 0.85rem; cursor: pointer;">
+                <option value="spring" selected>Spring (Hooke's Law)</option>
+                <option value="pendulum">Pendulum (gravity)</option>
+                <option value="morse">Molecular Bond (Morse potential)</option>
+            </select>
+        </div>
+        <div class="control-group">
+            <label class="control-label">Displacement x:
+                <span class="control-label-value">0.0</span>
+            </label>
+            <input type="range" class="slider" id="os-disp-slider"
+                   min="-2.5" max="2.5" step="0.1" value="0">
+        </div>
+        <div class="btn-group">
+            <button class="btn" onclick="resetRestoring()">Reset</button>
+        </div>
+    </div>
+</div>
+
+<div class="info-box">
+    <div class="info-box-title">Key Insight</div>
+    <p>
+        The dashed yellow curve shows the <strong>harmonic approximation</strong>:
+        \( U(x) \approx \tfrac{1}{2}k_{\text{eff}}x^2 \).  For the spring,
+        this parabola is exact.  For the pendulum and molecular bond, it&rsquo;s
+        only accurate near \( x = 0 \).  Here&rsquo;s the deep reason: if you
+        zoom in close enough to the bottom of <em>any</em> smooth valley, it
+        looks like a parabola.  This is why all small oscillations are simple
+        harmonic, regardless of the system.  Try pushing the pendulum to large
+        displacements (\( x > 2 \)) to see where the parabola stops matching.
+    </p>
+</div>
+
+<!-- Test Your Understanding #2 -->
+<div class="interactive-container question-section">
+    <div class="interactive-title">Test Your Understanding</div>
+
+    <p style="margin-bottom: var(--spacing-md); color: var(--text-secondary);">
+        Use the Restoring Force Lab to answer these questions.
+    </p>
+
+    <div class="tabs">
+        <div class="tab-buttons">
+            <button class="tab-button active">Question 4</button>
+            <button class="tab-button">Question 5</button>
+            <button class="tab-button">Question 6</button>
+        </div>
+
+        <!-- Q4: MCQ -->
+        <div class="tab-content active">
+            <div class="question-container" data-type="mcq" data-answer="0">
+                <div class="question-text">
+                    In the Spring system, drag the displacement slider to x = 1.5.
+                    What direction does the force point?
+                </div>
+                <div class="question-options">
+                    <label class="option">
+                        <input type="radio" name="os-q4" value="0">
+                        <span>Toward equilibrium (negative direction)</span>
+                    </label>
+                    <label class="option">
+                        <input type="radio" name="os-q4" value="1">
+                        <span>Away from equilibrium (positive direction)</span>
+                    </label>
+                    <label class="option">
+                        <input type="radio" name="os-q4" value="2">
+                        <span>Zero (no force)</span>
+                    </label>
+                </div>
+                <div class="question-actions">
+                    <button class="btn-verify">Verify</button>
+                </div>
+                <div class="question-explanation" style="display: none;">
+                    <div class="question-explanation-title">Explanation</div>
+                    <div class="question-explanation-text">
+                        For a spring, \( F = -kx \).  When \( x > 0 \), the force is
+                        negative &mdash; it points back toward \( x = 0 \) (equilibrium).
+                        This is the defining property of a <strong>restoring force</strong>:
+                        it always acts opposite to the displacement.  Without this, there
+                        would be no oscillation.
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Q5: MCQ -->
+        <div class="tab-content">
+            <div class="question-container" data-type="mcq" data-answer="2">
+                <div class="question-text">
+                    Switch to "Pendulum."  At what displacement does the exact force
+                    (magenta) start to differ noticeably from the linear approximation
+                    (yellow dashed)?
+                </div>
+                <div class="question-options">
+                    <label class="option">
+                        <input type="radio" name="os-q5" value="0">
+                        <span>They never differ</span>
+                    </label>
+                    <label class="option">
+                        <input type="radio" name="os-q5" value="1">
+                        <span>Immediately, at any x &ne; 0</span>
+                    </label>
+                    <label class="option">
+                        <input type="radio" name="os-q5" value="2">
+                        <span>Around x &asymp; 1 radian (about 57&deg;)</span>
+                    </label>
+                </div>
+                <div class="question-actions">
+                    <button class="btn-verify">Verify</button>
+                </div>
+                <div class="question-explanation" style="display: none;">
+                    <div class="question-explanation-title">Explanation</div>
+                    <div class="question-explanation-text">
+                        The exact pendulum force is \( -\sin(\theta) \) and the harmonic
+                        approximation replaces that with \( -\theta \).  For small angles,
+                        sin(&theta;) and &theta; are nearly equal (try it on a calculator:
+                        sin(0.3)&nbsp;=&nbsp;0.296).  But by &theta;&nbsp;&asymp;&nbsp;1 radian
+                        (57&deg;), sin(1)&nbsp;=&nbsp;0.84 while the approximation says 1.0
+                        &mdash; they differ by 16%.  Rule of thumb: the approximation works
+                        well for swings smaller than about 30&deg;.
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Q6: MSQ -->
+        <div class="tab-content">
+            <div class="question-container" data-type="msq" data-answer="0,1,3">
+                <div class="question-text">
+                    Which statements about restoring forces are correct?
+                    <strong>(Select all that apply)</strong>
+                </div>
+                <div class="question-options">
+                    <label class="option">
+                        <input type="checkbox" value="0">
+                        <span>Any smooth potential with a minimum gives approximately harmonic motion for small displacements</span>
+                    </label>
+                    <label class="option">
+                        <input type="checkbox" value="1">
+                        <span>The effective spring constant is \( k_{\text{eff}} = U''(x_0) \), the curvature of the potential at the minimum</span>
+                    </label>
+                    <label class="option">
+                        <input type="checkbox" value="2">
+                        <span>The harmonic approximation is exact for all systems</span>
+                    </label>
+                    <label class="option">
+                        <input type="checkbox" value="3">
+                        <span>The natural frequency \( \omega = \sqrt{k_{\text{eff}}/m} \) is determined by the system, not the initial push</span>
+                    </label>
+                </div>
+                <div class="question-actions">
+                    <button class="btn-verify">Verify</button>
+                </div>
+                <div class="question-explanation" style="display: none;">
+                    <div class="question-explanation-title">Explanation</div>
+                    <div class="question-explanation-text">
+                        <ul>
+                            <li><strong>True:</strong> Near the bottom of any smooth valley,
+                                the potential looks like a parabola:
+                                \( U(x) \approx U_0 + \tfrac{1}{2}k_{\text{eff}}(x-x_0)^2 \).
+                                The parabola fit works because the slope is zero at the minimum
+                                (that&rsquo;s what makes it a minimum), so the first thing that
+                                matters is the curvature.</li>
+                            <li><strong>True:</strong> The curvature \( U''(x_0) \) plays the
+                                role of the spring constant.  Steeper potentials give stiffer
+                                "springs" and faster oscillations.</li>
+                            <li><strong>False:</strong> It's only exact for a perfect spring
+                                (\( U = \frac{1}{2}kx^2 \)).  For all other systems, it's an
+                                approximation that improves as displacement shrinks.</li>
+                            <li><strong>True:</strong> The frequency \( \omega = \sqrt{k/m} \)
+                                depends on the spring constant and mass, not the amplitude.
+                                Push harder and the swing is wider, but not faster.</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<hr>
+
+<!-- ========== EXPLORER 3: PATTERN MATCHER ========== -->
+
+<h2>Read the Oscillation</h2>
+
+<p>
+    A physicist's most basic skill: look at an oscillating signal and
+    read off its parameters.  Given a mystery oscillation, identify:
+</p>
+<ul>
+    <li><strong>Amplitude A</strong>: the peak height (maximum displacement)</li>
+    <li><strong>Period T</strong>: the time for one complete cycle (peak to next peak)</li>
+    <li><strong>Initial displacement x(0)</strong>: the value at \( t = 0 \)</li>
+</ul>
+
+<div class="interactive-container" id="pattern-matcher">
+    <div class="interactive-title">Interactive: Pattern Matcher</div>
+
+    <div id="os-match-prompt"
+         style="padding: 12px 16px; background: rgba(255,107,107,0.1); border-left: 3px solid #ff6b6b; border-radius: 0 6px 6px 0; margin-bottom: 12px; font-size: 0.9rem; color: #c8c8e0;">
+    </div>
+
+    <div class="plot-container">
+        <div id="os-match-plot" style="width: 100%; height: 400px;"></div>
+    </div>
+
+    <div id="os-match-feedback"
+         style="padding: 8px 0; font-size: 0.9rem; text-align: center;">
+    </div>
+
+    <div class="control-panel">
+        <div class="control-group">
+            <label class="control-label">Amplitude A:</label>
+            <input type="number" id="os-match-amp"
+                   min="0" max="4" step="0.1" placeholder="e.g. 2.0"
+                   style="width: 100%; padding: 8px 12px; background: #1a1f3a; color: #c8c8e0; border: 1px solid #2a2f4a; border-radius: 6px; font-size: 0.95rem;">
+        </div>
+        <div class="control-group">
+            <label class="control-label">Period T (s):</label>
+            <input type="number" id="os-match-period"
+                   min="0" max="20" step="0.01" placeholder="e.g. 3.14"
+                   style="width: 100%; padding: 8px 12px; background: #1a1f3a; color: #c8c8e0; border: 1px solid #2a2f4a; border-radius: 6px; font-size: 0.95rem;">
+        </div>
+        <div class="control-group">
+            <label class="control-label">x(0):</label>
+            <input type="number" id="os-match-x0"
+                   min="-4" max="4" step="0.1" placeholder="e.g. 1.5"
+                   style="width: 100%; padding: 8px 12px; background: #1a1f3a; color: #c8c8e0; border: 1px solid #2a2f4a; border-radius: 6px; font-size: 0.95rem;">
+        </div>
+        <div class="btn-group">
+            <button class="btn" onclick="submitMatch()">Submit</button>
+            <button class="btn" onclick="nextPattern()">Next Challenge</button>
+            <button class="btn" onclick="resetMatcher()">Reset Score</button>
+        </div>
+    </div>
+</div>
+
+<div class="info-box">
+    <div class="info-box-title">Key Insight</div>
+    <p>
+        To read \( A \): find the highest peak &mdash; that's the amplitude.
+        To read \( T \): measure the time between two adjacent peaks (or two
+        adjacent zero-crossings going the same direction).
+        To read \( x(0) \): just look at where the curve starts at \( t = 0 \).
+        If \( x(0) = A \), the phase is 0&deg;; if \( x(0) = 0 \) (crossing
+        downward), the phase is 90&deg;; if \( x(0) = -A \), the phase is 180&deg;.
+    </p>
+</div>
+
+<!-- Test Your Understanding #3 -->
+<div class="interactive-container question-section">
+    <div class="interactive-title">Test Your Understanding</div>
+
+    <p style="margin-bottom: var(--spacing-md); color: var(--text-secondary);">
+        Use the Pattern Matcher and Parameter Explorer to answer these questions.
+    </p>
+
+    <div class="tabs">
+        <div class="tab-buttons">
+            <button class="tab-button active">Question 7</button>
+            <button class="tab-button">Question 8</button>
+            <button class="tab-button">Question 9</button>
+        </div>
+
+        <!-- Q7: Fill -->
+        <div class="tab-content active">
+            <div class="question-container" data-type="fill" data-answer="1.05[0.9,1.2]">
+                <div class="question-text">
+                    An oscillation has &omega; = 6 rad/s.  What is the period T?
+                    <br><br>
+                    T = <input type="text" class="fill-blank" placeholder="seconds"> s
+                </div>
+                <div class="question-actions">
+                    <button class="btn-verify">Verify</button>
+                </div>
+                <div class="question-explanation" style="display: none;">
+                    <div class="question-explanation-title">Explanation</div>
+                    <div class="question-explanation-text">
+                        \( T = 2\pi/\omega = 2\pi/6 \approx 1.047 \) s.  Set &omega; = 6
+                        in the Parameter Explorer and check that the green period markers
+                        are about 1 second apart.
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Q8: MCQ -->
+        <div class="tab-content">
+            <div class="question-container" data-type="mcq" data-answer="0">
+                <div class="question-text">
+                    A spring-mass system and a pendulum both oscillate with
+                    &omega; = 3 rad/s.  Do they have the same motion?
+                </div>
+                <div class="question-options">
+                    <label class="option">
+                        <input type="radio" name="os-q8" value="0">
+                        <span>Yes &mdash; same &omega; means identical x(t) (given same A and &phi;)</span>
+                    </label>
+                    <label class="option">
+                        <input type="radio" name="os-q8" value="1">
+                        <span>No &mdash; the physical systems are different so the motion must differ</span>
+                    </label>
+                    <label class="option">
+                        <input type="radio" name="os-q8" value="2">
+                        <span>Only if they have the same mass</span>
+                    </label>
+                </div>
+                <div class="question-actions">
+                    <button class="btn-verify">Verify</button>
+                </div>
+                <div class="question-explanation" style="display: none;">
+                    <div class="question-explanation-title">Explanation</div>
+                    <div class="question-explanation-text">
+                        This is the <strong>universality of SHO</strong>: any system described by
+                        \( \ddot{x} + \omega^2 x = 0 \) has the solution
+                        \( x(t) = A\cos(\omega t + \phi) \), regardless of what physical
+                        mechanism creates the restoring force.  A spring, a pendulum (for
+                        small angles), and an LC circuit all give exactly the same
+                        mathematical motion.  The physics is different; the mathematics
+                        is identical.
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Q9: MSQ -->
+        <div class="tab-content">
+            <div class="question-container" data-type="msq" data-answer="0,2">
+                <div class="question-text">
+                    Which physical systems exhibit simple harmonic motion (for small
+                    displacements)? <strong>(Select all that apply)</strong>
+                </div>
+                <div class="question-options">
+                    <label class="option">
+                        <input type="checkbox" value="0">
+                        <span>A mass on a spring</span>
+                    </label>
+                    <label class="option">
+                        <input type="checkbox" value="1">
+                        <span>A ball rolling off a hill (unstable equilibrium)</span>
+                    </label>
+                    <label class="option">
+                        <input type="checkbox" value="2">
+                        <span>Current in an LC circuit</span>
+                    </label>
+                    <label class="option">
+                        <input type="checkbox" value="3">
+                        <span>A particle in a uniform gravitational field (no boundaries)</span>
+                    </label>
+                </div>
+                <div class="question-actions">
+                    <button class="btn-verify">Verify</button>
+                </div>
+                <div class="question-explanation" style="display: none;">
+                    <div class="question-explanation-title">Explanation</div>
+                    <div class="question-explanation-text">
+                        <ul>
+                            <li><strong>True:</strong> The spring provides \( F = -kx \) &mdash;
+                                the textbook restoring force.  \( \omega = \sqrt{k/m} \).</li>
+                            <li><strong>False:</strong> A hilltop is an unstable equilibrium
+                                (\( U''(x_0) < 0 \)).  The force pushes <em>away</em> from
+                                equilibrium, causing runaway, not oscillation.</li>
+                            <li><strong>True:</strong> The LC circuit equation \( L\ddot{q} + q/C = 0 \)
+                                is an SHO with \( \omega = 1/\sqrt{LC} \).  Charge oscillates
+                                between capacitor and inductor.</li>
+                            <li><strong>False:</strong> A uniform field has no equilibrium point
+                                &mdash; the particle accelerates uniformly.  You need a
+                                potential minimum for oscillation.</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<hr>
+
+<!-- ========== PYTHON CODE ========== -->
+
+<h2>Python Code</h2>
+
+<p>Here's the Python equivalent for exploring oscillation parameters and restoring forces.</p>
+
+<div class="tabs">
+    <div class="tab-buttons">
+        <button class="tab-button active">SHO Parameters</button>
+        <button class="tab-button">Restoring Force</button>
+        <button class="tab-button">Prompt</button>
+    </div>
+
+    <!-- Tab 1: SHO parameters -->
+    <div class="tab-content active">
+        <div class="code-block-container">
+            <div class="code-header">
+                <span class="code-lang">Python</span>
+                <button class="copy-btn">Copy</button>
+            </div>
+            <pre><code class="language-python">import numpy as np
+import plotly.graph_objects as go
+
+# Parameters
+A = 2.0       # Amplitude
+omega = 2.0   # Angular frequency (rad/s)
+phi = 0.0     # Phase (radians)
+T = 2*np.pi / omega  # Period
+
+t = np.linspace(0, 4*T, 1000)
+x = A * np.cos(omega * t + phi)
+
+fig = go.Figure()
+fig.add_trace(go.Scatter(x=t, y=x, name='x(t) = A cos(ωt + φ)',
+    line=dict(color='#00f3ff', width=2.5)))
+
+# Amplitude envelope
+fig.add_hline(y=A, line=dict(color='#ffff00', dash='dash', width=1),
+    annotation_text=f'A = {A}')
+fig.add_hline(y=-A, line=dict(color='#ffff00', dash='dash', width=1))
+
+# Period markers
+fig.add_vline(x=0, line=dict(color='#00ff9f', dash='dot', width=1))
+fig.add_vline(x=T, line=dict(color='#00ff9f', dash='dot', width=1),
+    annotation_text=f'T = {T:.2f} s')
+
+fig.update_layout(template='plotly_dark',
+    title=f'SHM: A={A}, ω={omega} rad/s, φ={np.degrees(phi):.0f}°',
+    xaxis=dict(title='Time (s)', gridcolor='#2a2f4a',
+               zerolinecolor='#808080', linecolor='#808080'),
+    yaxis=dict(title='x(t)', range=[-3.5, 3.5], gridcolor='#2a2f4a',
+               zerolinecolor='#808080', linecolor='#808080'))
+fig.show()
+print(f"Period T = {T:.4f} s")
+print(f"Frequency f = {omega/(2*np.pi):.4f} Hz")
+print(f"x(0) = {A*np.cos(phi):.4f}")</code></pre>
+        </div>
+    </div>
+
+    <!-- Tab 2: Restoring force -->
+    <div class="tab-content">
+        <div class="code-block-container">
+            <div class="code-header">
+                <span class="code-lang">Python</span>
+                <button class="copy-btn">Copy</button>
+            </div>
+            <pre><code class="language-python">import numpy as np
+import plotly.graph_objects as go
+from plotly.subplots import make_subplots
+
+x = np.linspace(-3, 3, 500)
+
+# Three systems
+systems = {
+    'Spring':    {'U': 0.5*x**2,       'F': -x,           'U_approx': 0.5*x**2},
+    'Pendulum':  {'U': 1-np.cos(x),    'F': -np.sin(x),   'U_approx': 0.5*x**2},
+    'Morse':     {'U': 2*(1-np.exp(-x))**2, 'F': -4*np.exp(-x)*(1-np.exp(-x)),
+                  'U_approx': 2*x**2}
+}
+
+fig = make_subplots(rows=1, cols=2,
+    subplot_titles=['Potential Energy U(x)', 'Restoring Force F(x)'])
+
+colors = {'Spring': '#00f3ff', 'Pendulum': '#ff00ff', 'Morse': '#00ff9f'}
+for name, data in systems.items():
+    fig.add_trace(go.Scatter(x=x, y=data['U'], name=f'{name}',
+        line=dict(color=colors[name], width=2)), row=1, col=1)
+    fig.add_trace(go.Scatter(x=x, y=data['F'], name=f'{name} F',
+        line=dict(color=colors[name], width=2), showlegend=False), row=1, col=2)
+
+# Harmonic approximation (spring)
+fig.add_trace(go.Scatter(x=x, y=0.5*x**2, name='½kx² (approx)',
+    line=dict(color='#ffff00', width=1.5, dash='dash')), row=1, col=1)
+fig.add_trace(go.Scatter(x=x, y=-x, name='-kx (approx)',
+    line=dict(color='#ffff00', width=1.5, dash='dash'), showlegend=False), row=1, col=2)
+
+fig.update_xaxes(title='x', gridcolor='#2a2f4a',
+    zerolinecolor='#808080', linecolor='#808080')
+fig.update_yaxes(gridcolor='#2a2f4a',
+    zerolinecolor='#808080', linecolor='#808080')
+fig.update_layout(template='plotly_dark', height=450)
+fig.show()</code></pre>
+        </div>
+    </div>
+
+    <!-- Tab 3: Prompt -->
+    <div class="tab-content">
+        <div class="code-block-container">
+            <div class="code-header">
+                <span class="code-lang">Prompt for AI</span>
+                <button class="copy-btn">Copy</button>
+            </div>
+            <pre><code class="language-text">Explore simple harmonic motion in Python:
+
+Tasks:
+1. Parameter exploration:
+   - Plot x(t) = A cos(ωt + φ) for different values of A, ω, and φ
+   - Show how A affects height but not period
+   - Show how ω affects speed (and period T = 2π/ω)
+   - Show how φ shifts the starting point
+   - Mark the period T and amplitude A on the plot
+
+2. Restoring forces:
+   - Compare three systems: spring (U = ½kx²), pendulum (U = 1-cos(θ)),
+     and a molecular bond (Morse potential: U = D(1-e^(-ax))²)
+   - Plot U(x) and F(x) = -dU/dx for each
+   - Overlay the harmonic approximation ½k_eff x²
+   - Show where the approximation breaks down
+
+3. Universality:
+   - For each system, compute k_eff = U''(0)
+   - Show that ω = √(k_eff/m) gives the same SHO equation
+   - Plot the motion x(t) for each system starting from x=0.5
+     and show they are nearly identical
+
+Use plotly_dark template. Gray axes (#808080). Fixed y-ranges.</code></pre>
+        </div>
+
+        <div class="info-box" style="margin-top: var(--spacing-md);">
+            <div class="info-box-title">Tips for Prompting</div>
+            <ul>
+                <li>Ask for side-by-side potential and force plots</li>
+                <li>Request numerical verification of \( T = 2\pi/\omega \)</li>
+                <li>Try large vs small displacements to see nonlinearity</li>
+                <li>Extend to an LC circuit: \( L\ddot{q} + q/C = 0 \)</li>
+            </ul>
+        </div>
+    </div>
+</div>
+
+<hr>
+
+<!-- ========== EXERCISES ========== -->
+
+<h2>Exercises for Practice</h2>
+
+<div class="exercise-cards">
+    <div class="exercise-card">
+        <div class="exercise-card-header">
+            <span class="exercise-card-number">1.</span>
+            <span class="exercise-card-badge explore">Explore</span>
+        </div>
+        <div class="exercise-card-content">
+            In the Parameter Explorer, set &omega; = 4 rad/s and sweep &phi; from
+            0&deg; to 360&deg;.  At what phase does the oscillation begin at
+            equilibrium (x = 0) moving in the positive direction?
+            What is \( \phi \) in radians?  Verify with the formula
+            \( x(0) = A\cos\phi \).
+        </div>
+    </div>
+
+    <div class="exercise-card">
+        <div class="exercise-card-header">
+            <span class="exercise-card-number">2.</span>
+            <span class="exercise-card-badge coding">Coding</span>
+        </div>
+        <div class="exercise-card-content">
+            Write a Python script that compares the exact pendulum motion
+            (solving \( \ddot{\theta} + \sin\theta = 0 \) numerically) with
+            the SHO approximation (\( \theta(t) = \theta_0 \cos(\omega t) \))
+            for initial angles \( \theta_0 = 10°, 30°, 60°, 90° \).  At what
+            angle does the period start to differ by more than 5%?
+        </div>
+    </div>
+
+    <div class="exercise-card">
+        <div class="exercise-card-header">
+            <span class="exercise-card-number">3.</span>
+            <span class="exercise-card-badge think">Think</span>
+        </div>
+        <div class="exercise-card-content">
+            In the Restoring Force Lab, switch to "Molecular Bond" and push
+            the displacement to x = 2.5.  The exact potential flattens out
+            (the bond breaks!), but the harmonic approximation keeps rising.
+            What physical phenomenon does this represent?  Why can't a quadratic
+            potential describe bond breaking?  What term in the Taylor expansion
+            would you need to capture this asymmetry?
+        </div>
+    </div>
+</div>
+
+<hr>
+
+<!-- ========== NAVIGATION ========== -->
+
+<div class="btn-group mt-xl">
+    <button class="btn btn-magenta" onclick="navigateToSection('19-lissajous')">&larr; Previous: Lissajous Figures</button>
+    <button class="btn" onclick="scrollToTop()">&uarr; Back to Top</button>
+    <button class="btn btn-secondary" onclick="navigateToSection('21-sho-equation')">Next: The Math Behind the Motion &rarr;</button>
+</div>

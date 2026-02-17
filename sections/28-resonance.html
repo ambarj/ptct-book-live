@@ -1,0 +1,809 @@
+<!-- Section 3.9: Resonance: When Small Forces Win -->
+<!-- Source: Lecture4.nb (Part 2), Lecture4_2.nb -->
+<!-- Core concept: Resonance peak, amplitude response, quality factor Q, bandwidth -->
+<!-- Time: ~25 minutes -->
+<!-- Prerequisites: Section 3.8 (driven oscillator, transient vs steady-state, A(ω_d)) -->
+
+<h1>Resonance: When Small Forces Win</h1>
+
+<p>
+    A child pumps a swing at just the right rhythm.  An opera singer shatters
+    a wine glass with a sustained note.  A gust of wind topples a suspension
+    bridge.  In every case, a <strong>small</strong> periodic force produces a
+    <strong>huge</strong> response &mdash; because the force is tuned to the
+    system's natural frequency.  This is <strong>resonance</strong>, one of
+    the most powerful and universal phenomena in all of physics.
+</p>
+
+<p>
+    In the previous section, you saw the amplitude response curve \( A(\omega_d) \)
+    and noticed a peak near \( \omega_0 \).  Now we explore that peak in
+    detail: how tall it gets, how sharp it is, and what controls its shape.
+    The answer lies in a single number: the <strong>quality factor</strong> \( Q \).
+</p>
+
+<div class="info-box">
+    <div class="info-box-title">Learning Objectives</div>
+    <ul>
+        <li>Identify the resonance frequency and explain why the amplitude peaks there</li>
+        <li>Describe how damping controls the height and width of the resonance peak</li>
+        <li>Calculate the quality factor \( Q = \omega_0 / (2\gamma) \) and interpret it physically</li>
+        <li>Read the phase response curve and explain the 90&deg; crossing at resonance</li>
+    </ul>
+</div>
+
+<div class="equation-display">
+    <p><strong>Resonance essentials:</strong></p>
+    $$ A(\omega_d) = \frac{F_0/m}{\sqrt{(\omega_0^2 - \omega_d^2)^2 + (2\gamma\omega_d)^2}} $$
+    <p>
+        <strong>Resonance frequency:</strong> \( \omega_{\text{res}} = \sqrt{\omega_0^2 - 2\gamma^2} \approx \omega_0 \) for small damping<br>
+        <strong>Peak amplitude:</strong> \( A_{\text{peak}} \approx \displaystyle\frac{F_0}{2m\gamma\omega_0} \) (inversely proportional to damping)<br>
+        <strong>Quality factor:</strong> \( Q = \displaystyle\frac{\omega_0}{2\gamma} = \frac{\omega_0}{\Delta\omega} \approx 2\pi \times \frac{\text{energy stored}}{\text{energy lost per cycle}} \)
+    </p>
+</div>
+
+<hr>
+
+<!-- ========== EXPLORER 1: RESONANCE EXPLORER ========== -->
+
+<h2>Sweeping Through Resonance</h2>
+
+<p>
+    Drag the driving frequency \( \omega_d \) slowly from left to right across
+    the response curve.  Watch the steady-state amplitude grow as you approach
+    \( \omega_0 = 3.0 \), peak dramatically near resonance, then fall off.
+    The left panel shows the actual oscillation; the right panel shows your
+    position on the amplitude curve.
+</p>
+
+<div class="interactive-container" id="resonance-explorer">
+    <div class="interactive-title">Explorer 1: Resonance Explorer</div>
+
+    <div style="display: flex; gap: 0.5rem; flex-wrap: wrap;">
+        <div class="plot-container" style="flex: 1; min-width: 280px;">
+            <div id="rs-ex-plot" style="width: 100%; height: 380px;"></div>
+        </div>
+        <div class="plot-container" style="flex: 1; min-width: 280px;">
+            <div id="rs-ex-amp-plot" style="width: 100%; height: 380px;"></div>
+        </div>
+    </div>
+
+    <div id="rs-ex-stats"
+         style="display: flex; justify-content: center; gap: 1.5rem; padding: 8px 0; font-size: 0.85rem; color: #c8c8e0; flex-wrap: wrap;">
+    </div>
+
+    <div class="control-panel">
+        <div class="control-group">
+            <label class="control-label">Driving frequency &omega;<sub>d</sub>:
+                <span class="control-label-value">2.00</span>
+            </label>
+            <input type="range" class="slider" id="rs-ex-wd"
+                   min="0.20" max="5.80" step="0.01" value="2.00">
+        </div>
+        <div class="btn-group">
+            <button class="btn" onclick="resetResonance()">Reset</button>
+        </div>
+    </div>
+</div>
+
+<div class="info-box">
+    <div class="info-box-title">Key Insight</div>
+    <p>
+        Why does the amplitude peak at \( \omega_d \approx \omega_0 \)?
+        At this frequency, each push arrives at precisely the moment the
+        system is moving fastest through equilibrium &mdash; exactly when
+        it's most receptive to absorbing energy.  It's like pushing a child
+        on a swing: push at the right moment and the amplitude grows;
+        push at the wrong time and you fight the motion.
+    </p>
+</div>
+
+<!-- Test Your Understanding #1 -->
+<div class="interactive-container question-section">
+    <div class="interactive-title">Test Your Understanding</div>
+
+    <p style="margin-bottom: var(--spacing-md); color: var(--text-secondary);">
+        Use the Resonance Explorer to answer these questions.
+    </p>
+
+    <div class="tabs">
+        <div class="tab-buttons">
+            <button class="tab-button active">Question 1</button>
+            <button class="tab-button">Question 2</button>
+            <button class="tab-button">Question 3</button>
+        </div>
+
+        <!-- Q1: MCQ -->
+        <div class="tab-content active">
+            <div class="question-container" data-type="mcq" data-answer="1">
+                <div class="question-text">
+                    Drag \( \omega_d \) to find the peak amplitude.
+                    At resonance (\( \gamma = 0.20, \omega_0 = 3.0 \)),
+                    the amplitude is about:
+                </div>
+                <div class="question-options">
+                    <label class="option">
+                        <input type="radio" name="rs-q1" value="0">
+                        <span>A &approx; 1 (same size as the driving force)</span>
+                    </label>
+                    <label class="option">
+                        <input type="radio" name="rs-q1" value="1">
+                        <span>A &approx; 0.83 (amplified by the resonance peak)</span>
+                    </label>
+                    <label class="option">
+                        <input type="radio" name="rs-q1" value="2">
+                        <span>A &approx; 0.1 (most of the energy is damped)</span>
+                    </label>
+                    <label class="option">
+                        <input type="radio" name="rs-q1" value="3">
+                        <span>A &rarr; &infin; (unlimited growth)</span>
+                    </label>
+                </div>
+                <div class="question-actions">
+                    <button class="btn-verify">Verify</button>
+                </div>
+                <div class="question-explanation" style="display: none;">
+                    <div class="question-explanation-title">Explanation</div>
+                    <div class="question-explanation-text">
+                        At resonance, \( A_{\text{peak}} \approx F_0/(2m\gamma\omega_0) = 1/(2 \times 0.20 \times 3.0) = 0.83 \).
+                        The response is amplified relative to the static response
+                        \( F_0/(m\omega_0^2) = 1/9 = 0.11 \) by a factor of about
+                        \( Q = 7.5 \).  Damping prevents infinite growth, but
+                        the amplification is still dramatic.
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Q2: MCQ -->
+        <div class="tab-content">
+            <div class="question-container" data-type="mcq" data-answer="2">
+                <div class="question-text">
+                    Now set \( \omega_d = 0.30 \) (far below resonance).
+                    Compare the amplitude to the response at \( \omega_d = 5.50 \)
+                    (far above resonance).  Which is larger?
+                </div>
+                <div class="question-options">
+                    <label class="option">
+                        <input type="radio" name="rs-q2" value="0">
+                        <span>They are equal (the curve is symmetric)</span>
+                    </label>
+                    <label class="option">
+                        <input type="radio" name="rs-q2" value="1">
+                        <span>High frequency (\( \omega_d = 5.5 \)) is larger</span>
+                    </label>
+                    <label class="option">
+                        <input type="radio" name="rs-q2" value="2">
+                        <span>Low frequency (\( \omega_d = 0.3 \)) is larger</span>
+                    </label>
+                    <label class="option">
+                        <input type="radio" name="rs-q2" value="3">
+                        <span>Both are zero</span>
+                    </label>
+                </div>
+                <div class="question-actions">
+                    <button class="btn-verify">Verify</button>
+                </div>
+                <div class="question-explanation" style="display: none;">
+                    <div class="question-explanation-title">Explanation</div>
+                    <div class="question-explanation-text">
+                        The resonance curve is <em>not</em> symmetric.  At low
+                        frequencies (gentle, slow pushing), the system easily follows
+                        along &mdash; the response settles to a modest but nonzero level.
+                        At high frequencies (rapid shaking), the system can&rsquo;t
+                        keep up and the response drops toward zero.  So the
+                        low-frequency side of the peak is always higher than the
+                        high-frequency side.
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Q3: Fill -->
+        <div class="tab-content">
+            <div class="question-container" data-type="fill" data-answer="90[85,95]">
+                <div class="question-text">
+                    Look at the phase lag \( \delta \) in the stats bar as you
+                    sweep through resonance.  At exactly \( \omega_d = \omega_0 = 3.0 \),
+                    the phase lag is:
+                    <br><br>
+                    &delta; = <input type="text" class="fill-blank" placeholder="degrees">&deg;
+                </div>
+                <div class="question-actions">
+                    <button class="btn-verify">Verify</button>
+                </div>
+                <div class="question-explanation" style="display: none;">
+                    <div class="question-explanation-title">Explanation</div>
+                    <div class="question-explanation-text">
+                        At \( \omega_d = \omega_0 \), the formula gives
+                        \( \tan\delta = 2\gamma\omega_0 / (\omega_0^2 - \omega_0^2) = 2\gamma\omega_0 / 0 \rightarrow \infty \),
+                        so \( \delta = 90° \).  This is true for <em>any</em> value of
+                        \( \gamma \) &mdash; the phase always passes through 90&deg; at
+                        exactly \( \omega_d = \omega_0 \).  Physically, this means the
+                        response lags the force by a quarter cycle: peak displacement
+                        occurs when the force crosses zero.
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<hr>
+
+<!-- ========== EXPLORER 2: DAMPING EFFECT ========== -->
+
+<h2>Damping Shapes the Peak</h2>
+
+<p>
+    The resonance peak isn't fixed &mdash; damping controls both its
+    <strong>height</strong> and <strong>width</strong>.  Light damping
+    (small \( \gamma \)) produces a tall, narrow peak: the system is very
+    selective about which frequency excites it.  Heavy damping (large
+    \( \gamma \)) produces a short, broad peak: the system responds
+    similarly to a wide range of frequencies.
+</p>
+
+<p>
+    The right panel shows the <strong>phase response</strong> &mdash; how much
+    the response lags behind the driving force.  At low frequencies the
+    response is nearly in phase (\( \delta \approx 0 \)).  At resonance it
+    lags by exactly 90&deg;.  Above resonance it approaches 180&deg; (antiphase).
+    Sharper resonances have steeper phase transitions.
+</p>
+
+<div class="interactive-container" id="damping-effect">
+    <div class="interactive-title">Explorer 2: Damping Controls the Resonance</div>
+
+    <div style="display: flex; gap: 0.5rem; flex-wrap: wrap;">
+        <div class="plot-container" style="flex: 1; min-width: 280px;">
+            <div id="rs-dp-plot" style="width: 100%; height: 380px;"></div>
+        </div>
+        <div class="plot-container" style="flex: 1; min-width: 280px;">
+            <div id="rs-dp-phase-plot" style="width: 100%; height: 380px;"></div>
+        </div>
+    </div>
+
+    <div id="rs-dp-stats"
+         style="display: flex; justify-content: center; gap: 1.5rem; padding: 8px 0; font-size: 0.85rem; color: #c8c8e0; flex-wrap: wrap;">
+    </div>
+
+    <div class="control-panel">
+        <div class="control-group">
+            <label class="control-label">Damping &gamma;:
+                <span class="control-label-value">0.30</span>
+            </label>
+            <input type="range" class="slider" id="rs-dp-gamma"
+                   min="0.05" max="2.00" step="0.01" value="0.30">
+        </div>
+        <div class="btn-group">
+            <button class="btn" onclick="resetDampingEffect()">Reset</button>
+        </div>
+    </div>
+</div>
+
+<div class="info-box">
+    <div class="info-box-title">Key Insight</div>
+    <p>
+        The <strong>bandwidth</strong> &Delta;&omega; (yellow dashed line) is
+        the width of the peak &mdash; specifically, the range of driving
+        frequencies where the response is at least 70% of the peak height
+        (the &ldquo;half-power&rdquo; level, since power goes as amplitude
+        squared: 0.7&sup2;&nbsp;&asymp;&nbsp;0.5).  It turns out that
+        &Delta;&omega;&nbsp;&asymp;&nbsp;2&gamma;.  This means
+        Q&nbsp;=&nbsp;&omega;<sub>0</sub>/&Delta;&omega;: a high-Q system has
+        a narrow, sharp peak (responds to one frequency and ignores
+        everything else), while a low-Q system has a broad, flat peak.
+    </p>
+</div>
+
+<!-- Test Your Understanding #2 -->
+<div class="interactive-container question-section">
+    <div class="interactive-title">Test Your Understanding</div>
+
+    <p style="margin-bottom: var(--spacing-md); color: var(--text-secondary);">
+        Use the Damping Controls explorer to answer these questions.
+    </p>
+
+    <div class="tabs">
+        <div class="tab-buttons">
+            <button class="tab-button active">Question 4</button>
+            <button class="tab-button">Question 5</button>
+            <button class="tab-button">Question 6</button>
+        </div>
+
+        <!-- Q4: Fill -->
+        <div class="tab-content active">
+            <div class="question-container" data-type="fill" data-answer="5.0[4.5,5.5]">
+                <div class="question-text">
+                    Set \( \gamma = 0.30 \).  The quality factor is
+                    \( Q = \omega_0 / (2\gamma) = 3.0 / (2 \times 0.30) \).  Calculate \( Q \):
+                    <br><br>
+                    Q = <input type="text" class="fill-blank" placeholder="value">
+                </div>
+                <div class="question-actions">
+                    <button class="btn-verify">Verify</button>
+                </div>
+                <div class="question-explanation" style="display: none;">
+                    <div class="question-explanation-title">Explanation</div>
+                    <div class="question-explanation-text">
+                        \( Q = 3.0 / 0.60 = 5.0 \).  Check the stats bar: it should
+                        show Q = 5.0 and the bandwidth \( \Delta\omega \approx 0.60 \).
+                        Verify: \( Q \approx \omega_0 / \Delta\omega = 3.0 / 0.60 = 5.0 \).
+                        The two definitions agree.
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Q5: MCQ -->
+        <div class="tab-content">
+            <div class="question-container" data-type="mcq" data-answer="2">
+                <div class="question-text">
+                    Decrease \( \gamma \) from 0.30 to 0.10.  What happens to
+                    both the amplitude response and the phase response?
+                </div>
+                <div class="question-options">
+                    <label class="option">
+                        <input type="radio" name="rs-q5" value="0">
+                        <span>Peak gets shorter and wider; phase transition gets gentler</span>
+                    </label>
+                    <label class="option">
+                        <input type="radio" name="rs-q5" value="1">
+                        <span>Peak stays the same; only the phase changes</span>
+                    </label>
+                    <label class="option">
+                        <input type="radio" name="rs-q5" value="2">
+                        <span>Peak gets taller and narrower; phase transition gets steeper</span>
+                    </label>
+                    <label class="option">
+                        <input type="radio" name="rs-q5" value="3">
+                        <span>Peak shifts to a different frequency</span>
+                    </label>
+                </div>
+                <div class="question-actions">
+                    <button class="btn-verify">Verify</button>
+                </div>
+                <div class="question-explanation" style="display: none;">
+                    <div class="question-explanation-title">Explanation</div>
+                    <div class="question-explanation-text">
+                        Less damping &rarr; higher Q &rarr; taller and narrower
+                        amplitude peak.  The phase response mirrors this: a high-Q
+                        system switches rapidly from 0&deg; to 180&deg; as \( \omega_d \)
+                        crosses \( \omega_0 \), while a low-Q system transitions gradually.
+                        At \( \gamma = 0.10 \), Q = 15, and the peak is about 3 times
+                        taller than at \( \gamma = 0.30 \) (Q = 5).
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Q6: MCQ -->
+        <div class="tab-content">
+            <div class="question-container" data-type="mcq" data-answer="0">
+                <div class="question-text">
+                    The phase lag at \( \omega_d = \omega_0 \) is always exactly
+                    90&deg;, regardless of damping.  But the <em>steepness</em> of
+                    the phase transition depends on \( \gamma \).  Which system
+                    has the steepest (most abrupt) phase transition?
+                </div>
+                <div class="question-options">
+                    <label class="option">
+                        <input type="radio" name="rs-q6" value="0">
+                        <span>The one with the smallest \( \gamma \) (highest Q)</span>
+                    </label>
+                    <label class="option">
+                        <input type="radio" name="rs-q6" value="1">
+                        <span>The one with the largest \( \gamma \) (lowest Q)</span>
+                    </label>
+                    <label class="option">
+                        <input type="radio" name="rs-q6" value="2">
+                        <span>They all have the same steepness</span>
+                    </label>
+                    <label class="option">
+                        <input type="radio" name="rs-q6" value="3">
+                        <span>The one with \( \gamma = \omega_0 \)</span>
+                    </label>
+                </div>
+                <div class="question-actions">
+                    <button class="btn-verify">Verify</button>
+                </div>
+                <div class="question-explanation" style="display: none;">
+                    <div class="question-explanation-title">Explanation</div>
+                    <div class="question-explanation-text">
+                        Compare the dotted reference curves in the phase plot.
+                        The \( \gamma = 0.10 \) curve jumps almost vertically from
+                        0&deg; to 180&deg; in a narrow band around \( \omega_0 \).
+                        The \( \gamma = 1.00 \) curve transitions gently across a
+                        wide range.  Higher Q = sharper amplitude peak = steeper
+                        phase transition.  Both are manifestations of the same
+                        selectivity.
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<hr>
+
+<!-- ========== EXPLORER 3: Q FACTOR VISUALIZER ========== -->
+
+<h2>The Quality Factor Q</h2>
+
+<p>
+    The quality factor \( Q \) is the single number that characterizes a
+    resonance.  It tells you three things at once:
+</p>
+<ul>
+    <li><strong>Sharpness of the peak:</strong> \( Q = \omega_0 / \Delta\omega \) &mdash; a high Q means a narrow, selective peak</li>
+    <li><strong>Amplification at resonance:</strong> The peak amplitude is roughly Q times larger than the gentle-push response &mdash; resonance amplifies!</li>
+    <li><strong>How long it rings:</strong> A high-Q system stores a lot of energy and releases it slowly &mdash; it oscillates for about Q cycles after you stop driving it</li>
+</ul>
+
+<p>
+    The left panel shows normalized resonance curves for several Q values.
+    The right panel shows how Q and peak amplitude both increase as damping
+    decreases.
+</p>
+
+<div class="interactive-container" id="q-factor-visualizer">
+    <div class="interactive-title">Explorer 3: Q Factor Visualizer</div>
+
+    <div style="display: flex; gap: 0.5rem; flex-wrap: wrap;">
+        <div class="plot-container" style="flex: 1; min-width: 280px;">
+            <div id="rs-qf-plot" style="width: 100%; height: 380px;"></div>
+        </div>
+        <div class="plot-container" style="flex: 1; min-width: 280px;">
+            <div id="rs-qf-metrics-plot" style="width: 100%; height: 380px;"></div>
+        </div>
+    </div>
+
+    <div id="rs-qf-stats"
+         style="display: flex; justify-content: center; gap: 1.5rem; padding: 8px 0; font-size: 0.85rem; color: #c8c8e0; flex-wrap: wrap;">
+    </div>
+
+    <div class="control-panel">
+        <div class="control-group">
+            <label class="control-label">Natural frequency &omega;<sub>0</sub>:
+                <span class="control-label-value">3.00</span>
+            </label>
+            <input type="range" class="slider" id="rs-qf-omega0"
+                   min="1.00" max="6.00" step="0.10" value="3.00">
+        </div>
+        <div class="control-group">
+            <label class="control-label">Damping &gamma;:
+                <span class="control-label-value">0.30</span>
+            </label>
+            <input type="range" class="slider" id="rs-qf-gamma"
+                   min="0.05" max="2.00" step="0.01" value="0.30">
+        </div>
+        <div class="btn-group">
+            <button class="btn" onclick="resetQFactor()">Reset</button>
+        </div>
+    </div>
+</div>
+
+<div class="info-box">
+    <div class="info-box-title">Key Insight</div>
+    <p>
+        Real-world Q values span an enormous range.  A car suspension has
+        \( Q \approx 2\text{--}5 \) (broad response, quickly settling).
+        A guitar string has \( Q \approx 1000 \) (rings for seconds).
+        An atomic transition has \( Q \sim 10^8 \) (incredibly sharp frequency).
+        A laser cavity can reach \( Q \sim 10^{11} \).  The higher the Q,
+        the more precisely the system selects one frequency from all others.
+    </p>
+</div>
+
+<!-- Test Your Understanding #3 -->
+<div class="interactive-container question-section">
+    <div class="interactive-title">Test Your Understanding</div>
+
+    <p style="margin-bottom: var(--spacing-md); color: var(--text-secondary);">
+        Use the Q Factor Visualizer to answer these questions.
+    </p>
+
+    <div class="tabs">
+        <div class="tab-buttons">
+            <button class="tab-button active">Question 7</button>
+            <button class="tab-button">Question 8</button>
+            <button class="tab-button">Question 9</button>
+        </div>
+
+        <!-- Q7: MCQ -->
+        <div class="tab-content active">
+            <div class="question-container" data-type="mcq" data-answer="2">
+                <div class="question-text">
+                    Compare the Q = 1, Q = 10, and Q = 30 curves on the left
+                    panel.  As Q increases, the resonance peak:
+                </div>
+                <div class="question-options">
+                    <label class="option">
+                        <input type="radio" name="rs-q7" value="0">
+                        <span>Gets shorter and wider</span>
+                    </label>
+                    <label class="option">
+                        <input type="radio" name="rs-q7" value="1">
+                        <span>Shifts to a different frequency</span>
+                    </label>
+                    <label class="option">
+                        <input type="radio" name="rs-q7" value="2">
+                        <span>Gets taller and narrower (more selective)</span>
+                    </label>
+                    <label class="option">
+                        <input type="radio" name="rs-q7" value="3">
+                        <span>Disappears entirely</span>
+                    </label>
+                </div>
+                <div class="question-actions">
+                    <button class="btn-verify">Verify</button>
+                </div>
+                <div class="question-explanation" style="display: none;">
+                    <div class="question-explanation-title">Explanation</div>
+                    <div class="question-explanation-text">
+                        Higher Q means less damping relative to the natural frequency.
+                        The peak gets taller (amplitude amplification increases) and
+                        narrower (bandwidth \( \Delta\omega = \omega_0/Q \) decreases).
+                        The Q = 30 curve is a sharp spike; the Q = 1 curve is barely
+                        a bump.
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Q8: Fill -->
+        <div class="tab-content">
+            <div class="question-container" data-type="fill" data-answer="0.60[0.50,0.70]">
+                <div class="question-text">
+                    At \( \omega_0 = 3.0, Q = 5 \), the bandwidth is
+                    \( \Delta\omega = \omega_0 / Q \).  Calculate \( \Delta\omega \):
+                    <br><br>
+                    &Delta;&omega; = <input type="text" class="fill-blank" placeholder="rad/s"> rad/s
+                </div>
+                <div class="question-actions">
+                    <button class="btn-verify">Verify</button>
+                </div>
+                <div class="question-explanation" style="display: none;">
+                    <div class="question-explanation-title">Explanation</div>
+                    <div class="question-explanation-text">
+                        \( \Delta\omega = 3.0 / 5 = 0.60 \) rad/s.  This means the
+                        system responds strongly only within a band of width 0.60 rad/s
+                        centered on \( \omega_0 = 3.0 \).  Frequencies outside
+                        \( [2.70, 3.30] \) produce less than \( 1/\sqrt{2} \) of the
+                        peak amplitude.  Set \( \gamma = 0.30 \) (Q = 5) and verify
+                        from the yellow bandwidth markers in Explorer 2.
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Q9: MCQ -->
+        <div class="tab-content">
+            <div class="question-container" data-type="mcq" data-answer="1">
+                <div class="question-text">
+                    The stats bar shows \( 2\pi Q \) as "energy stored / energy
+                    lost per cycle."  For Q = 5, this ratio is about 31.
+                    What does this tell you physically?
+                </div>
+                <div class="question-options">
+                    <label class="option">
+                        <input type="radio" name="rs-q9" value="0">
+                        <span>The system loses all its energy in 31 cycles</span>
+                    </label>
+                    <label class="option">
+                        <input type="radio" name="rs-q9" value="1">
+                        <span>At any moment, the system stores 31 times more energy than it loses per cycle</span>
+                    </label>
+                    <label class="option">
+                        <input type="radio" name="rs-q9" value="2">
+                        <span>The system amplifies energy by a factor of 31</span>
+                    </label>
+                    <label class="option">
+                        <input type="radio" name="rs-q9" value="3">
+                        <span>The system requires 31 cycles to reach steady state</span>
+                    </label>
+                </div>
+                <div class="question-actions">
+                    <button class="btn-verify">Verify</button>
+                </div>
+                <div class="question-explanation" style="display: none;">
+                    <div class="question-explanation-title">Explanation</div>
+                    <div class="question-explanation-text">
+                        The ratio \( 2\pi Q \) compares stored energy to dissipated
+                        energy <em>per cycle</em>.  At steady state, energy input per
+                        cycle equals energy dissipated per cycle, and the stored energy
+                        is \( 2\pi Q \) times larger than either.  This means only a
+                        small fraction (\( 1/(2\pi Q) \approx 3\% \)) of the stored
+                        energy is lost each cycle &mdash; the rest keeps sloshing back
+                        and forth.
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<hr>
+
+<!-- ========== CODE EXAMPLES ========== -->
+<h2>Code It Yourself</h2>
+
+<div class="tabs">
+    <div class="tab-buttons">
+        <button class="tab-button active">Resonance Curve</button>
+        <button class="tab-button">Q Factor</button>
+        <button class="tab-button">Prompt</button>
+    </div>
+
+    <div class="tab-content active">
+        <div class="code-block-container">
+            <div class="code-header">
+                <span class="code-lang">Python</span>
+                <button class="copy-btn">Copy</button>
+            </div>
+            <pre><code class="language-python">import numpy as np
+import plotly.graph_objects as go
+
+def amplitude(F0m, omega0, wd, gamma):
+    return F0m / np.sqrt((omega0**2 - wd**2)**2 + (2*gamma*wd)**2)
+
+omega0, F0m = 3.0, 1.0
+wd = np.linspace(0.1, 6, 500)
+
+fig = go.Figure()
+for gamma, color, label in [
+    (0.10, '#00f3ff', 'γ=0.10 (Q=15)'),
+    (0.30, '#00ff9f', 'γ=0.30 (Q=5)'),
+    (1.00, '#ff00ff', 'γ=1.00 (Q=1.5)')]:
+    A = amplitude(F0m, omega0, wd, gamma)
+    fig.add_trace(go.Scatter(x=wd, y=A, name=label,
+        line=dict(color=color, width=2.5)))
+
+fig.update_layout(template='plotly_dark',
+    title='Resonance Curves at Different Damping',
+    xaxis=dict(title='ω_d (rad/s)', range=[0, 6],
+        gridcolor='#2a2f4a', zerolinecolor='#808080', linecolor='#808080'),
+    yaxis=dict(title='Amplitude A', range=[0, 10],
+        gridcolor='#2a2f4a', zerolinecolor='#808080', linecolor='#808080'))
+fig.show()</code></pre>
+        </div>
+    </div>
+
+    <div class="tab-content">
+        <div class="code-block-container">
+            <div class="code-header">
+                <span class="code-lang">Python</span>
+                <button class="copy-btn">Copy</button>
+            </div>
+            <pre><code class="language-python">import numpy as np
+import plotly.graph_objects as go
+from plotly.subplots import make_subplots
+
+omega0, F0m = 3.0, 1.0
+wd = np.linspace(0.1, 6, 500)
+
+# Amplitude and phase for several Q values
+fig = make_subplots(rows=1, cols=2,
+    subplot_titles=['Amplitude Response', 'Phase Response'])
+
+for Q, color in [(1, '#ff6b6b'), (5, '#ffff00'), (15, '#00f3ff'), (30, '#00ff9f')]:
+    gamma = omega0 / (2*Q)
+    A = F0m / np.sqrt((omega0**2 - wd**2)**2 + (2*gamma*wd)**2)
+    phase = np.arctan2(2*gamma*wd, omega0**2 - wd**2) * 180/np.pi
+
+    fig.add_trace(go.Scatter(x=wd, y=A, name=f'Q={Q}',
+        line=dict(color=color, width=2)), row=1, col=1)
+    fig.add_trace(go.Scatter(x=wd, y=phase, showlegend=False,
+        line=dict(color=color, width=2)), row=1, col=2)
+
+fig.update_layout(template='plotly_dark')
+fig.update_xaxes(title='ω_d', gridcolor='#2a2f4a', linecolor='#808080')
+fig.update_yaxes(gridcolor='#2a2f4a', linecolor='#808080')
+fig.update_yaxes(title='Amplitude', row=1, col=1)
+fig.update_yaxes(title='Phase (°)', row=1, col=2)
+fig.show()</code></pre>
+        </div>
+    </div>
+
+    <div class="tab-content">
+        <div class="code-block-container">
+            <div class="code-header">
+                <span class="code-lang">Prompt for AI</span>
+                <button class="copy-btn">Copy</button>
+            </div>
+            <pre><code class="language-text">Create a Python visualization of resonance in a driven oscillator.
+
+Part 1 - Resonance curves at different damping:
+- Plot A(ω_d) = (F₀/m) / √((ω₀²-ω_d²)² + (2γω_d)²)
+- Parameters: ω₀ = 3.0, F₀/m = 1.0
+- Show curves for γ = 0.1, 0.3, 1.0 on same plot
+- Label each with its Q factor: Q = ω₀/(2γ)
+- Mark the bandwidth Δω at half-power for each
+
+Part 2 - Phase response:
+- Plot δ(ω_d) = atan2(2γω_d, ω₀²-ω_d²) in degrees
+- Same three γ values
+- Show that all curves cross 90° at ω_d = ω₀
+- Note: steeper crossing = higher Q
+
+Part 3 - Q factor summary:
+- Plot Q vs γ and A_peak vs γ (dual y-axes)
+- Show that A_peak ≈ F₀/(2mγω₀) = Q × (F₀/mω₀²)
+- Mark real-world Q values: car suspension (Q≈3),
+  guitar string (Q≈1000), laser (Q≈10¹¹)
+
+Use Plotly dark theme, gray axes (#808080), fixed ranges.</code></pre>
+        </div>
+
+        <div class="info-box" style="margin-top: var(--spacing-md);">
+            <div class="info-box-title">Pro Tips for Prompting</div>
+            <ul>
+                <li>Always specify \( Q = \omega_0 / (2\gamma) \), not \( Q = \omega_0 / \gamma \) (a common confusion)</li>
+                <li>Ask for both amplitude AND phase response &mdash; they contain complementary information</li>
+                <li>Request normalized frequency axis (\( \omega_d / \omega_0 \)) for universal curves</li>
+            </ul>
+        </div>
+    </div>
+</div>
+
+<hr>
+
+<!-- ========== EXERCISES ========== -->
+<h2>Exercises for Practice</h2>
+
+<div class="exercise-cards">
+    <div class="exercise-card">
+        <div class="exercise-card-header">
+            <span class="exercise-card-number">1.</span>
+            <span class="exercise-card-badge explore">Explore</span>
+        </div>
+        <div class="exercise-card-content">
+            In the Damping Controls explorer, find three values of \( \gamma \)
+            that give Q = 2, Q = 10, and Q = 50 (with \( \omega_0 = 3.0 \)).
+            For each, record the peak amplitude and the bandwidth \( \Delta\omega \).
+            Verify that \( Q \approx \omega_0 / \Delta\omega \) in each case.
+            How does halving \( \gamma \) affect the peak amplitude?
+        </div>
+    </div>
+
+    <div class="exercise-card">
+        <div class="exercise-card-header">
+            <span class="exercise-card-number">2.</span>
+            <span class="exercise-card-badge coding">Coding</span>
+        </div>
+        <div class="exercise-card-content">
+            Write a Python function <code>resonance_summary(omega0, gamma, F0m)</code>
+            that returns: (1) the Q factor, (2) the resonance frequency
+            \( \omega_{\text{res}} \), (3) the peak amplitude, (4) the bandwidth,
+            and (5) the number of oscillations to reach 95% of steady-state
+            amplitude (approximately \( Q/\pi \) cycles).  Test it for a guitar
+            string (\( Q \approx 1000 \)) and a car suspension (\( Q \approx 3 \)).
+        </div>
+    </div>
+
+    <div class="exercise-card">
+        <div class="exercise-card-header">
+            <span class="exercise-card-number">3.</span>
+            <span class="exercise-card-badge think">Think</span>
+        </div>
+        <div class="exercise-card-content">
+            At exact resonance (\( \omega_d = \omega_0 \)), the steady-state
+            power absorbed by the oscillator is \( P = \frac{F_0^2}{4m\gamma} \).
+            Show that this can be written as \( P = \frac{1}{2} F_0^2 / (m\Delta\omega \cdot \omega_0) \).
+            Explain physically why a high-Q system absorbs more power at
+            resonance even though it dissipates less energy per cycle.
+            (Hint: it stores much more energy, and the steady-state balance
+            requires input = dissipation.)
+        </div>
+    </div>
+</div>
+
+<hr>
+
+<!-- ========== NAVIGATION ========== -->
+<div class="btn-group mt-xl">
+    <button class="btn btn-magenta" onclick="navigateToSection('27-external-forces')">&larr; Previous: Adding External Forces</button>
+    <button class="btn" onclick="scrollToTop()">&uarr; Back to Top</button>
+    <button class="btn btn-secondary" onclick="navigateToSection('29-beats-resonance')">Next: Beats and Near-Resonance &rarr;</button>
+</div>

@@ -1,0 +1,800 @@
+<!-- Section 3.4: One Equation, Many Systems -->
+<!-- Source: Module 4 - Review of Oscillations.nb (Part 4) -->
+<!-- Core concept: SHO universality across springs, pendulums, LC circuits -->
+<!-- Time: ~20 minutes -->
+<!-- Prerequisites: Sections 3.1-3.3 (SHO equation, energy, phase space) -->
+
+<h1>One Equation, Many Systems</h1>
+
+<p>
+    A mass on a spring, a swinging pendulum, a current sloshing back and forth
+    in an electrical circuit &mdash; these look nothing alike physically.  Yet if
+    you write down the equation of motion for each, <em>the same equation</em>
+    appears every time:
+</p>
+
+<div class="equation-display">
+    $$ \ddot{x} = -\omega^2 x $$
+    <p>
+        The variable \( x \) changes its name &mdash; displacement, angle, charge &mdash;
+        but the mathematics is identical.  Once you've solved it for one system,
+        you've solved it for <strong>all</strong> of them.
+    </p>
+</div>
+
+<div class="info-box">
+    <div class="info-box-title">Learning Objectives</div>
+    <ul>
+        <li>Map the SHO equation onto three physical systems: spring-mass, pendulum, and LC circuit</li>
+        <li>Convert parameters between domains (k, m &harr; g, L &harr; L, C)</li>
+        <li>Recognize that the derivative always leads the primary variable by \( \pi/2 \)</li>
+        <li>Appreciate that solving one system gives the solution for all</li>
+    </ul>
+</div>
+
+<hr>
+
+<!-- ========== EXPLORER 1: SYSTEM IDENTIFIER ========== -->
+
+<h2>Three Systems, One Pattern</h2>
+
+<p>
+    Let's see universality in action.  Below, three completely different physical
+    systems oscillate side by side.  Adjust their physical parameters and watch
+    how the natural frequency \( \omega \) changes.  The remarkable fact:
+    <strong>the oscillation shape is always a cosine</strong> &mdash; only the
+    frequency changes.
+</p>
+
+<div class="equation-display">
+    <p>
+        <strong>Spring:</strong> \( \omega = \sqrt{k/m} \) &emsp;
+        <strong>Pendulum:</strong> \( \omega = \sqrt{g/L} \) &emsp;
+        <strong>LC circuit:</strong> \( \omega = 1/\sqrt{LC} \)
+    </p>
+</div>
+
+<div class="interactive-container" id="system-identifier">
+    <div class="interactive-title">Explorer 1: System Identifier</div>
+
+    <div style="display: flex; gap: 0.5rem; flex-wrap: wrap;">
+        <div class="plot-container" style="flex: 1; min-width: 280px;">
+            <div id="un-sys-plot" style="width: 100%; height: 380px;"></div>
+        </div>
+        <div class="plot-container" style="flex: 1; min-width: 280px;">
+            <div id="un-sys-freq-plot" style="width: 100%; height: 380px;"></div>
+        </div>
+    </div>
+
+    <div id="un-sys-stats"
+         style="display: flex; justify-content: center; gap: 1.5rem; padding: 8px 0; font-size: 0.85rem; color: #c8c8e0; flex-wrap: wrap;">
+    </div>
+
+    <div class="control-panel">
+        <div class="control-group">
+            <label class="control-label">Spring constant k:
+                <span class="control-label-value">4.0</span>
+            </label>
+            <input type="range" class="slider" id="un-sys-k"
+                   min="0.5" max="20" step="0.5" value="4.0">
+        </div>
+        <div class="control-group">
+            <label class="control-label">Mass m:
+                <span class="control-label-value">1.0</span>
+            </label>
+            <input type="range" class="slider" id="un-sys-m"
+                   min="0.1" max="5.0" step="0.1" value="1.0">
+        </div>
+        <div class="control-group">
+            <label class="control-label">Pendulum length L:
+                <span class="control-label-value">1.0</span>
+            </label>
+            <input type="range" class="slider" id="un-sys-L"
+                   min="0.1" max="5.0" step="0.1" value="1.0">
+        </div>
+        <div class="control-group">
+            <label class="control-label">Inductance L<sub>c</sub>:
+                <span class="control-label-value">0.10</span>
+            </label>
+            <input type="range" class="slider" id="un-sys-Lc"
+                   min="0.01" max="2.0" step="0.01" value="0.10">
+        </div>
+        <div class="control-group">
+            <label class="control-label">Capacitance C:
+                <span class="control-label-value">0.01</span>
+            </label>
+            <input type="range" class="slider" id="un-sys-C"
+                   min="0.001" max="0.1" step="0.001" value="0.01">
+        </div>
+        <div class="btn-group">
+            <button class="btn" onclick="resetSystems()">Reset</button>
+        </div>
+    </div>
+</div>
+
+<div class="info-box">
+    <div class="info-box-title">Key Insight</div>
+    <p>
+        A stiff spring (large \( k \)) oscillates fast, just like a short pendulum (small \( L \))
+        or a small LC circuit (small \( L_c C \)).  The physics is different, but the math is the
+        same: <strong>larger restoring tendency means faster oscillation</strong>.
+    </p>
+</div>
+
+<!-- Test Your Understanding #1 -->
+<div class="interactive-container question-section">
+    <div class="interactive-title">Test Your Understanding</div>
+
+    <p style="margin-bottom: var(--spacing-md); color: var(--text-secondary);">
+        Use the System Identifier to answer these questions.
+    </p>
+
+    <div class="tabs">
+        <div class="tab-buttons">
+            <button class="tab-button active">Question 1</button>
+            <button class="tab-button">Question 2</button>
+            <button class="tab-button">Question 3</button>
+        </div>
+
+        <!-- Q1: MCQ -->
+        <div class="tab-content active">
+            <div class="question-container" data-type="mcq" data-answer="1">
+                <div class="question-text">
+                    You double the spring constant \( k \) while keeping mass \( m \) fixed.
+                    What happens to the natural frequency \( \omega \)?
+                </div>
+                <div class="question-options">
+                    <label class="option">
+                        <input type="radio" name="un-q1" value="0">
+                        <span>It doubles</span>
+                    </label>
+                    <label class="option">
+                        <input type="radio" name="un-q1" value="1">
+                        <span>It increases by a factor of \( \sqrt{2} \)</span>
+                    </label>
+                    <label class="option">
+                        <input type="radio" name="un-q1" value="2">
+                        <span>It stays the same</span>
+                    </label>
+                    <label class="option">
+                        <input type="radio" name="un-q1" value="3">
+                        <span>It halves</span>
+                    </label>
+                </div>
+                <div class="question-actions">
+                    <button class="btn-verify">Verify</button>
+                </div>
+                <div class="question-explanation" style="display: none;">
+                    <div class="question-explanation-title">Explanation</div>
+                    <div class="question-explanation-text">
+                        Since \( \omega = \sqrt{k/m} \), doubling \( k \) multiplies
+                        \( \omega \) by \( \sqrt{2} \approx 1.414 \).  The square root
+                        means you need to quadruple \( k \) to double \( \omega \).
+                        Try it: set k from 4 to 8 and watch the cyan curve speed up.
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Q2: Fill -->
+        <div class="tab-content">
+            <div class="question-container" data-type="fill" data-answer="0.25[0.2,0.3]">
+                <div class="question-text">
+                    A pendulum has length L = 1 m, so \( \omega = \sqrt{9.8} \approx 3.13 \) rad/s.
+                    What length gives \( \omega = 2 \times 3.13 = 6.26 \) rad/s?
+                    <br><br>
+                    L = <input type="text" class="fill-blank" placeholder="m"> m
+                </div>
+                <div class="question-actions">
+                    <button class="btn-verify">Verify</button>
+                </div>
+                <div class="question-explanation" style="display: none;">
+                    <div class="question-explanation-title">Explanation</div>
+                    <div class="question-explanation-text">
+                        Since \( \omega = \sqrt{g/L} \), doubling \( \omega \) requires
+                        \( L \to L/4 \).  So \( L = 1/4 = 0.25 \) m.  A shorter pendulum
+                        swings faster &mdash; just like a stiffer spring.  The analogy is
+                        "shorter pendulum = stiffer spring".
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Q3: MCQ -->
+        <div class="tab-content">
+            <div class="question-container" data-type="mcq" data-answer="2">
+                <div class="question-text">
+                    In an LC circuit, you replace the capacitor with one of four times the
+                    capacitance.  How does the oscillation period change?
+                </div>
+                <div class="question-options">
+                    <label class="option">
+                        <input type="radio" name="un-q3" value="0">
+                        <span>Period quadruples</span>
+                    </label>
+                    <label class="option">
+                        <input type="radio" name="un-q3" value="1">
+                        <span>Period halves</span>
+                    </label>
+                    <label class="option">
+                        <input type="radio" name="un-q3" value="2">
+                        <span>Period doubles</span>
+                    </label>
+                    <label class="option">
+                        <input type="radio" name="un-q3" value="3">
+                        <span>Period stays the same</span>
+                    </label>
+                </div>
+                <div class="question-actions">
+                    <button class="btn-verify">Verify</button>
+                </div>
+                <div class="question-explanation" style="display: none;">
+                    <div class="question-explanation-title">Explanation</div>
+                    <div class="question-explanation-text">
+                        \( \omega = 1/\sqrt{LC} \), so \( T = 2\pi\sqrt{LC} \).
+                        Replacing \( C \to 4C \) gives \( T \to 2\pi\sqrt{4LC} = 2T \).
+                        The period doubles.  Larger capacitance = more charge to move = slower
+                        oscillation, analogous to a heavier mass on a spring.
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<hr>
+
+<!-- ========== EXPLORER 2: CROSS-DOMAIN MAPPER ========== -->
+
+<h2>Translating Between Worlds</h2>
+
+<p>
+    The universality of \( \ddot{x} = -\omega^2 x \) means we can "translate"
+    between systems.  Given a spring with certain \( k \) and \( m \), what
+    pendulum length gives the same oscillation frequency?  What LC circuit?
+    The answer is always the same: <strong>match \( \omega \)</strong>.
+</p>
+
+<div class="equation-display">
+    <p>
+        <strong>Same \( \omega \) means:</strong> &emsp;
+        \( \displaystyle\sqrt{\frac{k}{m}} = \sqrt{\frac{g}{L}} = \frac{1}{\sqrt{L_c C}} \)
+    </p>
+</div>
+
+<div class="interactive-container" id="cross-domain-mapper">
+    <div class="interactive-title">Explorer 2: Cross-Domain Mapper</div>
+
+    <div style="display: flex; gap: 0.5rem; flex-wrap: wrap;">
+        <div class="plot-container" style="flex: 1; min-width: 280px;">
+            <div id="un-map-plot" style="width: 100%; height: 380px;"></div>
+        </div>
+        <div class="plot-container" style="flex: 1; min-width: 280px;">
+            <div id="un-map-conv-plot" style="width: 100%; height: 380px;"></div>
+        </div>
+    </div>
+
+    <div id="un-map-stats"
+         style="display: flex; justify-content: center; gap: 1.5rem; padding: 8px 0; font-size: 0.85rem; color: #c8c8e0; flex-wrap: wrap;">
+    </div>
+
+    <div class="control-panel">
+        <div class="control-group">
+            <label class="control-label">Source system:</label>
+            <select id="un-map-source" class="slider" style="width: 100%;">
+                <option value="spring" selected>Spring-Mass</option>
+                <option value="pendulum">Pendulum</option>
+                <option value="lc">LC Circuit</option>
+            </select>
+        </div>
+        <div class="control-group">
+            <label class="control-label" id="un-map-p1-label">Spring constant k:
+                <span class="control-label-value">4.0</span>
+            </label>
+            <input type="range" class="slider" id="un-map-p1"
+                   min="0.5" max="20" step="0.5" value="4.0">
+        </div>
+        <div class="control-group" id="un-map-p2-group">
+            <label class="control-label" id="un-map-p2-label">Mass m:
+                <span class="control-label-value">1.0</span>
+            </label>
+            <input type="range" class="slider" id="un-map-p2"
+                   min="0.1" max="5.0" step="0.1" value="1.0">
+        </div>
+        <div class="control-group">
+            <label class="control-label">Target system:</label>
+            <select id="un-map-target" class="slider" style="width: 100%;">
+                <option value="spring">Spring-Mass</option>
+                <option value="pendulum" selected>Pendulum</option>
+                <option value="lc">LC Circuit</option>
+            </select>
+        </div>
+        <div class="btn-group">
+            <button class="btn" onclick="resetMapper()">Reset</button>
+        </div>
+    </div>
+</div>
+
+<div class="info-box">
+    <div class="info-box-title">Key Insight</div>
+    <p>
+        The "Rosetta stone" for oscillations is the natural frequency \( \omega \).
+        Every system has its own formula for \( \omega \) in terms of physical
+        parameters, but once you know \( \omega \), the motion is
+        \( x(t) = A\cos(\omega t + \varphi) \) regardless of what's oscillating.
+    </p>
+</div>
+
+<!-- Test Your Understanding #2 -->
+<div class="interactive-container question-section">
+    <div class="interactive-title">Test Your Understanding</div>
+
+    <p style="margin-bottom: var(--spacing-md); color: var(--text-secondary);">
+        Use the Cross-Domain Mapper to answer these questions.
+    </p>
+
+    <div class="tabs">
+        <div class="tab-buttons">
+            <button class="tab-button active">Question 4</button>
+            <button class="tab-button">Question 5</button>
+            <button class="tab-button">Question 6</button>
+        </div>
+
+        <!-- Q4: Fill -->
+        <div class="tab-content active">
+            <div class="question-container" data-type="fill" data-answer="2.45[2.3,2.6]">
+                <div class="question-text">
+                    A spring has k = 6 N/m and m = 1 kg.
+                    What is \( \omega \)?
+                    <br><br>
+                    &omega; = <input type="text" class="fill-blank" placeholder="rad/s"> rad/s
+                </div>
+                <div class="question-actions">
+                    <button class="btn-verify">Verify</button>
+                </div>
+                <div class="question-explanation" style="display: none;">
+                    <div class="question-explanation-title">Explanation</div>
+                    <div class="question-explanation-text">
+                        \( \omega = \sqrt{k/m} = \sqrt{6/1} = \sqrt{6} \approx 2.449 \) rad/s.
+                        Set k = 6, m = 1 in the mapper to verify.
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Q5: Fill -->
+        <div class="tab-content">
+            <div class="question-container" data-type="fill" data-answer="2.01[1.9,2.1]">
+                <div class="question-text">
+                    A pendulum with L = 1 m has \( \omega = \sqrt{9.8} \approx 3.13 \) rad/s.
+                    What is the period?  <em>Hint:</em> \( T = 2\pi/\omega \).
+                    <br><br>
+                    T = <input type="text" class="fill-blank" placeholder="seconds"> s
+                </div>
+                <div class="question-actions">
+                    <button class="btn-verify">Verify</button>
+                </div>
+                <div class="question-explanation" style="display: none;">
+                    <div class="question-explanation-title">Explanation</div>
+                    <div class="question-explanation-text">
+                        \( T = 2\pi/3.13 \approx 2.01 \) s.
+                        A 1-meter pendulum takes about 2 seconds per full swing &mdash;
+                        that's why grandfather clocks are about 1 meter tall!
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Q6: MCQ -->
+        <div class="tab-content">
+            <div class="question-container" data-type="mcq" data-answer="0">
+                <div class="question-text">
+                    In the spring analogy for an LC circuit, what plays the role of the spring
+                    constant \( k \)?
+                </div>
+                <div class="question-options">
+                    <label class="option">
+                        <input type="radio" name="un-q6" value="0">
+                        <span>\( 1/C \) (inverse capacitance)</span>
+                    </label>
+                    <label class="option">
+                        <input type="radio" name="un-q6" value="1">
+                        <span>\( L \) (inductance)</span>
+                    </label>
+                    <label class="option">
+                        <input type="radio" name="un-q6" value="2">
+                        <span>\( C \) (capacitance)</span>
+                    </label>
+                    <label class="option">
+                        <input type="radio" name="un-q6" value="3">
+                        <span>\( R \) (resistance)</span>
+                    </label>
+                </div>
+                <div class="question-actions">
+                    <button class="btn-verify">Verify</button>
+                </div>
+                <div class="question-explanation" style="display: none;">
+                    <div class="question-explanation-title">Explanation</div>
+                    <div class="question-explanation-text">
+                        The LC circuit equation is \( L\ddot{Q} + Q/C = 0 \).
+                        Compare it side by side with the spring:
+                        \( m\ddot{x} + kx = 0 \).  They have the same structure!
+                        Inductance L plays the role of mass m (it resists changes
+                        in current, just like mass resists changes in velocity).
+                        And 1/C plays the role of spring constant k (a small
+                        capacitor &ldquo;pushes back&rdquo; harder, like a stiff spring).
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<hr>
+
+<!-- ========== EXPLORER 3: PHASE RELATIONSHIP EXPLORER ========== -->
+
+<h2>The Universal Phase Lag</h2>
+
+<p>
+    In every SHO system, the derivative of the oscillating quantity lags behind
+    (or leads) by exactly \( \pi/2 \) &mdash; one quarter of a period.
+    For a spring: velocity leads position by 90&deg;.
+    For an LC circuit: current \( I = dQ/dt \) leads charge \( Q \) by 90&deg;.
+    Switch between systems below and watch: <strong>the phase relationship
+    is always the same</strong>.
+</p>
+
+<div class="interactive-container" id="phase-relationship-explorer">
+    <div class="interactive-title">Explorer 3: Phase Relationship Explorer</div>
+
+    <div style="display: flex; gap: 0.5rem; flex-wrap: wrap;">
+        <div class="plot-container" style="flex: 1; min-width: 280px;">
+            <div id="un-pr-plot" style="width: 100%; height: 380px;"></div>
+        </div>
+        <div class="plot-container" style="flex: 1; min-width: 280px;">
+            <div id="un-pr-phase-plot" style="width: 100%; height: 380px;"></div>
+        </div>
+    </div>
+
+    <div id="un-pr-stats"
+         style="display: flex; justify-content: center; gap: 1.5rem; padding: 8px 0; font-size: 0.85rem; color: #c8c8e0; flex-wrap: wrap;">
+    </div>
+
+    <div class="control-panel">
+        <div class="control-group">
+            <label class="control-label">System:</label>
+            <select id="un-pr-system" class="slider" style="width: 100%;">
+                <option value="lc" selected>LC Circuit (Q and I)</option>
+                <option value="spring">Spring (x and v)</option>
+                <option value="pendulum">Pendulum (&theta; and d&theta;/dt)</option>
+            </select>
+        </div>
+        <div class="control-group">
+            <label class="control-label">&omega;:
+                <span class="control-label-value">2.0</span>
+            </label>
+            <input type="range" class="slider" id="un-pr-omega"
+                   min="0.5" max="5.0" step="0.1" value="2.0">
+        </div>
+        <div class="btn-group">
+            <button class="btn" onclick="resetPhaseRel()">Reset</button>
+        </div>
+    </div>
+</div>
+
+<div class="info-box">
+    <div class="info-box-title">Key Insight</div>
+    <p>
+        The 90&deg; phase lag is not a coincidence &mdash; it&rsquo;s built into
+        how cosines work.  Velocity is the derivative of position.  If position
+        is a cosine, velocity is a sine (from calculus:
+        d/dt[cos(&omega;t)]&nbsp;=&nbsp;&minus;&omega;sin(&omega;t)).  And sine
+        is just cosine shifted by a quarter period &mdash; that&rsquo;s exactly
+        90&deg;.  This relationship holds for every SHO system, whether it&rsquo;s
+        a spring, a pendulum, or a circuit.
+    </p>
+</div>
+
+<!-- Test Your Understanding #3 -->
+<div class="interactive-container question-section">
+    <div class="interactive-title">Test Your Understanding</div>
+
+    <p style="margin-bottom: var(--spacing-md); color: var(--text-secondary);">
+        Use the Phase Relationship Explorer to answer these questions.
+    </p>
+
+    <div class="tabs">
+        <div class="tab-buttons">
+            <button class="tab-button active">Question 7</button>
+            <button class="tab-button">Question 8</button>
+            <button class="tab-button">Question 9</button>
+        </div>
+
+        <!-- Q7: MCQ -->
+        <div class="tab-content active">
+            <div class="question-container" data-type="mcq" data-answer="1">
+                <div class="question-text">
+                    In an LC circuit, at the moment when charge Q is at its maximum,
+                    what is the current I?
+                </div>
+                <div class="question-options">
+                    <label class="option">
+                        <input type="radio" name="un-q7" value="0">
+                        <span>I is at its maximum</span>
+                    </label>
+                    <label class="option">
+                        <input type="radio" name="un-q7" value="1">
+                        <span>I = 0 (zero crossing)</span>
+                    </label>
+                    <label class="option">
+                        <input type="radio" name="un-q7" value="2">
+                        <span>I is at its negative maximum</span>
+                    </label>
+                    <label class="option">
+                        <input type="radio" name="un-q7" value="3">
+                        <span>I = Q</span>
+                    </label>
+                </div>
+                <div class="question-actions">
+                    <button class="btn-verify">Verify</button>
+                </div>
+                <div class="question-explanation" style="display: none;">
+                    <div class="question-explanation-title">Explanation</div>
+                    <div class="question-explanation-text">
+                        When Q is maximum, all energy is stored in the capacitor
+                        (like PE at maximum displacement).  The current, which is
+                        \( I = dQ/dt \), is zero at that moment &mdash; just like
+                        velocity is zero when a spring is at maximum extension.
+                        Switch to "Spring" mode to see the exact same pattern
+                        with x and v.
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Q8: MCQ -->
+        <div class="tab-content">
+            <div class="question-container" data-type="mcq" data-answer="2">
+                <div class="question-text">
+                    Switch between all three systems at the same \( \omega \).
+                    The phase space plot (right panel) is:
+                </div>
+                <div class="question-options">
+                    <label class="option">
+                        <input type="radio" name="un-q8" value="0">
+                        <span>Different shape for each system</span>
+                    </label>
+                    <label class="option">
+                        <input type="radio" name="un-q8" value="1">
+                        <span>A circle for all systems</span>
+                    </label>
+                    <label class="option">
+                        <input type="radio" name="un-q8" value="2">
+                        <span>The same ellipse for all systems</span>
+                    </label>
+                    <label class="option">
+                        <input type="radio" name="un-q8" value="3">
+                        <span>A straight line</span>
+                    </label>
+                </div>
+                <div class="question-actions">
+                    <button class="btn-verify">Verify</button>
+                </div>
+                <div class="question-explanation" style="display: none;">
+                    <div class="question-explanation-title">Explanation</div>
+                    <div class="question-explanation-text">
+                        Since all three systems obey the same \( \ddot{x} = -\omega^2 x \),
+                        their phase portraits are identical ellipses (with aspect ratio
+                        determined by \( \omega \)).  Only the axis labels change:
+                        (x, v), (\(\theta\), \(d\theta/dt\)), or (Q, I).
+                        The mathematics doesn't care what the physical variables represent!
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Q9: Fill -->
+        <div class="tab-content">
+            <div class="question-container" data-type="fill" data-answer="0.785[0.7,0.85]">
+                <div class="question-text">
+                    With \( \omega = 2 \) rad/s, the time delay between the primary
+                    variable peak and the derivative peak is \( \Delta t = \pi/(2\omega) \).
+                    Calculate this delay.
+                    <br><br>
+                    &Delta;t = <input type="text" class="fill-blank" placeholder="seconds"> s
+                </div>
+                <div class="question-actions">
+                    <button class="btn-verify">Verify</button>
+                </div>
+                <div class="question-explanation" style="display: none;">
+                    <div class="question-explanation-title">Explanation</div>
+                    <div class="question-explanation-text">
+                        \( \Delta t = \pi/(2 \times 2) = \pi/4 \approx 0.785 \) s.
+                        This is always one quarter of the period:
+                        \( T/4 = (2\pi/\omega)/4 = \pi/(2\omega) \).
+                        Check the yellow dashed markers on the time plot to verify!
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<hr>
+
+<!-- ========== CODE EXAMPLES ========== -->
+<h2>Code It Yourself</h2>
+
+<div class="tabs">
+    <div class="tab-buttons">
+        <button class="tab-button active">Multi-System</button>
+        <button class="tab-button">Parameter Map</button>
+        <button class="tab-button">Prompt</button>
+    </div>
+
+    <div class="tab-content active">
+        <div class="code-block-container">
+            <div class="code-header">
+                <span class="code-lang">Python</span>
+                <button class="copy-btn">Copy</button>
+            </div>
+            <pre><code class="language-python">import numpy as np
+import plotly.graph_objects as go
+from plotly.subplots import make_subplots
+
+# Physical parameters
+k, m = 4.0, 1.0        # spring
+L_pend = 1.0            # pendulum length
+L_c, C = 0.1, 0.01     # LC circuit
+
+# Natural frequencies
+omega_spring = np.sqrt(k / m)
+omega_pend = np.sqrt(9.8 / L_pend)
+omega_lc = 1.0 / np.sqrt(L_c * C)
+
+t = np.linspace(0, 15, 500)
+
+fig = go.Figure()
+for omega, name, color in [
+    (omega_spring, f'Spring (ω={omega_spring:.2f})', '#00f3ff'),
+    (omega_pend, f'Pendulum (ω={omega_pend:.2f})', '#ff00ff'),
+    (omega_lc, f'LC (ω={omega_lc:.2f})', '#ffff00')]:
+    fig.add_trace(go.Scatter(x=t, y=np.cos(omega*t),
+        name=name, line=dict(color=color, width=2)))
+
+fig.update_layout(template='plotly_dark',
+    title='Three Systems, One Equation',
+    xaxis=dict(title='Time (s)'),
+    yaxis=dict(title='Normalized displacement', range=[-1.5, 1.5]))
+fig.show()</code></pre>
+        </div>
+    </div>
+
+    <div class="tab-content">
+        <div class="code-block-container">
+            <div class="code-header">
+                <span class="code-lang">Python</span>
+                <button class="copy-btn">Copy</button>
+            </div>
+            <pre><code class="language-python">import numpy as np
+
+def match_frequency(omega_target, system='pendulum'):
+    """Find parameters to match a target frequency."""
+    if system == 'pendulum':
+        L = 9.8 / omega_target**2
+        print(f"Pendulum: L = {L:.4f} m")
+    elif system == 'spring':
+        # Choose m=1 kg
+        k = omega_target**2
+        print(f"Spring: k = {k:.4f} N/m (m = 1 kg)")
+    elif system == 'lc':
+        # Choose C = 1 mF
+        C = 1e-3
+        Lc = 1.0 / (omega_target**2 * C)
+        print(f"LC: L = {Lc:.4f} H, C = {C*1e3:.1f} mF")
+
+# Example: spring with k=10, m=2 → match other systems
+omega = np.sqrt(10 / 2)  # = √5 ≈ 2.236
+print(f"Source: spring k=10, m=2 → ω = {omega:.3f}")
+match_frequency(omega, 'pendulum')
+match_frequency(omega, 'lc')</code></pre>
+        </div>
+    </div>
+
+    <div class="tab-content">
+        <div class="code-block-container">
+            <div class="code-header">
+                <span class="code-lang">Prompt for AI</span>
+                <button class="copy-btn">Copy</button>
+            </div>
+            <pre><code class="language-text">Create a Python visualization comparing three SHO systems:
+spring-mass, simple pendulum, and LC circuit.
+
+Part 1 - Time domain:
+- Plot normalized oscillations for all three systems on one graph
+- Use parameters: spring (k=4, m=1), pendulum (L=1 m), LC (L=0.1 H, C=0.01 F)
+- Label each curve with its natural frequency
+
+Part 2 - Parameter mapping:
+- Given a target ω, calculate equivalent parameters for each system
+- Show a side-by-side comparison bar chart of ω, T, f
+
+Part 3 - Phase relationship:
+- For the LC circuit, plot Q(t) and I(t) = dQ/dt
+- Mark the π/2 phase lag between them
+- Show the phase space ellipse (Q vs I)
+
+Use Plotly dark theme with neon colors.</code></pre>
+        </div>
+
+        <div class="info-box" style="margin-top: var(--spacing-md);">
+            <div class="info-box-title">Pro Tips for Prompting</div>
+            <ul>
+                <li>Ask for normalized amplitudes so you can compare oscillation shapes</li>
+                <li>Specify the cross-domain parameter conversion formulas</li>
+                <li>Request both time-domain and phase-space views to see the universality</li>
+            </ul>
+        </div>
+    </div>
+</div>
+
+<hr>
+
+<!-- ========== EXERCISES ========== -->
+<h2>Exercises for Practice</h2>
+
+<div class="exercise-cards">
+    <div class="exercise-card">
+        <div class="exercise-card-header">
+            <span class="exercise-card-number">1.</span>
+            <span class="exercise-card-badge explore">Explore</span>
+        </div>
+        <div class="exercise-card-content">
+            In the System Identifier, find parameter combinations that make all three
+            systems oscillate at the same frequency.  What spring constant \( k \)
+            (with m = 1 kg), pendulum length \( L \), and LC product give
+            \( \omega = 3 \) rad/s?  Verify visually that all three curves overlap.
+        </div>
+    </div>
+
+    <div class="exercise-card">
+        <div class="exercise-card-header">
+            <span class="exercise-card-number">2.</span>
+            <span class="exercise-card-badge coding">Coding</span>
+        </div>
+        <div class="exercise-card-content">
+            Write a Python function that takes any two of the three system types
+            and converts parameters between them.  For example:
+            <code>convert('spring', k=10, m=2, to='pendulum')</code>
+            should return the pendulum length that gives the same frequency.
+            Test it with at least three different conversions.
+        </div>
+    </div>
+
+    <div class="exercise-card">
+        <div class="exercise-card-header">
+            <span class="exercise-card-number">3.</span>
+            <span class="exercise-card-badge think">Think</span>
+        </div>
+        <div class="exercise-card-content">
+            The analogy between a spring-mass and an LC circuit is deep:
+            displacement \( x \leftrightarrow \) charge \( Q \),
+            velocity \( v \leftrightarrow \) current \( I \),
+            mass \( m \leftrightarrow \) inductance \( L \),
+            spring constant \( k \leftrightarrow 1/C \).
+            What plays the role of kinetic energy \( \frac{1}{2}mv^2 \) in the
+            electrical system?  What plays the role of potential energy
+            \( \frac{1}{2}kx^2 \)?  Verify that the total energy is conserved.
+        </div>
+    </div>
+</div>
+
+<hr>
+
+<!-- ========== NAVIGATION ========== -->
+<div class="btn-group mt-xl">
+    <button class="btn btn-magenta" onclick="navigateToSection('22-energy-phase-space')">&larr; Previous: Energy and Phase Space</button>
+    <button class="btn" onclick="scrollToTop()">&uarr; Back to Top</button>
+    <button class="btn btn-secondary" onclick="navigateToSection('24-introducing-damping')">Next: Introducing Damping &rarr;</button>
+</div>

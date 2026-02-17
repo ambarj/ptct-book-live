@@ -1,0 +1,682 @@
+<!-- Section 3.12: Numerical Methods — Euler's First Steps -->
+<!-- Source: Lecture7.nb (Part 1), numerical methods intro -->
+<!-- Core concept: Euler's method for solving ODEs, step size, error growth -->
+<!-- Time: ~20 minutes -->
+<!-- Prerequisites: Section 3.2 (SHO equation), Section 3.3 (energy conservation) -->
+
+<h1>Numerical Methods: Euler&rsquo;s First Steps</h1>
+
+<p>
+    So far, every oscillator we&rsquo;ve studied had a neat analytical solution:
+    sines, cosines, exponentials.  But what happens when the equation gets messy
+    &mdash; nonlinear springs, complicated forcing, friction that depends on
+    velocity?  <strong>Analytical solutions vanish.</strong>  The only way
+    forward is to let the computer march through time, step by step.
+</p>
+
+<p>
+    The simplest such marching method is <strong>Euler&rsquo;s method</strong>,
+    invented by Leonhard Euler in 1768.  It&rsquo;s beautifully simple: at each
+    moment, follow the tangent line for a small time \( h \), then recalculate
+    the slope and follow the new tangent.  Think of it as navigating with a
+    compass &mdash; you check your heading, walk a bit, then check again.
+</p>
+
+<div class="info-box">
+    <div class="info-box-title">Learning Objectives</div>
+    <ul>
+        <li>Explain why numerical methods are needed when analytical solutions fail</li>
+        <li>Implement Euler&rsquo;s method: \( x_{n+1} = x_n + h\, f(x_n, t_n) \)</li>
+        <li>Observe how step size \( h \) controls accuracy vs computation</li>
+        <li>Identify Euler&rsquo;s fatal flaw: energy drift in conservative systems</li>
+    </ul>
+</div>
+
+<div class="equation-display">
+    <p><strong>Euler&rsquo;s method</strong> for a second-order ODE \( \ddot{x} = -\omega_0^2 x \):</p>
+    <p>Convert to a first-order system:</p>
+    $$ \frac{dx}{dt} = v, \qquad \frac{dv}{dt} = -\omega_0^2\, x $$
+    <p>Then step forward:</p>
+    $$ x_{n+1} = x_n + h\, v_n, \qquad v_{n+1} = v_n + h\,(-\omega_0^2\, x_n) $$
+    <p>
+        Each step follows the <strong>current tangent</strong> for a time \( h \).
+        The smaller \( h \), the more faithful the path &mdash; but the more steps you need.
+    </p>
+</div>
+
+<hr>
+
+<!-- ========== EXPLORER 1: STEP-BY-STEP VISUALIZER ========== -->
+
+<h2>Walking the Tangent Line</h2>
+
+<p>
+    The left panel shows each Euler step as a straight-line segment (magenta)
+    vs the true cosine solution (green).  The cyan dots are the computed
+    points.  With a large step size, the Euler path visibly drifts away.
+    The right panel shows the same story in <strong>phase space</strong>:
+    the exact orbit is a closed ellipse, but Euler spirals outward &mdash;
+    it <em>gains energy</em> at every step.
+</p>
+
+<div class="interactive-container" id="step-by-step-euler">
+    <div class="interactive-title">Explorer 1: Step-by-Step Euler Visualizer</div>
+
+    <div style="display: flex; gap: 0.5rem; flex-wrap: wrap;">
+        <div class="plot-container" style="flex: 1; min-width: 280px;">
+            <div id="eu-sv-plot" style="width: 100%; height: 380px;"></div>
+        </div>
+        <div class="plot-container" style="flex: 1; min-width: 280px;">
+            <div id="eu-sv-phase" style="width: 100%; height: 380px;"></div>
+        </div>
+    </div>
+
+    <div id="eu-sv-stats"
+         style="display: flex; justify-content: center; gap: 1.5rem; padding: 8px 0; font-size: 0.85rem; color: #c8c8e0; flex-wrap: wrap;">
+    </div>
+
+    <div class="control-panel">
+        <div class="control-group">
+            <label class="control-label">Step size h:
+                <span class="control-label-value">0.30</span> s
+            </label>
+            <input type="range" class="slider" id="eu-sv-h" min="0.05" max="0.80" step="0.01" value="0.30">
+        </div>
+        <div class="control-group">
+            <label class="control-label">Number of steps:
+                <span class="control-label-value">15</span>
+            </label>
+            <input type="range" class="slider" id="eu-sv-n" min="3" max="60" step="1" value="15">
+        </div>
+        <button class="btn btn-sm" onclick="resetStepVis()">Reset</button>
+    </div>
+</div>
+
+<!-- Questions Group 1 -->
+<div class="interactive-container question-section">
+    <div class="interactive-title">Test Your Understanding</div>
+    <p style="margin-bottom: var(--spacing-md); color: var(--text-secondary);">
+        Use the Step-by-Step Euler Visualizer above to answer these questions.
+    </p>
+    <div class="tabs">
+        <div class="tab-buttons">
+            <button class="tab-button active">Question 1</button>
+            <button class="tab-button">Question 2</button>
+            <button class="tab-button">Question 3</button>
+        </div>
+
+        <div class="tab-content active">
+            <div class="question-container" data-type="mcq" data-answer="2">
+                <div class="question-text">
+                    Set h = 0.50 and watch the Euler orbit in phase space.
+                    What happens to the orbit compared to the exact (green) ellipse?
+                </div>
+                <div class="question-options">
+                    <label class="option"><input type="radio" name="eu-q1" value="0"><span>The Euler orbit stays exactly on the ellipse</span></label>
+                    <label class="option"><input type="radio" name="eu-q1" value="1"><span>The Euler orbit spirals inward (loses energy)</span></label>
+                    <label class="option"><input type="radio" name="eu-q1" value="2"><span>The Euler orbit spirals outward (gains energy)</span></label>
+                    <label class="option"><input type="radio" name="eu-q1" value="3"><span>The Euler orbit becomes a straight line</span></label>
+                </div>
+                <div class="question-actions"><button class="btn-verify">Verify</button></div>
+                <div class="question-explanation" style="display:none;">
+                    <strong>Explanation:</strong>
+                    Euler&rsquo;s method consistently <em>overestimates</em> the energy of
+                    a simple harmonic oscillator.  Each step follows the tangent,
+                    which always lies outside the true curve.  The phase-space orbit
+                    spirals outward, meaning the numerical &ldquo;oscillator&rdquo;
+                    gains energy &mdash; a serious flaw for long simulations.
+                </div>
+            </div>
+        </div>
+
+        <div class="tab-content">
+            <div class="question-container" data-type="fill" data-answer="1.59[1.3,1.9]">
+                <div class="question-text">
+                    Set h = 0.30 and 15 steps.  Read the position error from the stats bar.
+                    |Error| &asymp;
+                    <input type="text" class="fill-blank" placeholder="?">
+                </div>
+                <div class="question-actions"><button class="btn-verify">Verify</button></div>
+                <div class="question-explanation" style="display:none;">
+                    <strong>Explanation:</strong>
+                    With h = 0.30 and 15 steps, we reach t = 4.5 s.  The Euler
+                    solution gives x &asymp; &minus;2.51 while the exact value
+                    is x &asymp; &minus;0.91, so |Error| &asymp; 1.59.  That&rsquo;s
+                    a huge discrepancy &mdash; the step size is too large for this
+                    fast oscillation.  Try h = 0.10 and you&rsquo;ll see the error
+                    drop substantially.
+                </div>
+            </div>
+        </div>
+
+        <div class="tab-content">
+            <div class="question-container" data-type="mcq" data-answer="1">
+                <div class="question-text">
+                    Why does Euler&rsquo;s method need to convert a second-order ODE
+                    into two first-order equations?
+                </div>
+                <div class="question-options">
+                    <label class="option"><input type="radio" name="eu-q3" value="0"><span>It can&rsquo;t handle variables with units of acceleration</span></label>
+                    <label class="option"><input type="radio" name="eu-q3" value="1"><span>Euler&rsquo;s update rule only works on first derivatives: \( x_{n+1} = x_n + h\, f(x_n) \)</span></label>
+                    <label class="option"><input type="radio" name="eu-q3" value="2"><span>Second-order ODEs have no numerical solutions</span></label>
+                    <label class="option"><input type="radio" name="eu-q3" value="3"><span>It&rsquo;s just a convention &mdash; you could apply Euler directly to \( \ddot{x} \)</span></label>
+                </div>
+                <div class="question-actions"><button class="btn-verify">Verify</button></div>
+                <div class="question-explanation" style="display:none;">
+                    <strong>Explanation:</strong>
+                    Euler&rsquo;s formula \( x_{n+1} = x_n + h\,f \) steps one derivative
+                    at a time.  To handle \( \ddot{x} = -\omega_0^2 x \), we introduce
+                    \( v = \dot{x} \) and get two coupled first-order equations.  This is a
+                    general technique: <em>any</em> \( n \)-th order ODE becomes \( n \)
+                    coupled first-order equations.
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="info-box">
+    <div class="info-box-title">The Euler Recipe</div>
+    <p>Euler&rsquo;s method in three lines of pseudocode:</p>
+    <ol>
+        <li><strong>Evaluate</strong> the derivative: slope = f(current state, current time)</li>
+        <li><strong>Step</strong>: new state = old state + h &times; slope</li>
+        <li><strong>Repeat</strong> until you reach the final time</li>
+    </ol>
+    <p>
+        That&rsquo;s it.  Every numerical ODE method is a refinement of this basic
+        idea &mdash; the differences lie in <em>how</em> they estimate the slope.
+    </p>
+</div>
+
+<hr>
+
+<!-- ========== EXPLORER 2: STEP SIZE EXPLORER ========== -->
+
+<h2>The Step Size Dilemma</h2>
+
+<p>
+    A smaller step size means more accuracy &mdash; but more computation.
+    A larger step size is fast but inaccurate.  The left panel shows
+    Euler&rsquo;s solution (cyan) vs exact (green) for a step size you
+    choose.  The right panel compares error growth over time for four
+    different step sizes.  Notice the errors grow <em>exponentially</em>
+    &mdash; even a small per-step error compounds over many steps.
+</p>
+
+<div class="interactive-container" id="step-size-explorer">
+    <div class="interactive-title">Explorer 2: Step Size Explorer</div>
+
+    <div style="display: flex; gap: 0.5rem; flex-wrap: wrap;">
+        <div class="plot-container" style="flex: 1; min-width: 280px;">
+            <div id="eu-ss-plot" style="width: 100%; height: 380px;"></div>
+        </div>
+        <div class="plot-container" style="flex: 1; min-width: 280px;">
+            <div id="eu-ss-err-plot" style="width: 100%; height: 380px;"></div>
+        </div>
+    </div>
+
+    <div id="eu-ss-stats"
+         style="display: flex; justify-content: center; gap: 1.5rem; padding: 8px 0; font-size: 0.85rem; color: #c8c8e0; flex-wrap: wrap;">
+    </div>
+
+    <div class="control-panel">
+        <div class="control-group">
+            <label class="control-label">Step size h:
+                <span class="control-label-value">0.30</span> s
+            </label>
+            <input type="range" class="slider" id="eu-ss-h" min="0.02" max="0.80" step="0.02" value="0.30">
+        </div>
+        <button class="btn btn-sm" onclick="resetStepSize()">Reset</button>
+    </div>
+</div>
+
+<!-- Questions Group 2 -->
+<div class="interactive-container question-section">
+    <div class="interactive-title">Test Your Understanding</div>
+    <p style="margin-bottom: var(--spacing-md); color: var(--text-secondary);">
+        Use the Step Size Explorer above to answer these questions.
+    </p>
+    <div class="tabs">
+        <div class="tab-buttons">
+            <button class="tab-button active">Question 4</button>
+            <button class="tab-button">Question 5</button>
+            <button class="tab-button">Question 6</button>
+        </div>
+
+        <div class="tab-content active">
+            <div class="question-container" data-type="mcq" data-answer="2">
+                <div class="question-text">
+                    Looking at the error plot (right panel), how does the error
+                    at t = 10 change when you halve the step size from h = 0.50 to h = 0.20?
+                </div>
+                <div class="question-options">
+                    <label class="option"><input type="radio" name="eu-q4" value="0"><span>Error stays the same (step size doesn&rsquo;t matter)</span></label>
+                    <label class="option"><input type="radio" name="eu-q4" value="1"><span>Error doubles (larger h is better)</span></label>
+                    <label class="option"><input type="radio" name="eu-q4" value="2"><span>Error decreases significantly (smaller h is more accurate)</span></label>
+                    <label class="option"><input type="radio" name="eu-q4" value="3"><span>Error becomes exactly zero</span></label>
+                </div>
+                <div class="question-actions"><button class="btn-verify">Verify</button></div>
+                <div class="question-explanation" style="display:none;">
+                    <strong>Explanation:</strong>
+                    Euler&rsquo;s method makes a small error at each step (proportional to h&sup2;),
+                    but these errors add up over many steps.  Over a fixed total time, the
+                    accumulated error ends up proportional to h itself.
+                    So halving h roughly halves the final error.  You can see this in the
+                    right panel: the h = 0.20 curve is well below the h = 0.50 curve.
+                </div>
+            </div>
+        </div>
+
+        <div class="tab-content">
+            <div class="question-container" data-type="msq" data-answer="0,3">
+                <div class="question-text">
+                    Which of these are true about Euler&rsquo;s method?
+                    (Select all that apply)
+                </div>
+                <div class="question-options">
+                    <label class="option"><input type="checkbox" value="0"><span>Errors grow over time, even with small step sizes</span></label>
+                    <label class="option"><input type="checkbox" value="1"><span>Making h smaller always gives exact results</span></label>
+                    <label class="option"><input type="checkbox" value="2"><span>The error curves on the log plot are perfectly flat (constant error)</span></label>
+                    <label class="option"><input type="checkbox" value="3"><span>For a conservative system like the SHO, Euler systematically gains energy</span></label>
+                </div>
+                <div class="question-actions"><button class="btn-verify">Verify</button></div>
+                <div class="question-explanation" style="display:none;">
+                    <strong>Explanation:</strong>
+                    <ul>
+                        <li><strong>Statement 1 (True):</strong> Errors accumulate at every step.
+                            Even tiny per-step errors compound over many steps, growing roughly
+                            linearly or faster with time.</li>
+                        <li><strong>Statement 2 (False):</strong> Smaller h gives better accuracy
+                            but never exact results.  You&rsquo;d need h &rarr; 0 (infinite
+                            computation) for zero error.</li>
+                        <li><strong>Statement 3 (False):</strong> The error curves grow with time
+                            (upward slope on the log plot), not flat.</li>
+                        <li><strong>Statement 4 (True):</strong> For the SHO, Euler overshoots at
+                            each step, causing the numerical energy to increase monotonically.
+                            This is a fundamental limitation of the forward Euler method.</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <div class="tab-content">
+            <div class="question-container" data-type="fill" data-answer="200[190,210]">
+                <div class="question-text">
+                    If you want to simulate t = 10 s with step size h = 0.05,
+                    how many Euler steps do you need?
+                    N = t / h = 10 / 0.05 = <input type="text" class="fill-blank" placeholder="?">
+                </div>
+                <div class="question-actions"><button class="btn-verify">Verify</button></div>
+                <div class="question-explanation" style="display:none;">
+                    <strong>Explanation:</strong>
+                    \( N = t_{\text{max}} / h = 10 / 0.05 = 200 \) steps.  That&rsquo;s
+                    200 evaluations of the derivative.  Compare with h = 1.0: only 10 steps
+                    but much worse accuracy.  This is the fundamental trade-off: accuracy
+                    costs computation.  We&rsquo;ll see in the next section how smarter
+                    methods (Runge-Kutta) get much better accuracy per step.
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<hr>
+
+<!-- ========== EXPLORER 3: ERROR ACCUMULATION TRACKER ========== -->
+
+<h2>The Fatal Flaw: Energy Drift</h2>
+
+<p>
+    The SHO should conserve energy: \( E = \tfrac{1}{2}v^2 + \tfrac{1}{2}\omega_0^2 x^2 \)
+    is constant.  But Euler&rsquo;s method breaks this.  The left panel shows
+    how the final error depends on step size.  Both axes use a logarithmic
+    scale (each tick mark is 10&times; the previous), so a straight line
+    means a <em>power-law</em> relationship.  If the data follows the dashed
+    reference line, error is proportional to \( h \).  The right panel
+    shows the energy ratio \( E(t)/E(0) \) growing steadily above 1 &mdash;
+    the numerical oscillator is gaining energy it shouldn&rsquo;t have.
+</p>
+
+<div class="interactive-container" id="error-accumulation-tracker">
+    <div class="interactive-title">Explorer 3: Error Accumulation Tracker</div>
+
+    <div style="display: flex; gap: 0.5rem; flex-wrap: wrap;">
+        <div class="plot-container" style="flex: 1; min-width: 280px;">
+            <div id="eu-et-plot" style="width: 100%; height: 380px;"></div>
+        </div>
+        <div class="plot-container" style="flex: 1; min-width: 280px;">
+            <div id="eu-et-energy-plot" style="width: 100%; height: 380px;"></div>
+        </div>
+    </div>
+
+    <div id="eu-et-stats"
+         style="display: flex; justify-content: center; gap: 1.5rem; padding: 8px 0; font-size: 0.85rem; color: #c8c8e0; flex-wrap: wrap;">
+    </div>
+
+    <div class="control-panel">
+        <div class="control-group">
+            <label class="control-label">Number of periods:
+                <span class="control-label-value">3</span>
+            </label>
+            <input type="range" class="slider" id="eu-et-periods" min="1" max="15" step="1" value="3">
+        </div>
+        <button class="btn btn-sm" onclick="resetErrorTracker()">Reset</button>
+    </div>
+</div>
+
+<!-- Questions Group 3 -->
+<div class="interactive-container question-section">
+    <div class="interactive-title">Test Your Understanding</div>
+    <p style="margin-bottom: var(--spacing-md); color: var(--text-secondary);">
+        Use the Error Accumulation Tracker above to answer these questions.
+    </p>
+    <div class="tabs">
+        <div class="tab-buttons">
+            <button class="tab-button active">Question 7</button>
+            <button class="tab-button">Question 8</button>
+            <button class="tab-button">Question 9</button>
+        </div>
+
+        <div class="tab-content active">
+            <div class="question-container" data-type="mcq" data-answer="0">
+                <div class="question-text">
+                    On the log-log error plot (left), the data points roughly
+                    follow the dashed "error &prop; h" reference line.  This means:
+                </div>
+                <div class="question-options">
+                    <label class="option"><input type="radio" name="eu-q7" value="0"><span>Halving h roughly halves the error &mdash; Euler is first-order accurate</span></label>
+                    <label class="option"><input type="radio" name="eu-q7" value="1"><span>Halving h quarters the error &mdash; Euler is second-order accurate</span></label>
+                    <label class="option"><input type="radio" name="eu-q7" value="2"><span>The error is independent of h</span></label>
+                    <label class="option"><input type="radio" name="eu-q7" value="3"><span>The error decreases exponentially with h</span></label>
+                </div>
+                <div class="question-actions"><button class="btn-verify">Verify</button></div>
+                <div class="question-explanation" style="display:none;">
+                    <strong>Explanation:</strong>
+                    On a log-log plot, a straight line with slope 1 means "error is
+                    proportional to h" &mdash; halving h halves the error.  That&rsquo;s what
+                    we see, confirming Euler is a <strong>first-order method</strong>.
+                    In the next section, we&rsquo;ll meet a method where halving h cuts
+                    the error by a factor of 4 &mdash; a dramatic improvement.
+                </div>
+            </div>
+        </div>
+
+        <div class="tab-content">
+            <div class="question-container" data-type="mcq" data-answer="2">
+                <div class="question-text">
+                    Increase the number of periods to 10.  What happens to the
+                    energy drift (right panel)?
+                </div>
+                <div class="question-options">
+                    <label class="option"><input type="radio" name="eu-q8" value="0"><span>Energy stays at E(0) &mdash; Euler conserves energy over long times</span></label>
+                    <label class="option"><input type="radio" name="eu-q8" value="1"><span>Energy oscillates around E(0) but doesn&rsquo;t drift</span></label>
+                    <label class="option"><input type="radio" name="eu-q8" value="2"><span>Energy climbs steadily higher &mdash; the drift worsens with more periods</span></label>
+                    <label class="option"><input type="radio" name="eu-q8" value="3"><span>Energy decreases &mdash; the numerical oscillator loses energy</span></label>
+                </div>
+                <div class="question-actions"><button class="btn-verify">Verify</button></div>
+                <div class="question-explanation" style="display:none;">
+                    <strong>Explanation:</strong>
+                    Forward Euler systematically adds energy at every step.  Over 10 periods
+                    (about 31 s), the energy drift becomes dramatic.  Check the stats bar:
+                    the drift percentage grows substantially.  This makes Euler unsuitable
+                    for long-time simulations of conservative systems &mdash; which is why
+                    we need the better methods introduced in the next section.
+                </div>
+            </div>
+        </div>
+
+        <div class="tab-content">
+            <div class="question-container" data-type="fill" data-answer="1[0.95,1.05]">
+                <div class="question-text">
+                    On the log-log error vs h plot, the slope of the data points
+                    should be approximately
+                    <input type="text" class="fill-blank" placeholder="?">
+                    (A slope of 1 means first-order; a slope of 2 means second-order.)
+                </div>
+                <div class="question-actions"><button class="btn-verify">Verify</button></div>
+                <div class="question-explanation" style="display:none;">
+                    <strong>Explanation:</strong>
+                    On a log-log plot, if the error is proportional to h<sup>p</sup>,
+                    the data forms a line with slope p.  For Euler, p = 1 (first-order),
+                    so the data follows the dashed reference line with slope 1.
+                    This means that to cut the error in half, you must also halve h &mdash;
+                    doubling the number of steps.  That&rsquo;s a steep price for modest
+                    accuracy gains.
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="info-box">
+    <div class="info-box-title">Why Euler Matters (Even Though It&rsquo;s Terrible)</div>
+    <p>
+        Euler&rsquo;s method is inaccurate, energy-violating, and first-order.
+        So why study it?  Because <strong>every better method is built on the
+        same idea</strong>: evaluate derivatives, step forward.  Once you
+        understand Euler&rsquo;s strengths and weaknesses, you&rsquo;ll
+        immediately appreciate why smarter methods sample the slope at
+        multiple points per step.  Euler is the conceptual foundation;
+        the Runge-Kutta methods in the next section are the practical tools.
+    </p>
+</div>
+
+<hr>
+
+<!-- ========== CODE EXAMPLES ========== -->
+
+<h2>Code Examples</h2>
+
+<div class="tabs">
+    <div class="tab-buttons">
+        <button class="tab-button active">Basic Euler</button>
+        <button class="tab-button">Step Size Comparison</button>
+        <button class="tab-button">Prompt</button>
+    </div>
+
+    <div class="tab-content active">
+        <div class="code-block-container">
+            <div class="code-header">
+                <span class="code-lang">Python</span>
+                <button class="copy-btn">Copy</button>
+            </div>
+            <pre><code class="language-python">import numpy as np
+import plotly.graph_objects as go
+
+def euler_sho(x0, v0, omega0, h, t_max):
+    """Euler's method for the simple harmonic oscillator."""
+    n_steps = int(t_max / h)
+    t = np.zeros(n_steps + 1)
+    x = np.zeros(n_steps + 1)
+    v = np.zeros(n_steps + 1)
+    x[0], v[0] = x0, v0
+
+    for i in range(n_steps):
+        x[i+1] = x[i] + h * v[i]
+        v[i+1] = v[i] + h * (-omega0**2 * x[i])
+        t[i+1] = t[i] + h
+    return t, x, v
+
+# Parameters
+omega0, x0, v0 = 2.0, 1.0, 0.0
+t_max = 10.0
+
+# Exact solution
+t_exact = np.linspace(0, t_max, 500)
+x_exact = x0 * np.cos(omega0 * t_exact)
+
+# Euler with h = 0.10
+t_eu, x_eu, v_eu = euler_sho(x0, v0, omega0, h=0.10, t_max=t_max)
+
+fig = go.Figure()
+fig.add_trace(go.Scatter(x=t_exact, y=x_exact, mode='lines',
+    line=dict(color='#00ff9f', width=2), name='Exact'))
+fig.add_trace(go.Scatter(x=t_eu, y=x_eu, mode='lines',
+    line=dict(color='#00f3ff', width=2), name='Euler h=0.10'))
+
+fig.update_layout(template='plotly_dark',
+    title='Euler vs Exact: Simple Harmonic Oscillator',
+    xaxis=dict(title='Time (s)', range=[0, 10],
+        gridcolor='#2a2f4a', zerolinecolor='#808080', linecolor='#808080'),
+    yaxis=dict(title='x(t)', range=[-3, 3],
+        gridcolor='#2a2f4a', zerolinecolor='#808080', linecolor='#808080'))
+fig.show()</code></pre>
+        </div>
+    </div>
+
+    <div class="tab-content">
+        <div class="code-block-container">
+            <div class="code-header">
+                <span class="code-lang">Python</span>
+                <button class="copy-btn">Copy</button>
+            </div>
+            <pre><code class="language-python">import numpy as np
+import plotly.graph_objects as go
+from plotly.subplots import make_subplots
+
+def euler_sho(x0, v0, omega0, h, t_max):
+    n = int(t_max / h)
+    t, x, v = np.zeros(n+1), np.zeros(n+1), np.zeros(n+1)
+    x[0], v[0] = x0, v0
+    for i in range(n):
+        x[i+1] = x[i] + h * v[i]
+        v[i+1] = v[i] + h * (-omega0**2 * x[i])
+        t[i+1] = t[i] + h
+    return t, x, v
+
+omega0, x0, v0 = 2.0, 1.0, 0.0
+h_values = [0.50, 0.20, 0.10, 0.05]
+colors = ['#ff6b6b', '#ffff00', '#00f3ff', '#ff00ff']
+t_max = 10.0
+t_exact = np.linspace(0, t_max, 500)
+x_exact = x0 * np.cos(omega0 * t_exact)
+
+fig = make_subplots(rows=1, cols=2,
+    subplot_titles=['Euler vs Exact', 'Error Growth'])
+
+fig.add_trace(go.Scatter(x=t_exact, y=x_exact, mode='lines',
+    line=dict(color='#00ff9f', width=3), name='Exact'), row=1, col=1)
+
+for h, color in zip(h_values, colors):
+    t_eu, x_eu, _ = euler_sho(x0, v0, omega0, h, t_max)
+    fig.add_trace(go.Scatter(x=t_eu, y=x_eu, mode='lines',
+        line=dict(color=color, width=1.5), name=f'h={h}'), row=1, col=1)
+
+    # Error
+    x_ex = x0 * np.cos(omega0 * t_eu)
+    error = np.abs(x_eu - x_ex)
+    error[error == 0] = 1e-10  # avoid log(0)
+    fig.add_trace(go.Scatter(x=t_eu, y=error, mode='lines',
+        line=dict(color=color, width=1.5), name=f'h={h}',
+        showlegend=False), row=1, col=2)
+
+fig.update_layout(template='plotly_dark')
+fig.update_yaxes(type='log', row=1, col=2)
+fig.update_xaxes(title_text='Time (s)', gridcolor='#2a2f4a',
+    zerolinecolor='#808080', linecolor='#808080')
+fig.update_yaxes(gridcolor='#2a2f4a', zerolinecolor='#808080',
+    linecolor='#808080')
+fig.show()</code></pre>
+        </div>
+    </div>
+
+    <div class="tab-content">
+        <div class="code-block-container">
+            <div class="code-header">
+                <span class="code-lang">Prompt for AI</span>
+                <button class="copy-btn">Copy</button>
+            </div>
+            <pre><code class="language-text">Create a Python script using Plotly to demonstrate Euler's method.
+
+Part 1 — Basic Implementation:
+- Solve the SHO: x'' + ω₀²x = 0 with ω₀ = 2, x(0) = 1, v(0) = 0
+- Convert to system: dx/dt = v, dv/dt = -ω₀²x
+- Implement Euler: x_{n+1} = x_n + h*v_n, v_{n+1} = v_n - h*ω₀²*x_n
+- Compare with exact solution x(t) = cos(ω₀t)
+- Use h = 0.10, simulate for 10 seconds
+
+Part 2 — Step Size Comparison:
+- Run Euler with h = 0.50, 0.20, 0.10, 0.05
+- Plot all solutions vs exact on same plot
+- On a second plot, show |error| vs time on log scale
+- Show how smaller h gives less error but more computation
+
+Part 3 — Energy Analysis:
+- Track E(t) = 0.5*v² + 0.5*ω₀²*x² over time
+- Show that Euler systematically gains energy (E(t)/E(0) > 1)
+- This is the "fatal flaw" motivating better methods
+
+Use dark theme, gray axes (#808080), fixed ranges.</code></pre>
+        </div>
+
+        <div class="info-box" style="margin-top: var(--spacing-md);">
+            <div class="info-box-title">Pro Tips for Prompting</div>
+            <ul>
+                <li>Specify the exact update formulas &mdash; AI sometimes confuses forward and symplectic Euler</li>
+                <li>Ask for the energy plot explicitly &mdash; it&rsquo;s the most revealing diagnostic</li>
+                <li>Request a log-scale error plot to visualize convergence order</li>
+            </ul>
+        </div>
+    </div>
+</div>
+
+<hr>
+
+<!-- ========== EXERCISES ========== -->
+<h2>Exercises for Practice</h2>
+
+<div class="exercise-cards">
+    <div class="exercise-card">
+        <div class="exercise-card-header">
+            <span class="exercise-card-number">1.</span>
+            <span class="exercise-card-badge explore">Explore</span>
+        </div>
+        <div class="exercise-card-content">
+            In the Step-by-Step Visualizer, find the largest step size h
+            that keeps the phase-space orbit visually close to the exact
+            ellipse after 30 steps.  How does this threshold relate to the
+            oscillation period \( T = 2\pi/\omega_0 \approx 3.14 \) s?
+            (You need at least ~6&ndash;10 steps per period for reasonable tracking.)
+        </div>
+    </div>
+
+    <div class="exercise-card">
+        <div class="exercise-card-header">
+            <span class="exercise-card-number">2.</span>
+            <span class="exercise-card-badge coding">Coding</span>
+        </div>
+        <div class="exercise-card-content">
+            Implement Euler&rsquo;s method for a <em>damped</em> oscillator:
+            \( \ddot{x} + 2\gamma\dot{x} + \omega_0^2 x = 0 \).
+            The update becomes \( v_{n+1} = v_n + h(-2\gamma v_n - \omega_0^2 x_n) \).
+            Compare with the exact solution \( x(t) = e^{-\gamma t}\cos(\omega_d t) \)
+            for \( \gamma = 0.3, \omega_0 = 2.0, h = 0.05 \).  Does Euler still
+            gain energy when there&rsquo;s damping?
+        </div>
+    </div>
+
+    <div class="exercise-card">
+        <div class="exercise-card-header">
+            <span class="exercise-card-number">3.</span>
+            <span class="exercise-card-badge think">Think</span>
+        </div>
+        <div class="exercise-card-content">
+            The <strong>symplectic Euler</strong> method uses an updated velocity
+            in the position step: \( v_{n+1} = v_n - h\omega_0^2 x_n \), then
+            \( x_{n+1} = x_n + h\, v_{n+1} \).  Show that this conserves a
+            modified energy \( \tilde{E} = \frac{1}{2}v^2 + \frac{1}{2}\omega_0^2 x^2
+            - \frac{h}{2}\omega_0^2\, x\, v \) exactly.  (Hint: substitute and expand.)
+            This explains why symplectic methods don&rsquo;t drift.
+        </div>
+    </div>
+</div>
+
+<hr>
+
+<!-- ========== NAVIGATION ========== -->
+<div class="btn-group mt-xl">
+    <button class="btn btn-magenta" onclick="navigateToSection('30-resonance-disasters')">&larr; Previous: Resonance Disasters</button>
+    <button class="btn" onclick="scrollToTop()">&uarr; Back to Top</button>
+    <button class="btn btn-secondary" onclick="navigateToSection('32-runge-kutta')">Next: Better Algorithms &rarr;</button>
+</div>

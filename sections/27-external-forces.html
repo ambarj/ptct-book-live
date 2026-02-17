@@ -1,0 +1,857 @@
+<!-- Section 3.8: Adding External Forces -->
+<!-- Source: Lecture4.nb (Part 1), Lecture4_1.nb -->
+<!-- Core concept: Driven oscillators — transient vs steady-state, frequency dependence, IC independence -->
+<!-- Time: ~20 minutes -->
+<!-- Prerequisites: Section 3.7 (damping ratio, three regimes, settling time) -->
+
+<h1>Adding External Forces</h1>
+
+<p>
+    Everything we've studied so far &mdash; free oscillation, damping, energy
+    decay &mdash; describes a system left to its own devices after an initial
+    push.  But the most interesting physics happens when you <strong>keep
+    pushing</strong>.  A child on a swing, a radio antenna, a bridge in the
+    wind &mdash; these are all <em>driven</em> oscillators.
+</p>
+
+<p>
+    The surprise: no matter how you start a driven oscillator, it eventually
+    "forgets" its initial conditions and settles into a rhythm dictated entirely
+    by the external force.  The <strong>transient</strong> dies; the
+    <strong>steady state</strong> survives.  And the amplitude of that steady
+    state depends dramatically on the driving frequency.
+</p>
+
+<div class="info-box">
+    <div class="info-box-title">Learning Objectives</div>
+    <ul>
+        <li>Write the equation of motion for a driven, damped oscillator</li>
+        <li>Separate the full solution into transient (homogeneous) and steady-state (particular) parts</li>
+        <li>Explain why the system "forgets" initial conditions after a few decay times</li>
+        <li>Read an amplitude response curve and identify the resonance region</li>
+    </ul>
+</div>
+
+<div class="equation-display">
+    <p><strong>The driven oscillator equation:</strong></p>
+    $$ \ddot{x} + 2\gamma\dot{x} + \omega_0^2 x = \frac{F_0}{m}\cos(\omega_d t) $$
+    <p>
+        <strong>Full solution:</strong><br>
+        \( x(t) = \underbrace{x_{\text{trans}}(t)}_{\text{dies as } e^{-\gamma t}} + \underbrace{A\cos(\omega_d t - \delta)}_{\text{persists forever}} \)
+    </p>
+    <p>
+        <strong>Steady-state amplitude:</strong>
+        \( \displaystyle A = \frac{F_0/m}{\sqrt{(\omega_0^2 - \omega_d^2)^2 + (2\gamma\omega_d)^2}} \)
+    </p>
+</div>
+
+<hr>
+
+<!-- ========== EXPLORER 1: TRANSIENT DECAY ANIMATOR ========== -->
+
+<h2>Watching the Transient Die</h2>
+
+<p>
+    The full solution has two parts.  The <strong>transient</strong> (red,
+    dotted) oscillates at the natural frequency and decays exponentially.
+    The <strong>steady state</strong> (green, dashed) oscillates at the
+    <em>driving</em> frequency and persists forever.  The actual motion (cyan,
+    solid) is the sum.  At early times they interfere &mdash; producing beats
+    and messy-looking motion.  But after a few decay times \( \tau = 1/\gamma \),
+    only the steady state remains.
+</p>
+
+<div class="interactive-container" id="transient-decay-animator">
+    <div class="interactive-title">Explorer 1: Transient Decay Animator</div>
+
+    <div style="display: flex; gap: 0.5rem; flex-wrap: wrap;">
+        <div class="plot-container" style="flex: 1; min-width: 280px;">
+            <div id="ef-tr-plot" style="width: 100%; height: 380px;"></div>
+        </div>
+        <div class="plot-container" style="flex: 1; min-width: 280px;">
+            <div id="ef-tr-env-plot" style="width: 100%; height: 380px;"></div>
+        </div>
+    </div>
+
+    <div id="ef-tr-stats"
+         style="display: flex; justify-content: center; gap: 1.5rem; padding: 8px 0; font-size: 0.85rem; color: #c8c8e0; flex-wrap: wrap;">
+    </div>
+
+    <div class="control-panel">
+        <div class="control-group">
+            <label class="control-label">Damping &gamma;:
+                <span class="control-label-value">0.30</span>
+            </label>
+            <input type="range" class="slider" id="ef-tr-gamma"
+                   min="0.05" max="2.00" step="0.01" value="0.30">
+        </div>
+        <div class="control-group">
+            <label class="control-label">Driving frequency &omega;<sub>d</sub>:
+                <span class="control-label-value">2.50</span>
+            </label>
+            <input type="range" class="slider" id="ef-tr-wd"
+                   min="0.50" max="5.50" step="0.01" value="2.50">
+        </div>
+        <div class="btn-group">
+            <button class="btn" onclick="resetTransient()">Reset</button>
+        </div>
+    </div>
+</div>
+
+<div class="info-box">
+    <div class="info-box-title">Key Insight</div>
+    <p>
+        The transient is the system's "memory" of how it started.
+        Damping erases that memory on a timescale \( \tau = 1/\gamma \).
+        After about \( 3\tau \), the transient has decayed to \( e^{-3} \approx 5\% \)
+        of its initial size &mdash; the system has essentially forgotten its
+        initial conditions.  Increase \( \gamma \) and the memory fades faster.
+    </p>
+</div>
+
+<!-- Test Your Understanding #1 -->
+<div class="interactive-container question-section">
+    <div class="interactive-title">Test Your Understanding</div>
+
+    <p style="margin-bottom: var(--spacing-md); color: var(--text-secondary);">
+        Use the Transient Decay Animator to answer these questions.
+    </p>
+
+    <div class="tabs">
+        <div class="tab-buttons">
+            <button class="tab-button active">Question 1</button>
+            <button class="tab-button">Question 2</button>
+            <button class="tab-button">Question 3</button>
+        </div>
+
+        <!-- Q1: MCQ -->
+        <div class="tab-content active">
+            <div class="question-container" data-type="mcq" data-answer="2">
+                <div class="question-text">
+                    Set \( \gamma = 0.30 \) and \( \omega_d = 2.50 \).
+                    The decay time is \( \tau = 1/\gamma \).  After approximately
+                    how many seconds does the total response (cyan) become
+                    indistinguishable from the steady state (green dashed)?
+                </div>
+                <div class="question-options">
+                    <label class="option">
+                        <input type="radio" name="ef-q1" value="0">
+                        <span>About 1 second (one decay time)</span>
+                    </label>
+                    <label class="option">
+                        <input type="radio" name="ef-q1" value="1">
+                        <span>About 3 seconds (\( \tau = 3.3 \) s, so &lt; \( \tau \))</span>
+                    </label>
+                    <label class="option">
+                        <input type="radio" name="ef-q1" value="2">
+                        <span>About 10 seconds (\( \approx 3\tau \))</span>
+                    </label>
+                    <label class="option">
+                        <input type="radio" name="ef-q1" value="3">
+                        <span>They never converge</span>
+                    </label>
+                </div>
+                <div class="question-actions">
+                    <button class="btn-verify">Verify</button>
+                </div>
+                <div class="question-explanation" style="display: none;">
+                    <div class="question-explanation-title">Explanation</div>
+                    <div class="question-explanation-text">
+                        With \( \gamma = 0.30 \), the decay time is
+                        \( \tau = 1/0.30 = 3.3 \) s.  After \( 3\tau \approx 10 \) s,
+                        the transient has decayed to \( e^{-3} \approx 5\% \) of its
+                        initial value.  Look at the right panel: the red envelope
+                        (upper bound) converges to the green steady-state line around
+                        \( t = 10 \) s.
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Q2: MCQ -->
+        <div class="tab-content">
+            <div class="question-container" data-type="mcq" data-answer="1">
+                <div class="question-text">
+                    Increase \( \gamma \) from 0.30 to 1.00.  What happens to the
+                    transient?
+                </div>
+                <div class="question-options">
+                    <label class="option">
+                        <input type="radio" name="ef-q2" value="0">
+                        <span>It oscillates more before dying</span>
+                    </label>
+                    <label class="option">
+                        <input type="radio" name="ef-q2" value="1">
+                        <span>It dies much faster (\( \tau \) decreases from 3.3 to 1.0 s)</span>
+                    </label>
+                    <label class="option">
+                        <input type="radio" name="ef-q2" value="2">
+                        <span>It grows without bound</span>
+                    </label>
+                    <label class="option">
+                        <input type="radio" name="ef-q2" value="3">
+                        <span>It doesn't change (only the steady state changes)</span>
+                    </label>
+                </div>
+                <div class="question-actions">
+                    <button class="btn-verify">Verify</button>
+                </div>
+                <div class="question-explanation" style="display: none;">
+                    <div class="question-explanation-title">Explanation</div>
+                    <div class="question-explanation-text">
+                        The transient decays as \( e^{-\gamma t} \).  Larger \( \gamma \)
+                        means faster decay.  At \( \gamma = 1.0 \), the decay time drops
+                        to \( \tau = 1 \) s, so the system reaches steady state by about
+                        \( t = 3 \) s instead of 10 s.  The system "forgets" its initial
+                        conditions three times faster.
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Q3: Fill -->
+        <div class="tab-content">
+            <div class="question-container" data-type="fill" data-answer="3.33[3.0,3.7]">
+                <div class="question-text">
+                    With \( \gamma = 0.30 \), the decay time \( \tau = 1/\gamma \) is:
+                    <br><br>
+                    &tau; = <input type="text" class="fill-blank" placeholder="seconds"> s
+                </div>
+                <div class="question-actions">
+                    <button class="btn-verify">Verify</button>
+                </div>
+                <div class="question-explanation" style="display: none;">
+                    <div class="question-explanation-title">Explanation</div>
+                    <div class="question-explanation-text">
+                        \( \tau = 1/\gamma = 1/0.30 = 3.33 \) s.  This is the time for
+                        the transient amplitude to drop by a factor of \( e \approx 2.718 \).
+                        The total time to effectively reach steady state is about
+                        \( 3\tau \approx 10 \) s.
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<hr>
+
+<!-- ========== EXPLORER 2: DRIVING FREQUENCY EXPLORER ========== -->
+
+<h2>The Amplitude Response Curve</h2>
+
+<p>
+    The steady-state amplitude depends on the driving frequency \( \omega_d \).
+    Drive far from the natural frequency \( \omega_0 \), and the response is
+    small.  Drive near \( \omega_0 \), and the amplitude grows dramatically.
+    This is the first hint of <strong>resonance</strong> &mdash; the focus
+    of the next section.
+</p>
+
+<p>
+    The left panel shows the steady-state oscillation at the current
+    \( \omega_d \), with the driving force shown for reference.  The right
+    panel shows the full amplitude response curve \( A(\omega_d) \) with a
+    star marking your current position.
+</p>
+
+<div class="interactive-container" id="driving-frequency-explorer">
+    <div class="interactive-title">Explorer 2: Driving Frequency Explorer</div>
+
+    <div style="display: flex; gap: 0.5rem; flex-wrap: wrap;">
+        <div class="plot-container" style="flex: 1; min-width: 280px;">
+            <div id="ef-fr-plot" style="width: 100%; height: 380px;"></div>
+        </div>
+        <div class="plot-container" style="flex: 1; min-width: 280px;">
+            <div id="ef-fr-amp-plot" style="width: 100%; height: 380px;"></div>
+        </div>
+    </div>
+
+    <div id="ef-fr-stats"
+         style="display: flex; justify-content: center; gap: 1.5rem; padding: 8px 0; font-size: 0.85rem; color: #c8c8e0; flex-wrap: wrap;">
+    </div>
+
+    <div class="control-panel">
+        <div class="control-group">
+            <label class="control-label">Driving frequency &omega;<sub>d</sub>:
+                <span class="control-label-value">2.00</span>
+            </label>
+            <input type="range" class="slider" id="ef-fr-wd"
+                   min="0.20" max="5.80" step="0.01" value="2.00">
+        </div>
+        <div class="control-group">
+            <label class="control-label">Damping &gamma;:
+                <span class="control-label-value">0.30</span>
+            </label>
+            <input type="range" class="slider" id="ef-fr-gamma"
+                   min="0.05" max="2.00" step="0.01" value="0.30">
+        </div>
+        <div class="btn-group">
+            <button class="btn" onclick="resetFreqExplorer()">Reset</button>
+        </div>
+    </div>
+</div>
+
+<div class="info-box">
+    <div class="info-box-title">Key Insight</div>
+    <p>
+        The amplitude response curve has a characteristic shape: a sharp peak
+        near &omega;<sub>0</sub>, falling off on both sides.  At <strong>low
+        driving frequencies</strong> (much slower than the natural frequency),
+        the system easily follows the gentle push &mdash; it moves in step
+        with the force, like slowly rocking a swing.  At <strong>high
+        frequencies</strong> (much faster than natural), the system can&rsquo;t
+        keep up and barely responds &mdash; like trying to shake a heavy
+        object very rapidly.  The <strong>sweet spot near
+        &omega;<sub>d</sub>&nbsp;&asymp;&nbsp;&omega;<sub>0</sub></strong> is
+        where the pushes are perfectly timed to build up large oscillations.
+    </p>
+</div>
+
+<!-- Test Your Understanding #2 -->
+<div class="interactive-container question-section">
+    <div class="interactive-title">Test Your Understanding</div>
+
+    <p style="margin-bottom: var(--spacing-md); color: var(--text-secondary);">
+        Use the Driving Frequency Explorer to answer these questions.
+    </p>
+
+    <div class="tabs">
+        <div class="tab-buttons">
+            <button class="tab-button active">Question 4</button>
+            <button class="tab-button">Question 5</button>
+            <button class="tab-button">Question 6</button>
+        </div>
+
+        <!-- Q4: MCQ -->
+        <div class="tab-content active">
+            <div class="question-container" data-type="mcq" data-answer="1">
+                <div class="question-text">
+                    At \( \gamma = 0.30 \), drag \( \omega_d \) to find the frequency
+                    that gives the largest steady-state amplitude.  This peak is near:
+                </div>
+                <div class="question-options">
+                    <label class="option">
+                        <input type="radio" name="ef-q4" value="0">
+                        <span>\( \omega_d = 1.0 \) (well below \( \omega_0 \))</span>
+                    </label>
+                    <label class="option">
+                        <input type="radio" name="ef-q4" value="1">
+                        <span>\( \omega_d \approx 2.97 \) (just below \( \omega_0 = 3.0 \))</span>
+                    </label>
+                    <label class="option">
+                        <input type="radio" name="ef-q4" value="2">
+                        <span>\( \omega_d = 5.0 \) (well above \( \omega_0 \))</span>
+                    </label>
+                    <label class="option">
+                        <input type="radio" name="ef-q4" value="3">
+                        <span>Amplitude is the same at all frequencies</span>
+                    </label>
+                </div>
+                <div class="question-actions">
+                    <button class="btn-verify">Verify</button>
+                </div>
+                <div class="question-explanation" style="display: none;">
+                    <div class="question-explanation-title">Explanation</div>
+                    <div class="question-explanation-text">
+                        The resonance frequency is \( \omega_{\text{res}} = \sqrt{\omega_0^2 - 2\gamma^2} = \sqrt{9 - 0.18} \approx 2.97 \).
+                        This is slightly below \( \omega_0 = 3.0 \) because damping
+                        shifts the peak downward.  For small damping (\( \gamma \ll \omega_0 \)),
+                        the shift is negligible and the peak sits very close to \( \omega_0 \).
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Q5: MCQ -->
+        <div class="tab-content">
+            <div class="question-container" data-type="mcq" data-answer="0">
+                <div class="question-text">
+                    Now increase \( \gamma \) from 0.30 to 1.50.
+                    What happens to the amplitude response curve?
+                </div>
+                <div class="question-options">
+                    <label class="option">
+                        <input type="radio" name="ef-q5" value="0">
+                        <span>The peak gets shorter and wider (more damping = less resonance)</span>
+                    </label>
+                    <label class="option">
+                        <input type="radio" name="ef-q5" value="1">
+                        <span>The peak gets taller and sharper</span>
+                    </label>
+                    <label class="option">
+                        <input type="radio" name="ef-q5" value="2">
+                        <span>The peak shifts to higher frequency</span>
+                    </label>
+                    <label class="option">
+                        <input type="radio" name="ef-q5" value="3">
+                        <span>Nothing changes (damping only affects the transient)</span>
+                    </label>
+                </div>
+                <div class="question-actions">
+                    <button class="btn-verify">Verify</button>
+                </div>
+                <div class="question-explanation" style="display: none;">
+                    <div class="question-explanation-title">Explanation</div>
+                    <div class="question-explanation-text">
+                        Damping limits the peak amplitude.  The peak height at resonance
+                        is approximately \( F_0/(2m\gamma\omega_0) \), inversely proportional
+                        to \( \gamma \).  So increasing \( \gamma \) lowers the peak.
+                        It also broadens it: with more damping, a wider range of
+                        frequencies can excite the system appreciably.  We'll quantify
+                        this with the <em>quality factor</em> in the next section.
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Q6: Fill -->
+        <div class="tab-content">
+            <div class="question-container" data-type="fill" data-answer="1.11[1.0,1.2]">
+                <div class="question-text">
+                    At \( \gamma = 0.30, \omega_d = 3.00 \) (exactly at \( \omega_0 \)),
+                    the steady-state amplitude formula gives
+                    \( A = \frac{F_0/m}{\sqrt{0 + (2 \times 0.3 \times 3)^2}} = \frac{2}{1.8} \).
+                    Calculate \( A \):
+                    <br><br>
+                    A = <input type="text" class="fill-blank" placeholder="value">
+                    <span style="color: var(--text-secondary); font-size: 0.9rem;">
+                        (round to 2 decimal places)
+                    </span>
+                </div>
+                <div class="question-actions">
+                    <button class="btn-verify">Verify</button>
+                </div>
+                <div class="question-explanation" style="display: none;">
+                    <div class="question-explanation-title">Explanation</div>
+                    <div class="question-explanation-text">
+                        At \( \omega_d = \omega_0 \), the term \( (\omega_0^2 - \omega_d^2)^2 = 0 \),
+                        so \( A = \frac{F_0/m}{2\gamma\omega_d} = \frac{2}{2 \times 0.3 \times 3} = \frac{2}{1.8} \approx 1.11 \).
+                        Verify by setting \( \omega_d = 3.00 \) in the explorer and
+                        reading the amplitude from the star marker on the response curve.
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<hr>
+
+<!-- ========== EXPLORER 3: IC INDEPENDENCE ========== -->
+
+<h2>Forgetting Where You Started</h2>
+
+<p>
+    Perhaps the most remarkable property of the driven oscillator: it doesn't
+    matter where you start.  Four systems with wildly different initial
+    conditions &mdash; different positions, different velocities &mdash; all
+    converge to the <em>same</em> steady-state oscillation.  The driving force
+    is a tyrant: it imposes its rhythm regardless of the system's history.
+</p>
+
+<p>
+    The left panel shows all four trajectories converging.  The right panel
+    shows each trajectory's deviation from the steady state &mdash; the
+    transient component &mdash; which decays exponentially with the same rate
+    \( e^{-\gamma t} \) for all initial conditions.
+</p>
+
+<div class="interactive-container" id="initial-condition-independence">
+    <div class="interactive-title">Explorer 3: Initial Condition Independence</div>
+
+    <div style="display: flex; gap: 0.5rem; flex-wrap: wrap;">
+        <div class="plot-container" style="flex: 1; min-width: 280px;">
+            <div id="ef-ic-plot" style="width: 100%; height: 380px;"></div>
+        </div>
+        <div class="plot-container" style="flex: 1; min-width: 280px;">
+            <div id="ef-ic-diff-plot" style="width: 100%; height: 380px;"></div>
+        </div>
+    </div>
+
+    <div id="ef-ic-stats"
+         style="display: flex; justify-content: center; gap: 1.5rem; padding: 8px 0; font-size: 0.85rem; color: #c8c8e0; flex-wrap: wrap;">
+    </div>
+
+    <div class="control-panel">
+        <div class="control-group">
+            <label class="control-label">Highlight:</label>
+            <select class="slider" id="ef-ic-select" style="width: auto; min-width: 200px;">
+                <option value="4">All (show all equally)</option>
+                <option value="0">IC 1: x₀=0, v₀=0 (cyan)</option>
+                <option value="1">IC 2: x₀=5, v₀=0 (magenta)</option>
+                <option value="2">IC 3: x₀=&minus;3, v₀=4 (yellow)</option>
+                <option value="3">IC 4: x₀=0, v₀=&minus;6 (red)</option>
+            </select>
+        </div>
+        <div class="btn-group">
+            <button class="btn" onclick="resetICTest()">Reset</button>
+        </div>
+    </div>
+</div>
+
+<div class="info-box">
+    <div class="info-box-title">Key Insight</div>
+    <p>
+        This &ldquo;forgetting&rdquo; property has practical consequences.
+        A radio receiver locks onto a station regardless of what it was doing
+        when you turned it on.  A vibration isolator reaches its design
+        performance no matter how you installed it.  The reason: damping
+        gradually erases the part of the motion that depends on how the
+        system started (the transient), leaving only the part that depends
+        on the driving force (the steady state).  Eventually, only the
+        driving force matters.
+    </p>
+</div>
+
+<!-- Test Your Understanding #3 -->
+<div class="interactive-container question-section">
+    <div class="interactive-title">Test Your Understanding</div>
+
+    <p style="margin-bottom: var(--spacing-md); color: var(--text-secondary);">
+        Use the Initial Condition Independence explorer to answer these questions.
+    </p>
+
+    <div class="tabs">
+        <div class="tab-buttons">
+            <button class="tab-button active">Question 7</button>
+            <button class="tab-button">Question 8</button>
+            <button class="tab-button">Question 9</button>
+        </div>
+
+        <!-- Q7: MCQ -->
+        <div class="tab-content active">
+            <div class="question-container" data-type="mcq" data-answer="2">
+                <div class="question-text">
+                    Look at the right panel (deviation from steady state).
+                    All four curves decay inside the same dotted envelope.
+                    This envelope decays as \( e^{-\gamma t} \) with
+                    \( \gamma = 0.3 \).  After what time have all deviations
+                    dropped below 5% of their initial values?
+                </div>
+                <div class="question-options">
+                    <label class="option">
+                        <input type="radio" name="ef-q7" value="0">
+                        <span>About 1 second</span>
+                    </label>
+                    <label class="option">
+                        <input type="radio" name="ef-q7" value="1">
+                        <span>About 5 seconds</span>
+                    </label>
+                    <label class="option">
+                        <input type="radio" name="ef-q7" value="2">
+                        <span>About 10 seconds (\( 3/\gamma = 10 \))</span>
+                    </label>
+                    <label class="option">
+                        <input type="radio" name="ef-q7" value="3">
+                        <span>They never fully converge</span>
+                    </label>
+                </div>
+                <div class="question-actions">
+                    <button class="btn-verify">Verify</button>
+                </div>
+                <div class="question-explanation" style="display: none;">
+                    <div class="question-explanation-title">Explanation</div>
+                    <div class="question-explanation-text">
+                        The 5% threshold corresponds to \( e^{-3} \approx 0.05 \), reached
+                        at \( t = 3/\gamma = 3/0.3 = 10 \) s.  The stats bar confirms
+                        "All converge by t &approx; 10 s (3&tau;)."  After this time,
+                        you can't tell which initial condition produced which trajectory.
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Q8: MCQ -->
+        <div class="tab-content">
+            <div class="question-container" data-type="mcq" data-answer="1">
+                <div class="question-text">
+                    The steady-state oscillation (green dashed) has a specific
+                    frequency and amplitude.  Which of the following determines
+                    the steady-state frequency?
+                </div>
+                <div class="question-options">
+                    <label class="option">
+                        <input type="radio" name="ef-q8" value="0">
+                        <span>The natural frequency \( \omega_0 \)</span>
+                    </label>
+                    <label class="option">
+                        <input type="radio" name="ef-q8" value="1">
+                        <span>The driving frequency \( \omega_d \)</span>
+                    </label>
+                    <label class="option">
+                        <input type="radio" name="ef-q8" value="2">
+                        <span>The average of \( \omega_0 \) and \( \omega_d \)</span>
+                    </label>
+                    <label class="option">
+                        <input type="radio" name="ef-q8" value="3">
+                        <span>The initial conditions</span>
+                    </label>
+                </div>
+                <div class="question-actions">
+                    <button class="btn-verify">Verify</button>
+                </div>
+                <div class="question-explanation" style="display: none;">
+                    <div class="question-explanation-title">Explanation</div>
+                    <div class="question-explanation-text">
+                        The steady state oscillates at the <em>driving</em> frequency
+                        \( \omega_d \), not the natural frequency \( \omega_0 \).  The
+                        system is forced to move at the rhythm of the external force.
+                        The natural frequency \( \omega_0 \) determines the <em>amplitude</em>
+                        of the response (through the resonance curve), but not the
+                        frequency of the response.
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Q9: MCQ -->
+        <div class="tab-content">
+            <div class="question-container" data-type="mcq" data-answer="0">
+                <div class="question-text">
+                    If there were <em>no</em> damping (\( \gamma = 0 \)), would
+                    the system still forget its initial conditions?
+                </div>
+                <div class="question-options">
+                    <label class="option">
+                        <input type="radio" name="ef-q9" value="0">
+                        <span>No &mdash; without damping, the transient never decays and ICs matter forever</span>
+                    </label>
+                    <label class="option">
+                        <input type="radio" name="ef-q9" value="1">
+                        <span>Yes &mdash; the driving force always dominates eventually</span>
+                    </label>
+                    <label class="option">
+                        <input type="radio" name="ef-q9" value="2">
+                        <span>It depends on the driving frequency</span>
+                    </label>
+                    <label class="option">
+                        <input type="radio" name="ef-q9" value="3">
+                        <span>It depends on the initial conditions</span>
+                    </label>
+                </div>
+                <div class="question-actions">
+                    <button class="btn-verify">Verify</button>
+                </div>
+                <div class="question-explanation" style="display: none;">
+                    <div class="question-explanation-title">Explanation</div>
+                    <div class="question-explanation-text">
+                        Without damping, the part of the motion from the initial
+                        conditions never dies away &mdash; it oscillates at the natural
+                        frequency &omega;<sub>0</sub> forever.  So the total motion is a
+                        mix of two frequencies (natural + driving) that produces a
+                        perpetual beating pattern.  The system never &ldquo;forgets&rdquo;
+                        how it started.
+                        Damping is essential for the forgetting property.
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<hr>
+
+<!-- ========== CODE EXAMPLES ========== -->
+<h2>Code It Yourself</h2>
+
+<div class="tabs">
+    <div class="tab-buttons">
+        <button class="tab-button active">Driven Oscillator</button>
+        <button class="tab-button">IC Independence</button>
+        <button class="tab-button">Prompt</button>
+    </div>
+
+    <div class="tab-content active">
+        <div class="code-block-container">
+            <div class="code-header">
+                <span class="code-lang">Python</span>
+                <button class="copy-btn">Copy</button>
+            </div>
+            <pre><code class="language-python">import numpy as np
+import plotly.graph_objects as go
+
+def steady_amp(F0m, omega0, wd, gamma):
+    return F0m / np.sqrt((omega0**2 - wd**2)**2 + (2*gamma*wd)**2)
+
+def steady_phase(omega0, wd, gamma):
+    return np.arctan2(2*gamma*wd, omega0**2 - wd**2)
+
+def driven(t, x0, v0, F0m, omega0, wd, gamma):
+    A = steady_amp(F0m, omega0, wd, gamma)
+    delta = steady_phase(omega0, wd, gamma)
+    x_ss = A * np.cos(wd*t - delta)
+    # Transient (underdamped)
+    wd_nat = np.sqrt(omega0**2 - gamma**2)
+    xT0 = x0 - A*np.cos(delta)
+    vT0 = v0 - A*wd*np.sin(delta)
+    C = xT0
+    D = (vT0 + gamma*xT0) / wd_nat
+    x_trans = np.exp(-gamma*t) * (C*np.cos(wd_nat*t) + D*np.sin(wd_nat*t))
+    return x_trans + x_ss, x_trans, x_ss
+
+omega0, gamma, F0m = 3.0, 0.3, 2.0
+t = np.linspace(0, 20, 800)
+
+fig = go.Figure()
+x_tot, x_tr, x_ss = driven(t, 3, 0, F0m, omega0, 2.5, gamma)
+fig.add_trace(go.Scatter(x=t, y=x_ss, name='Steady-state',
+    line=dict(color='#00ff9f', dash='dash', width=1.5)))
+fig.add_trace(go.Scatter(x=t, y=x_tr, name='Transient',
+    line=dict(color='#ff6b6b', dash='dot', width=1.5)))
+fig.add_trace(go.Scatter(x=t, y=x_tot, name='Total',
+    line=dict(color='#00f3ff', width=2.5)))
+
+fig.update_layout(template='plotly_dark',
+    title='Driven Oscillator: Transient + Steady State',
+    xaxis=dict(title='Time (s)', range=[0, 20],
+        gridcolor='#2a2f4a', zerolinecolor='#808080', linecolor='#808080'),
+    yaxis=dict(title='x(t)', range=[-8, 8],
+        gridcolor='#2a2f4a', zerolinecolor='#808080', linecolor='#808080'))
+fig.show()</code></pre>
+        </div>
+    </div>
+
+    <div class="tab-content">
+        <div class="code-block-container">
+            <div class="code-header">
+                <span class="code-lang">Python</span>
+                <button class="copy-btn">Copy</button>
+            </div>
+            <pre><code class="language-python">import numpy as np
+import plotly.graph_objects as go
+
+def driven(t, x0, v0, F0m, omega0, wd, gamma):
+    A = F0m / np.sqrt((omega0**2 - wd**2)**2 + (2*gamma*wd)**2)
+    delta = np.arctan2(2*gamma*wd, omega0**2 - wd**2)
+    x_ss = A * np.cos(wd*t - delta)
+    wd_nat = np.sqrt(omega0**2 - gamma**2)
+    xT0 = x0 - A*np.cos(delta)
+    vT0 = v0 - A*wd*np.sin(delta)
+    x_tr = np.exp(-gamma*t) * (xT0*np.cos(wd_nat*t) +
+        (vT0 + gamma*xT0)/wd_nat * np.sin(wd_nat*t))
+    return x_tr + x_ss
+
+omega0, gamma, wd, F0m = 3.0, 0.3, 2.0, 2.0
+t = np.linspace(0, 25, 800)
+
+ics = [(0, 0, '#00f3ff'), (5, 0, '#ff00ff'),
+       (-3, 4, '#ffff00'), (0, -6, '#ff6b6b')]
+
+fig = go.Figure()
+for x0, v0, color in ics:
+    x = driven(t, x0, v0, F0m, omega0, wd, gamma)
+    fig.add_trace(go.Scatter(x=t, y=x,
+        name=f'x₀={x0}, v₀={v0}', line=dict(color=color, width=2)))
+
+fig.update_layout(template='plotly_dark',
+    title='Four ICs → One Steady State',
+    xaxis=dict(title='Time (s)', range=[0, 25],
+        gridcolor='#2a2f4a', zerolinecolor='#808080', linecolor='#808080'),
+    yaxis=dict(title='x(t)', range=[-8, 8],
+        gridcolor='#2a2f4a', zerolinecolor='#808080', linecolor='#808080'))
+fig.show()</code></pre>
+        </div>
+    </div>
+
+    <div class="tab-content">
+        <div class="code-block-container">
+            <div class="code-header">
+                <span class="code-lang">Prompt for AI</span>
+                <button class="copy-btn">Copy</button>
+            </div>
+            <pre><code class="language-text">Create a Python visualization of a driven damped oscillator.
+
+Part 1 - Transient + Steady-State Decomposition:
+- Equation: x'' + 2γx' + ω₀²x = (F₀/m)cos(ω_d t)
+- Parameters: ω₀=3, γ=0.3, F₀/m=2, ω_d=2.5
+- Initial conditions: x(0)=3, v(0)=0
+- Plot THREE curves: total (cyan), transient (red dotted), steady-state (green dashed)
+- Show transient decaying as e^(-γt) envelope
+
+Part 2 - Amplitude Response Curve:
+- Plot A(ω_d) = (F₀/m) / √((ω₀²-ω_d²)² + (2γω_d)²)
+- Sweep ω_d from 0 to 6, show peak near ω₀
+- Try γ = 0.1, 0.3, 1.0 on same plot to show damping effect
+
+Part 3 - Initial Condition Independence:
+- Same ω₀, γ, ω_d, F₀/m as Part 1
+- Use 4 different initial conditions: (0,0), (5,0), (-3,4), (0,-6)
+- Show all 4 trajectories converging to the SAME steady state
+- Mark the convergence time ~3/γ
+
+Use Plotly dark theme, gray axes (#808080), fixed ranges.</code></pre>
+        </div>
+
+        <div class="info-box" style="margin-top: var(--spacing-md);">
+            <div class="info-box-title">Pro Tips for Prompting</div>
+            <ul>
+                <li>Specify the full equation with all parameters &mdash; AI often confuses \( \omega_d \) with \( \omega_0 \)</li>
+                <li>Ask for the transient and steady-state <em>separately</em>, not just the total</li>
+                <li>Request initial condition independence to see the "forgetting" property in action</li>
+            </ul>
+        </div>
+    </div>
+</div>
+
+<hr>
+
+<!-- ========== EXERCISES ========== -->
+<h2>Exercises for Practice</h2>
+
+<div class="exercise-cards">
+    <div class="exercise-card">
+        <div class="exercise-card-header">
+            <span class="exercise-card-number">1.</span>
+            <span class="exercise-card-badge explore">Explore</span>
+        </div>
+        <div class="exercise-card-content">
+            In the Transient Decay Animator, set \( \gamma = 0.30 \) and sweep
+            \( \omega_d \) slowly from 0.5 to 5.5.  At what \( \omega_d \) does
+            the steady-state amplitude \( A_{\text{ss}} \) reach its maximum?
+            Now increase \( \gamma \) to 1.0 and repeat.  Does the peak
+            frequency shift?  By how much?  Record both peak values and compare
+            with the formula \( \omega_{\text{res}} = \sqrt{\omega_0^2 - 2\gamma^2} \).
+        </div>
+    </div>
+
+    <div class="exercise-card">
+        <div class="exercise-card-header">
+            <span class="exercise-card-number">2.</span>
+            <span class="exercise-card-badge coding">Coding</span>
+        </div>
+        <div class="exercise-card-content">
+            Write a Python function that plots the amplitude response curve
+            \( A(\omega_d) \) for three values of damping: \( \gamma = 0.1, 0.5, 1.5 \),
+            all with \( \omega_0 = 3.0, F_0/m = 2.0 \).  On the same plot, mark
+            the resonance frequency for each \( \gamma \) with a vertical line.
+            How does the peak height scale with \( \gamma \)?  Verify numerically
+            that the peak amplitude is approximately \( F_0 / (2m\gamma\omega_0) \).
+        </div>
+    </div>
+
+    <div class="exercise-card">
+        <div class="exercise-card-header">
+            <span class="exercise-card-number">3.</span>
+            <span class="exercise-card-badge think">Think</span>
+        </div>
+        <div class="exercise-card-content">
+            The phase lag \( \delta \) between force and response satisfies
+            \( \tan\delta = 2\gamma\omega_d / (\omega_0^2 - \omega_d^2) \).
+            Show that at exact resonance (\( \omega_d = \omega_0 \)),
+            \( \delta = \pi/2 \) regardless of \( \gamma \).  What does this
+            mean physically?  (Hint: if the force is a cosine and the response
+            lags by \( \pi/2 \), the response is a sine &mdash; the response
+            peaks when the force crosses zero.)
+        </div>
+    </div>
+</div>
+
+<hr>
+
+<!-- ========== NAVIGATION ========== -->
+<div class="btn-group mt-xl">
+    <button class="btn btn-magenta" onclick="navigateToSection('26-critical-damping')">&larr; Previous: Critical Damping in Engineering</button>
+    <button class="btn" onclick="scrollToTop()">&uarr; Back to Top</button>
+    <button class="btn btn-secondary" onclick="navigateToSection('28-resonance')">Next: Resonance: When Small Forces Win &rarr;</button>
+</div>

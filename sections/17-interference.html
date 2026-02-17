@@ -1,0 +1,808 @@
+<!-- Section 2.11: Same Frequency Interference -->
+<!-- Source: Lecture3.nb (Part 2) -->
+<!-- Core concept: Phase difference controls interference at same frequency -->
+<!-- Time: ~20 minutes -->
+<!-- Prerequisites: Superposition principle (Section 2.10) -->
+
+<h1>Same Frequency Interference</h1>
+
+<p>
+    In the last section you saw that two cosines at the <em>same frequency</em>
+    add to give another cosine at that frequency.  Now let's dig into the
+    details: <strong>how does the phase difference between two waves control
+    the resulting amplitude?</strong>  This is the physics of interference
+    &mdash; the mechanism behind noise-cancelling headphones, thin-film
+    colours, and the double-slit experiment.
+</p>
+
+<div class="info-box">
+    <div class="info-box-title">Learning Objectives</div>
+    <ul>
+        <li>Derive the resultant amplitude formula for two same-frequency waves</li>
+        <li>Identify constructive and destructive interference from the phase difference</li>
+        <li>Represent wave addition as phasor (rotating vector) addition</li>
+        <li>Predict the phase difference needed to achieve a target amplitude</li>
+    </ul>
+</div>
+
+<div class="equation-display">
+    <p><strong>The amplitude formula:</strong></p>
+    $$ A^2 = A_1^2 + A_2^2 + 2A_1 A_2 \cos(\Delta\phi) $$
+    <p>
+        where \( \Delta\phi = \phi_2 - \phi_1 \) is the phase difference.
+        This single equation captures all of interference: when \( \cos(\Delta\phi) = +1 \)
+        (constructive), \( A = A_1 + A_2 \); when \( \cos(\Delta\phi) = -1 \)
+        (destructive), \( A = |A_1 - A_2| \).
+    </p>
+</div>
+
+<hr>
+
+<!-- ========== EXPLORER 1: INTERFERENCE VISUALIZER ========== -->
+
+<h2>Visualising Interference</h2>
+
+<p>
+    Sweep the phase difference \( \Delta\phi \) from 0&deg; to 360&deg; and
+    watch the sum wave grow and shrink.  With equal amplitudes, the sum
+    oscillates between double height (constructive) and complete cancellation
+    (destructive).  The dashed envelope shows the resultant amplitude.
+</p>
+
+<div class="interactive-container" id="interference-visualizer">
+    <div class="interactive-title">Interactive: Interference Visualizer</div>
+
+    <div class="plot-container">
+        <div id="if-wave-plot" style="width: 100%; height: 400px;"></div>
+    </div>
+
+    <div id="if-wave-stats"
+         style="display: flex; justify-content: center; gap: 1.5rem; padding: 8px 0; font-size: 0.85rem; color: #c8c8e0; flex-wrap: wrap;">
+    </div>
+
+    <div class="control-panel">
+        <div class="control-group">
+            <label class="control-label">A&sub1;:
+                <span class="control-label-value">1.0</span>
+            </label>
+            <input type="range" class="slider" id="if-a1-slider"
+                   min="0" max="2" step="0.1" value="1.0">
+        </div>
+        <div class="control-group">
+            <label class="control-label">A&sub2;:
+                <span class="control-label-value">1.0</span>
+            </label>
+            <input type="range" class="slider" id="if-a2-slider"
+                   min="0" max="2" step="0.1" value="1.0">
+        </div>
+        <div class="control-group">
+            <label class="control-label">&Delta;&phi;:
+                <span class="control-label-value">0&deg;</span>
+            </label>
+            <input type="range" class="slider" id="if-dphi-slider"
+                   min="0" max="6.283" step="0.05" value="0">
+        </div>
+        <div class="btn-group">
+            <button class="btn" onclick="resetInterference()">Reset</button>
+        </div>
+    </div>
+</div>
+
+<div class="info-box">
+    <div class="info-box-title">Key Insight</div>
+    <p>
+        The formula \( A^2 = A_1^2 + A_2^2 + 2A_1 A_2 \cos(\Delta\phi) \) looks
+        exactly like the <strong>law of cosines</strong> for a triangle with sides
+        \( A_1 \) and \( A_2 \) and included angle \( \pi - \Delta\phi \).
+        This isn't a coincidence &mdash; it's the phasor addition you'll see
+        in the next explorer.  Set A&sub1; = A&sub2; = 1 and sweep &Delta;&phi;
+        slowly: the amplitude goes from 2 (at 0&deg;) to 0 (at 180&deg;) and
+        back to 2 (at 360&deg;).
+    </p>
+</div>
+
+<!-- Test Your Understanding #1 -->
+<div class="interactive-container question-section">
+    <div class="interactive-title">Test Your Understanding</div>
+
+    <p style="margin-bottom: var(--spacing-md); color: var(--text-secondary);">
+        Use the Interference Visualizer to answer these questions.
+    </p>
+
+    <div class="tabs">
+        <div class="tab-buttons">
+            <button class="tab-button active">Question 1</button>
+            <button class="tab-button">Question 2</button>
+            <button class="tab-button">Question 3</button>
+        </div>
+
+        <!-- Q1: MCQ -->
+        <div class="tab-content active">
+            <div class="question-container" data-type="mcq" data-answer="1">
+                <div class="question-text">
+                    Set A&sub1; = 2 and A&sub2; = 1.  What is the minimum possible
+                    resultant amplitude as you sweep &Delta;&phi;?
+                </div>
+                <div class="question-options">
+                    <label class="option">
+                        <input type="radio" name="if-q1" value="0">
+                        <span>0</span>
+                    </label>
+                    <label class="option">
+                        <input type="radio" name="if-q1" value="1">
+                        <span>1</span>
+                    </label>
+                    <label class="option">
+                        <input type="radio" name="if-q1" value="2">
+                        <span>2</span>
+                    </label>
+                    <label class="option">
+                        <input type="radio" name="if-q1" value="3">
+                        <span>3</span>
+                    </label>
+                </div>
+                <div class="question-actions">
+                    <button class="btn-verify">Verify</button>
+                </div>
+                <div class="question-explanation" style="display: none;">
+                    <div class="question-explanation-title">Explanation</div>
+                    <div class="question-explanation-text">
+                        Maximum destructive interference gives \( A = |A_1 - A_2| = |2 - 1| = 1 \).
+                        Complete cancellation (\( A = 0 \)) only occurs when \( A_1 = A_2 \).
+                        With unequal amplitudes, the larger wave always "wins" &mdash; you
+                        can never fully cancel it.  Sweep to &Delta;&phi; = 180&deg; to see.
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Q2: Fill -->
+        <div class="tab-content">
+            <div class="question-container" data-type="fill" data-answer="3[2.9,3.1]">
+                <div class="question-text">
+                    With A&sub1; = 2 and A&sub2; = 1, the maximum resultant amplitude is:
+                    <br><br>
+                    A<sub>max</sub> = <input type="text" class="fill-blank" placeholder="value">
+                </div>
+                <div class="question-actions">
+                    <button class="btn-verify">Verify</button>
+                </div>
+                <div class="question-explanation" style="display: none;">
+                    <div class="question-explanation-title">Explanation</div>
+                    <div class="question-explanation-text">
+                        Maximum constructive interference: \( A = A_1 + A_2 = 2 + 1 = 3 \).
+                        This occurs at \( \Delta\phi = 0° \) (or \( 360° \)), when both
+                        waves peak at exactly the same time.  The formula gives
+                        \( A^2 = 4 + 1 + 2(2)(1)\cos(0) = 9 \), so \( A = 3 \).
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Q3: MCQ -->
+        <div class="tab-content">
+            <div class="question-container" data-type="mcq" data-answer="2">
+                <div class="question-text">
+                    At what phase difference does the resultant amplitude equal
+                    \( \sqrt{A_1^2 + A_2^2} \)?
+                </div>
+                <div class="question-options">
+                    <label class="option">
+                        <input type="radio" name="if-q3" value="0">
+                        <span>0&deg;</span>
+                    </label>
+                    <label class="option">
+                        <input type="radio" name="if-q3" value="1">
+                        <span>45&deg;</span>
+                    </label>
+                    <label class="option">
+                        <input type="radio" name="if-q3" value="2">
+                        <span>90&deg;</span>
+                    </label>
+                    <label class="option">
+                        <input type="radio" name="if-q3" value="3">
+                        <span>180&deg;</span>
+                    </label>
+                </div>
+                <div class="question-actions">
+                    <button class="btn-verify">Verify</button>
+                </div>
+                <div class="question-explanation" style="display: none;">
+                    <div class="question-explanation-title">Explanation</div>
+                    <div class="question-explanation-text">
+                        \( A^2 = A_1^2 + A_2^2 + 2A_1A_2\cos(\Delta\phi) \).  For the
+                        cross term to vanish, we need \( \cos(\Delta\phi) = 0 \), which
+                        means \( \Delta\phi = 90° \).  At 90&deg;, the two waves are
+                        "orthogonal" &mdash; their energies add like the sides of a
+                        right triangle (Pythagoras!).
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<hr>
+
+<!-- ========== EXPLORER 2: PHASOR DIAGRAM ========== -->
+
+<h2>Phasor Addition</h2>
+
+<p>
+    There's a beautiful geometric way to visualise wave addition.  Represent
+    each wave \( A\cos(\omega t + \phi) \) as a <strong>rotating vector
+    (phasor)</strong> of length \( A \), spinning at angular frequency
+    \( \omega \).  To add two waves, place the phasors tip-to-tail.  The
+    resultant phasor &mdash; from the origin to the final tip &mdash; gives the
+    amplitude and phase of the sum.  The <em>real part</em> (horizontal
+    projection) is the physical displacement at any instant.
+</p>
+
+<div class="interactive-container" id="phasor-diagram">
+    <div class="interactive-title">Interactive: Phasor Diagram</div>
+
+    <div style="display: flex; gap: 0.5rem; flex-wrap: wrap;">
+        <div class="plot-container" style="flex: 1; min-width: 280px;">
+            <div id="if-phasor-plot" style="width: 100%; height: 380px;"></div>
+        </div>
+        <div class="plot-container" style="flex: 1; min-width: 280px;">
+            <div id="if-phasor-time-plot" style="width: 100%; height: 380px;"></div>
+        </div>
+    </div>
+
+    <div id="if-phasor-stats"
+         style="display: flex; justify-content: center; gap: 1.5rem; padding: 8px 0; font-size: 0.85rem; color: #c8c8e0; flex-wrap: wrap;">
+    </div>
+
+    <div class="control-panel">
+        <div class="control-group">
+            <label class="control-label">A&sub1;:
+                <span class="control-label-value">1.0</span>
+            </label>
+            <input type="range" class="slider" id="if-ph-a1-slider"
+                   min="0" max="2" step="0.1" value="1.0">
+        </div>
+        <div class="control-group">
+            <label class="control-label">A&sub2;:
+                <span class="control-label-value">1.0</span>
+            </label>
+            <input type="range" class="slider" id="if-ph-a2-slider"
+                   min="0" max="2" step="0.1" value="1.0">
+        </div>
+        <div class="control-group">
+            <label class="control-label">&Delta;&phi;:
+                <span class="control-label-value">0&deg;</span>
+            </label>
+            <input type="range" class="slider" id="if-ph-dphi-slider"
+                   min="0" max="6.283" step="0.05" value="0">
+        </div>
+        <div class="control-group">
+            <label class="control-label">Time t:
+                <span class="control-label-value">0.0&pi;</span>
+            </label>
+            <input type="range" class="slider" id="if-ph-time-slider"
+                   min="0" max="12.566" step="0.1" value="0">
+        </div>
+        <div class="btn-group">
+            <button class="btn" onclick="resetPhasor()">Reset</button>
+        </div>
+    </div>
+</div>
+
+<div class="info-box">
+    <div class="info-box-title">Key Insight</div>
+    <p>
+        As you drag the time slider, both phasors rotate together (same
+        \( \omega \)), but the angle <em>between</em> them stays fixed at
+        \( \Delta\phi \).  That's why the resultant amplitude doesn't change
+        with time &mdash; it only depends on the phase <em>difference</em>.
+        The phasor picture makes the law-of-cosines formula obvious:
+        the resultant is the third side of a triangle with sides \( A_1 \)
+        and \( A_2 \) and included angle \( \Delta\phi \).
+    </p>
+</div>
+
+<!-- Test Your Understanding #2 -->
+<div class="interactive-container question-section">
+    <div class="interactive-title">Test Your Understanding</div>
+
+    <p style="margin-bottom: var(--spacing-md); color: var(--text-secondary);">
+        Use the Phasor Diagram to answer these questions.
+    </p>
+
+    <div class="tabs">
+        <div class="tab-buttons">
+            <button class="tab-button active">Question 4</button>
+            <button class="tab-button">Question 5</button>
+            <button class="tab-button">Question 6</button>
+        </div>
+
+        <!-- Q4: MCQ -->
+        <div class="tab-content active">
+            <div class="question-container" data-type="mcq" data-answer="0">
+                <div class="question-text">
+                    Set &Delta;&phi; = 180&deg; and A&sub1; = A&sub2; = 1.
+                    In the phasor diagram, what happens to the two vectors?
+                </div>
+                <div class="question-options">
+                    <label class="option">
+                        <input type="radio" name="if-q4" value="0">
+                        <span>They point in opposite directions &mdash; the resultant is zero</span>
+                    </label>
+                    <label class="option">
+                        <input type="radio" name="if-q4" value="1">
+                        <span>They point in the same direction &mdash; the resultant doubles</span>
+                    </label>
+                    <label class="option">
+                        <input type="radio" name="if-q4" value="2">
+                        <span>They are perpendicular</span>
+                    </label>
+                </div>
+                <div class="question-actions">
+                    <button class="btn-verify">Verify</button>
+                </div>
+                <div class="question-explanation" style="display: none;">
+                    <div class="question-explanation-title">Explanation</div>
+                    <div class="question-explanation-text">
+                        At \( \Delta\phi = 180° \), phasor 2 points opposite to phasor 1.
+                        In tail-to-tip addition, phasor 2 walks back to the origin,
+                        giving a zero resultant.  This is destructive interference
+                        visualised geometrically.  Drag the time slider to confirm
+                        the resultant stays zero at every instant.
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Q5: Fill -->
+        <div class="tab-content">
+            <div class="question-container" data-type="fill" data-answer="1.41[1.3,1.5]">
+                <div class="question-text">
+                    Set A&sub1; = 1, A&sub2; = 1, &Delta;&phi; = 90&deg;.  The phasors
+                    form a right angle.  What is the resultant amplitude?
+                    <br><br>
+                    A = <input type="text" class="fill-blank" placeholder="value">
+                </div>
+                <div class="question-actions">
+                    <button class="btn-verify">Verify</button>
+                </div>
+                <div class="question-explanation" style="display: none;">
+                    <div class="question-explanation-title">Explanation</div>
+                    <div class="question-explanation-text">
+                        Two equal phasors at 90&deg; form a right triangle.  By Pythagoras,
+                        \( A = \sqrt{1^2 + 1^2} = \sqrt{2} \approx 1.41 \).  This is the
+                        same result you get from the formula with \( \cos(90°) = 0 \).
+                        The phasor diagram makes it visually obvious &mdash; it's just
+                        vector addition!
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Q6: MCQ -->
+        <div class="tab-content">
+            <div class="question-container" data-type="mcq" data-answer="2">
+                <div class="question-text">
+                    As you drag the time slider, how does the resultant phasor change?
+                </div>
+                <div class="question-options">
+                    <label class="option">
+                        <input type="radio" name="if-q6" value="0">
+                        <span>Its length changes but direction stays fixed</span>
+                    </label>
+                    <label class="option">
+                        <input type="radio" name="if-q6" value="1">
+                        <span>Both length and direction change</span>
+                    </label>
+                    <label class="option">
+                        <input type="radio" name="if-q6" value="2">
+                        <span>It rotates (direction changes) but its length stays the same</span>
+                    </label>
+                </div>
+                <div class="question-actions">
+                    <button class="btn-verify">Verify</button>
+                </div>
+                <div class="question-explanation" style="display: none;">
+                    <div class="question-explanation-title">Explanation</div>
+                    <div class="question-explanation-text">
+                        Both phasors rotate at the same rate \( \omega \), so the triangle
+                        they form is rigid &mdash; it rotates as a whole without changing
+                        shape.  The resultant's length (amplitude) stays constant; only its
+                        angle changes.  This is why the sum of two same-frequency cosines
+                        is always another cosine at that frequency, with a fixed amplitude.
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<hr>
+
+<!-- ========== EXPLORER 3: AMPLITUDE CHALLENGE ========== -->
+
+<h2>The Amplitude Challenge</h2>
+
+<p>
+    Time to put the formula to work.  You're given two amplitudes A&sub1; and
+    A&sub2;, and a target resultant amplitude.  Your job: calculate the phase
+    difference \( \Delta\phi \) that achieves it.  Rearrange the formula:
+    \( \cos(\Delta\phi) = \frac{A^2 - A_1^2 - A_2^2}{2 A_1 A_2} \).
+</p>
+
+<div class="interactive-container" id="amplitude-challenge">
+    <div class="interactive-title">Interactive: Amplitude Challenge</div>
+
+    <div id="if-challenge-prompt"
+         style="padding: 12px 16px; background: rgba(255,107,107,0.1); border-left: 3px solid #ff6b6b; border-radius: 0 6px 6px 0; margin-bottom: 12px; font-size: 0.9rem; color: #c8c8e0;">
+    </div>
+
+    <div style="display: flex; gap: 0.5rem; flex-wrap: wrap;">
+        <div class="plot-container" style="flex: 1; min-width: 280px;">
+            <div id="if-challenge-curve-plot" style="width: 100%; height: 380px;"></div>
+        </div>
+        <div class="plot-container" style="flex: 1; min-width: 280px;">
+            <div id="if-challenge-wave-plot" style="width: 100%; height: 380px;"></div>
+        </div>
+    </div>
+
+    <div id="if-challenge-feedback"
+         style="padding: 8px 0; font-size: 0.9rem; text-align: center;">
+    </div>
+
+    <div class="control-panel">
+        <div class="control-group">
+            <label class="control-label">Your &Delta;&phi; guess (degrees):</label>
+            <input type="number" id="if-challenge-input"
+                   min="0" max="360" step="1" placeholder="e.g. 90"
+                   style="width: 100%; padding: 8px 12px; background: #1a1f3a; color: #c8c8e0; border: 1px solid #2a2f4a; border-radius: 6px; font-size: 0.95rem;">
+        </div>
+        <div class="btn-group">
+            <button class="btn" onclick="submitChallenge()">Submit</button>
+            <button class="btn" onclick="nextChallenge()">Next Challenge</button>
+            <button class="btn" onclick="resetChallenge()">Reset Score</button>
+        </div>
+    </div>
+</div>
+
+<div class="info-box">
+    <div class="info-box-title">Key Insight</div>
+    <p>
+        The inverse formula \( \cos(\Delta\phi) = \frac{A^2 - A_1^2 - A_2^2}{2A_1 A_2} \)
+        always has a solution when \( |A_1 - A_2| \le A \le A_1 + A_2 \).
+        Outside this range, no phase difference can produce the target amplitude.
+        Notice that this range is exactly the <strong>triangle inequality</strong>
+        &mdash; the resultant is the third side of the phasor triangle.
+    </p>
+</div>
+
+<!-- Test Your Understanding #3 -->
+<div class="interactive-container question-section">
+    <div class="interactive-title">Test Your Understanding</div>
+
+    <p style="margin-bottom: var(--spacing-md); color: var(--text-secondary);">
+        Use the Amplitude Challenge and the formula to answer these questions.
+    </p>
+
+    <div class="tabs">
+        <div class="tab-buttons">
+            <button class="tab-button active">Question 7</button>
+            <button class="tab-button">Question 8</button>
+            <button class="tab-button">Question 9</button>
+        </div>
+
+        <!-- Q7: Fill -->
+        <div class="tab-content active">
+            <div class="question-container" data-type="fill" data-answer="120[115,125]">
+                <div class="question-text">
+                    Given A&sub1; = 1, A&sub2; = 1, what &Delta;&phi; (in degrees)
+                    gives a resultant amplitude of exactly 1?
+                    <br><br>
+                    &Delta;&phi; = <input type="text" class="fill-blank" placeholder="degrees"> &deg;
+                </div>
+                <div class="question-actions">
+                    <button class="btn-verify">Verify</button>
+                </div>
+                <div class="question-explanation" style="display: none;">
+                    <div class="question-explanation-title">Explanation</div>
+                    <div class="question-explanation-text">
+                        \( \cos(\Delta\phi) = \frac{1 - 1 - 1}{2(1)(1)} = -\frac{1}{2} \),
+                        so \( \Delta\phi = 120° \).  With equal amplitudes, you get an
+                        equilateral triangle in the phasor diagram when the output equals
+                        the input &mdash; each phasor and the resultant all have length 1.
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Q8: MCQ -->
+        <div class="tab-content">
+            <div class="question-container" data-type="mcq" data-answer="0">
+                <div class="question-text">
+                    If A&sub1; = 3 and A&sub2; = 1, can you achieve a resultant
+                    amplitude of A = 0?
+                </div>
+                <div class="question-options">
+                    <label class="option">
+                        <input type="radio" name="if-q8" value="0">
+                        <span>No &mdash; the minimum is |A&sub1; &minus; A&sub2;| = 2</span>
+                    </label>
+                    <label class="option">
+                        <input type="radio" name="if-q8" value="1">
+                        <span>Yes, at &Delta;&phi; = 180&deg;</span>
+                    </label>
+                    <label class="option">
+                        <input type="radio" name="if-q8" value="2">
+                        <span>Yes, at &Delta;&phi; = 270&deg;</span>
+                    </label>
+                </div>
+                <div class="question-actions">
+                    <button class="btn-verify">Verify</button>
+                </div>
+                <div class="question-explanation" style="display: none;">
+                    <div class="question-explanation-title">Explanation</div>
+                    <div class="question-explanation-text">
+                        Complete cancellation requires \( A_1 = A_2 \).  When the amplitudes
+                        are unequal, the best destructive interference can do is
+                        \( A = |A_1 - A_2| = |3 - 1| = 2 \).  The stronger wave always
+                        "survives."  This is why perfect noise cancellation needs precisely
+                        matched amplitudes.
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Q9: MSQ -->
+        <div class="tab-content">
+            <div class="question-container" data-type="msq" data-answer="1,2">
+                <div class="question-text">
+                    Which statements about same-frequency interference are correct?
+                    <strong>(Select all that apply)</strong>
+                </div>
+                <div class="question-options">
+                    <label class="option">
+                        <input type="checkbox" value="0">
+                        <span>The resultant frequency depends on &Delta;&phi;</span>
+                    </label>
+                    <label class="option">
+                        <input type="checkbox" value="1">
+                        <span>The resultant amplitude depends only on A&sub1;, A&sub2;, and &Delta;&phi;</span>
+                    </label>
+                    <label class="option">
+                        <input type="checkbox" value="2">
+                        <span>Energy is conserved: it redistributes between constructive and destructive regions</span>
+                    </label>
+                    <label class="option">
+                        <input type="checkbox" value="3">
+                        <span>Three or more waves can't interfere destructively</span>
+                    </label>
+                </div>
+                <div class="question-actions">
+                    <button class="btn-verify">Verify</button>
+                </div>
+                <div class="question-explanation" style="display: none;">
+                    <div class="question-explanation-title">Explanation</div>
+                    <div class="question-explanation-text">
+                        <ul>
+                            <li><strong>False:</strong> The resultant is always at the same
+                                frequency \( \omega \).  Phase difference controls the amplitude,
+                                not the frequency.</li>
+                            <li><strong>True:</strong> The amplitude formula
+                                \( A^2 = A_1^2 + A_2^2 + 2A_1 A_2 \cos(\Delta\phi) \) depends
+                                only on these three quantities.</li>
+                            <li><strong>True:</strong> Interference doesn't create or destroy
+                                energy.  Where waves add constructively, they're brighter; where
+                                they cancel, the energy goes elsewhere.  The total energy is
+                                always the sum of the individual energies.</li>
+                            <li><strong>False:</strong> Three waves of equal amplitude spaced
+                                120&deg; apart cancel perfectly (\( 1 + e^{i2\pi/3} + e^{i4\pi/3} = 0 \)).
+                                This is the basis of three-phase power systems.</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<hr>
+
+<!-- ========== PYTHON CODE ========== -->
+
+<h2>Python Code</h2>
+
+<p>Here's the Python equivalent for interference calculations and phasor diagrams.</p>
+
+<div class="tabs">
+    <div class="tab-buttons">
+        <button class="tab-button active">Interference</button>
+        <button class="tab-button">Phasor Diagram</button>
+        <button class="tab-button">Prompt</button>
+    </div>
+
+    <!-- Tab 1: Interference -->
+    <div class="tab-content active">
+        <div class="code-block-container">
+            <div class="code-header">
+                <span class="code-lang">Python</span>
+                <button class="copy-btn">Copy</button>
+            </div>
+            <pre><code class="language-python">import numpy as np
+import plotly.graph_objects as go
+
+t = np.linspace(0, 8*np.pi, 1000)
+omega = 1.0
+A1, A2 = 1.0, 1.0
+
+# Sweep phase difference
+for dphi_deg in [0, 60, 90, 120, 180]:
+    dphi = np.radians(dphi_deg)
+    x1 = A1 * np.cos(omega*t)
+    x2 = A2 * np.cos(omega*t + dphi)
+    A_res = np.sqrt(A1**2 + A2**2 + 2*A1*A2*np.cos(dphi))
+    print(f"Δφ = {dphi_deg:>3d}° → A = {A_res:.3f}")
+
+# Plot A vs Δφ
+dphi_arr = np.linspace(0, 2*np.pi, 360)
+A_arr = np.sqrt(A1**2 + A2**2 + 2*A1*A2*np.cos(dphi_arr))
+
+fig = go.Figure()
+fig.add_trace(go.Scatter(x=np.degrees(dphi_arr), y=A_arr,
+    line=dict(color='#00f3ff', width=2.5), name='A(Δφ)'))
+fig.add_hline(y=A1+A2, line=dict(color='#00ff9f', dash='dash'), annotation_text='Constructive')
+fig.add_hline(y=abs(A1-A2), line=dict(color='#ff6b6b', dash='dash'), annotation_text='Destructive')
+fig.update_layout(template='plotly_dark',
+    xaxis=dict(title='Δφ (degrees)', dtick=45),
+    yaxis=dict(title='Resultant Amplitude'))
+fig.show()</code></pre>
+        </div>
+    </div>
+
+    <!-- Tab 2: Phasor diagram -->
+    <div class="tab-content">
+        <div class="code-block-container">
+            <div class="code-header">
+                <span class="code-lang">Python</span>
+                <button class="copy-btn">Copy</button>
+            </div>
+            <pre><code class="language-python">import numpy as np
+import plotly.graph_objects as go
+
+A1, A2 = 1.0, 1.0
+dphi = np.radians(90)  # 90° phase difference
+
+# Phasor 1: starts at origin
+p1_end = np.array([A1, 0])  # at t=0, angle = 0
+
+# Phasor 2: starts at tip of phasor 1
+p2_dir = np.array([np.cos(dphi), np.sin(dphi)])
+p2_end = p1_end + A2 * p2_dir
+
+# Resultant
+A_res = np.sqrt(A1**2 + A2**2 + 2*A1*A2*np.cos(dphi))
+phi_res = np.arctan2(p2_end[1], p2_end[0])
+
+fig = go.Figure()
+# Phasor 1
+fig.add_trace(go.Scatter(x=[0, p1_end[0]], y=[0, p1_end[1]],
+    mode='lines+markers', line=dict(color='#00f3ff', width=3),
+    marker=dict(size=[0, 10]), name=f'A₁ = {A1}'))
+# Phasor 2
+fig.add_trace(go.Scatter(x=[p1_end[0], p2_end[0]], y=[p1_end[1], p2_end[1]],
+    mode='lines+markers', line=dict(color='#ff00ff', width=3),
+    marker=dict(size=[0, 10]), name=f'A₂ = {A2}'))
+# Resultant
+fig.add_trace(go.Scatter(x=[0, p2_end[0]], y=[0, p2_end[1]],
+    mode='lines+markers', line=dict(color='#ffff00', width=3),
+    marker=dict(size=[0, 12]), name=f'A = {A_res:.2f}'))
+
+rmax = (A1+A2)*1.3
+fig.update_layout(template='plotly_dark',
+    xaxis=dict(title='Re', range=[-rmax, rmax], scaleanchor='y'),
+    yaxis=dict(title='Im', range=[-rmax, rmax]),
+    title=f'Phasor Addition: Δφ = {np.degrees(dphi):.0f}°')
+fig.show()</code></pre>
+        </div>
+    </div>
+
+    <!-- Tab 3: Prompt -->
+    <div class="tab-content">
+        <div class="code-block-container">
+            <div class="code-header">
+                <span class="code-lang">Prompt for AI</span>
+                <button class="copy-btn">Copy</button>
+            </div>
+            <pre><code class="language-text">Explore same-frequency interference in Python:
+
+Tasks:
+1. Two waves at the same frequency:
+   - x₁ = A₁ cos(ωt), x₂ = A₂ cos(ωt + Δφ)
+   - Plot the sum for Δφ = 0°, 90°, 180°
+   - Verify A² = A₁² + A₂² + 2A₁A₂cos(Δφ)
+   - Plot A as a function of Δφ
+
+2. Phasor diagram:
+   - Draw phasors as arrows from origin (tip-to-tail)
+   - Show the resultant phasor and its projection
+   - Animate as a function of time
+
+3. Inverse problem:
+   - Given A₁=1.5, A₂=0.8, target A=1.0
+   - Compute Δφ = arccos((A²-A₁²-A₂²)/(2A₁A₂))
+   - Plot the resulting waveform to verify
+
+Use plotly_dark template. Gray axes (#808080).</code></pre>
+        </div>
+
+        <div class="info-box" style="margin-top: var(--spacing-md);">
+            <div class="info-box-title">Tips for Prompting</div>
+            <ul>
+                <li>Ask for both the A-vs-Δφ curve and the time-domain waveforms</li>
+                <li>Request phasor diagrams at several time snapshots</li>
+                <li>Try the inverse problem: given a target amplitude, find the phase</li>
+                <li>Extend to three-wave interference for a challenge</li>
+            </ul>
+        </div>
+    </div>
+</div>
+
+<hr>
+
+<!-- ========== EXERCISES ========== -->
+
+<h2>Exercises for Practice</h2>
+
+<div class="exercise-cards">
+    <div class="exercise-card">
+        <div class="exercise-card-header">
+            <span class="exercise-card-number">1.</span>
+            <span class="exercise-card-badge explore">Explore</span>
+        </div>
+        <div class="exercise-card-content">
+            In the Interference Visualizer, set A&sub1; = 1.5 and A&sub2; = 0.5.
+            Sweep &Delta;&phi; from 0&deg; to 360&deg; and note the maximum and
+            minimum amplitudes.  Verify these match \( A_1 + A_2 = 2.0 \) and
+            \( |A_1 - A_2| = 1.0 \).  What fraction of the full range 0&ndash;360&deg;
+            gives partial constructive interference (A &gt; \( \sqrt{A_1^2 + A_2^2} \))?
+        </div>
+    </div>
+
+    <div class="exercise-card">
+        <div class="exercise-card-header">
+            <span class="exercise-card-number">2.</span>
+            <span class="exercise-card-badge coding">Coding</span>
+        </div>
+        <div class="exercise-card-content">
+            Write a Python script that adds <strong>three</strong> equal-amplitude
+            waves at the same frequency with phases 0&deg;, 120&deg;, and 240&deg;.
+            Show that the sum is identically zero.  Then change one phase slightly
+            (e.g., 0&deg;, 120&deg;, 235&deg;) and plot how the imperfect cancellation
+            produces a small residual wave.
+        </div>
+    </div>
+
+    <div class="exercise-card">
+        <div class="exercise-card-header">
+            <span class="exercise-card-number">3.</span>
+            <span class="exercise-card-badge think">Think</span>
+        </div>
+        <div class="exercise-card-content">
+            Noise-cancelling headphones generate a wave that's 180&deg; out of phase
+            with incoming noise.  Using the amplitude formula, explain why they work
+            well for low-frequency drone noise (where the phase can be matched accurately)
+            but poorly for sudden, high-frequency sounds (where the phase matching fails).
+            What amplitude error tolerance (as a percentage) would you need for the
+            cancellation to reduce noise by at least 20 dB?
+        </div>
+    </div>
+</div>
+
+<hr>
+
+<!-- ========== NAVIGATION ========== -->
+
+<div class="btn-group mt-xl">
+    <button class="btn btn-magenta" onclick="navigateToSection('16-superposition-intro')">&larr; Previous: Superposition Principle</button>
+    <button class="btn" onclick="scrollToTop()">&uarr; Back to Top</button>
+    <button class="btn btn-secondary" onclick="navigateToSection('18-beats')">Next: Beats &rarr;</button>
+</div>
