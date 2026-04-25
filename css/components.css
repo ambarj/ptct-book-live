@@ -85,6 +85,54 @@
   height: auto;
 }
 
+/* Dual Panel Layout */
+.dual-panel {
+  display: flex;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+  margin: var(--spacing-md) 0;
+}
+
+.dual-panel > .panel,
+.dual-panel > .plot-container {
+  flex: 1;
+  min-width: 280px;
+}
+
+.dual-panel > .panel > .plot-container {
+  margin: 0;
+}
+
+/* Stats Bar */
+.stats-bar {
+  display: flex;
+  gap: 1rem;
+  justify-content: center;
+  flex-wrap: wrap;
+  margin: var(--spacing-sm) 0;
+  padding: var(--spacing-sm) var(--spacing-md);
+  background: var(--bg-tertiary);
+  border-radius: 6px;
+  border: 1px solid var(--border-color);
+  font-size: 0.85rem;
+}
+
+.stat-item {
+  display: flex;
+  gap: 0.4rem;
+  align-items: center;
+}
+
+.stat-label {
+  color: var(--text-secondary);
+}
+
+.stat-value {
+  color: var(--neon-cyan);
+  font-family: var(--font-mono);
+  font-weight: 600;
+}
+
 /* Control Panel */
 .control-panel {
   background: var(--bg-tertiary);

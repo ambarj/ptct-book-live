@@ -1,0 +1,712 @@
+<!--
+    Section 4.9: Mechanical Oscillators with Damping
+    Source: NPTEL Module 5 (Damped Oscillator), Module 7 (Euler for Oscillations)
+    Concept: Numerical solution of damped spring-mass; cross-domain analogy; Euler's limits
+    Time: ~18 minutes
+    Prerequisites: Sections 4.6-4.8 (coupled systems, LCR circuits), Section 3.5 (damping intro)
+-->
+
+<h1>Mechanical Oscillators with Damping</h1>
+
+<p>
+    In Section 4.8 you solved an LCR circuit and discovered that a single parameter
+    \( w = L/(R^2C) \) controls everything. Now consider the mechanical version: a mass on
+    a spring with friction. Non-dimensionalization reveals something remarkable &mdash; the
+    same equation, the same code, the same solver applies to both systems.
+</p>
+
+<div class="info-box">
+    <div class="info-box-title">Learning Objectives</div>
+    <ul>
+        <li>Solve the damped spring-mass system numerically and compare with exact solutions</li>
+        <li>Verify the mechanical-electrical analogy computationally (same \( w \), same curves)</li>
+        <li>Discover Euler's method limitations for oscillatory systems (energy drift, phase error)</li>
+    </ul>
+</div>
+
+<div class="equation-display">
+    <p><strong>Damped spring-mass:</strong></p>
+    $$ m\ddot{x} + b\dot{x} + kx = 0 $$
+    <p>Non-dimensionalize with \( \tau = t \cdot b/m \), and the equation becomes
+    \( \ddot{x} + \dot{x} + wx = 0 \) with \( w = km/b^2 \) &mdash; <strong>identical</strong>
+    to the LCR equation with \( w = L/(R^2C) \).</p>
+</div>
+
+<hr>
+
+<!-- ============================================================ -->
+<!-- EXPLORER 1: Damped Spring Simulator -->
+<!-- ============================================================ -->
+<div class="interactive-container" id="spring-simulator">
+    <div class="interactive-title">Explorer 1: Damped Spring Simulator</div>
+
+    <p style="margin-bottom: var(--spacing-sm); color: var(--text-secondary);">
+        Adjust the physical parameters (mass, damping, stiffness) and see the resulting motion.
+        The dashed gray curve is the exact analytical solution.
+    </p>
+
+    <div class="dual-panel">
+        <div class="panel">
+            <div class="plot-container" id="dampMech-timePlot"></div>
+        </div>
+        <div class="panel">
+            <div class="plot-container" id="dampMech-phasePlot"></div>
+        </div>
+    </div>
+
+    <div class="stats-bar">
+        <div class="stat-item">
+            <span class="stat-label">w = km/b&sup2;</span>
+            <span class="stat-value" id="dampMech-w">--</span>
+        </div>
+        <div class="stat-item">
+            <span class="stat-label">Regime</span>
+            <span class="stat-value" id="dampMech-regime">--</span>
+        </div>
+        <div class="stat-item">
+            <span class="stat-label">Period</span>
+            <span class="stat-value" id="dampMech-period">--</span>
+        </div>
+        <div class="stat-item">
+            <span class="stat-label">Max |Error|</span>
+            <span class="stat-value" id="dampMech-maxErr">--</span>
+        </div>
+    </div>
+
+    <div class="control-panel">
+        <div class="control-group">
+            <label class="control-label">
+                m (kg): <span class="control-label-value" id="dampMech-m-value">1.0</span>
+            </label>
+            <input type="range" id="dampMech-m-slider" class="slider"
+                   min="0.1" max="5.0" step="0.1" value="1.0">
+        </div>
+        <div class="control-group">
+            <label class="control-label">
+                k (N/m): <span class="control-label-value" id="dampMech-k-value">4.0</span>
+            </label>
+            <input type="range" id="dampMech-k-slider" class="slider"
+                   min="0.5" max="20" step="0.5" value="4.0">
+        </div>
+        <div class="control-group">
+            <label class="control-label">
+                b (Ns/m): <span class="control-label-value" id="dampMech-b-value">1.0</span>
+            </label>
+            <input type="range" id="dampMech-b-slider" class="slider"
+                   min="0.1" max="10" step="0.1" value="1.0">
+        </div>
+        <div class="control-group">
+            <label class="control-label">
+                h: <span class="control-label-value" id="dampMech-h-value">0.02</span>
+            </label>
+            <input type="range" id="dampMech-h-slider" class="slider"
+                   min="0.005" max="0.20" step="0.005" value="0.02">
+        </div>
+        <div class="control-group">
+            <button class="btn btn-secondary" onclick="dampMechSimReset()">Reset</button>
+        </div>
+    </div>
+</div>
+
+<!-- ============================================================ -->
+<!-- TEST YOUR UNDERSTANDING #1 -->
+<!-- ============================================================ -->
+<div class="interactive-container question-section">
+    <div class="interactive-title">Test Your Understanding</div>
+
+    <p style="margin-bottom: var(--spacing-md); color: var(--text-secondary);">
+        Use the Damped Spring Simulator to answer these questions.
+    </p>
+
+    <div class="tabs">
+        <div class="tab-buttons">
+            <button class="tab-button active">Q1</button>
+            <button class="tab-button">Q2</button>
+            <button class="tab-button">Q3</button>
+        </div>
+
+        <div class="tab-content active">
+            <div class="question-container" data-type="fill" data-answer="4[3.5,4.5]">
+                <div class="question-text">
+                    With defaults \( m = 1 \), \( k = 4 \), \( b = 1 \), the non-dimensional
+                    parameter is \( w = km/b^2 = \)
+                    <input type="text" class="fill-blank" placeholder="?">.
+                    What regime is this? (Check the stats bar.)
+                </div>
+                <div class="question-actions">
+                    <button class="btn-verify">Verify</button>
+                </div>
+                <div class="question-explanation" style="display:none;">
+                    <strong>Explanation:</strong>
+                    \( w = km/b^2 = (4)(1)/(1)^2 = 4 \). Since \( 4 \gg 0.25 \), this is
+                    deeply underdamped. The system oscillates many times before the amplitude
+                    decays significantly. In the phase portrait, you see a tight inward spiral.
+                </div>
+            </div>
+        </div>
+
+        <div class="tab-content">
+            <div class="question-container" data-type="mcq" data-answer="2">
+                <div class="question-text">
+                    Increase the damping coefficient \( b \) while keeping \( m = 1, k = 4 \) fixed.
+                    At what value of \( b \) does the system become critically damped (\( w = 0.25 \))?
+                </div>
+                <div class="question-options">
+                    <label class="option">
+                        <input type="radio" name="dampMech-q2" value="0">
+                        <span>\( b = 1 \) Ns/m</span>
+                    </label>
+                    <label class="option">
+                        <input type="radio" name="dampMech-q2" value="1">
+                        <span>\( b = 2 \) Ns/m</span>
+                    </label>
+                    <label class="option">
+                        <input type="radio" name="dampMech-q2" value="2">
+                        <span>\( b = 4 \) Ns/m</span>
+                    </label>
+                    <label class="option">
+                        <input type="radio" name="dampMech-q2" value="3">
+                        <span>\( b = 8 \) Ns/m</span>
+                    </label>
+                </div>
+                <div class="question-actions">
+                    <button class="btn-verify">Verify</button>
+                </div>
+                <div class="question-explanation" style="display:none;">
+                    <strong>Explanation:</strong>
+                    Critical damping requires \( w = 0.25 \), so \( km/b^2 = 0.25 \),
+                    giving \( b^2 = 4km = 4(4)(1) = 16 \), hence \( b = 4 \). This is the
+                    familiar condition \( b^2 = 4mk \). Try setting \( b = 4 \) in the explorer
+                    to see the non-oscillatory decay.
+                </div>
+            </div>
+        </div>
+
+        <div class="tab-content">
+            <div class="question-container" data-type="mcq" data-answer="1">
+                <div class="question-text">
+                    With \( m = 1, k = 4, b = 1 \), what does the phase portrait show?
+                </div>
+                <div class="question-options">
+                    <label class="option">
+                        <input type="radio" name="dampMech-q3" value="0">
+                        <span>A closed ellipse (no energy loss)</span>
+                    </label>
+                    <label class="option">
+                        <input type="radio" name="dampMech-q3" value="1">
+                        <span>An inward spiral converging to the origin</span>
+                    </label>
+                    <label class="option">
+                        <input type="radio" name="dampMech-q3" value="2">
+                        <span>A straight line to the origin</span>
+                    </label>
+                    <label class="option">
+                        <input type="radio" name="dampMech-q3" value="3">
+                        <span>An outward spiral diverging from the origin</span>
+                    </label>
+                </div>
+                <div class="question-actions">
+                    <button class="btn-verify">Verify</button>
+                </div>
+                <div class="question-explanation" style="display:none;">
+                    <strong>Explanation:</strong>
+                    The underdamped oscillator loses energy each cycle, so the phase portrait
+                    spirals inward. Each revolution is slightly smaller than the last. If there
+                    were no damping (\( b = 0 \)), you would see a closed ellipse. If overdamped,
+                    you would see a curve going directly to the origin without winding.
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- ============================================================ -->
+<!-- EXPLORER 2: Cross-Domain Mapper -->
+<!-- ============================================================ -->
+<div class="interactive-container" id="cross-domain-mapper">
+    <div class="interactive-title">Explorer 2: Cross-Domain Mapper</div>
+
+    <p style="margin-bottom: var(--spacing-sm); color: var(--text-secondary);">
+        The mechanical and electrical systems share the same non-dimensional equation.
+        Adjust \( w \) and watch both produce <strong>identical</strong> curves.
+    </p>
+
+    <div class="dual-panel">
+        <div class="panel">
+            <div class="plot-container" id="dampMech-mechPlot"></div>
+        </div>
+        <div class="panel">
+            <div class="plot-container" id="dampMech-elecPlot"></div>
+        </div>
+    </div>
+
+    <div class="stats-bar">
+        <div class="stat-item">
+            <span class="stat-label">w</span>
+            <span class="stat-value" id="dampMech-cross-w">--</span>
+        </div>
+        <div class="stat-item">
+            <span class="stat-label">Mechanical</span>
+            <span class="stat-value" id="dampMech-cross-mech">km/b&sup2;</span>
+        </div>
+        <div class="stat-item">
+            <span class="stat-label">Electrical</span>
+            <span class="stat-value" id="dampMech-cross-elec">L/(R&sup2;C)</span>
+        </div>
+        <div class="stat-item">
+            <span class="stat-label">Max Difference</span>
+            <span class="stat-value" id="dampMech-cross-diff">--</span>
+        </div>
+    </div>
+
+    <div class="control-panel">
+        <div class="control-group">
+            <label class="control-label">
+                w: <span class="control-label-value" id="dampMech-cross-w-value">5.0</span>
+            </label>
+            <input type="range" id="dampMech-cross-w-slider" class="slider"
+                   min="0.10" max="20" step="0.10" value="5.0">
+        </div>
+        <div class="control-group">
+            <button class="btn btn-secondary" onclick="dampMechCrossReset()">Reset</button>
+        </div>
+    </div>
+</div>
+
+<!-- ============================================================ -->
+<!-- TEST YOUR UNDERSTANDING #2 -->
+<!-- ============================================================ -->
+<div class="interactive-container question-section">
+    <div class="interactive-title">Test Your Understanding</div>
+
+    <p style="margin-bottom: var(--spacing-md); color: var(--text-secondary);">
+        Use the Cross-Domain Mapper to answer these questions.
+    </p>
+
+    <div class="tabs">
+        <div class="tab-buttons">
+            <button class="tab-button active">Q4</button>
+            <button class="tab-button">Q5</button>
+            <button class="tab-button">Q6</button>
+        </div>
+
+        <div class="tab-content active">
+            <div class="question-container" data-type="mcq" data-answer="0">
+                <div class="question-text">
+                    The mechanical and electrical curves are plotted with the <em>same</em>
+                    non-dimensional parameter \( w \). What do you observe?
+                </div>
+                <div class="question-options">
+                    <label class="option">
+                        <input type="radio" name="dampMech-q4" value="0">
+                        <span>The curves are identical &mdash; the physics is the same equation</span>
+                    </label>
+                    <label class="option">
+                        <input type="radio" name="dampMech-q4" value="1">
+                        <span>The mechanical curve oscillates faster</span>
+                    </label>
+                    <label class="option">
+                        <input type="radio" name="dampMech-q4" value="2">
+                        <span>The electrical curve has more damping</span>
+                    </label>
+                    <label class="option">
+                        <input type="radio" name="dampMech-q4" value="3">
+                        <span>They have different shapes entirely</span>
+                    </label>
+                </div>
+                <div class="question-actions">
+                    <button class="btn-verify">Verify</button>
+                </div>
+                <div class="question-explanation" style="display:none;">
+                    <strong>Explanation:</strong>
+                    After non-dimensionalization, both systems satisfy the same equation
+                    \( \ddot{y} + \dot{y} + wy = 0 \) with the same initial conditions.
+                    The solutions are mathematically identical. This is the power of
+                    non-dimensionalization: different physical systems, one universal equation.
+                </div>
+            </div>
+        </div>
+
+        <div class="tab-content">
+            <div class="question-container" data-type="msq" data-answer="0,1,3">
+                <div class="question-text">
+                    Which parameter mappings between mechanical and electrical domains are correct?
+                    (Select all that apply)
+                </div>
+                <div class="question-options">
+                    <label class="option">
+                        <input type="checkbox" value="0">
+                        <span>Mass \( m \) maps to inductance \( L \) (both resist changes in motion/current)</span>
+                    </label>
+                    <label class="option">
+                        <input type="checkbox" value="1">
+                        <span>Damping \( b \) maps to resistance \( R \) (both dissipate energy)</span>
+                    </label>
+                    <label class="option">
+                        <input type="checkbox" value="2">
+                        <span>Spring constant \( k \) maps to capacitance \( C \)</span>
+                    </label>
+                    <label class="option">
+                        <input type="checkbox" value="3">
+                        <span>Spring constant \( k \) maps to \( 1/C \) (both store potential energy)</span>
+                    </label>
+                </div>
+                <div class="question-actions">
+                    <button class="btn-verify">Verify</button>
+                </div>
+                <div class="question-explanation" style="display:none;">
+                    <strong>Explanation:</strong>
+                    <ul>
+                        <li>\( m \leftrightarrow L \): True &mdash; both provide "inertia" (mass resists acceleration, inductance resists current change).</li>
+                        <li>\( b \leftrightarrow R \): True &mdash; both dissipate energy irreversibly (friction → heat, resistance → Joule heating).</li>
+                        <li>\( k \leftrightarrow C \): False &mdash; the correct mapping is \( k \leftrightarrow 1/C \).</li>
+                        <li>\( k \leftrightarrow 1/C \): True &mdash; both provide a restoring force/voltage proportional to displacement/charge.</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <div class="tab-content">
+            <div class="question-container" data-type="fill" data-answer="0.25[0.20,0.30]">
+                <div class="question-text">
+                    For a circuit with \( L = 1 \) mH, \( R = 2 \) &Omega;, \( C = 1 \) mF,
+                    \( w = L/(R^2C) = \) <input type="text" class="fill-blank" placeholder="?">.
+                    A spring-mass system with \( m = 1 \) kg, \( k = 1 \) N/m, \( b = 2 \) Ns/m
+                    has \( w = km/b^2 = \) the same value. Both are critically damped.
+                </div>
+                <div class="question-actions">
+                    <button class="btn-verify">Verify</button>
+                </div>
+                <div class="question-explanation" style="display:none;">
+                    <strong>Explanation:</strong>
+                    \( w = L/(R^2C) = 0.001/(4 \times 0.001) = 0.25 \).
+                    \( w = km/b^2 = (1)(1)/(4) = 0.25 \). Both systems are at the critical
+                    damping boundary, and both produce identical non-dimensional decay curves.
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="info-box">
+    <div class="info-box-title">One Equation Rules Them All</div>
+    <p>
+        Every second-order linear system with damping &mdash; springs, circuits, pendulums,
+        acoustic resonators &mdash; reduces to \( \ddot{y} + \dot{y} + wy = 0 \) after
+        non-dimensionalization. Master one, and you've mastered them all. Your Euler solver
+        doesn't care whether \( y \) is charge, displacement, or angle.
+    </p>
+</div>
+
+<!-- ============================================================ -->
+<!-- EXPLORER 3: Euler's Limits -->
+<!-- ============================================================ -->
+<div class="interactive-container" id="euler-limits">
+    <div class="interactive-title">Explorer 3: Euler's Limits</div>
+
+    <p style="margin-bottom: var(--spacing-sm); color: var(--text-secondary);">
+        Euler's method is first-order accurate: errors grow with step size. For oscillatory
+        systems, this manifests as <strong>energy drift</strong> &mdash; the numerical solution
+        gains or loses energy that the real system conserves (or dissipates smoothly).
+    </p>
+
+    <div class="dual-panel">
+        <div class="panel">
+            <div class="plot-container" id="dampMech-eulerErrPlot"></div>
+        </div>
+        <div class="panel">
+            <div class="plot-container" id="dampMech-energyDriftPlot"></div>
+        </div>
+    </div>
+
+    <div class="stats-bar">
+        <div class="stat-item">
+            <span class="stat-label">h</span>
+            <span class="stat-value" id="dampMech-euler-h">--</span>
+        </div>
+        <div class="stat-item">
+            <span class="stat-label">Max |Q Error|</span>
+            <span class="stat-value" id="dampMech-euler-maxErr">--</span>
+        </div>
+        <div class="stat-item">
+            <span class="stat-label">Energy Drift</span>
+            <span class="stat-value" id="dampMech-euler-drift">--</span>
+        </div>
+    </div>
+
+    <div class="control-panel">
+        <div class="control-group">
+            <label class="control-label">
+                w: <span class="control-label-value" id="dampMech-euler-w-value">10.0</span>
+            </label>
+            <input type="range" id="dampMech-euler-w-slider" class="slider"
+                   min="0.5" max="20" step="0.5" value="10.0">
+        </div>
+        <div class="control-group">
+            <label class="control-label">
+                h: <span class="control-label-value" id="dampMech-euler-h-value">0.10</span>
+            </label>
+            <input type="range" id="dampMech-euler-h-slider" class="slider"
+                   min="0.01" max="0.30" step="0.01" value="0.10">
+        </div>
+        <div class="control-group">
+            <button class="btn btn-secondary" onclick="dampMechEulerReset()">Reset</button>
+        </div>
+    </div>
+</div>
+
+<!-- ============================================================ -->
+<!-- TEST YOUR UNDERSTANDING #3 -->
+<!-- ============================================================ -->
+<div class="interactive-container question-section">
+    <div class="interactive-title">Test Your Understanding</div>
+
+    <p style="margin-bottom: var(--spacing-md); color: var(--text-secondary);">
+        Use the Euler's Limits explorer to answer these questions.
+    </p>
+
+    <div class="tabs">
+        <div class="tab-buttons">
+            <button class="tab-button active">Q7</button>
+            <button class="tab-button">Q8</button>
+            <button class="tab-button">Q9</button>
+        </div>
+
+        <div class="tab-content active">
+            <div class="question-container" data-type="mcq" data-answer="2">
+                <div class="question-text">
+                    Set \( w = 10 \) and increase \( h \) from 0.01 to 0.20. What happens to
+                    the Euler solution in the phase portrait?
+                </div>
+                <div class="question-options">
+                    <label class="option">
+                        <input type="radio" name="dampMech-q7" value="0">
+                        <span>It stays the same regardless of \( h \)</span>
+                    </label>
+                    <label class="option">
+                        <input type="radio" name="dampMech-q7" value="1">
+                        <span>The spiral becomes tighter (decays faster)</span>
+                    </label>
+                    <label class="option">
+                        <input type="radio" name="dampMech-q7" value="2">
+                        <span>The spiral drifts outward &mdash; Euler adds artificial energy</span>
+                    </label>
+                    <label class="option">
+                        <input type="radio" name="dampMech-q7" value="3">
+                        <span>The spiral becomes a straight line</span>
+                    </label>
+                </div>
+                <div class="question-actions">
+                    <button class="btn-verify">Verify</button>
+                </div>
+                <div class="question-explanation" style="display:none;">
+                    <strong>Explanation:</strong>
+                    Forward Euler systematically overestimates the magnitude of oscillatory solutions.
+                    At each step, it follows the tangent line which "overshoots" the curve, adding
+                    artificial energy. With large \( h \), the numerical spiral grows instead of
+                    decaying. This is a fundamental limitation of first-order methods for oscillations.
+                </div>
+            </div>
+        </div>
+
+        <div class="tab-content">
+            <div class="question-container" data-type="fill" data-answer="0.01[0.005,0.02]">
+                <div class="question-text">
+                    With \( w = 10 \), find the largest step size where the energy drift at
+                    \( t = 10 \) stays below 10%. Approximately \( h \leq \)
+                    <input type="text" class="fill-blank" placeholder="?">. (Hint: try several values.)
+                </div>
+                <div class="question-actions">
+                    <button class="btn-verify">Verify</button>
+                </div>
+                <div class="question-explanation" style="display:none;">
+                    <strong>Explanation:</strong>
+                    For \( w = 10 \), the oscillation frequency \( \beta \approx 3.12 \) requires
+                    many steps per period (\( T \approx 2 \)) to track accurately. You need roughly
+                    \( h \lesssim 0.01 \) (about 200 steps per period) to keep energy drift below
+                    10%. Higher-order methods like Runge-Kutta can use much larger steps.
+                </div>
+            </div>
+        </div>
+
+        <div class="tab-content">
+            <div class="question-container" data-type="msq" data-answer="1,2,3">
+                <div class="question-text">
+                    Which statements about Euler's method for oscillatory systems are correct?
+                    (Select all that apply)
+                </div>
+                <div class="question-options">
+                    <label class="option">
+                        <input type="checkbox" value="0">
+                        <span>Euler's method conserves energy exactly for undamped oscillators</span>
+                    </label>
+                    <label class="option">
+                        <input type="checkbox" value="1">
+                        <span>Euler's method tends to add energy to the system (spiral outward)</span>
+                    </label>
+                    <label class="option">
+                        <input type="checkbox" value="2">
+                        <span>Higher-frequency oscillations require smaller step sizes</span>
+                    </label>
+                    <label class="option">
+                        <input type="checkbox" value="3">
+                        <span>Runge-Kutta methods handle oscillations much better than Euler</span>
+                    </label>
+                </div>
+                <div class="question-actions">
+                    <button class="btn-verify">Verify</button>
+                </div>
+                <div class="question-explanation" style="display:none;">
+                    <strong>Explanation:</strong>
+                    <ul>
+                        <li>Conserves energy: False &mdash; Euler systematically adds energy to oscillators. This was demonstrated in Section 3.12 and is visible in the energy drift plot.</li>
+                        <li>Adds energy: True &mdash; forward Euler overshoots at each step, causing the numerical orbit to spiral outward.</li>
+                        <li>Higher frequency needs smaller h: True &mdash; more steps per oscillation period are needed to track the curve accurately.</li>
+                        <li>RK is better: True &mdash; RK2 has O(h&sup2;) error and RK4 has O(h&sup4;), allowing much larger step sizes for the same accuracy.</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- ============================================================ -->
+<!-- PYTHON CODE EXAMPLES -->
+<!-- ============================================================ -->
+<h3>Python Implementation</h3>
+
+<div class="tabs">
+    <div class="tab-buttons">
+        <button class="tab-button active">Damped Spring</button>
+        <button class="tab-button">Cross-Domain</button>
+        <button class="tab-button">Prompt</button>
+    </div>
+
+    <div class="tab-content active">
+        <div class="code-block-container">
+            <div class="code-header">
+                <span class="code-lang">Python</span>
+                <button class="copy-btn">Copy</button>
+            </div>
+            <pre><code class="language-python">import numpy as np
+import plotly.graph_objects as go
+from plotly.subplots import make_subplots
+
+def euler_system(f, y0, t_max, h):
+    """Vector Euler solver."""
+    t = [0.0]
+    Y = [np.array(y0, dtype=float)]
+    y = np.array(y0, dtype=float)
+    for _ in range(int(t_max / h)):
+        y = y + h * np.array(f(y, t[-1]))
+        t.append(t[-1] + h)
+        Y.append(y.copy())
+    return np.array(t), np.array(Y)
+
+# Physical parameters
+m, k, b = 1.0, 4.0, 1.0
+w = k * m / b**2  # non-dimensional parameter
+
+# Non-dimensional system: dy1/dt = y2, dy2/dt = -w*y1 - y2
+def damped(y, t):
+    return [y[1], -w * y[0] - y[1]]
+
+t, Y = euler_system(damped, [1.0, 0.0], 15, 0.01)
+
+# Exact solution (underdamped)
+beta = np.sqrt(w - 0.25)
+x_exact = np.exp(-t/2) * (np.cos(beta*t) + np.sin(beta*t)/(2*beta))
+
+fig = make_subplots(rows=1, cols=2,
+    subplot_titles=[f'x(t) — w={w:.1f}', 'Phase Portrait'])
+fig.add_trace(go.Scatter(x=t, y=Y[:,0], name='Euler',
+    line=dict(color='#00f3ff', width=2)), row=1, col=1)
+fig.add_trace(go.Scatter(x=t, y=x_exact, name='Exact',
+    line=dict(color='#808080', dash='dash', width=2)), row=1, col=1)
+fig.add_trace(go.Scatter(x=Y[:,0], y=Y[:,1], name='(x, v)',
+    line=dict(color='#00ff9f', width=2)), row=1, col=2)
+
+fig.update_layout(template='plotly_dark')
+fig.show()</code></pre>
+        </div>
+    </div>
+
+    <div class="tab-content">
+        <div class="code-block-container">
+            <div class="code-header">
+                <span class="code-lang">Python</span>
+                <button class="copy-btn">Copy</button>
+            </div>
+            <pre><code class="language-python">import numpy as np
+import plotly.graph_objects as go
+from plotly.subplots import make_subplots
+
+def euler_system(f, y0, t_max, h):
+    t = [0.0]
+    Y = [np.array(y0, dtype=float)]
+    y = np.array(y0, dtype=float)
+    for _ in range(int(t_max / h)):
+        y = y + h * np.array(f(y, t[-1]))
+        t.append(t[-1] + h)
+        Y.append(y.copy())
+    return np.array(t), np.array(Y)
+
+# Same w for both systems
+w = 5.0
+
+# Mechanical: m=1 kg, k=5 N/m, b=1 Ns/m → w = 5*1/1 = 5
+# Electrical: L=5 mH, R=1 Ω, C=1 mF → w = 0.005/(1*0.001) = 5
+def system(y, t):
+    return [y[1], -w * y[0] - y[1]]
+
+t, Y = euler_system(system, [1.0, 0.0], 15, 0.01)
+
+fig = make_subplots(rows=1, cols=2,
+    subplot_titles=['Mechanical: x(t)', 'Electrical: Q(t)'])
+
+# Same data, different labels!
+fig.add_trace(go.Scatter(x=t, y=Y[:,0], name='Displacement',
+    line=dict(color='#00f3ff', width=2)), row=1, col=1)
+fig.add_trace(go.Scatter(x=t, y=Y[:,0], name='Charge',
+    line=dict(color='#ff00ff', width=2)), row=1, col=2)
+
+fig.update_layout(template='plotly_dark',
+    xaxis=dict(title='τ (mech)', linecolor='#808080'),
+    xaxis2=dict(title='τ (elec)', linecolor='#808080'))
+fig.show()
+
+print(f"Both curves are identical — same w = {w}")</code></pre>
+        </div>
+    </div>
+
+    <div class="tab-content">
+        <div class="code-block-container">
+            <div class="code-header">
+                <span class="code-lang">Prompt for AI</span>
+                <button class="copy-btn">Copy</button>
+            </div>
+            <pre><code class="language-text">Create a Python script comparing mechanical and electrical damped oscillators.
+
+Requirements:
+1. Non-dimensional equation: y'' + y' + w*y = 0
+   Coupled form: y1' = y2, y2' = -w*y1 - y2
+2. Show that mechanical (m,k,b → w = km/b²) and electrical (L,R,C → w = L/(R²C))
+   produce identical solutions when w is the same
+3. Plot side by side:
+   - Left: mechanical x(t) and v(t) with exact overlay
+   - Right: electrical Q(t) and I(t) with exact overlay
+4. Also show Euler's energy drift: plot E(t)/E(0) for different h values
+5. Use plotly_dark theme, gray axes (#808080)
+6. Compare h = 0.01, 0.05, 0.10 to show accuracy degradation</code></pre>
+        </div>
+    </div>
+</div>
+
+<!-- ============================================================ -->
+<!-- NAVIGATION -->
+<!-- ============================================================ -->
+<div class="btn-group mt-xl">
+    <button class="btn btn-magenta" onclick="navigateToSection('41-lcr-circuits')">&larr; Previous: LCR Circuits</button>
+    <button class="btn btn-secondary" onclick="scrollToTop()">&uarr; Back to Top</button>
+    <button class="btn btn-secondary" onclick="navigateToSection('43-practical-errors')">Next: Error Analysis in Practice &rarr;</button>
+</div>

@@ -1,0 +1,722 @@
+<!-- ============================================================
+     Section 5.12: Jacobian Matrix for 2D Systems
+     Source: NPTEL Lecture 8_3 (Linearization, Part 2)
+     Concept: The Jacobian matrix as the 2D generalization of
+              f'(x₀) — partial derivatives forming the linearization
+              matrix near a fixed point
+     Time: 20-25 minutes
+     Prerequisites: Sections 5.7-5.8 (linear systems, eigenvalues,
+                    τ-Δ), 5.11 (1D linearization), multivariable
+                    calculus (partial derivatives)
+     ============================================================ -->
+
+<h1>Jacobian Matrix for 2D Systems</h1>
+
+<p>
+    In 1D, linearization meant computing one derivative: \( \lambda = f'(x_0) \).
+    In 2D, you have two functions \( f(x,y) \) and \( g(x,y) \), each depending on
+    two variables. The derivative becomes a <strong>matrix of partial derivatives</strong>
+    &mdash; the <strong>Jacobian</strong>. It plays exactly the same role as the matrix
+    \( A \) in linear systems: its eigenvalues determine stability.
+</p>
+
+<div class="info-box">
+    <div class="info-box-title">Learning Objectives</div>
+    <ul>
+        <li>Compute the Jacobian matrix \( J = \begin{pmatrix} \partial f/\partial x & \partial f/\partial y \\ \partial g/\partial x & \partial g/\partial y \end{pmatrix} \) for a 2D system</li>
+        <li>Evaluate \( J \) at a fixed point to obtain the <strong>linearization matrix</strong></li>
+        <li>Understand that near a fixed point, \( \dot{\mathbf{Y}} \approx J\,\mathbf{Y} \) &mdash; the nonlinear system looks linear</li>
+        <li>Connect the Jacobian&rsquo;s eigenvalues to the &tau;-&Delta; classification from Section 5.8</li>
+    </ul>
+</div>
+
+<div class="equation-display">
+    <p><strong>The 2D Linearization Recipe:</strong></p>
+    $$ \dot{x} = f(x,y),\quad \dot{y} = g(x,y) \quad\xrightarrow{\text{near } (x_0, y_0)}\quad
+    \dot{\mathbf{Y}} \approx J\,\mathbf{Y} $$
+    <p>where \( \mathbf{Y} = (x - x_0,\; y - y_0) \) and the Jacobian is:</p>
+    $$ J = \begin{pmatrix} \dfrac{\partial f}{\partial x} & \dfrac{\partial f}{\partial y} \\[6pt]
+    \dfrac{\partial g}{\partial x} & \dfrac{\partial g}{\partial y} \end{pmatrix}\Bigg|_{(x_0, y_0)} $$
+</div>
+
+<hr>
+
+<!-- ============================================================ -->
+<!-- EXPLORER 1: Jacobian Calculator -->
+<!-- ============================================================ -->
+<div class="interactive-container" id="jacobian-calculator">
+    <div class="interactive-title">Explorer: Jacobian Calculator</div>
+
+    <p>
+        Choose a nonlinear 2D system. The explorer finds the fixed points, computes
+        the Jacobian matrix at each one, and displays the partial derivatives,
+        trace, determinant, and eigenvalues. Select a fixed point to see the
+        details.
+    </p>
+
+    <div class="dual-panel">
+        <div class="panel">
+            <div class="plot-container" id="jc-vectorField" style="height: 400px;"></div>
+        </div>
+        <div class="panel">
+            <div class="plot-container" id="jc-tdLocation" style="height: 400px;"></div>
+        </div>
+    </div>
+
+    <div id="jc-stats1" class="stats-bar"></div>
+
+    <div class="control-panel">
+        <div class="control-group">
+            <label class="control-label" for="jc-system-select">System:</label>
+            <select id="jc-system-select" class="control-select">
+                <option value="lotkaVolterra">Lotka-Volterra (predator-prey)</option>
+                <option value="competition">Competing Species</option>
+                <option value="vanderpol">Van der Pol Oscillator</option>
+                <option value="pendulum">Damped Pendulum</option>
+            </select>
+        </div>
+        <div class="control-group">
+            <label class="control-label" for="jc-fp-select">Fixed point:</label>
+            <select id="jc-fp-select" class="control-select">
+                <option value="0">(0, 0)</option>
+            </select>
+        </div>
+        <div class="control-group">
+            <button class="btn" onclick="jcReset()">Reset</button>
+        </div>
+    </div>
+</div>
+
+<div class="info-box">
+    <div class="info-box-title">Reading the Jacobian</div>
+    <p>
+        Each entry of \( J \) answers a specific question:
+    </p>
+    <ul>
+        <li>\( \partial f/\partial x \): How does the x-velocity change when x increases? (Self-feedback in x)</li>
+        <li>\( \partial f/\partial y \): How does the x-velocity change when y increases? (Cross-coupling: y affects x)</li>
+        <li>\( \partial g/\partial x \): How does the y-velocity change when x increases? (Cross-coupling: x affects y)</li>
+        <li>\( \partial g/\partial y \): How does the y-velocity change when y increases? (Self-feedback in y)</li>
+    </ul>
+    <p>
+        The diagonal entries are <strong>self-effects</strong>; the off-diagonal entries are <strong>interactions</strong>.
+    </p>
+</div>
+
+<!-- ========== Test Your Understanding #1 ========== -->
+<div class="interactive-container question-section">
+    <div class="interactive-title">Test Your Understanding</div>
+
+    <p style="margin-bottom: var(--spacing-md); color: var(--text-secondary);">
+        Use the Jacobian Calculator to answer these questions.
+    </p>
+
+    <div class="tabs">
+        <div class="tab-buttons">
+            <button class="tab-button active">Question 1</button>
+            <button class="tab-button">Question 2</button>
+            <button class="tab-button">Question 3</button>
+        </div>
+
+        <div class="tab-content active">
+            <div class="question-container" data-type="mcq" data-answer="1">
+                <div class="question-text">
+                    Select <strong>Lotka-Volterra</strong> and the fixed point at the origin (0, 0).
+                    What type of fixed point is it?
+                </div>
+                <div class="question-options">
+                    <label class="option">
+                        <input type="radio" name="jc-q1" value="0">
+                        <span>Stable node &mdash; both species die out</span>
+                    </label>
+                    <label class="option">
+                        <input type="radio" name="jc-q1" value="1">
+                        <span>Saddle &mdash; unstable equilibrium</span>
+                    </label>
+                    <label class="option">
+                        <input type="radio" name="jc-q1" value="2">
+                        <span>Center &mdash; populations oscillate</span>
+                    </label>
+                    <label class="option">
+                        <input type="radio" name="jc-q1" value="3">
+                        <span>Unstable spiral</span>
+                    </label>
+                </div>
+                <div class="question-actions">
+                    <button class="btn-verify">Verify</button>
+                </div>
+                <div class="question-explanation" style="display:none;">
+                    <strong>Explanation:</strong>
+                    At (0, 0) the Jacobian for the standard Lotka-Volterra system gives
+                    eigenvalues with opposite signs (one positive, one negative). This is a
+                    <strong>saddle</strong>: the extinction equilibrium is unstable. Any small
+                    population of prey grows (positive eigenvalue), but predators without prey
+                    die (negative eigenvalue).
+                </div>
+            </div>
+        </div>
+
+        <div class="tab-content">
+            <div class="question-container" data-type="mcq" data-answer="0">
+                <div class="question-text">
+                    Now select the <strong>coexistence</strong> fixed point of Lotka-Volterra.
+                    What type is it?
+                </div>
+                <div class="question-options">
+                    <label class="option">
+                        <input type="radio" name="jc-q2" value="0">
+                        <span>Center &mdash; populations oscillate forever</span>
+                    </label>
+                    <label class="option">
+                        <input type="radio" name="jc-q2" value="1">
+                        <span>Stable spiral &mdash; oscillations decay</span>
+                    </label>
+                    <label class="option">
+                        <input type="radio" name="jc-q2" value="2">
+                        <span>Saddle &mdash; unstable</span>
+                    </label>
+                    <label class="option">
+                        <input type="radio" name="jc-q2" value="3">
+                        <span>Stable node &mdash; direct approach</span>
+                    </label>
+                </div>
+                <div class="question-actions">
+                    <button class="btn-verify">Verify</button>
+                </div>
+                <div class="question-explanation" style="display:none;">
+                    <strong>Explanation:</strong>
+                    At the coexistence point, the Jacobian has \( \tau = 0 \) (trace zero) and
+                    \( \Delta > 0 \). This sits on the &tau; = 0 axis inside the parabola &mdash;
+                    a <strong>center</strong>. The linearization predicts eternal oscillation.
+                    (For the full nonlinear system, these are indeed closed orbits.)
+                </div>
+            </div>
+        </div>
+
+        <div class="tab-content">
+            <div class="question-container" data-type="fill" data-answer="4">
+                <div class="question-text">
+                    The Jacobian is a 2&times;2 matrix, so it has
+                    <input type="text" class="fill-blank" style="width: 50px">
+                    partial derivatives to compute.
+                </div>
+                <div class="question-actions">
+                    <button class="btn-verify">Verify</button>
+                </div>
+                <div class="question-explanation" style="display:none;">
+                    <strong>Explanation:</strong>
+                    A 2&times;2 matrix has <strong>4</strong> entries:
+                    \( \partial f/\partial x \), \( \partial f/\partial y \),
+                    \( \partial g/\partial x \), \( \partial g/\partial y \).
+                    Each is a partial derivative of one of the two velocity functions
+                    with respect to one of the two state variables.
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- ============================================================ -->
+<!-- EXPLORER 2: Linearization Comparison -->
+<!-- ============================================================ -->
+<div class="interactive-container" id="linearization-comparison">
+    <div class="interactive-title">Explorer: Nonlinear vs Linearized</div>
+
+    <p>
+        See the <strong>nonlinear</strong> vector field alongside the
+        <strong>linearized</strong> vector field (from the Jacobian) near a
+        fixed point. Close to the fixed point they match; far away they diverge.
+        Trajectories are shown for both systems from the same initial condition.
+    </p>
+
+    <div class="dual-panel">
+        <div class="panel">
+            <div class="plot-container" id="jc-nonlinearPlot" style="height: 400px;"></div>
+        </div>
+        <div class="panel">
+            <div class="plot-container" id="jc-linearizedPlot" style="height: 400px;"></div>
+        </div>
+    </div>
+
+    <div id="jc-stats2" class="stats-bar"></div>
+
+    <div class="control-panel">
+        <div class="control-group">
+            <label class="control-label" for="jc-cmp-system">System:</label>
+            <select id="jc-cmp-system" class="control-select">
+                <option value="lotkaVolterra">Lotka-Volterra</option>
+                <option value="competition">Competing Species</option>
+                <option value="pendulum">Damped Pendulum</option>
+            </select>
+        </div>
+        <div class="control-group">
+            <label class="control-label" for="jc-cmp-fp">Fixed point:</label>
+            <select id="jc-cmp-fp" class="control-select">
+                <option value="0">(0, 0)</option>
+            </select>
+        </div>
+        <div class="control-group">
+            <label class="control-label" for="jc-zoom-slider">Zoom level:
+                <span id="jc-zoom-value">1.0</span>
+            </label>
+            <input type="range" class="slider" id="jc-zoom-slider"
+                   min="0.2" max="3" step="0.1" value="1">
+        </div>
+        <div class="control-group">
+            <button class="btn" onclick="jcCmpReset()">Reset</button>
+        </div>
+    </div>
+</div>
+
+<div class="info-box">
+    <div class="info-box-title">Zoom In and See Linear</div>
+    <p>
+        The zoom slider controls how close you look to the fixed point. At high
+        zoom (small region), the nonlinear and linearized fields become
+        <strong>indistinguishable</strong>. This is the geometric meaning of
+        linearization: sufficiently close to the fixed point, the nonlinear
+        system <em>is</em> its Jacobian.
+    </p>
+</div>
+
+<!-- ========== Test Your Understanding #2 ========== -->
+<div class="interactive-container question-section">
+    <div class="interactive-title">Test Your Understanding</div>
+
+    <p style="margin-bottom: var(--spacing-md); color: var(--text-secondary);">
+        Use the Linearization Comparison explorer to answer these questions.
+    </p>
+
+    <div class="tabs">
+        <div class="tab-buttons">
+            <button class="tab-button active">Question 4</button>
+            <button class="tab-button">Question 5</button>
+            <button class="tab-button">Question 6</button>
+        </div>
+
+        <div class="tab-content active">
+            <div class="question-container" data-type="mcq" data-answer="2">
+                <div class="question-text">
+                    Select <strong>Lotka-Volterra</strong> at the coexistence point. Set zoom
+                    to 0.3 (close-up). How do the two vector fields compare?
+                </div>
+                <div class="question-options">
+                    <label class="option">
+                        <input type="radio" name="jc-q4" value="0">
+                        <span>They point in completely different directions</span>
+                    </label>
+                    <label class="option">
+                        <input type="radio" name="jc-q4" value="1">
+                        <span>The linearized field is zero everywhere</span>
+                    </label>
+                    <label class="option">
+                        <input type="radio" name="jc-q4" value="2">
+                        <span>They are nearly identical &mdash; arrows point the same way</span>
+                    </label>
+                    <label class="option">
+                        <input type="radio" name="jc-q4" value="3">
+                        <span>The nonlinear field has saddle structure but the linear one has a center</span>
+                    </label>
+                </div>
+                <div class="question-actions">
+                    <button class="btn-verify">Verify</button>
+                </div>
+                <div class="question-explanation" style="display:none;">
+                    <strong>Explanation:</strong>
+                    Close to the fixed point (small zoom), the Taylor expansion is accurate
+                    and both fields are <strong>nearly identical</strong>. The arrows point
+                    in the same directions with similar magnitudes. This is the whole point
+                    of linearization: locally, the two systems are the same.
+                </div>
+            </div>
+        </div>
+
+        <div class="tab-content">
+            <div class="question-container" data-type="mcq" data-answer="1">
+                <div class="question-text">
+                    Now set zoom to 3.0 (wide view). What happens?
+                </div>
+                <div class="question-options">
+                    <label class="option">
+                        <input type="radio" name="jc-q5" value="0">
+                        <span>They still match perfectly</span>
+                    </label>
+                    <label class="option">
+                        <input type="radio" name="jc-q5" value="1">
+                        <span>The fields differ significantly far from the fixed point</span>
+                    </label>
+                    <label class="option">
+                        <input type="radio" name="jc-q5" value="2">
+                        <span>The linearized system becomes unstable</span>
+                    </label>
+                    <label class="option">
+                        <input type="radio" name="jc-q5" value="3">
+                        <span>Both fields become uniform (constant direction)</span>
+                    </label>
+                </div>
+                <div class="question-actions">
+                    <button class="btn-verify">Verify</button>
+                </div>
+                <div class="question-explanation" style="display:none;">
+                    <strong>Explanation:</strong>
+                    At wide zoom, the nonlinear terms become important. The linearized field
+                    (straight-line arrows from a linear system) diverges from the curved,
+                    nonlinear reality. The linearization is a <strong>local</strong> tool &mdash;
+                    it only works near the fixed point.
+                </div>
+            </div>
+        </div>
+
+        <div class="tab-content">
+            <div class="question-container" data-type="msq" data-answer="1,2">
+                <div class="question-text">
+                    Which statements about the Jacobian linearization are true? (Select all)
+                </div>
+                <div class="question-options">
+                    <label class="option">
+                        <input type="checkbox" value="0">
+                        <span>The Jacobian is the same at every fixed point of a system</span>
+                    </label>
+                    <label class="option">
+                        <input type="checkbox" value="1">
+                        <span>Different fixed points of the same system can have different classifications</span>
+                    </label>
+                    <label class="option">
+                        <input type="checkbox" value="2">
+                        <span>The Jacobian reduces to a scalar \( f'(x_0) \) in 1D</span>
+                    </label>
+                    <label class="option">
+                        <input type="checkbox" value="3">
+                        <span>The linearized system is valid globally, not just near the fixed point</span>
+                    </label>
+                </div>
+                <div class="question-actions">
+                    <button class="btn-verify">Verify</button>
+                </div>
+                <div class="question-explanation" style="display:none;">
+                    <strong>Explanation:</strong>
+                    <ul>
+                        <li><strong>Same at every FP:</strong> ✗ The Jacobian is evaluated at the fixed point. Different FPs give different matrices (different partial derivative values).</li>
+                        <li><strong>Different classifications:</strong> ✓ Lotka-Volterra has a saddle at (0,0) and a center at the coexistence point. Same system, different FP types.</li>
+                        <li><strong>Reduces to scalar in 1D:</strong> ✓ In 1D: one function, one variable. The 1&times;1 Jacobian is just \( f'(x_0) \), recovering the 1D linearization from Section 5.11.</li>
+                        <li><strong>Valid globally:</strong> ✗ Linearization is a local approximation. It only works near the fixed point where higher-order terms are negligible.</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- ============================================================ -->
+<!-- EXPLORER 3: Full Linearization Pipeline -->
+<!-- ============================================================ -->
+<div class="interactive-container" id="full-pipeline">
+    <div class="interactive-title">Explorer: The Full Pipeline</div>
+
+    <p>
+        The complete linearization workflow: choose a system, find its fixed points,
+        compute the Jacobian at each, extract &tau; and &Delta;, and classify.
+        All steps displayed together so you can see the <strong>entire analysis
+        chain</strong>.
+    </p>
+
+    <div class="plot-container" id="jc-pipelinePlot" style="height: 440px;"></div>
+
+    <div id="jc-stats3" class="stats-bar"></div>
+
+    <div class="control-panel">
+        <div class="control-group">
+            <label class="control-label" for="jc-pipe-system">System:</label>
+            <select id="jc-pipe-system" class="control-select">
+                <option value="lotkaVolterra">Lotka-Volterra</option>
+                <option value="competition">Competing Species</option>
+                <option value="vanderpol">Van der Pol</option>
+                <option value="pendulum">Damped Pendulum</option>
+            </select>
+        </div>
+        <div class="control-group">
+            <label class="control-label" for="jc-pipe-fp">Fixed point:</label>
+            <select id="jc-pipe-fp" class="control-select">
+                <option value="0">(0, 0)</option>
+            </select>
+        </div>
+        <div class="control-group">
+            <button class="btn" onclick="jcPipeReset()">Reset</button>
+        </div>
+    </div>
+</div>
+
+<!-- ========== Test Your Understanding #3 ========== -->
+<div class="interactive-container question-section">
+    <div class="interactive-title">Test Your Understanding</div>
+
+    <p style="margin-bottom: var(--spacing-md); color: var(--text-secondary);">
+        Use the Full Pipeline explorer to answer these questions.
+    </p>
+
+    <div class="tabs">
+        <div class="tab-buttons">
+            <button class="tab-button active">Question 7</button>
+            <button class="tab-button">Question 8</button>
+            <button class="tab-button">Question 9</button>
+        </div>
+
+        <div class="tab-content active">
+            <div class="question-container" data-type="mcq" data-answer="2">
+                <div class="question-text">
+                    Select <strong>Competing Species</strong> and look at the coexistence
+                    fixed point (1, 1). What is its classification?
+                </div>
+                <div class="question-options">
+                    <label class="option">
+                        <input type="radio" name="jc-q7" value="0">
+                        <span>Stable node &mdash; both species coexist stably</span>
+                    </label>
+                    <label class="option">
+                        <input type="radio" name="jc-q7" value="1">
+                        <span>Center &mdash; populations oscillate</span>
+                    </label>
+                    <label class="option">
+                        <input type="radio" name="jc-q7" value="2">
+                        <span>Saddle &mdash; coexistence is unstable</span>
+                    </label>
+                    <label class="option">
+                        <input type="radio" name="jc-q7" value="3">
+                        <span>Stable spiral &mdash; damped oscillations</span>
+                    </label>
+                </div>
+                <div class="question-actions">
+                    <button class="btn-verify">Verify</button>
+                </div>
+                <div class="question-explanation" style="display:none;">
+                    <strong>Explanation:</strong>
+                    For the competing species model at (1, 1), the Jacobian gives \( \Delta < 0 \)
+                    &mdash; a <strong>saddle</strong>. Coexistence is unstable: a tiny perturbation
+                    favoring one species leads to the other&rsquo;s extinction. This is the
+                    <strong>competitive exclusion principle</strong>.
+                </div>
+            </div>
+        </div>
+
+        <div class="tab-content">
+            <div class="question-container" data-type="fill" data-answer="stable spiral">
+                <div class="question-text">
+                    Select <strong>Van der Pol</strong> at the origin. The Jacobian shows
+                    \( \tau < 0 \) and the eigenvalues are complex with negative real part.
+                    The fixed point is a
+                    <select class="fill-blank-select">
+                        <option value=""></option>
+                        <option value="center">center</option>
+                        <option value="stable spiral">stable spiral</option>
+                        <option value="unstable spiral">unstable spiral</option>
+                        <option value="stable node">stable node</option>
+                    </select>.
+                </div>
+                <div class="question-actions">
+                    <button class="btn-verify">Verify</button>
+                </div>
+                <div class="question-explanation" style="display:none;">
+                    <strong>Explanation:</strong>
+                    The Van der Pol oscillator at the origin (with small &mu;) has complex
+                    eigenvalues with negative real part when \( \mu < 0 \), giving a
+                    <strong>stable spiral</strong>. For \( \mu > 0 \), the real part flips
+                    positive → unstable spiral (leading to a limit cycle). The sign of &mu;
+                    controls stability.
+                </div>
+            </div>
+        </div>
+
+        <div class="tab-content">
+            <div class="question-container" data-type="mcq" data-answer="3">
+                <div class="question-text">
+                    Select <strong>Damped Pendulum</strong>. How many fixed points does it
+                    have (in the displayed range)?
+                </div>
+                <div class="question-options">
+                    <label class="option">
+                        <input type="radio" name="jc-q9" value="0">
+                        <span>One &mdash; only the hanging-down position</span>
+                    </label>
+                    <label class="option">
+                        <input type="radio" name="jc-q9" value="1">
+                        <span>Two &mdash; hanging down and inverted</span>
+                    </label>
+                    <label class="option">
+                        <input type="radio" name="jc-q9" value="2">
+                        <span>Two &mdash; both stable</span>
+                    </label>
+                    <label class="option">
+                        <input type="radio" name="jc-q9" value="3">
+                        <span>Three &mdash; one stable spiral and two saddles (or vice versa)</span>
+                    </label>
+                </div>
+                <div class="question-actions">
+                    <button class="btn-verify">Verify</button>
+                </div>
+                <div class="question-explanation" style="display:none;">
+                    <strong>Explanation:</strong>
+                    The damped pendulum \( \ddot{\theta} + \gamma\dot{\theta} + \sin\theta = 0 \)
+                    has fixed points at \( \theta = 0, \pm\pi, \pm 2\pi, \ldots \). In the range
+                    \( [-\pi, \pi] \): the downward position (0, 0) is a <strong>stable spiral</strong>
+                    (damped oscillations), while \( (\pm\pi, 0) \) are <strong>saddles</strong>
+                    (inverted pendulum &mdash; unstable). Three fixed points with different types.
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- ============================================================ -->
+<!-- PYTHON CODE EXAMPLES -->
+<!-- ============================================================ -->
+<h2>Python Code</h2>
+
+<div class="tabs">
+    <div class="tab-buttons">
+        <button class="tab-button active">Jacobian Computation</button>
+        <button class="tab-button">Full Pipeline</button>
+        <button class="tab-button">Prompt</button>
+    </div>
+
+    <div class="tab-content active">
+        <div class="code-block-container">
+            <div class="code-header">
+                <span class="code-lang">Python</span>
+                <button class="copy-btn">Copy</button>
+            </div>
+            <pre><code class="language-python">
+import numpy as np
+
+# Lotka-Volterra: ẋ = x(2 - y), ẏ = y(-1 + x)
+# f(x,y) = x(2 - y),  g(x,y) = y(-1 + x)
+
+# Jacobian (by hand):
+# J = [[∂f/∂x, ∂f/∂y], [∂g/∂x, ∂g/∂y]]
+#   = [[2 - y,  -x  ],  [y,    -1 + x]]
+
+def jacobian_lv(x, y):
+    return np.array([[2 - y, -x],
+                     [y, -1 + x]])
+
+# Fixed points: f = g = 0
+# x(2-y)=0 → x=0 or y=2
+# y(-1+x)=0 → y=0 or x=1
+# FP1: (0,0), FP2: (1,2)
+
+fps = [(0, 0), (1, 2)]
+for x0, y0 in fps:
+    J = jacobian_lv(x0, y0)
+    tau = np.trace(J)
+    delta = np.linalg.det(J)
+    evals = np.linalg.eigvals(J)
+    print(f'\nFixed point ({x0}, {y0}):')
+    print(f'  J = {J.tolist()}')
+    print(f'  τ = {tau:.2f}, Δ = {delta:.2f}')
+    print(f'  λ = {evals}')
+    if delta < 0:
+        print('  → Saddle')
+    elif abs(tau) < 0.01:
+        print('  → Center')
+    elif tau < 0:
+        print('  → Stable (spiral or node)')
+    else:
+        print('  → Unstable')
+            </code></pre>
+        </div>
+    </div>
+
+    <div class="tab-content">
+        <div class="code-block-container">
+            <div class="code-header">
+                <span class="code-lang">Python</span>
+                <button class="copy-btn">Copy</button>
+            </div>
+            <pre><code class="language-python">
+import numpy as np
+import plotly.graph_objects as go
+
+def rk4(f, g, x0, y0, T, N):
+    h = T/N; X, Y = [x0], [y0]; x, y = x0, y0
+    for _ in range(N):
+        k1x, k1y = f(x,y), g(x,y)
+        k2x, k2y = f(x+h/2*k1x,y+h/2*k1y), g(x+h/2*k1x,y+h/2*k1y)
+        k3x, k3y = f(x+h/2*k2x,y+h/2*k2y), g(x+h/2*k2x,y+h/2*k2y)
+        k4x, k4y = f(x+h*k3x,y+h*k3y), g(x+h*k3x,y+h*k3y)
+        x += h/6*(k1x+2*k2x+2*k3x+k4x)
+        y += h/6*(k1y+2*k2y+2*k3y+k4y)
+        if abs(x)>20 or abs(y)>20: break
+        X.append(x); Y.append(y)
+    return np.array(X), np.array(Y)
+
+# Competing species: ẋ=x(3-x-2y), ẏ=y(2-x-y)
+f = lambda x,y: x*(3-x-2*y)
+g = lambda x,y: y*(2-x-y)
+
+# Fixed points: (0,0), (3,0), (0,2), (1,1)
+fps = [(0,0,'Origin'), (3,0,'Species 1 wins'),
+       (0,2,'Species 2 wins'), (1,1,'Coexistence')]
+
+fig = go.Figure()
+colors = ['#00f3ff','#ff006e','#ffbe0b','#00ff88',
+          '#bb86fc','#ff5722','#76ff03','#40c4ff']
+
+for k in range(8):
+    th = k*np.pi/4
+    X, Y = rk4(f, g, 0.1+1.5*np.cos(th), 0.1+1.5*np.sin(th), 15, 3000)
+    fig.add_trace(go.Scatter(x=X, y=Y, mode='lines',
+        line=dict(color=colors[k], width=1.5), showlegend=False))
+
+for x0, y0, label in fps:
+    J = np.array([[3-2*x0-2*y0, -2*x0], [-y0, 2-x0-2*y0]])
+    delta = np.linalg.det(J)
+    sym = 'circle' if delta > 0 and np.trace(J) < 0 else 'circle-open'
+    fig.add_trace(go.Scatter(x=[x0], y=[y0], mode='markers+text',
+        marker=dict(color='#ffbe0b', size=10, symbol=sym,
+            line=dict(color='white', width=2)),
+        text=[label], textposition='top center',
+        textfont=dict(color='white', size=9), showlegend=False))
+
+fig.update_layout(template='plotly_dark',
+    xaxis=dict(title='Species 1', range=[-0.5, 4],
+        zerolinecolor='#808080'),
+    yaxis=dict(title='Species 2', range=[-0.5, 3],
+        zerolinecolor='#808080'),
+    height=500, width=600)
+fig.show()
+            </code></pre>
+        </div>
+    </div>
+
+    <div class="tab-content">
+        <div class="code-block-container">
+            <div class="code-header">
+                <span class="code-lang">Prompt for AI</span>
+                <button class="copy-btn">Copy</button>
+            </div>
+            <pre><code class="language-text">Create a Python script to perform Jacobian linearization
+of a 2D nonlinear dynamical system.
+
+Requirements:
+- System: Lotka-Volterra ẋ=x(2-y), ẏ=y(-1+x)
+- Compute Jacobian analytically:
+  J = [[2-y, -x], [y, -1+x]]
+- Evaluate at each fixed point: (0,0) and (1,2)
+- Print: J, τ, Δ, eigenvalues, classification
+- Plot: phase portrait with 8 RK4 trajectories
+- Mark fixed points (filled=stable, open=unstable/saddle)
+- Also show: competing species ẋ=x(3-x-2y), ẏ=y(2-x-y)
+  with 4 fixed points and basin structure
+- Use dark theme (plotly_dark) with gray (#808080) axes
+- Solve with RK4 (not scipy)</code></pre>
+        </div>
+    </div>
+</div>
+
+<!-- ============================================================ -->
+<!-- NAVIGATION -->
+<!-- ============================================================ -->
+<div class="btn-group mt-xl">
+    <button class="btn btn-magenta" onclick="navigateToSection('61-linearization-1d')">&larr; Previous: 1D Linearization</button>
+    <button class="btn btn-secondary" onclick="scrollToTop()">&uarr; Back to Top</button>
+    <button class="btn btn-secondary" onclick="navigateToSection('63-linearization-stability')">Next: Stability from Linearization &rarr;</button>
+</div>

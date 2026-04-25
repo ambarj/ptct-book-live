@@ -1,0 +1,432 @@
+<!-- ============================================================
+     Section 7.10: Applications — Diffusion in the Real World
+     Source: Supplementary material
+     Concept: The diffusion equation appears across physics,
+              chemistry, biology, finance, engineering — same
+              math, different variables
+     Time: 20-25 minutes
+     Prerequisites: Sections 7.1-7.9 (random walks through
+                    Stirling/Gaussian limit)
+     ============================================================ -->
+
+<h1>Applications: Diffusion in the Real World</h1>
+
+<p>
+    One equation, many worlds. The diffusion equation
+    \( \partial u / \partial t = D\,\nabla^2 u \) appears wherever
+    <em>microscopic randomness produces macroscopic spreading</em>. Change
+    the name of \( u \), plug in a different \( D \), and you describe
+    heat conduction, molecular diffusion, pollutant dispersal, doping
+    profiles in semiconductors, or even stock-price fluctuations. This
+    section tours the applications and builds a single computational tool
+    that handles them all.
+</p>
+
+<div class="info-box">
+    <div class="info-box-title">Learning Objectives</div>
+    <ul>
+        <li>Recognize the diffusion equation in at least five different scientific domains</li>
+        <li>Use the scaling relation \( \ell \sim \sqrt{Dt} \) to make quick estimates in any field</li>
+        <li>Understand that <strong>same equation = same solution</strong> — only the physical interpretation of \( u \) and \( D \) changes</li>
+        <li>Appreciate the power of mathematical universality: one derivation serves all applications</li>
+    </ul>
+</div>
+
+<div class="equation-display">
+    <p><strong>The Universal Equation:</strong></p>
+    $$ \frac{\partial u}{\partial t} = D\,\nabla^2 u $$
+    <p>
+        <strong>Heat:</strong> \( u = T \), \( D = \kappa \) (thermal diffusivity). &ensp;
+        <strong>Mass:</strong> \( u = c \), \( D = D_\text{mol} \). &ensp;
+        <strong>Finance:</strong> \( u = P \), \( D = \tfrac{1}{2}\sigma^2 \).
+    </p>
+</div>
+
+<hr>
+
+<!-- ============================================================ -->
+<!-- EXPLORER 1: Cross-Domain Parameter Explorer -->
+<!-- ============================================================ -->
+<div class="interactive-container" id="parameter-explorer">
+    <div class="interactive-title">Explorer: Diffusion Across Domains</div>
+
+    <p>
+        Select a physical system and see its diffusion coefficient \( D \),
+        the spreading Gaussian, and practical time/length scales. The same
+        Gaussian solution describes all of them — only \( D \) and the
+        interpretation change.
+    </p>
+
+    <div class="dual-panel">
+        <div class="panel"><div class="plot-container" id="da-gaussPlot" style="height: 400px;"></div></div>
+        <div class="panel"><div class="plot-container" id="da-rmsPlot" style="height: 400px;"></div></div>
+    </div>
+    <div id="da-stats1" class="stats-bar"></div>
+
+    <div class="control-panel">
+        <div class="control-group">
+            <label class="control-label" for="da-system-select">System:</label>
+            <select class="slider" id="da-system-select" style="width: 220px; height: 32px;">
+                <option value="0">Heat in iron (κ = 2.3×10⁻⁵ m²/s)</option>
+                <option value="1">Ink in water (D = 1×10⁻⁹ m²/s)</option>
+                <option value="2">O₂ in air (D = 2×10⁻⁵ m²/s)</option>
+                <option value="3">Dopant in silicon (D = 1×10⁻¹⁶ m²/s)</option>
+                <option value="4">Stock price (σ² = 0.04/yr)</option>
+                <option value="5">Bacteria in agar (D = 5×10⁻¹⁰ m²/s)</option>
+            </select>
+        </div>
+        <div class="control-group">
+            <label class="control-label" for="da-t-slider">Time:
+                <span id="da-t-value">1.0</span> <span id="da-t-unit">s</span>
+            </label>
+            <input type="range" class="slider" id="da-t-slider"
+                   min="0.1" max="10" step="0.1" value="1">
+        </div>
+        <div class="control-group">
+            <button class="btn" onclick="daParamReset()">Reset</button>
+        </div>
+    </div>
+</div>
+
+<!-- ========== Test Your Understanding #1 ========== -->
+<div class="interactive-container question-section">
+    <div class="interactive-title">Test Your Understanding</div>
+    <p style="margin-bottom: var(--spacing-md); color: var(--text-secondary);">Use the Parameter Explorer above.</p>
+    <div class="tabs">
+        <div class="tab-buttons">
+            <button class="tab-button active">Question 1</button>
+            <button class="tab-button">Question 2</button>
+            <button class="tab-button">Question 3</button>
+        </div>
+        <div class="tab-content active">
+            <div class="question-container" data-type="mcq" data-answer="2">
+                <div class="question-text">Compare "Heat in iron" and "Ink in water." Which spreads to 1 cm faster?</div>
+                <div class="question-options">
+                    <label class="option"><input type="radio" name="da-q1" value="0"><span>Ink in water &mdash; liquids flow faster than solids</span></label>
+                    <label class="option"><input type="radio" name="da-q1" value="1"><span>They take the same time</span></label>
+                    <label class="option"><input type="radio" name="da-q1" value="2"><span>Heat in iron &mdash; its D is 10,000× larger</span></label>
+                    <label class="option"><input type="radio" name="da-q1" value="3"><span>Cannot be compared &mdash; different physics</span></label>
+                </div>
+                <div class="question-actions"><button class="btn-verify">Verify</button></div>
+                <div class="question-explanation" style="display:none;"><strong>Explanation:</strong> Heat diffusivity in iron is \( \kappa \approx 2.3 \times 10^{-5} \) m²/s, while molecular diffusion of ink in water is \( D \approx 10^{-9} \) m²/s — a factor of ~20,000. Heat reaches 1 cm in about 1 second; ink takes hours. The <em>same equation</em> governs both, but with vastly different \( D \) values.</div>
+            </div>
+        </div>
+        <div class="tab-content">
+            <div class="question-container" data-type="fill" data-answer="1e-8[5e-9,5e-8]">
+                <div class="question-text">For dopant in silicon (\( D = 10^{-16} \) m²/s), the RMS distance after 1 hour (3600 s) is \( \sqrt{2Dt} \approx \) <input type="text" class="fill-blank" style="width: 80px"> m. (Use scientific notation like 1e-8.)</div>
+                <div class="question-actions"><button class="btn-verify">Verify</button></div>
+                <div class="question-explanation" style="display:none;"><strong>Explanation:</strong> \( \sqrt{2 \times 10^{-16} \times 3600} = \sqrt{7.2 \times 10^{-13}} \approx 8.5 \times 10^{-7} \) m = 0.85 μm. Semiconductor doping is <em>incredibly</em> slow — that is why it requires high-temperature furnaces (which increase \( D \) exponentially).</div>
+            </div>
+        </div>
+        <div class="tab-content">
+            <div class="question-container" data-type="msq" data-answer="0,1,3">
+                <div class="question-text">Which are valid applications of the diffusion equation? (Select all)</div>
+                <div class="question-options">
+                    <label class="option"><input type="checkbox" value="0"><span>Pollutant spreading from a factory smokestack</span></label>
+                    <label class="option"><input type="checkbox" value="1"><span>Stock price evolution in the Black–Scholes model</span></label>
+                    <label class="option"><input type="checkbox" value="2"><span>A ball rolling down a frictionless ramp</span></label>
+                    <label class="option"><input type="checkbox" value="3"><span>Morphogen concentration gradients during embryo development</span></label>
+                </div>
+                <div class="question-actions"><button class="btn-verify">Verify</button></div>
+                <div class="question-explanation" style="display:none;"><strong>Explanation:</strong><ul><li><strong>Pollutant:</strong> ✓ Atmospheric dispersion is diffusion (plus advection from wind).</li><li><strong>Stock price:</strong> ✓ The Black–Scholes PDE is a diffusion equation in disguise, with \( D = \frac{1}{2}\sigma^2 \).</li><li><strong>Ball on ramp:</strong> ✗ This is deterministic Newtonian mechanics — no randomness, no diffusion.</li><li><strong>Morphogens:</strong> ✓ Signaling molecules diffuse through tissue to form concentration gradients that guide cell differentiation.</li></ul></div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- ============================================================ -->
+<!-- EXPLORER 2: Scaling Estimator -->
+<!-- ============================================================ -->
+<div class="interactive-container" id="scaling-estimator">
+    <div class="interactive-title">Explorer: The √(Dt) Scaling Calculator</div>
+
+    <p>
+        The most powerful quick-estimation tool in all of diffusion physics:
+        \( \ell \sim \sqrt{Dt} \). Enter <em>any two</em> of \( D \),
+        \( t \), and \( \ell \), and the calculator solves for the third.
+        This one formula lets you estimate everything from
+        "how long until the tea cools?" to "how deep does doping penetrate?"
+    </p>
+
+    <div class="plot-container" id="da-scalePlot" style="height: 420px;"></div>
+    <div id="da-stats2" class="stats-bar"></div>
+
+    <div class="control-panel">
+        <div class="control-group">
+            <label class="control-label" for="da-logD-slider">log₁₀(D) [m²/s]:
+                <span id="da-logD-value">-5.0</span>
+            </label>
+            <input type="range" class="slider" id="da-logD-slider"
+                   min="-16" max="-1" step="0.5" value="-5">
+        </div>
+        <div class="control-group">
+            <label class="control-label" for="da-logT-slider">log₁₀(t) [s]:
+                <span id="da-logT-value">0.0</span>
+            </label>
+            <input type="range" class="slider" id="da-logT-slider"
+                   min="-3" max="9" step="0.5" value="0">
+        </div>
+        <div class="control-group">
+            <button class="btn" onclick="daScaleReset()">Reset</button>
+        </div>
+    </div>
+</div>
+
+<!-- ========== Test Your Understanding #2 ========== -->
+<div class="interactive-container question-section">
+    <div class="interactive-title">Test Your Understanding</div>
+    <p style="margin-bottom: var(--spacing-md); color: var(--text-secondary);">Use the Scaling Calculator.</p>
+    <div class="tabs">
+        <div class="tab-buttons">
+            <button class="tab-button active">Question 4</button>
+            <button class="tab-button">Question 5</button>
+            <button class="tab-button">Question 6</button>
+        </div>
+        <div class="tab-content active">
+            <div class="question-container" data-type="mcq" data-answer="3">
+                <div class="question-text">To double the diffusion distance, you must wait&hellip;</div>
+                <div class="question-options">
+                    <label class="option"><input type="radio" name="da-q4" value="0"><span>Twice as long</span></label>
+                    <label class="option"><input type="radio" name="da-q4" value="1"><span>Half as long</span></label>
+                    <label class="option"><input type="radio" name="da-q4" value="2"><span>The same time</span></label>
+                    <label class="option"><input type="radio" name="da-q4" value="3"><span>Four times as long &mdash; because \( \ell \propto \sqrt{t} \)</span></label>
+                </div>
+                <div class="question-actions"><button class="btn-verify">Verify</button></div>
+                <div class="question-explanation" style="display:none;"><strong>Explanation:</strong> \( \ell = \sqrt{2Dt} \), so \( t = \ell^2/(2D) \). Doubling \( \ell \) quadruples \( t \). This is why diffusion is <em>slow</em> over long distances — it is efficient only over short ones. Nature uses convection (blood flow, wind) to beat the diffusion speed limit.</div>
+            </div>
+        </div>
+        <div class="tab-content">
+            <div class="question-container" data-type="fill" data-answer="3.2[2.5,4.0]">
+                <div class="question-text">O₂ in air (\( D = 2 \times 10^{-5} \) m²/s). How far does it diffuse in 1 minute? Set the sliders and read: \( \ell \approx \) <input type="text" class="fill-blank" style="width: 60px"> cm.</div>
+                <div class="question-actions"><button class="btn-verify">Verify</button></div>
+                <div class="question-explanation" style="display:none;"><strong>Explanation:</strong> \( \ell = \sqrt{2 \times 2 \times 10^{-5} \times 60} = \sqrt{2.4 \times 10^{-3}} \approx 0.049 \) m = 4.9 cm. Even gas-phase diffusion only reaches a few centimeters in a minute — that is why you can smell dinner from the kitchen but not from across the street (convection carries most of it).</div>
+            </div>
+        </div>
+        <div class="tab-content">
+            <div class="question-container" data-type="mcq" data-answer="1">
+                <div class="question-text">A semiconductor fab heats silicon to increase \( D \) from \( 10^{-16} \) to \( 10^{-12} \) m²/s. The doping time for the same depth is reduced by&hellip;</div>
+                <div class="question-options">
+                    <label class="option"><input type="radio" name="da-q6" value="0"><span>A factor of 4</span></label>
+                    <label class="option"><input type="radio" name="da-q6" value="1"><span>A factor of 10,000 &mdash; because \( t \propto 1/D \) at fixed \( \ell \)</span></label>
+                    <label class="option"><input type="radio" name="da-q6" value="2"><span>A factor of 100</span></label>
+                    <label class="option"><input type="radio" name="da-q6" value="3"><span>Not at all — depth doesn't depend on D</span></label>
+                </div>
+                <div class="question-actions"><button class="btn-verify">Verify</button></div>
+                <div class="question-explanation" style="display:none;"><strong>Explanation:</strong> At fixed depth \( \ell \), \( t = \ell^2/(2D) \propto 1/D \). Increasing \( D \) by \( 10^4 \) reduces \( t \) by the same factor. This is why semiconductor doping furnaces run at 1000°C+ — it is the only way to achieve practical processing times.</div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- ============================================================ -->
+<!-- EXPLORER 3: Heat vs Mass Diffusion Side-by-Side -->
+<!-- ============================================================ -->
+<div class="interactive-container" id="heat-vs-mass">
+    <div class="interactive-title">Explorer: Heat vs Mass — Same Math, Different Physics</div>
+
+    <p>
+        A hot iron rod and a drop of ink in water. Both evolve as Gaussians.
+        Both obey \( \partial u / \partial t = D\,\nabla^2 u \). The left
+        panel shows the temperature profile \( T(x,t) \); the right shows
+        the concentration profile \( c(x,t) \). Watch them spread at
+        different rates — the shape is identical, only the timescale differs.
+    </p>
+
+    <div class="dual-panel">
+        <div class="panel"><div class="plot-container" id="da-heatPlot" style="height: 400px;"></div></div>
+        <div class="panel"><div class="plot-container" id="da-massPlot" style="height: 400px;"></div></div>
+    </div>
+    <div id="da-stats3" class="stats-bar"></div>
+
+    <div class="control-panel">
+        <div class="control-group">
+            <label class="control-label" for="da-cmp-t-slider">Time:
+                <span id="da-cmp-t-value">1.0</span> s
+            </label>
+            <input type="range" class="slider" id="da-cmp-t-slider"
+                   min="0.1" max="20" step="0.1" value="1">
+        </div>
+        <div class="control-group">
+            <button class="btn" onclick="daCmpReset()">Reset</button>
+        </div>
+    </div>
+</div>
+
+<!-- ========== Test Your Understanding #3 ========== -->
+<div class="interactive-container question-section">
+    <div class="interactive-title">Test Your Understanding</div>
+    <p style="margin-bottom: var(--spacing-md); color: var(--text-secondary);">Use the Heat vs Mass explorer.</p>
+    <div class="tabs">
+        <div class="tab-buttons">
+            <button class="tab-button active">Question 7</button>
+            <button class="tab-button">Question 8</button>
+            <button class="tab-button">Question 9</button>
+        </div>
+        <div class="tab-content active">
+            <div class="question-container" data-type="mcq" data-answer="0">
+                <div class="question-text">At \( t = 1 \) s, the heat profile has already spread significantly while the ink profile is still a sharp spike. Why?</div>
+                <div class="question-options">
+                    <label class="option"><input type="radio" name="da-q7" value="0"><span>Because \( \kappa_\text{iron} \) is ~20,000× larger than \( D_\text{ink} \)</span></label>
+                    <label class="option"><input type="radio" name="da-q7" value="1"><span>Because heat and mass obey different equations</span></label>
+                    <label class="option"><input type="radio" name="da-q7" value="2"><span>Because temperature is a scalar but concentration is a vector</span></label>
+                    <label class="option"><input type="radio" name="da-q7" value="3"><span>Because liquids are denser than solids</span></label>
+                </div>
+                <div class="question-actions"><button class="btn-verify">Verify</button></div>
+                <div class="question-explanation" style="display:none;"><strong>Explanation:</strong> The equations are <em>identical</em>. The only difference is \( D \): thermal diffusivity of iron (~\( 2.3 \times 10^{-5} \) m²/s) vs molecular diffusivity of ink in water (~\( 10^{-9} \) m²/s). Same physics, different timescales.</div>
+            </div>
+        </div>
+        <div class="tab-content">
+            <div class="question-container" data-type="fill" data-answer="20000[10000,30000]">
+                <div class="question-text">The ratio \( \kappa_\text{iron}/D_\text{ink} \approx 2.3 \times 10^{-5} / 10^{-9} = \) <input type="text" class="fill-blank" style="width: 80px">. This is how many times faster heat spreads compared to ink.</div>
+                <div class="question-actions"><button class="btn-verify">Verify</button></div>
+                <div class="question-explanation" style="display:none;"><strong>Explanation:</strong> \( 2.3 \times 10^{-5} / 10^{-9} = 2.3 \times 10^{4} = 23{,}000 \). Heat reaches 1 cm in ~1 s; ink takes ~\( 10^{4} \) s (about 3 hours). The <em>ratio of timescales</em> for the same distance equals the <em>ratio of diffusion coefficients</em>.</div>
+            </div>
+        </div>
+        <div class="tab-content">
+            <div class="question-container" data-type="msq" data-answer="0,2">
+                <div class="question-text">Which are true about mathematical universality? (Select all)</div>
+                <div class="question-options">
+                    <label class="option"><input type="checkbox" value="0"><span>Solving the diffusion equation once gives solutions for heat, mass, finance, and biology simultaneously</span></label>
+                    <label class="option"><input type="checkbox" value="1"><span>You need different solution methods for each application</span></label>
+                    <label class="option"><input type="checkbox" value="2"><span>A physicist studying heat and a biologist studying morphogens can read each other's papers</span></label>
+                    <label class="option"><input type="checkbox" value="3"><span>Universality means all systems have the same diffusion coefficient</span></label>
+                </div>
+                <div class="question-actions"><button class="btn-verify">Verify</button></div>
+                <div class="question-explanation" style="display:none;"><strong>Explanation:</strong><ul><li><strong>One solution serves all:</strong> ✓ The Gaussian fundamental solution, Fourier methods, numerical schemes — all transfer instantly between domains.</li><li><strong>Different methods:</strong> ✗ The same PDE has the same solutions. Boundary conditions may differ, but the mathematical toolkit is shared.</li><li><strong>Cross-disciplinary reading:</strong> ✓ This is the power of mathematical physics — shared language across fields.</li><li><strong>Same D:</strong> ✗ Universality means same <em>equation</em>, not same <em>parameters</em>. \( D \) varies by 15 orders of magnitude across our examples!</li></ul></div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- ============================================================ -->
+<!-- CHAPTER SUMMARY -->
+<!-- ============================================================ -->
+<div class="info-box">
+    <div class="info-box-title">Chapter 7 Summary: From Steps to PDEs</div>
+    <p>
+        We began with a single drunk step (±1) and built an entire theoretical
+        framework: <strong>random walk → binomial distribution → (Stirling) →
+        Gaussian → diffusion equation</strong>. Along the way we learned that
+        microscopic randomness produces macroscopic order — the Gaussian and
+        \( \sqrt{t} \) scaling are <em>universal</em>. These ideas underpin
+        statistical mechanics, financial mathematics, biological transport, and
+        engineering design. The diffusion equation is where random walks meet
+        partial differential equations — and computational thinking ties it all
+        together.
+    </p>
+</div>
+
+<!-- ============================================================ -->
+<!-- PYTHON CODE -->
+<!-- ============================================================ -->
+<h2>Python Code</h2>
+<div class="tabs">
+    <div class="tab-buttons">
+        <button class="tab-button active">Multi-Domain Plot</button>
+        <button class="tab-button">Scaling Calculator</button>
+        <button class="tab-button">Prompt</button>
+    </div>
+    <div class="tab-content active">
+        <div class="code-block-container"><div class="code-header"><span class="code-lang">Python</span><button class="copy-btn">Copy</button></div>
+            <pre><code class="language-python">
+import numpy as np
+import plotly.graph_objects as go
+from plotly.subplots import make_subplots
+
+systems = [
+    ('Heat in iron',     2.3e-5, 's', 0.1),
+    ('Ink in water',     1e-9,   's', 0.01),
+    ('O₂ in air',        2e-5,   's', 0.1),
+    ('Dopant in Si',     1e-16,  's', 1e-7),
+]
+colors = ['#00f3ff', '#ff006e', '#ffbe0b', '#00ff88']
+
+fig = make_subplots(rows=1, cols=2,
+    subplot_titles=['Gaussian profiles (t=1 unit)', 'RMS distance vs time'])
+
+for i, (name, D, unit, xmax) in enumerate(systems):
+    x = np.linspace(-xmax, xmax, 300)
+    rho = np.exp(-x**2/(4*D*1)) / np.sqrt(4*np.pi*D*1)
+    fig.add_trace(go.Scatter(x=x, y=rho, mode='lines',
+        line=dict(color=colors[i], width=2), name=name), row=1, col=1)
+
+    t = np.linspace(0.01, 10, 100)
+    rms = np.sqrt(2*D*t)
+    fig.add_trace(go.Scatter(x=t, y=rms, mode='lines',
+        line=dict(color=colors[i], width=2), name=name,
+        showlegend=False), row=1, col=2)
+
+fig.update_layout(template='plotly_dark', height=400)
+for ax in ['xaxis', 'xaxis2', 'yaxis', 'yaxis2']:
+    fig.update_layout(**{ax: dict(zerolinecolor='#808080')})
+fig.show()
+            </code></pre>
+        </div>
+    </div>
+    <div class="tab-content">
+        <div class="code-block-container"><div class="code-header"><span class="code-lang">Python</span><button class="copy-btn">Copy</button></div>
+            <pre><code class="language-python">
+import numpy as np
+import plotly.graph_objects as go
+
+# Scaling: ℓ = √(2Dt)  →  t = ℓ²/(2D)  →  D = ℓ²/(2t)
+def diffusion_distance(D, t):
+    return np.sqrt(2 * D * t)
+
+def diffusion_time(D, ell):
+    return ell**2 / (2 * D)
+
+# Example: how long for ink to diffuse 1 cm?
+D_ink = 1e-9  # m²/s
+ell = 0.01    # 1 cm in meters
+t = diffusion_time(D_ink, ell)
+print(f"Ink diffuses 1 cm in {t:.0f} s = {t/3600:.1f} hours")
+
+# Sweep: distance vs time for multiple systems
+systems = {'Heat/iron': 2.3e-5, 'O₂/air': 2e-5,
+           'Ink/water': 1e-9, 'Dopant/Si': 1e-16}
+t = np.logspace(-2, 8, 200)
+
+fig = go.Figure()
+for name, D in systems.items():
+    fig.add_trace(go.Scatter(x=t, y=diffusion_distance(D, t),
+        mode='lines', line=dict(width=2), name=f'{name} (D={D:.0e})'))
+
+fig.update_layout(template='plotly_dark',
+    xaxis=dict(title='time (s)', type='log', zerolinecolor='#808080'),
+    yaxis=dict(title='distance (m)', type='log', zerolinecolor='#808080'),
+    height=400)
+fig.show()
+            </code></pre>
+        </div>
+    </div>
+    <div class="tab-content">
+        <div class="code-block-container"><div class="code-header"><span class="code-lang">Prompt for AI</span><button class="copy-btn">Copy</button></div>
+            <pre><code class="language-text">Create a Python script using numpy and Plotly to explore real-world diffusion.
+
+Requirements:
+- Part 1: Gaussian profiles at t = 1 for multiple systems:
+  heat in iron (κ = 2.3e-5), ink in water (D = 1e-9),
+  O₂ in air (D = 2e-5), dopant in silicon (D = 1e-16).
+  Each on appropriate x-axis scale.
+- Part 2: Log-log plot of diffusion distance √(2Dt) vs time
+  for all systems. Time from 0.01 s to 10⁸ s (3 years).
+  Add horizontal lines at 1 μm, 1 mm, 1 cm, 1 m for reference.
+- Part 3: Scaling calculator function — input any two of
+  (D, t, ℓ), compute the third. Print results for:
+  "How long for ink to diffuse 1 cm?"
+  "How far does heat spread in 10 s?"
+  "What D is needed to reach 1 mm in 1 hour?"
+- Use dark theme, gray axes (#808080), neon colors.</code></pre>
+        </div>
+    </div>
+</div>
+
+<!-- ============================================================ -->
+<!-- NAVIGATION -->
+<!-- ============================================================ -->
+<div class="btn-group mt-xl">
+    <button class="btn btn-magenta" onclick="navigateToSection('84-stirling-gaussian')">&larr; Previous: Stirling &amp; the Gaussian Limit</button>
+    <button class="btn btn-secondary" onclick="scrollToTop()">&uarr; Back to Top</button>
+    <button class="btn btn-secondary" onclick="navigateToSection('86-two-body-reduction')">Next: Chapter 8 &mdash; The Two-Body Problem &rarr;</button>
+</div>

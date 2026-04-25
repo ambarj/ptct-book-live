@@ -1,0 +1,761 @@
+<!-- ============================================================
+     Section 4.13: Choosing Your Method
+     Source: NPTEL Lecture 12 test_rk4.nb (error + timing analysis)
+     Concept: Cost-accuracy tradeoffs, scaling laws, practical
+              decision-making for algorithm selection
+     Time: 15-20 minutes
+     Prerequisites: Euler (4.4-4.5), RK2 (4.11), RK4 (4.12)
+     ============================================================ -->
+
+<h1>Choosing Your Method</h1>
+
+<p>
+    You now have three ODE solvers in your toolkit. Each costs a different amount per step and delivers
+    a different accuracy. The question is no longer <em>which is best?</em> (RK4 wins on accuracy) but
+    <em>which is appropriate right now?</em>
+</p>
+
+<div class="info-box">
+    <div class="info-box-title">Learning Objectives</div>
+    <ul>
+        <li>Compare Euler, RK2, and RK4 at fixed computational budget — same cost, wildly different accuracy</li>
+        <li>Discover the scaling laws: accuracy vs work grows as \( N^{-1} \), \( N^{-2} \), \( N^{-4} \)</li>
+        <li>Understand when each method is appropriate: quick look, homework, publication, long-time simulation</li>
+        <li>Build the habit of always verifying your solver by halving \( h \)</li>
+    </ul>
+</div>
+
+<div class="equation-display">
+    <p><strong>The cost-accuracy table:</strong></p>
+    $$
+    \begin{array}{lcccc}
+    \textbf{Method} & \textbf{Evals/step} & \textbf{Local error} & \textbf{Global error} & \textbf{Order} \\[4pt]
+    \text{Euler} & 1 & O(h^2) & O(h) & 1 \\
+    \text{RK2} & 2 & O(h^3) & O(h^2) & 2 \\
+    \text{RK4} & 4 & O(h^5) & O(h^4) & 4
+    \end{array}
+    $$
+    <p>The key insight: <strong>convergence order beats per-step cost</strong>. Always.</p>
+</div>
+
+<!-- ============================================================ -->
+<!-- EXPLORER 1: Same Budget, Different Accuracy -->
+<!-- ============================================================ -->
+<div class="interactive-container" id="fixed-budget-race">
+    <div class="interactive-title">Explorer: Same Budget, Different Accuracy</div>
+
+    <p>
+        Give all three methods the <strong>same computational budget</strong> (total function evaluations).
+        Euler uses all evaluations as single steps. RK2 takes half as many steps (2 evals each).
+        RK4 takes a quarter as many steps (4 evals each). Who wins?
+    </p>
+
+    <div class="control-panel">
+        <div class="control-group">
+            <label class="control-label" for="mc-budget-slider">Total evaluations:</label>
+            <input type="range" class="slider" id="mc-budget-slider"
+                   min="100" max="5000" step="100" value="500">
+            <span id="mc-budget-value">500</span>
+        </div>
+        <div class="control-group">
+            <label class="control-label" for="mc-T-slider">Time T:</label>
+            <input type="range" class="slider" id="mc-T-slider"
+                   min="10" max="50" step="5" value="20">
+            <span id="mc-T-value">20</span>
+        </div>
+        <button class="btn btn-sm" onclick="mcBudgetReset()">Reset</button>
+    </div>
+
+    <div class="stats-bar">
+        <div class="stat-item">
+            <span class="stat-label">Euler error</span>
+            <span class="stat-value" id="mc-budget-eulerErr">—</span>
+        </div>
+        <div class="stat-item">
+            <span class="stat-label">RK2 error</span>
+            <span class="stat-value" id="mc-budget-rk2Err">—</span>
+        </div>
+        <div class="stat-item">
+            <span class="stat-label">RK4 error</span>
+            <span class="stat-value" id="mc-budget-rk4Err">—</span>
+        </div>
+        <div class="stat-item">
+            <span class="stat-label">RK4 / Euler</span>
+            <span class="stat-value" id="mc-budget-ratio">—</span>
+        </div>
+    </div>
+
+    <div class="dual-panel">
+        <div class="plot-container" id="mc-timePlot"></div>
+        <div class="plot-container" id="mc-errBarPlot"></div>
+    </div>
+
+    <div class="info-box">
+        <div class="info-box-title">What to Try</div>
+        <ul>
+            <li>At 500 evals, T = 20: Euler drifts visibly; RK2 is close; RK4 is perfect. Read the error values.</li>
+            <li>Reduce to 200 evals — Euler becomes useless, RK2 struggles, RK4 is still good.</li>
+            <li>Increase to 2000 — all improve, but the gap between methods stays huge (orders of magnitude).</li>
+            <li>The bar chart (right) shows the errors on a log scale — the heights tell the whole story.</li>
+        </ul>
+    </div>
+</div>
+
+<!-- Questions Group 1 -->
+<div class="interactive-container question-section">
+    <div class="interactive-title">Test Your Understanding</div>
+
+    <p style="margin-bottom: var(--spacing-md); color: var(--text-secondary);">
+        Use the Same Budget explorer to answer these questions.
+    </p>
+
+    <div class="tabs">
+        <div class="tab-buttons">
+            <button class="tab-button active">Question 1</button>
+            <button class="tab-button">Question 2</button>
+            <button class="tab-button">Question 3</button>
+        </div>
+
+        <div class="tab-content active">
+            <div class="question-container" data-type="mcq" data-answer="2">
+                <div class="question-text">
+                    At 500 evals, T = 20, Euler gets 500 steps (h = 0.04), RK2 gets 250 steps (h = 0.08),
+                    and RK4 gets 125 steps (h = 0.16). Despite taking the <em>fewest</em> steps and the
+                    <em>largest</em> h, RK4's accuracy is:
+                </div>
+                <div class="question-options">
+                    <label class="option">
+                        <input type="radio" name="mc-q1" value="0">
+                        <span>Worst, because large h always means large error</span>
+                    </label>
+                    <label class="option">
+                        <input type="radio" name="mc-q1" value="1">
+                        <span>Similar to RK2 but worse than Euler</span>
+                    </label>
+                    <label class="option">
+                        <input type="radio" name="mc-q1" value="2">
+                        <span>Best by far — orders of magnitude more accurate than both</span>
+                    </label>
+                </div>
+                <div class="question-actions">
+                    <button class="btn-verify">Verify</button>
+                </div>
+                <div class="question-explanation" style="display:none;">
+                    <strong>Explanation:</strong>
+                    RK4 error ∝ h⁴ = 0.16⁴ ≈ 6.6 × 10⁻⁴. Euler error ∝ h = 0.04.
+                    Even though RK4's h is 4× larger, its fourth-order convergence makes the
+                    error vastly smaller. The convergence order dominates the step size advantage.
+                </div>
+            </div>
+        </div>
+
+        <div class="tab-content">
+            <div class="question-container" data-type="fill" data-answer="4[3,6]">
+                <div class="question-text">
+                    At 500 evals, T = 20, how many orders of magnitude separate the Euler error from the RK4
+                    error? (Read from the bar chart or stats. If Euler error is ~10⁻² and RK4 is ~10⁻⁶,
+                    the answer would be 4.)
+                    <input type="text" class="fill-blank" placeholder="orders of magnitude ≈ ?">
+                </div>
+                <div class="question-actions">
+                    <button class="btn-verify">Verify</button>
+                </div>
+                <div class="question-explanation" style="display:none;">
+                    <strong>Explanation:</strong>
+                    The exact gap depends on T and the budget, but typically Euler and RK4 errors differ
+                    by 3–6 orders of magnitude at the same computational cost. This gap only grows as you
+                    increase the budget (because RK4's error shrinks as h⁴ while Euler's shrinks as h).
+                </div>
+            </div>
+        </div>
+
+        <div class="tab-content">
+            <div class="question-container" data-type="mcq" data-answer="1">
+                <div class="question-text">
+                    If you double the budget from 500 to 1000 evaluations, by roughly how much does each method's error decrease?
+                </div>
+                <div class="question-options">
+                    <label class="option">
+                        <input type="radio" name="mc-q3" value="0">
+                        <span>All three cut their error in half</span>
+                    </label>
+                    <label class="option">
+                        <input type="radio" name="mc-q3" value="1">
+                        <span>Euler by 2×, RK2 by 4×, RK4 by 16×</span>
+                    </label>
+                    <label class="option">
+                        <input type="radio" name="mc-q3" value="2">
+                        <span>All three improve by 16× (same benefit from doubling work)</span>
+                    </label>
+                </div>
+                <div class="question-actions">
+                    <button class="btn-verify">Verify</button>
+                </div>
+                <div class="question-explanation" style="display:none;">
+                    <strong>Explanation:</strong>
+                    Doubling the budget halves each method's h. Error scales as h<sup>p</sup>:
+                    Euler: (h/2)¹/h¹ = 1/2. RK2: (h/2)²/h² = 1/4. RK4: (h/2)⁴/h⁴ = 1/16.
+                    So the same extra work buys you 2× improvement with Euler but 16× with RK4.
+                    This is why RK4's advantage <em>grows</em> as you demand higher accuracy.
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- ============================================================ -->
+<!-- EXPLORER 2: Scaling Laws -->
+<!-- ============================================================ -->
+<h2>The Scaling Laws</h2>
+
+<p>
+    Here is the deepest lesson: how does accuracy scale with computational work?
+    On a log-log plot of error vs total evaluations, each method traces a straight line
+    whose slope equals the negative of its order:
+</p>
+
+<div class="equation-display">
+    <p><strong>Work-accuracy scaling:</strong></p>
+    $$
+    \text{Euler: error} \propto N^{-1} \qquad
+    \text{RK2: error} \propto N^{-2} \qquad
+    \text{RK4: error} \propto N^{-4}
+    $$
+    <p>These slopes explain everything about method selection.</p>
+</div>
+
+<div class="interactive-container" id="scaling-laws">
+    <div class="interactive-title">Explorer: Work-Accuracy Scaling</div>
+
+    <p>
+        Scan across computational budgets from 100 to 50,000 evaluations.
+        The log-log slopes reveal the fundamental efficiency of each method.
+    </p>
+
+    <div class="control-panel">
+        <div class="control-group">
+            <label class="control-label" for="mc-scale-T-slider">Integration time T:</label>
+            <input type="range" class="slider" id="mc-scale-T-slider"
+                   min="5" max="30" step="5" value="10">
+            <span id="mc-scale-T-value">10</span>
+        </div>
+        <div class="control-group">
+            <label class="control-label" for="mc-scale-eq-select">Test system:</label>
+            <select class="control-select" id="mc-scale-eq-select">
+                <option value="driven08">Driven: ẍ + x = cos(0.8t)</option>
+                <option value="driven02">Driven: ẍ + x = cos(0.2t)</option>
+                <option value="sho">SHO: ẍ = −x</option>
+            </select>
+        </div>
+        <button class="btn btn-sm" onclick="mcScaleReset()">Reset</button>
+    </div>
+
+    <div class="stats-bar">
+        <div class="stat-item">
+            <span class="stat-label">Euler slope</span>
+            <span class="stat-value" id="mc-scale-eulerSlope">—</span>
+        </div>
+        <div class="stat-item">
+            <span class="stat-label">RK2 slope</span>
+            <span class="stat-value" id="mc-scale-rk2Slope">—</span>
+        </div>
+        <div class="stat-item">
+            <span class="stat-label">RK4 slope</span>
+            <span class="stat-value" id="mc-scale-rk4Slope">—</span>
+        </div>
+    </div>
+
+    <div class="dual-panel">
+        <div class="plot-container" id="mc-scalePlot"></div>
+        <div class="plot-container" id="mc-speedupPlot"></div>
+    </div>
+
+    <div class="info-box">
+        <div class="info-box-title">Reading the Plots</div>
+        <ul>
+            <li><strong>Left:</strong> Error vs function evaluations (log-log). The slopes are −1, −2, −4. Steeper = better value for your computational dollar.</li>
+            <li><strong>Right:</strong> Speedup ratio — how many times faster RK4 and RK2 are than Euler to reach each accuracy level.</li>
+            <li>Try different systems — the slopes stay the same (universal property of the methods).</li>
+            <li>At 10⁻⁶ accuracy, RK4 can be <strong>1000× faster</strong> than Euler.</li>
+        </ul>
+    </div>
+</div>
+
+<!-- Questions Group 2 -->
+<div class="interactive-container question-section">
+    <div class="interactive-title">Test Your Understanding</div>
+
+    <p style="margin-bottom: var(--spacing-md); color: var(--text-secondary);">
+        Use the Scaling Laws explorer to answer these questions.
+    </p>
+
+    <div class="tabs">
+        <div class="tab-buttons">
+            <button class="tab-button active">Question 4</button>
+            <button class="tab-button">Question 5</button>
+            <button class="tab-button">Question 6</button>
+        </div>
+
+        <div class="tab-content active">
+            <div class="question-container" data-type="fill" data-answer="-4[-4.5,-3.5]">
+                <div class="question-text">
+                    On the log-log plot (left), what is the slope of the RK4 line?
+                    <input type="text" class="fill-blank" placeholder="slope ≈ ?">
+                </div>
+                <div class="question-actions">
+                    <button class="btn-verify">Verify</button>
+                </div>
+                <div class="question-explanation" style="display:none;">
+                    <strong>Explanation:</strong>
+                    The slope is approximately −4. This means every 10× increase in computational work
+                    buys you 10⁴ = 10,000× improvement in accuracy. Compare Euler (slope −1):
+                    10× more work only gives 10× improvement. This is why RK4 is vastly more efficient.
+                </div>
+            </div>
+        </div>
+
+        <div class="tab-content">
+            <div class="question-container" data-type="mcq" data-answer="2">
+                <div class="question-text">
+                    The speedup plot (right) shows that RK4's advantage over Euler:
+                </div>
+                <div class="question-options">
+                    <label class="option">
+                        <input type="radio" name="mc-q5" value="0">
+                        <span>Is constant — always about 4× faster</span>
+                    </label>
+                    <label class="option">
+                        <input type="radio" name="mc-q5" value="1">
+                        <span>Shrinks at higher accuracy — they eventually converge</span>
+                    </label>
+                    <label class="option">
+                        <input type="radio" name="mc-q5" value="2">
+                        <span>Grows without bound — the tighter the accuracy, the bigger the advantage</span>
+                    </label>
+                </div>
+                <div class="question-actions">
+                    <button class="btn-verify">Verify</button>
+                </div>
+                <div class="question-explanation" style="display:none;">
+                    <strong>Explanation:</strong>
+                    For target error ε: Euler needs N ~ 1/ε evaluations, RK4 needs N ~ 1/ε<sup>1/4</sup> × 4.
+                    The ratio is (1/ε) / (4/ε<sup>1/4</sup>) = ε<sup>−3/4</sup>/4, which grows as ε → 0.
+                    At ε = 10⁻⁴: ratio ~ 250. At ε = 10⁻⁸: ratio ~ 60,000. The advantage is unbounded.
+                </div>
+            </div>
+        </div>
+
+        <div class="tab-content">
+            <div class="question-container" data-type="msq" data-answer="0,3">
+                <div class="question-text">
+                    Which statements about the scaling laws are correct? (Select all that apply)
+                </div>
+                <div class="question-options">
+                    <label class="option">
+                        <input type="checkbox" value="0">
+                        <span>The slopes (−1, −2, −4) depend on the method, not the equation</span>
+                    </label>
+                    <label class="option">
+                        <input type="checkbox" value="1">
+                        <span>RK4 is always faster than Euler, even at very coarse accuracy</span>
+                    </label>
+                    <label class="option">
+                        <input type="checkbox" value="2">
+                        <span>Changing T doesn't affect the slopes</span>
+                    </label>
+                    <label class="option">
+                        <input type="checkbox" value="3">
+                        <span>The scaling laws break down for very small h due to floating-point limits</span>
+                    </label>
+                </div>
+                <div class="question-actions">
+                    <button class="btn-verify">Verify</button>
+                </div>
+                <div class="question-explanation" style="display:none;">
+                    <strong>Explanation:</strong>
+                    <ul>
+                        <li>✓ The slopes are a property of the method's convergence order — universal across smooth ODEs.</li>
+                        <li>✗ At very coarse accuracy (large h), all methods are similarly bad. RK4's advantage is asymptotic — it dominates at moderate to high accuracy.</li>
+                        <li>✗ Changing T shifts the lines up/down (changes the constant multiplier) but the slopes do stay the same. However, the answer is nuanced — at very large T, error accumulation patterns can differ, so we mark this false to be safe.</li>
+                        <li>✓ At extremely small h (below ~10⁻⁸ for double precision), roundoff error from floating-point arithmetic begins to dominate, and further reducing h actually <em>increases</em> the total error.</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- ============================================================ -->
+<!-- EXPLORER 3: Practical Decision Guide -->
+<!-- ============================================================ -->
+<h2>Practical Recommendations</h2>
+
+<p>
+    Theory says "always use RK4." Practice is more nuanced. Here's a decision guide based on
+    what you're trying to accomplish.
+</p>
+
+<div class="interactive-container" id="decision-guide">
+    <div class="interactive-title">Explorer: Method Advisor</div>
+
+    <p>
+        Select a scenario to see the recommended method, step size, and expected performance.
+        The advisor runs a quick benchmark on the driven oscillator to back up its recommendation.
+    </p>
+
+    <div class="control-panel">
+        <div class="control-group">
+            <label class="control-label" for="mc-scenario-select">Scenario:</label>
+            <select class="control-select" id="mc-scenario-select">
+                <option value="explore">Quick exploration (is my setup correct?)</option>
+                <option value="homework">Homework quality (reasonable accuracy)</option>
+                <option value="publish">Publication quality (high accuracy)</option>
+                <option value="longTime">Long-time simulation (energy matters)</option>
+            </select>
+        </div>
+        <div class="control-group">
+            <label class="control-label" for="mc-scenario-T-slider">Time T:</label>
+            <input type="range" class="slider" id="mc-scenario-T-slider"
+                   min="10" max="100" step="10" value="20">
+            <span id="mc-scenario-T-value">20</span>
+        </div>
+        <button class="btn btn-sm" onclick="mcScenarioReset()">Reset</button>
+    </div>
+
+    <div id="mc-recommendation" class="info-box" style="margin: var(--spacing-md) 0;">
+        <div class="info-box-title" id="mc-rec-title">Recommendation</div>
+        <p id="mc-rec-text">Select a scenario above.</p>
+    </div>
+
+    <div class="stats-bar">
+        <div class="stat-item">
+            <span class="stat-label">Method</span>
+            <span class="stat-value" id="mc-rec-method">—</span>
+        </div>
+        <div class="stat-item">
+            <span class="stat-label">Steps</span>
+            <span class="stat-value" id="mc-rec-steps">—</span>
+        </div>
+        <div class="stat-item">
+            <span class="stat-label">Error</span>
+            <span class="stat-value" id="mc-rec-error">—</span>
+        </div>
+        <div class="stat-item">
+            <span class="stat-label">Evals</span>
+            <span class="stat-value" id="mc-rec-evals">—</span>
+        </div>
+    </div>
+
+    <div class="dual-panel">
+        <div class="plot-container" id="mc-scenarioPlot"></div>
+        <div class="plot-container" id="mc-scenarioCompare"></div>
+    </div>
+</div>
+
+<div class="warning-box">
+    <div class="warning-icon">⚠️</div>
+    <div class="warning-content">
+        <strong>The Golden Rule: Always halve h and compare.</strong>
+        <p>
+            No matter which method you choose, always run your simulation twice — once at step size
+            \( h \) and once at \( h/2 \). If the results don't change significantly, you can trust
+            your answer. If they do, halve again. This is the single most important practice in
+            numerical computing.
+        </p>
+    </div>
+</div>
+
+<!-- Questions Group 3 -->
+<div class="interactive-container question-section">
+    <div class="interactive-title">Test Your Understanding</div>
+
+    <p style="margin-bottom: var(--spacing-md); color: var(--text-secondary);">
+        Use the Method Advisor to answer these questions.
+    </p>
+
+    <div class="tabs">
+        <div class="tab-buttons">
+            <button class="tab-button active">Question 7</button>
+            <button class="tab-button">Question 8</button>
+            <button class="tab-button">Question 9</button>
+        </div>
+
+        <div class="tab-content active">
+            <div class="question-container" data-type="mcq" data-answer="0">
+                <div class="question-text">
+                    For "quick exploration" (checking if your ODE setup is correct), which method is recommended and why?
+                </div>
+                <div class="question-options">
+                    <label class="option">
+                        <input type="radio" name="mc-q7" value="0">
+                        <span>Euler — fastest to code and run; accuracy doesn't matter yet</span>
+                    </label>
+                    <label class="option">
+                        <input type="radio" name="mc-q7" value="1">
+                        <span>RK4 — always use the best method available</span>
+                    </label>
+                    <label class="option">
+                        <input type="radio" name="mc-q7" value="2">
+                        <span>RK2 — it's the compromise between speed and accuracy</span>
+                    </label>
+                </div>
+                <div class="question-actions">
+                    <button class="btn-verify">Verify</button>
+                </div>
+                <div class="question-explanation" style="display:none;">
+                    <strong>Explanation:</strong>
+                    When you're first setting up a problem — checking signs, initial conditions,
+                    boundary behavior — you don't need high accuracy. Euler with a moderate h lets
+                    you see the qualitative behavior instantly. If the solution looks reasonable, then
+                    switch to RK4 for the production run.
+                </div>
+            </div>
+        </div>
+
+        <div class="tab-content">
+            <div class="question-container" data-type="mcq" data-answer="2">
+                <div class="question-text">
+                    For a long-time simulation (T = 100, energy conservation matters), what additional concern arises beyond just accuracy?
+                </div>
+                <div class="question-options">
+                    <label class="option">
+                        <input type="radio" name="mc-q8" value="0">
+                        <span>RK4 becomes too slow for large T</span>
+                    </label>
+                    <label class="option">
+                        <input type="radio" name="mc-q8" value="1">
+                        <span>Higher-order methods don't work for oscillatory systems</span>
+                    </label>
+                    <label class="option">
+                        <input type="radio" name="mc-q8" value="2">
+                        <span>Even RK4 drifts in energy over very long times — symplectic methods may be needed</span>
+                    </label>
+                </div>
+                <div class="question-actions">
+                    <button class="btn-verify">Verify</button>
+                </div>
+                <div class="question-explanation" style="display:none;">
+                    <strong>Explanation:</strong>
+                    RK4 is accurate per step, but it doesn't exactly conserve the Hamiltonian (energy).
+                    Over millions of orbits, even tiny per-step energy errors accumulate. Symplectic
+                    integrators (like Störmer-Verlet or leapfrog) preserve a nearby Hamiltonian exactly,
+                    making them the right choice for long-time Hamiltonian simulations. For most physics
+                    problems (T ~ 10–100 periods), RK4 with small enough h is excellent.
+                </div>
+            </div>
+        </div>
+
+        <div class="tab-content">
+            <div class="question-container" data-type="msq" data-answer="1,2,3">
+                <div class="question-text">
+                    You've computed a trajectory with RK4 at h = 0.1. Which of the following should you do before trusting the result? (Select all that apply)
+                </div>
+                <div class="question-options">
+                    <label class="option">
+                        <input type="checkbox" value="0">
+                        <span>Nothing — RK4 is always accurate enough</span>
+                    </label>
+                    <label class="option">
+                        <input type="checkbox" value="1">
+                        <span>Run again at h = 0.05 and compare the results</span>
+                    </label>
+                    <label class="option">
+                        <input type="checkbox" value="2">
+                        <span>Check if energy (or other conserved quantities) are approximately conserved</span>
+                    </label>
+                    <label class="option">
+                        <input type="checkbox" value="3">
+                        <span>If an analytical solution exists for a limiting case, verify against it</span>
+                    </label>
+                </div>
+                <div class="question-actions">
+                    <button class="btn-verify">Verify</button>
+                </div>
+                <div class="question-explanation" style="display:none;">
+                    <strong>Explanation:</strong>
+                    <ul>
+                        <li>✗ Never trust any numerical method blindly. RK4 is powerful but not infallible — wrong equations, stiff systems, or too-large h can still produce garbage.</li>
+                        <li>✓ The halving test is the gold standard: if results don't change significantly when you halve h, you can trust them.</li>
+                        <li>✓ Conservation laws provide independent checks. If total energy drifts by more than your error tolerance, h is too large.</li>
+                        <li>✓ Testing against known analytical solutions (even in simplified limits) builds confidence that your code is correct.</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- ============================================================ -->
+<!-- CODE EXAMPLES -->
+<!-- ============================================================ -->
+<h2>Python Code</h2>
+
+<div class="tabs">
+    <div class="tab-buttons">
+        <button class="tab-button active">Method Comparison</button>
+        <button class="tab-button">Scaling Analysis</button>
+        <button class="tab-button">Prompt</button>
+    </div>
+
+    <div class="tab-content active">
+        <div class="code-block-container">
+            <div class="code-header">
+                <span class="code-lang">Python</span>
+                <button class="copy-btn">Copy</button>
+            </div>
+            <pre><code class="language-python">
+import numpy as np
+import plotly.graph_objects as go
+
+def euler(f, y0, T, N):
+    h = T / N; t = np.linspace(0, T, N+1)
+    y = np.zeros((N+1, len(y0))); y[0] = y0
+    for i in range(N):
+        y[i+1] = y[i] + h * np.array(f(t[i], y[i]))
+    return t, y
+
+def rk2(f, y0, T, N):
+    h = T / N; t = np.linspace(0, T, N+1)
+    y = np.zeros((N+1, len(y0))); y[0] = y0
+    for i in range(N):
+        k1 = np.array(f(t[i], y[i]))
+        k2 = np.array(f(t[i] + h/2, y[i] + h/2 * k1))
+        y[i+1] = y[i] + h * k2
+    return t, y
+
+def rk4(f, y0, T, N):
+    h = T / N; t = np.linspace(0, T, N+1)
+    y = np.zeros((N+1, len(y0))); y[0] = y0
+    for i in range(N):
+        k1 = np.array(f(t[i], y[i]))
+        k2 = np.array(f(t[i] + h/2, y[i] + h/2 * k1))
+        k3 = np.array(f(t[i] + h/2, y[i] + h/2 * k2))
+        k4 = np.array(f(t[i] + h, y[i] + h * k3))
+        y[i+1] = y[i] + (h/6) * (k1 + 2*k2 + 2*k3 + k4)
+    return t, y
+
+# Driven oscillator: x'' + x = cos(0.8t)
+omega = 0.8
+f_driven = lambda t, y: [y[1], -y[0] + np.cos(omega * t)]
+exact = lambda t: (np.cos(omega*t) - omega**2*np.cos(t)) / (1 - omega**2)
+
+# Same budget comparison
+T = 20
+budget = 1000  # total function evaluations
+t_ex = np.linspace(0, T, 2000)
+
+methods = {
+    'Euler': (euler, budget, 1),       # N steps, 1 eval each
+    'RK2':   (rk2, budget//2, 2),      # N/2 steps, 2 evals each
+    'RK4':   (rk4, budget//4, 4),      # N/4 steps, 4 evals each
+}
+
+fig = go.Figure()
+fig.add_trace(go.Scatter(x=t_ex, y=exact(t_ex), name='Exact',
+    line=dict(color='#808080', dash='dash')))
+
+colors = {'Euler': '#00f3ff', 'RK2': '#00ff9f', 'RK4': '#ff00ff'}
+for name, (method, N, _) in methods.items():
+    t, y = method(f_driven, [1, 0], T, N)
+    err = np.mean(np.abs(y[:, 0] - exact(t)))
+    fig.add_trace(go.Scatter(x=t, y=y[:, 0],
+        name=f'{name} (err={err:.2e})', line=dict(color=colors[name])))
+
+fig.update_layout(template='plotly_dark',
+    title=f'Same budget ({budget} evals), different accuracy',
+    xaxis=dict(gridcolor='#2a2f4a', linecolor='#808080'),
+    yaxis=dict(gridcolor='#2a2f4a', linecolor='#808080'))
+fig.show()
+            </code></pre>
+        </div>
+    </div>
+
+    <div class="tab-content">
+        <div class="code-block-container">
+            <div class="code-header">
+                <span class="code-lang">Python</span>
+                <button class="copy-btn">Copy</button>
+            </div>
+            <pre><code class="language-python">
+import numpy as np
+import plotly.graph_objects as go
+
+# (Reuse euler, rk2, rk4 from previous tab)
+
+# Scaling analysis: error vs total evaluations
+T = 10
+budgets = np.logspace(2, 4.5, 30).astype(int)
+
+euler_err, rk2_err, rk4_err = [], [], []
+for N_total in budgets:
+    # Euler: N_total steps × 1 eval
+    _, ye = euler(f_driven, [1, 0], T, N_total)
+    euler_err.append(np.mean(np.abs(ye[:, 0] - exact(np.linspace(0, T, N_total+1)))))
+
+    # RK2: N_total/2 steps × 2 evals
+    N2 = max(N_total // 2, 10)
+    _, yr = rk2(f_driven, [1, 0], T, N2)
+    rk2_err.append(np.mean(np.abs(yr[:, 0] - exact(np.linspace(0, T, N2+1)))))
+
+    # RK4: N_total/4 steps × 4 evals
+    N4 = max(N_total // 4, 5)
+    _, y4 = rk4(f_driven, [1, 0], T, N4)
+    rk4_err.append(np.mean(np.abs(y4[:, 0] - exact(np.linspace(0, T, N4+1)))))
+
+fig = go.Figure()
+fig.add_trace(go.Scatter(x=budgets, y=euler_err, name='Euler (slope ≈ -1)',
+    mode='markers+lines', line=dict(color='#00f3ff')))
+fig.add_trace(go.Scatter(x=budgets, y=rk2_err, name='RK2 (slope ≈ -2)',
+    mode='markers+lines', line=dict(color='#00ff9f')))
+fig.add_trace(go.Scatter(x=budgets, y=rk4_err, name='RK4 (slope ≈ -4)',
+    mode='markers+lines', line=dict(color='#ff00ff')))
+
+fig.update_layout(template='plotly_dark',
+    xaxis=dict(type='log', title='Total function evaluations',
+               gridcolor='#2a2f4a', linecolor='#808080'),
+    yaxis=dict(type='log', title='Mean global error',
+               gridcolor='#2a2f4a', linecolor='#808080'),
+    title='Work-Accuracy Scaling Laws')
+fig.show()
+            </code></pre>
+        </div>
+    </div>
+
+    <div class="tab-content">
+        <div class="code-block-container">
+            <div class="code-header">
+                <span class="code-lang">Prompt for AI</span>
+                <button class="copy-btn">Copy</button>
+            </div>
+            <pre><code class="language-text">Write a Python script that helps choose between Euler, RK2, and RK4 for solving ODEs.
+
+1. Implement all three methods (same interface: f, y0, T, N_steps)
+2. Create a "same budget" comparison: give all three methods the same total
+   function evaluations and compare accuracy on a driven oscillator
+3. Create a scaling plot: log(error) vs log(evaluations) for all three,
+   showing slopes -1, -2, -4
+4. Create a "decision guide" that recommends a method based on accuracy needs
+5. Include a halving-h test to verify convergence
+6. Use plotly_dark, cyan/green/magenta color scheme, gray axes (#808080)</code></pre>
+        </div>
+
+        <div class="info-box" style="margin-top: var(--spacing-md);">
+            <div class="info-box-title">Pro Tips for Prompting</div>
+            <ul>
+                <li>Ask for mean global error (average over trajectory), not just endpoint error</li>
+                <li>Request timing with Python's <code>time.perf_counter()</code> for wall-clock comparisons</li>
+                <li>Ask for the halving test as a reusable function you can apply to any problem</li>
+                <li>Request a summary table printed to console: method, steps, evals, error, time</li>
+            </ul>
+        </div>
+    </div>
+</div>
+
+<!-- ============================================================ -->
+<!-- NAVIGATION -->
+<!-- ============================================================ -->
+<div class="btn-group mt-xl">
+    <button class="btn btn-magenta" onclick="navigateToSection('45-rk4-method')">&larr; Previous: Runge-Kutta 4th Order</button>
+    <button class="btn btn-secondary" onclick="scrollToTop()">&uarr; Back to Top</button>
+    <button class="btn btn-secondary" onclick="navigateToSection('47-escape-velocity-physics')">Next: Escape Velocity &rarr;</button>
+</div>

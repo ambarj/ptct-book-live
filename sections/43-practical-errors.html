@@ -1,0 +1,737 @@
+<!-- ============================================================
+     Section 4.10: Error Analysis in Practice (Optional)
+     Source: NPTEL Lecture 7-8, numerical methods error theory
+     Concept: Truncation vs round-off errors, convergence testing,
+              optimal step size selection, Richardson extrapolation
+     Time: 15-20 minutes
+     Prerequisites: Euler method (4.4-4.5), coupled systems (4.7-4.9)
+     ============================================================ -->
+
+<h1>Error Analysis in Practice</h1>
+
+<p>
+    Every numerical method introduces error, but not all errors are the same. When you solve a differential equation
+    with Euler's method, you're fighting on <strong>two fronts</strong>: truncation error from the algorithm,
+    and round-off error from the computer. Understanding both is essential for trusting your numerical results.
+</p>
+
+<div class="info-box">
+    <div class="info-box-title">Learning Objectives</div>
+    <ul>
+        <li>Distinguish between truncation error and round-off error</li>
+        <li>Verify that Euler's method converges as \( O(h) \) by testing at multiple step sizes</li>
+        <li>Understand why there's an optimal step size — too small is also bad</li>
+        <li>Use Richardson extrapolation to get better answers from cheap solvers</li>
+    </ul>
+</div>
+
+<div class="equation-display">
+    <p><strong>Total Error:</strong></p>
+    $$ \text{Total Error} = \underbrace{\text{Truncation Error}}_{\text{from the algorithm}} + \underbrace{\text{Round-off Error}}_{\text{from the computer}} $$
+</div>
+
+<p>
+    <strong>Truncation error</strong> comes from replacing the exact derivative with a finite-difference approximation.
+    For Euler's method, we use \( y_{n+1} = y_n + h\,f(t_n, y_n) \), which ignores higher-order terms in the Taylor
+    expansion. This error scales as \( O(h) \) — halve the step, halve the error.
+</p>
+
+<p>
+    <strong>Round-off error</strong> comes from the computer storing numbers with finite precision (about 15-16 digits
+    in double precision). Each step adds a tiny rounding error, and with \( N = T/h \) steps, these accumulate.
+    Smaller \( h \) means more steps means more accumulated round-off.
+</p>
+
+<div class="warning-box">
+    <div class="warning-icon">⚠️</div>
+    <div class="warning-content">
+        <strong>The Paradox:</strong>
+        <p>
+            Making \( h \) smaller reduces truncation error but increases round-off error.
+            There's an <em>optimal</em> step size where total error is minimized!
+        </p>
+    </div>
+</div>
+
+<hr>
+
+<!-- ============================================================ -->
+<!-- EXPLORER 1: Error Dissection -->
+<!-- ============================================================ -->
+<div class="interactive-container" id="error-dissection">
+    <div class="interactive-title">Explorer: Error Dissection</div>
+
+    <p>
+        Solve \( dy/dt = -y \) (exact solution: \( y = e^{-t} \)) with Euler's method at various step sizes.
+        Watch how the two error sources compete.
+    </p>
+
+    <div class="control-panel">
+        <div class="control-group">
+            <label class="control-label" for="practErr-h-slider">Step size h:</label>
+            <input type="range" class="slider" id="practErr-h-slider"
+                   min="-4" max="0" step="0.1" value="-1">
+            <span id="practErr-h-value">0.100</span>
+        </div>
+        <div class="control-group">
+            <label class="control-label" for="practErr-T-slider">Integration time T:</label>
+            <input type="range" class="slider" id="practErr-T-slider"
+                   min="1" max="10" step="1" value="5">
+            <span id="practErr-T-value">5</span>
+        </div>
+        <button class="btn btn-sm" onclick="practErrDissectReset()">Reset</button>
+    </div>
+
+    <div class="stats-bar">
+        <div class="stat-item">
+            <span class="stat-label">h</span>
+            <span class="stat-value" id="practErr-stat-h">0.100</span>
+        </div>
+        <div class="stat-item">
+            <span class="stat-label">Steps</span>
+            <span class="stat-value" id="practErr-stat-steps">50</span>
+        </div>
+        <div class="stat-item">
+            <span class="stat-label">Max Error</span>
+            <span class="stat-value" id="practErr-stat-maxErr">—</span>
+        </div>
+        <div class="stat-item">
+            <span class="stat-label">Error at t=T</span>
+            <span class="stat-value" id="practErr-stat-endErr">—</span>
+        </div>
+    </div>
+
+    <div class="dual-panel">
+        <div class="plot-container" id="practErr-solPlot"></div>
+        <div class="plot-container" id="practErr-errPlot"></div>
+    </div>
+
+    <div class="info-box">
+        <div class="info-box-title">What to Try</div>
+        <ul>
+            <li>Start at h = 0.1, then decrease. Watch the Euler curve approach the exact solution.</li>
+            <li>Go very small (h &lt; 10⁻⁴). Does the error keep shrinking?</li>
+            <li>The right panel shows how error grows along the trajectory — note the exponential shape.</li>
+        </ul>
+    </div>
+</div>
+
+<!-- Questions Group 1 -->
+<div class="interactive-container question-section">
+    <div class="interactive-title">Test Your Understanding</div>
+
+    <p style="margin-bottom: var(--spacing-md); color: var(--text-secondary);">
+        Use the Error Dissection explorer to answer these questions.
+    </p>
+
+    <div class="tabs">
+        <div class="tab-buttons">
+            <button class="tab-button active">Question 1</button>
+            <button class="tab-button">Question 2</button>
+            <button class="tab-button">Question 3</button>
+        </div>
+
+        <div class="tab-content active">
+            <div class="question-container" data-type="mcq" data-answer="1">
+                <div class="question-text">
+                    When you halve the step size \( h \) for Euler's method, what happens to the truncation error?
+                </div>
+                <div class="question-options">
+                    <label class="option">
+                        <input type="radio" name="practErr-q1" value="0">
+                        <span>It roughly doubles</span>
+                    </label>
+                    <label class="option">
+                        <input type="radio" name="practErr-q1" value="1">
+                        <span>It roughly halves</span>
+                    </label>
+                    <label class="option">
+                        <input type="radio" name="practErr-q1" value="2">
+                        <span>It roughly quarters</span>
+                    </label>
+                    <label class="option">
+                        <input type="radio" name="practErr-q1" value="3">
+                        <span>It stays the same</span>
+                    </label>
+                </div>
+                <div class="question-actions">
+                    <button class="btn-verify">Verify</button>
+                </div>
+                <div class="question-explanation" style="display:none;">
+                    <strong>Explanation:</strong>
+                    Euler's method has first-order convergence: global error \( \propto O(h) \).
+                    So halving \( h \) halves the truncation error. (RK4 would quarter it — that's fourth-order.)
+                </div>
+            </div>
+        </div>
+
+        <div class="tab-content">
+            <div class="question-container" data-type="mcq" data-answer="2">
+                <div class="question-text">
+                    Why does making \( h \) extremely small (say \( 10^{-8} \)) eventually INCREASE the total error?
+                </div>
+                <div class="question-options">
+                    <label class="option">
+                        <input type="radio" name="practErr-q2" value="0">
+                        <span>The algorithm becomes unstable at small \( h \)</span>
+                    </label>
+                    <label class="option">
+                        <input type="radio" name="practErr-q2" value="1">
+                        <span>The truncation error formula breaks down</span>
+                    </label>
+                    <label class="option">
+                        <input type="radio" name="practErr-q2" value="2">
+                        <span>Accumulated round-off errors from billions of tiny steps dominate</span>
+                    </label>
+                </div>
+                <div class="question-actions">
+                    <button class="btn-verify">Verify</button>
+                </div>
+                <div class="question-explanation" style="display:none;">
+                    <strong>Explanation:</strong>
+                    With \( h = 10^{-8} \), integrating to \( T = 5 \) requires \( 5 \times 10^8 \) steps.
+                    Each step introduces a round-off error of about \( 10^{-16} \) (machine epsilon). After
+                    \( N \) steps, round-off errors accumulate to roughly \( \sqrt{N} \times 10^{-16} \approx 10^{-12} \),
+                    which can exceed the truncation error. There's a sweet spot!
+                </div>
+            </div>
+        </div>
+
+        <div class="tab-content">
+            <div class="question-container" data-type="fill" data-answer="1[0.8,1.2]">
+                <div class="question-text">
+                    Set \( T = 5 \). Compare the max error at \( h = 0.1 \) vs \( h = 0.05 \).
+                    The ratio (error at 0.1) / (error at 0.05) ≈
+                    <input type="text" class="fill-blank" placeholder="ratio">.
+                    (A ratio near 2 confirms first-order convergence.)
+                </div>
+                <div class="question-actions">
+                    <button class="btn-verify">Verify</button>
+                </div>
+                <div class="question-explanation" style="display:none;">
+                    <strong>Explanation:</strong>
+                    For the test equation \( dy/dt = -y \), at \( t = 5 \): error at \( h=0.1 \) is about 0.004
+                    and at \( h=0.05 \) is about 0.002. The ratio is close to 2, but not exact because we measure
+                    global error which also depends on error propagation. The log-log slope should be near 1.
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- ============================================================ -->
+<!-- EXPLORER 2: Convergence Tester -->
+<!-- ============================================================ -->
+<h2>Measuring Convergence Order</h2>
+
+<p>
+    How do you <em>verify</em> that your code converges at the expected rate? Run the solver at multiple step sizes,
+    measure the error at a fixed time, and plot error vs \( h \) on a log-log scale. The slope tells you the
+    <strong>convergence order</strong>.
+</p>
+
+<div class="equation-display">
+    <p><strong>Convergence Test:</strong></p>
+    $$ \text{error}(h) \propto h^p \quad\Longrightarrow\quad \log(\text{error}) = p\,\log(h) + \text{const} $$
+    <p>For Euler: \( p = 1 \). For RK2: \( p = 2 \). For RK4: \( p = 4 \).</p>
+</div>
+
+<div class="interactive-container" id="convergence-tester">
+    <div class="interactive-title">Explorer: Convergence Tester</div>
+
+    <p>
+        Solve \( dy/dt = -y \) at step sizes from \( h = 1 \) down to \( h = 10^{-5} \).
+        The log-log plot reveals the convergence order as the slope of the error line.
+    </p>
+
+    <div class="control-panel">
+        <div class="control-group">
+            <label class="control-label" for="practErr-conv-T-slider">Evaluation time T:</label>
+            <input type="range" class="slider" id="practErr-conv-T-slider"
+                   min="1" max="10" step="1" value="5">
+            <span id="practErr-conv-T-value">5</span>
+        </div>
+        <div class="control-group">
+            <label class="control-label" for="practErr-conv-eq-select">Test equation:</label>
+            <select class="control-select" id="practErr-conv-eq-select">
+                <option value="decay">dy/dt = −y (decay)</option>
+                <option value="growth">dy/dt = y (growth)</option>
+                <option value="oscillator">SHO: ẍ = −x</option>
+            </select>
+        </div>
+        <button class="btn btn-sm" onclick="practErrConvReset()">Reset</button>
+    </div>
+
+    <div class="stats-bar">
+        <div class="stat-item">
+            <span class="stat-label">Measured slope</span>
+            <span class="stat-value" id="practErr-conv-slope">—</span>
+        </div>
+        <div class="stat-item">
+            <span class="stat-label">Expected order</span>
+            <span class="stat-value" id="practErr-conv-expected">1 (Euler)</span>
+        </div>
+        <div class="stat-item">
+            <span class="stat-label">Optimal h</span>
+            <span class="stat-value" id="practErr-conv-optH">—</span>
+        </div>
+    </div>
+
+    <div class="dual-panel">
+        <div class="plot-container" id="practErr-convPlot"></div>
+        <div class="plot-container" id="practErr-richPlot"></div>
+    </div>
+
+    <div class="info-box">
+        <div class="info-box-title">Reading the Plot</div>
+        <ul>
+            <li><strong>Left:</strong> Error vs h on log-log scale. A straight line with slope = 1 confirms Euler is O(h).</li>
+            <li><strong>Right:</strong> Richardson extrapolation — combining two Euler runs at h and h/2 to get a much better answer.</li>
+            <li>Notice the U-shape at very small h? That's round-off taking over.</li>
+        </ul>
+    </div>
+</div>
+
+<div class="info-box">
+    <div class="info-box-title">Richardson Extrapolation</div>
+    <p>
+        If your method has error \( \propto h^p \), you can combine two runs at step sizes \( h \) and \( h/2 \)
+        to cancel the leading error term:
+    </p>
+    $$ y_{\text{better}} = \frac{2^p \, y(h/2) - y(h)}{2^p - 1} $$
+    <p>
+        For Euler (\( p = 1 \)): \( y_{\text{better}} = 2\,y(h/2) - y(h) \). This effectively gives you
+        second-order accuracy from a first-order method — for free!
+    </p>
+</div>
+
+<!-- Questions Group 2 -->
+<div class="interactive-container question-section">
+    <div class="interactive-title">Test Your Understanding</div>
+
+    <p style="margin-bottom: var(--spacing-md); color: var(--text-secondary);">
+        Use the Convergence Tester to answer these questions.
+    </p>
+
+    <div class="tabs">
+        <div class="tab-buttons">
+            <button class="tab-button active">Question 4</button>
+            <button class="tab-button">Question 5</button>
+            <button class="tab-button">Question 6</button>
+        </div>
+
+        <div class="tab-content active">
+            <div class="question-container" data-type="mcq" data-answer="0">
+                <div class="question-text">
+                    On a log-log plot of error vs \( h \), what does a slope of exactly 1 tell you?
+                </div>
+                <div class="question-options">
+                    <label class="option">
+                        <input type="radio" name="practErr-q4" value="0">
+                        <span>The method is first-order: halving \( h \) halves the error</span>
+                    </label>
+                    <label class="option">
+                        <input type="radio" name="practErr-q4" value="1">
+                        <span>The method has converged to machine precision</span>
+                    </label>
+                    <label class="option">
+                        <input type="radio" name="practErr-q4" value="2">
+                        <span>The method is unstable and errors are growing</span>
+                    </label>
+                </div>
+                <div class="question-actions">
+                    <button class="btn-verify">Verify</button>
+                </div>
+                <div class="question-explanation" style="display:none;">
+                    <strong>Explanation:</strong>
+                    On a log-log scale, \( \log(\text{err}) = p \log(h) + C \) is a straight line with slope \( p \).
+                    A slope of 1 means \( \text{err} \propto h^1 \), confirming first-order convergence (Euler's method).
+                    A slope of 2 would mean RK2, and 4 would mean RK4.
+                </div>
+            </div>
+        </div>
+
+        <div class="tab-content">
+            <div class="question-container" data-type="msq" data-answer="0,2">
+                <div class="question-text">
+                    Which of the following are true about Richardson extrapolation? (Select all that apply)
+                </div>
+                <div class="question-options">
+                    <label class="option">
+                        <input type="checkbox" value="0">
+                        <span>It combines two runs at different step sizes to cancel the leading error term</span>
+                    </label>
+                    <label class="option">
+                        <input type="checkbox" value="1">
+                        <span>It works only for fourth-order methods like RK4</span>
+                    </label>
+                    <label class="option">
+                        <input type="checkbox" value="2">
+                        <span>For Euler, it gives second-order accuracy from first-order runs</span>
+                    </label>
+                    <label class="option">
+                        <input type="checkbox" value="3">
+                        <span>It eliminates all error, giving the exact solution</span>
+                    </label>
+                </div>
+                <div class="question-actions">
+                    <button class="btn-verify">Verify</button>
+                </div>
+                <div class="question-explanation" style="display:none;">
+                    <strong>Explanation:</strong>
+                    <ul>
+                        <li>✓ Richardson extrapolation cancels the \( O(h^p) \) leading term, leaving \( O(h^{p+1}) \).</li>
+                        <li>✗ It works for <em>any</em> method with known convergence order \( p \).</li>
+                        <li>✓ For Euler (p=1): combines to get O(h²) — a free upgrade!</li>
+                        <li>✗ Higher-order terms remain. It reduces error significantly but doesn't eliminate it.</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <div class="tab-content">
+            <div class="question-container" data-type="fill" data-answer="2|3">
+                <div class="question-text">
+                    Richardson extrapolation for Euler uses: \( y_{\text{better}} = \)
+                    <input type="text" class="fill-blank" placeholder="?"> · y(h/2) −  y(h).
+                    This effectively gives order
+                    <input type="text" class="fill-blank" placeholder="?"> convergence
+                    (one better than Euler alone).
+                </div>
+                <div class="question-actions">
+                    <button class="btn-verify">Verify</button>
+                </div>
+                <div class="question-explanation" style="display:none;">
+                    <strong>Explanation:</strong>
+                    For Euler (\( p = 1 \)): \( y_{\text{better}} = \frac{2^1 y(h/2) - y(h)}{2^1 - 1} = 2 y(h/2) - y(h) \).
+                    The leading \( O(h) \) term cancels, leaving \( O(h^2) \). But we wrote it without
+                    the denominator as \( 2 \cdot y(h/2) - y(h) \) since \( 2^1 - 1 = 1 \).
+                    This has second-order accuracy, but really order \( p+1 = 2 \).
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- ============================================================ -->
+<!-- EXPLORER 3: Step Size Advisor -->
+<!-- ============================================================ -->
+<h2>Choosing the Right Step Size</h2>
+
+<p>
+    In practice, you need to balance <strong>accuracy</strong> against <strong>computational cost</strong>.
+    Smaller \( h \) gives better accuracy, but requires more steps (and more CPU time).
+    The key question: <em>how small is small enough?</em>
+</p>
+
+<div class="interactive-container" id="step-size-advisor">
+    <div class="interactive-title">Explorer: Step Size Advisor</div>
+
+    <p>
+        Compare Euler solutions for a damped oscillator (\( \ddot{x} + \dot{x} + 4x = 0 \)) at different step sizes.
+        See how many steps you need for a given accuracy target, and why better methods (RK4) save enormous effort.
+    </p>
+
+    <div class="control-panel">
+        <div class="control-group">
+            <label class="control-label" for="practErr-adv-target-slider">Target accuracy (digits):</label>
+            <input type="range" class="slider" id="practErr-adv-target-slider"
+                   min="1" max="6" step="1" value="3">
+            <span id="practErr-adv-target-value">3</span>
+        </div>
+        <div class="control-group">
+            <label class="control-label" for="practErr-adv-T-slider">Integration time T:</label>
+            <input type="range" class="slider" id="practErr-adv-T-slider"
+                   min="5" max="30" step="5" value="10">
+            <span id="practErr-adv-T-value">10</span>
+        </div>
+        <button class="btn btn-sm" onclick="practErrAdvReset()">Reset</button>
+    </div>
+
+    <div class="stats-bar">
+        <div class="stat-item">
+            <span class="stat-label">Euler steps needed</span>
+            <span class="stat-value" id="practErr-adv-eulerSteps">—</span>
+        </div>
+        <div class="stat-item">
+            <span class="stat-label">RK4 steps needed</span>
+            <span class="stat-value" id="practErr-adv-rk4Steps">—</span>
+        </div>
+        <div class="stat-item">
+            <span class="stat-label">Speedup factor</span>
+            <span class="stat-value" id="practErr-adv-speedup">—</span>
+        </div>
+    </div>
+
+    <div class="dual-panel">
+        <div class="plot-container" id="practErr-costPlot"></div>
+        <div class="plot-container" id="practErr-compPlot"></div>
+    </div>
+
+    <div class="info-box">
+        <div class="info-box-title">Why RK4 Wins</div>
+        <p>
+            For 6-digit accuracy, Euler needs millions of steps while RK4 needs only hundreds. Even though
+            each RK4 step costs 4× more function evaluations than Euler, the \( O(h^4) \) convergence rate
+            crushes Euler's \( O(h) \). This is why RK4 is the standard workhorse in computational physics.
+        </p>
+    </div>
+</div>
+
+<!-- Questions Group 3 -->
+<div class="interactive-container question-section">
+    <div class="interactive-title">Test Your Understanding</div>
+
+    <p style="margin-bottom: var(--spacing-md); color: var(--text-secondary);">
+        Use the Step Size Advisor to answer these questions.
+    </p>
+
+    <div class="tabs">
+        <div class="tab-buttons">
+            <button class="tab-button active">Question 7</button>
+            <button class="tab-button">Question 8</button>
+            <button class="tab-button">Question 9</button>
+        </div>
+
+        <div class="tab-content active">
+            <div class="question-container" data-type="mcq" data-answer="2">
+                <div class="question-text">
+                    To achieve 6-digit accuracy with Euler's method on a typical problem, approximately how many steps are needed
+                    compared to RK4?
+                </div>
+                <div class="question-options">
+                    <label class="option">
+                        <input type="radio" name="practErr-q7" value="0">
+                        <span>About the same number</span>
+                    </label>
+                    <label class="option">
+                        <input type="radio" name="practErr-q7" value="1">
+                        <span>About 100× more</span>
+                    </label>
+                    <label class="option">
+                        <input type="radio" name="practErr-q7" value="2">
+                        <span>About 1000× or more</span>
+                    </label>
+                    <label class="option">
+                        <input type="radio" name="practErr-q7" value="3">
+                        <span>About 4× more (since RK4 has 4 stages)</span>
+                    </label>
+                </div>
+                <div class="question-actions">
+                    <button class="btn-verify">Verify</button>
+                </div>
+                <div class="question-explanation" style="display:none;">
+                    <strong>Explanation:</strong>
+                    For 6-digit accuracy (\( 10^{-6} \)): Euler needs \( h \sim 10^{-6} \), so \( N = T/h \sim 10^7 \) steps.
+                    RK4 needs \( h^4 \sim 10^{-6} \), so \( h \sim 0.03 \) and \( N \sim 300 \) steps.
+                    That's roughly \( 10^4 \)× fewer steps — even accounting for 4 evaluations per step,
+                    RK4 is about 1000× cheaper overall.
+                </div>
+            </div>
+        </div>
+
+        <div class="tab-content">
+            <div class="question-container" data-type="msq" data-answer="1,2">
+                <div class="question-text">
+                    Which strategies help improve numerical accuracy? (Select all that apply)
+                </div>
+                <div class="question-options">
+                    <label class="option">
+                        <input type="checkbox" value="0">
+                        <span>Always use the smallest possible step size</span>
+                    </label>
+                    <label class="option">
+                        <input type="checkbox" value="1">
+                        <span>Use a higher-order method (e.g., RK4 instead of Euler)</span>
+                    </label>
+                    <label class="option">
+                        <input type="checkbox" value="2">
+                        <span>Use Richardson extrapolation to cancel leading error terms</span>
+                    </label>
+                    <label class="option">
+                        <input type="checkbox" value="3">
+                        <span>Use the largest step size that doesn't crash the simulation</span>
+                    </label>
+                </div>
+                <div class="question-actions">
+                    <button class="btn-verify">Verify</button>
+                </div>
+                <div class="question-explanation" style="display:none;">
+                    <strong>Explanation:</strong>
+                    <ul>
+                        <li>✗ The smallest possible h eventually hits round-off limits — there's an optimal range.</li>
+                        <li>✓ Higher-order methods converge much faster, giving the same accuracy with far fewer steps.</li>
+                        <li>✓ Richardson extrapolation boosts order by one, combining cheap runs cleverly.</li>
+                        <li>✗ The largest stable h gives poor accuracy, barely capturing the physics.</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <div class="tab-content">
+            <div class="question-container" data-type="fill" data-answer="4">
+                <div class="question-text">
+                    For an \( O(h^p) \) method, halving the step size reduces the error by a factor of \( 2^p \).
+                    For RK4 (\( p = 4 \)), halving \( h \) reduces error by a factor of
+                    <input type="text" class="fill-blank" placeholder="?"> × the previous error.
+                    (Just enter the reduction factor as a single number, i.e., \( 2^4 = \)?)
+                </div>
+                <div class="question-actions">
+                    <button class="btn-verify">Verify</button>
+                </div>
+                <div class="question-explanation" style="display:none;">
+                    <strong>Explanation:</strong>
+                    For RK4 (\( p = 4 \)): error \( \propto h^4 \). Halving \( h \):
+                    \( (h/2)^4 = h^4/16 \). The error drops by a factor of 16.
+                    That's why RK4 converges so much faster than Euler (factor of 2 per halving).
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- ============================================================ -->
+<!-- CODE EXAMPLES -->
+<!-- ============================================================ -->
+<h2>Python Code</h2>
+
+<div class="tabs">
+    <div class="tab-buttons">
+        <button class="tab-button active">Convergence Test</button>
+        <button class="tab-button">Richardson Extrapolation</button>
+        <button class="tab-button">Prompt</button>
+    </div>
+
+    <div class="tab-content active">
+        <div class="code-block-container">
+            <div class="code-header">
+                <span class="code-lang">Python</span>
+                <button class="copy-btn">Copy</button>
+            </div>
+            <pre><code class="language-python">
+import numpy as np
+import plotly.graph_objects as go
+
+def euler(f, y0, T, h):
+    """Euler method: returns (t_array, y_array)."""
+    t = np.arange(0, T + h/2, h)
+    y = np.zeros(len(t))
+    y[0] = y0
+    for i in range(len(t) - 1):
+        y[i+1] = y[i] + h * f(t[i], y[i])
+    return t, y
+
+# Test equation: dy/dt = -y, exact: y = exp(-t)
+f = lambda t, y: -y
+exact = lambda t: np.exp(-t)
+
+# Run at multiple step sizes
+T = 5.0
+h_values = np.logspace(-4, 0, 30)  # h from 0.0001 to 1
+errors = []
+
+for h in h_values:
+    t, y = euler(f, 1.0, T, h)
+    err = abs(y[-1] - exact(T))
+    errors.append(err)
+
+# Log-log plot
+fig = go.Figure()
+fig.add_trace(go.Scatter(x=h_values, y=errors,
+    mode='markers+lines', name='Euler error',
+    line=dict(color='#00f3ff', width=2)))
+
+# Reference slope-1 line
+fig.add_trace(go.Scatter(x=[1e-4, 1], y=[1e-4, 1],
+    mode='lines', name='O(h) reference',
+    line=dict(color='#808080', dash='dash')))
+
+fig.update_layout(
+    template='plotly_dark',
+    xaxis=dict(type='log', title='Step size h',
+               gridcolor='#2a2f4a', linecolor='#808080'),
+    yaxis=dict(type='log', title='|Error at t=T|',
+               gridcolor='#2a2f4a', linecolor='#808080'),
+    title='Euler Method Convergence')
+fig.show()
+            </code></pre>
+        </div>
+    </div>
+
+    <div class="tab-content">
+        <div class="code-block-container">
+            <div class="code-header">
+                <span class="code-lang">Python</span>
+                <button class="copy-btn">Copy</button>
+            </div>
+            <pre><code class="language-python">
+import numpy as np
+
+def euler(f, y0, T, h):
+    t = np.arange(0, T + h/2, h)
+    y = np.zeros(len(t))
+    y[0] = y0
+    for i in range(len(t) - 1):
+        y[i+1] = y[i] + h * f(t[i], y[i])
+    return t, y
+
+f = lambda t, y: -y
+exact_val = np.exp(-5.0)  # exact at T=5
+T = 5.0
+
+print(f"Exact y(T=5) = {exact_val:.10f}\n")
+print(f"{'h':>10s}  {'y_Euler':>12s}  {'y_Rich':>12s}  {'Err_Euler':>10s}  {'Err_Rich':>10s}")
+print("-" * 62)
+
+for h in [0.5, 0.2, 0.1, 0.05, 0.02, 0.01]:
+    _, y1 = euler(f, 1.0, T, h)      # run at h
+    _, y2 = euler(f, 1.0, T, h/2)    # run at h/2
+
+    y_euler = y1[-1]
+    y_rich = 2 * y2[-1] - y1[-1]     # Richardson for p=1
+
+    err_euler = abs(y_euler - exact_val)
+    err_rich = abs(y_rich - exact_val)
+
+    print(f"{h:10.4f}  {y_euler:12.8f}  {y_rich:12.8f}  {err_euler:10.2e}  {err_rich:10.2e}")
+            </code></pre>
+        </div>
+    </div>
+
+    <div class="tab-content">
+        <div class="code-block-container">
+            <div class="code-header">
+                <span class="code-lang">Prompt for AI</span>
+                <button class="copy-btn">Copy</button>
+            </div>
+            <pre><code class="language-text">Write a Python script to study numerical error in Euler's method.
+
+1. Solve dy/dt = -y (exact: y = exp(-t)) with Euler from t=0 to T=5
+2. Run at step sizes h from 0.0001 to 1 (logarithmically spaced)
+3. Plot |error at t=T| vs h on a log-log scale using Plotly
+4. Add a reference line with slope 1 to verify O(h) convergence
+5. Implement Richardson extrapolation: y_better = 2*y(h/2) - y(h)
+6. Show improvement ratio in a table
+7. Use plotly_dark theme, cyan data, gray axes (#808080)</code></pre>
+        </div>
+
+        <div class="info-box" style="margin-top: var(--spacing-md);">
+            <div class="info-box-title">Pro Tips for Prompting</div>
+            <ul>
+                <li>Ask for log-log plots specifically — they reveal power-law scaling</li>
+                <li>Request reference lines (slope 1, slope 2) for visual comparison</li>
+                <li>Ask for a table showing error ratios when halving h</li>
+                <li>Specify "Richardson extrapolation" by name for the improvement technique</li>
+            </ul>
+        </div>
+    </div>
+</div>
+
+<!-- ============================================================ -->
+<!-- NAVIGATION -->
+<!-- ============================================================ -->
+<div class="btn-group mt-xl">
+    <button class="btn btn-magenta" onclick="navigateToSection('42-damped-mechanics')">&larr; Previous: Mechanical Oscillators</button>
+    <button class="btn btn-secondary" onclick="scrollToTop()">&uarr; Back to Top</button>
+    <button class="btn btn-secondary" onclick="navigateToSection('44-improved-euler')">Next: Improved Euler Method &rarr;</button>
+</div>

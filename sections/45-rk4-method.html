@@ -1,0 +1,777 @@
+<!-- ============================================================
+     Section 4.12: Runge-Kutta 4th Order (RK4)
+     Source: NPTEL Lecture 12, test_rk4.nb
+     Concept: The industry-standard ODE solver — four slope evaluations
+              yield O(h⁴) global error, an optimal accuracy-cost balance
+     Time: 15-20 minutes
+     Prerequisites: Euler (4.4-4.5), RK2 (4.11), convergence testing (4.10)
+     ============================================================ -->
+
+<h1>Runge-Kutta 4th Order (RK4)</h1>
+
+<p>
+    RK2 used <strong>two</strong> slope evaluations per step and achieved \( O(h^2) \). What if we
+    sample the slope at <strong>four</strong> carefully chosen points? That's RK4 — and the payoff is
+    spectacular: the error drops to \( O(h^4) \).
+</p>
+
+<div class="info-box">
+    <div class="info-box-title">Learning Objectives</div>
+    <ul>
+        <li>Understand RK4's four-stage recipe: sample slopes at the start, two midpoints, and the end</li>
+        <li>Implement RK4 and race it against Euler and RK2 on a driven oscillator</li>
+        <li>Verify fourth-order convergence \( O(h^4) \) — halving \( h \) reduces error by 16×</li>
+        <li>See why RK4 is the default choice: far fewer total evaluations for the same accuracy</li>
+    </ul>
+</div>
+
+<div class="equation-display">
+    <p><strong>The RK4 Recipe:</strong></p>
+    $$
+    \begin{aligned}
+    k_1 &= f(t_n,\; y_n) & &\text{(slope at start)} \\[4pt]
+    k_2 &= f\!\left(t_n + \tfrac{h}{2},\; y_n + \tfrac{h}{2}\,k_1\right) & &\text{(slope at midpoint, using } k_1\text{)} \\[4pt]
+    k_3 &= f\!\left(t_n + \tfrac{h}{2},\; y_n + \tfrac{h}{2}\,k_2\right) & &\text{(slope at midpoint, using } k_2\text{)} \\[4pt]
+    k_4 &= f\!\left(t_n + h,\; y_n + h\,k_3\right) & &\text{(slope at end)} \\[6pt]
+    y_{n+1} &= y_n + \frac{h}{6}\!\left(k_1 + 2k_2 + 2k_3 + k_4\right) & &\text{(weighted average)}
+    \end{aligned}
+    $$
+    <p>Four evaluations of \( f \) per step. The weights \( (1, 2, 2, 1)/6 \) come from matching
+    the Taylor expansion to fourth order — but you don't need to derive them. Just trust the recipe
+    and verify it works.</p>
+</div>
+
+<div class="info-box">
+    <div class="info-box-title">Why These Weights?</div>
+    <p>
+        The weights \( \frac{1}{6}(1, 2, 2, 1) \) arise from <strong>Simpson's rule</strong> for
+        numerical integration. Think of it as a weighted average that gives more importance to the
+        midpoint slopes (sampled twice, weighted double) — this is the same idea that makes Simpson's
+        rule so accurate for integrals. The result: RK4 captures terms through \( O(h^4) \) in the
+        Taylor expansion without ever computing a derivative of \( f \).
+    </p>
+</div>
+
+<p>
+    To test RK4 on a richer problem than the simple harmonic oscillator, we'll use a
+    <strong>driven oscillator</strong>:
+</p>
+
+<div class="equation-display">
+    <p><strong>Driven harmonic oscillator:</strong></p>
+    $$ \ddot{x} + x = \cos(\omega t) \qquad \omega = 0.8 $$
+    <p>
+        with initial conditions \( x(0) = 1 \), \( \dot{x}(0) = 0 \). The exact solution is
+        \( x(t) = \frac{\cos(\omega t) - \omega^2 \cos(t)}{1 - \omega^2} \).
+    </p>
+</div>
+
+<!-- ============================================================ -->
+<!-- EXPLORER 1: Three-Way Algorithm Race -->
+<!-- ============================================================ -->
+<div class="interactive-container" id="algorithm-race-rk4">
+    <div class="interactive-title">Explorer: Three-Way Algorithm Race</div>
+
+    <p>
+        Euler, RK2, and RK4 all solve the same driven oscillator at the same step size.
+        Watch RK4 hug the exact solution while the others struggle.
+    </p>
+
+    <div class="control-panel">
+        <div class="control-group">
+            <label class="control-label" for="rk4-race-h-slider">Step size h:</label>
+            <input type="range" class="slider" id="rk4-race-h-slider"
+                   min="0.05" max="0.50" step="0.01" value="0.20">
+            <span id="rk4-race-h-value">0.20</span>
+        </div>
+        <div class="control-group">
+            <label class="control-label" for="rk4-race-T-slider">Time T:</label>
+            <input type="range" class="slider" id="rk4-race-T-slider"
+                   min="20" max="100" step="10" value="50">
+            <span id="rk4-race-T-value">50</span>
+        </div>
+        <button class="btn btn-sm" onclick="rk4RaceReset()">Reset</button>
+    </div>
+
+    <div class="stats-bar">
+        <div class="stat-item">
+            <span class="stat-label">Euler error</span>
+            <span class="stat-value" id="rk4-race-eulerErr">—</span>
+        </div>
+        <div class="stat-item">
+            <span class="stat-label">RK2 error</span>
+            <span class="stat-value" id="rk4-race-rk2Err">—</span>
+        </div>
+        <div class="stat-item">
+            <span class="stat-label">RK4 error</span>
+            <span class="stat-value" id="rk4-race-rk4Err">—</span>
+        </div>
+    </div>
+
+    <div class="dual-panel">
+        <div class="plot-container" id="rk4-timePlot"></div>
+        <div class="plot-container" id="rk4-phasePlot"></div>
+    </div>
+
+    <div class="info-box">
+        <div class="info-box-title">What to Try</div>
+        <ul>
+            <li>At h = 0.20, T = 50: Euler diverges wildly, RK2 drifts, RK4 is nearly indistinguishable from exact.</li>
+            <li>Increase T to 100 — the gap between methods grows dramatically.</li>
+            <li>In the phase portrait (right), RK4 traces the exact path; Euler's spiral expands outward.</li>
+            <li>Try h = 0.05 — all three improve, but RK4 is already perfect at h = 0.20.</li>
+        </ul>
+    </div>
+</div>
+
+<!-- Questions Group 1 -->
+<div class="interactive-container question-section">
+    <div class="interactive-title">Test Your Understanding</div>
+
+    <p style="margin-bottom: var(--spacing-md); color: var(--text-secondary);">
+        Use the Algorithm Race explorer to answer these questions.
+    </p>
+
+    <div class="tabs">
+        <div class="tab-buttons">
+            <button class="tab-button active">Question 1</button>
+            <button class="tab-button">Question 2</button>
+            <button class="tab-button">Question 3</button>
+        </div>
+
+        <div class="tab-content active">
+            <div class="question-container" data-type="mcq" data-answer="2">
+                <div class="question-text">
+                    At h = 0.20, T = 50, how does RK4's trajectory compare to the exact solution?
+                </div>
+                <div class="question-options">
+                    <label class="option">
+                        <input type="radio" name="rk4-q1" value="0">
+                        <span>It drifts noticeably, similar to RK2</span>
+                    </label>
+                    <label class="option">
+                        <input type="radio" name="rk4-q1" value="1">
+                        <span>It spirals outward like Euler, but more slowly</span>
+                    </label>
+                    <label class="option">
+                        <input type="radio" name="rk4-q1" value="2">
+                        <span>It is nearly indistinguishable from the exact solution</span>
+                    </label>
+                </div>
+                <div class="question-actions">
+                    <button class="btn-verify">Verify</button>
+                </div>
+                <div class="question-explanation" style="display:none;">
+                    <strong>Explanation:</strong>
+                    At h = 0.20, RK4's error is typically \( 10^{-5} \) to \( 10^{-7} \) — far below
+                    what the eye can detect. The magenta RK4 curve lies directly on the gray dashed
+                    exact solution. This is the power of fourth-order convergence: even a modest step
+                    size gives excellent accuracy.
+                </div>
+            </div>
+        </div>
+
+        <div class="tab-content">
+            <div class="question-container" data-type="fill" data-answer="4">
+                <div class="question-text">
+                    RK4 requires <input type="text" class="fill-blank" placeholder="?"> evaluations
+                    of \( f \) per step, compared to 2 for RK2 and 1 for Euler.
+                </div>
+                <div class="question-actions">
+                    <button class="btn-verify">Verify</button>
+                </div>
+                <div class="question-explanation" style="display:none;">
+                    <strong>Explanation:</strong>
+                    RK4 computes four slopes per step: \( k_1, k_2, k_3, k_4 \). Each requires one
+                    evaluation of \( f \). So RK4 costs 4× per step compared to Euler, or 2× compared to RK2.
+                    Despite this higher per-step cost, RK4 needs far fewer total steps for the same accuracy.
+                </div>
+            </div>
+        </div>
+
+        <div class="tab-content">
+            <div class="question-container" data-type="mcq" data-answer="0">
+                <div class="question-text">
+                    Set h = 0.20, T = 50. Read the error values from the stats bar. Which ordering is correct?
+                </div>
+                <div class="question-options">
+                    <label class="option">
+                        <input type="radio" name="rk4-q3" value="0">
+                        <span>Euler error \( \gg \) RK2 error \( \gg \) RK4 error</span>
+                    </label>
+                    <label class="option">
+                        <input type="radio" name="rk4-q3" value="1">
+                        <span>All three errors are similar in magnitude</span>
+                    </label>
+                    <label class="option">
+                        <input type="radio" name="rk4-q3" value="2">
+                        <span>RK4 error is worst because it evaluates \( f \) more times</span>
+                    </label>
+                </div>
+                <div class="question-actions">
+                    <button class="btn-verify">Verify</button>
+                </div>
+                <div class="question-explanation" style="display:none;">
+                    <strong>Explanation:</strong>
+                    Each method's error follows its convergence order: Euler \( \propto h \),
+                    RK2 \( \propto h^2 \), RK4 \( \propto h^4 \). At h = 0.20:
+                    Euler error ~ 0.2, RK2 error ~ 0.04, RK4 error ~ 0.0016.
+                    Each jump is dramatic — RK4 is typically thousands of times more accurate than Euler.
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- ============================================================ -->
+<!-- EXPLORER 2: Convergence Rate -->
+<!-- ============================================================ -->
+<h2>Measuring Fourth-Order Convergence</h2>
+
+<p>
+    The log-log convergence plot is the definitive test: the slope in the \( \log(\text{error}) \) vs
+    \( \log(h) \) plot reveals the method's order. Watch the three methods fan out with slopes
+    1, 2, and 4:
+</p>
+
+<div class="equation-display">
+    <p><strong>Convergence Orders:</strong></p>
+    $$ \text{Euler:} \; O(h^1) \qquad \text{RK2:} \; O(h^2) \qquad \text{RK4:} \; O(h^4) $$
+    <p>Halving \( h \) reduces error by: 2× (Euler), 4× (RK2), <strong>16×</strong> (RK4).</p>
+</div>
+
+<div class="interactive-container" id="convergence-rk4">
+    <div class="interactive-title">Explorer: Convergence Rate Plotter</div>
+
+    <p>
+        Run all three methods across 20+ step sizes and measure the endpoint error.
+        The log-log slopes confirm each method's convergence order.
+    </p>
+
+    <div class="control-panel">
+        <div class="control-group">
+            <label class="control-label" for="rk4-conv-T-slider">Evaluation time T:</label>
+            <input type="range" class="slider" id="rk4-conv-T-slider"
+                   min="1" max="10" step="1" value="5">
+            <span id="rk4-conv-T-value">5</span>
+        </div>
+        <div class="control-group">
+            <label class="control-label" for="rk4-conv-eq-select">Test system:</label>
+            <select class="control-select" id="rk4-conv-eq-select">
+                <option value="sho">SHO: ẍ = −x</option>
+                <option value="decay">Decay: dy/dt = −y</option>
+                <option value="driven">Driven: ẍ + x = cos(0.8t)</option>
+            </select>
+        </div>
+        <button class="btn btn-sm" onclick="rk4ConvReset()">Reset</button>
+    </div>
+
+    <div class="stats-bar">
+        <div class="stat-item">
+            <span class="stat-label">Euler slope</span>
+            <span class="stat-value" id="rk4-conv-eulerSlope">—</span>
+        </div>
+        <div class="stat-item">
+            <span class="stat-label">RK2 slope</span>
+            <span class="stat-value" id="rk4-conv-rk2Slope">—</span>
+        </div>
+        <div class="stat-item">
+            <span class="stat-label">RK4 slope</span>
+            <span class="stat-value" id="rk4-conv-rk4Slope">—</span>
+        </div>
+    </div>
+
+    <div class="dual-panel">
+        <div class="plot-container" id="rk4-convPlot"></div>
+        <div class="plot-container" id="rk4-halvingPlot"></div>
+    </div>
+
+    <div class="info-box">
+        <div class="info-box-title">Reading the Plots</div>
+        <ul>
+            <li><strong>Left:</strong> Log-log error vs h. Euler slope ≈ 1, RK2 slope ≈ 2, RK4 slope ≈ 4. The lines fan out at small h.</li>
+            <li><strong>Right:</strong> Error improvement when halving h. Euler → 2×, RK2 → 4×, RK4 → 16×.</li>
+            <li>Try different test systems — the slopes are universal, independent of the equation.</li>
+        </ul>
+    </div>
+</div>
+
+<!-- Questions Group 2 -->
+<div class="interactive-container question-section">
+    <div class="interactive-title">Test Your Understanding</div>
+
+    <p style="margin-bottom: var(--spacing-md); color: var(--text-secondary);">
+        Use the Convergence Rate Plotter to answer these questions.
+    </p>
+
+    <div class="tabs">
+        <div class="tab-buttons">
+            <button class="tab-button active">Question 4</button>
+            <button class="tab-button">Question 5</button>
+            <button class="tab-button">Question 6</button>
+        </div>
+
+        <div class="tab-content active">
+            <div class="question-container" data-type="fill" data-answer="4[3.5,4.5]">
+                <div class="question-text">
+                    Using the SHO system at T = 5, what is the measured slope of the RK4 convergence
+                    line (shown in the stats bar)?
+                    <input type="text" class="fill-blank" placeholder="slope ≈ ?">
+                </div>
+                <div class="question-actions">
+                    <button class="btn-verify">Verify</button>
+                </div>
+                <div class="question-explanation" style="display:none;">
+                    <strong>Explanation:</strong>
+                    The slope should be close to 4.0, confirming RK4 is a fourth-order method.
+                    The measured value may differ slightly due to higher-order error terms and
+                    floating-point effects, but it should fall within 3.5–4.5.
+                </div>
+            </div>
+        </div>
+
+        <div class="tab-content">
+            <div class="question-container" data-type="fill" data-answer="16[14,18]">
+                <div class="question-text">
+                    Look at the halving-h bars for RK4. When \( h \) is halved, the error
+                    drops by a factor of approximately
+                    <input type="text" class="fill-blank" placeholder="?">.
+                    (Read from the rightmost RK4 bar.)
+                </div>
+                <div class="question-actions">
+                    <button class="btn-verify">Verify</button>
+                </div>
+                <div class="question-explanation" style="display:none;">
+                    <strong>Explanation:</strong>
+                    For \( O(h^4) \): error(h/2)/error(h) = \( (h/2)^4 / h^4 = 1/16 \).
+                    So the error drops by a factor of 16 each time you halve h. Compare:
+                    Euler drops by 2×, RK2 by 4×, RK4 by 16×. This is why RK4 reaches high accuracy
+                    with remarkably few steps.
+                </div>
+            </div>
+        </div>
+
+        <div class="tab-content">
+            <div class="question-container" data-type="msq" data-answer="0,2">
+                <div class="question-text">
+                    Which statements are true about the convergence plots? (Select all that apply)
+                </div>
+                <div class="question-options">
+                    <label class="option">
+                        <input type="checkbox" value="0">
+                        <span>The convergence order is a property of the method, not the equation</span>
+                    </label>
+                    <label class="option">
+                        <input type="checkbox" value="1">
+                        <span>RK4 always has lower error than RK2, even at very large h</span>
+                    </label>
+                    <label class="option">
+                        <input type="checkbox" value="2">
+                        <span>At very small h, the gap between methods grows — RK4's advantage increases</span>
+                    </label>
+                    <label class="option">
+                        <input type="checkbox" value="3">
+                        <span>The slopes change when you switch between test systems</span>
+                    </label>
+                </div>
+                <div class="question-actions">
+                    <button class="btn-verify">Verify</button>
+                </div>
+                <div class="question-explanation" style="display:none;">
+                    <strong>Explanation:</strong>
+                    <ul>
+                        <li>✓ The convergence order depends on the algorithm, not the equation (for smooth ODEs). Try all three systems — the slopes are always 1, 2, 4.</li>
+                        <li>✗ At very large h, all methods are inaccurate and the ordering can be unpredictable. The convergence rate is an <em>asymptotic</em> property as h → 0.</li>
+                        <li>✓ On the log-log plot, lines with different slopes diverge as h → 0. A slope-4 line drops much faster than slope-1, so the gap widens.</li>
+                        <li>✗ The slopes stay the same (1, 2, 4) for all smooth test systems. The constant multiplier changes, but the slope does not.</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- ============================================================ -->
+<!-- EXPLORER 3: Efficiency Calculator -->
+<!-- ============================================================ -->
+<h2>The Efficiency Argument</h2>
+
+<p>
+    RK4 costs 4 evaluations per step. Euler costs only 1. Isn't that a waste?
+    <strong>Not at all.</strong> To match RK4's accuracy, Euler needs astronomically more total
+    evaluations. Let's see this quantitatively.
+</p>
+
+<div class="interactive-container" id="efficiency-calculator">
+    <div class="interactive-title">Explorer: Efficiency Calculator</div>
+
+    <p>
+        Choose a target accuracy. The calculator estimates how many function evaluations each method
+        needs to reach that accuracy — the bar chart tells the story.
+    </p>
+
+    <div class="control-panel">
+        <div class="control-group">
+            <label class="control-label" for="rk4-eff-target-slider">Target accuracy (digits):</label>
+            <input type="range" class="slider" id="rk4-eff-target-slider"
+                   min="1" max="6" step="1" value="3">
+            <span id="rk4-eff-target-value">3</span>
+        </div>
+        <div class="control-group">
+            <label class="control-label" for="rk4-eff-T-slider">Integration time T:</label>
+            <input type="range" class="slider" id="rk4-eff-T-slider"
+                   min="5" max="30" step="5" value="10">
+            <span id="rk4-eff-T-value">10</span>
+        </div>
+        <button class="btn btn-sm" onclick="rk4EffReset()">Reset</button>
+    </div>
+
+    <div class="stats-bar">
+        <div class="stat-item">
+            <span class="stat-label">Euler evals</span>
+            <span class="stat-value" id="rk4-eff-eulerEvals">—</span>
+        </div>
+        <div class="stat-item">
+            <span class="stat-label">RK2 evals</span>
+            <span class="stat-value" id="rk4-eff-rk2Evals">—</span>
+        </div>
+        <div class="stat-item">
+            <span class="stat-label">RK4 evals</span>
+            <span class="stat-value" id="rk4-eff-rk4Evals">—</span>
+        </div>
+        <div class="stat-item">
+            <span class="stat-label">RK4 speedup</span>
+            <span class="stat-value" id="rk4-eff-speedup">—</span>
+        </div>
+    </div>
+
+    <div class="dual-panel">
+        <div class="plot-container" id="rk4-errScanPlot"></div>
+        <div class="plot-container" id="rk4-costPlot"></div>
+    </div>
+
+    <div class="info-box">
+        <div class="info-box-title">What to Try</div>
+        <ul>
+            <li>At 3-digit accuracy: RK4 needs hundreds of evaluations; Euler needs thousands.</li>
+            <li>Push to 6 digits — the gap becomes enormous. Euler needs millions; RK4 still under a thousand.</li>
+            <li>Increase T to 30 — all methods need more evaluations, but the <em>ratio</em> stays lopsided.</li>
+            <li>This is why RK4 is the default for scientific computing: unbeatable efficiency for smooth problems.</li>
+        </ul>
+    </div>
+</div>
+
+<div class="info-box">
+    <div class="info-box-title">Why Not RK5, RK6, ...?</div>
+    <p>
+        Higher-order methods exist, but they require <em>more than one extra evaluation per order</em>
+        beyond RK4. An order-5 method needs 6 evaluations (not 5), order-6 needs at least 7, and so on.
+        RK4 sits at a sweet spot: 4 evaluations for 4th-order accuracy. Going higher gives diminishing
+        returns unless you need extreme precision. For most physics problems, RK4 is the right tool.
+    </p>
+</div>
+
+<!-- Questions Group 3 -->
+<div class="interactive-container question-section">
+    <div class="interactive-title">Test Your Understanding</div>
+
+    <p style="margin-bottom: var(--spacing-md); color: var(--text-secondary);">
+        Use the Efficiency Calculator to answer these questions.
+    </p>
+
+    <div class="tabs">
+        <div class="tab-buttons">
+            <button class="tab-button active">Question 7</button>
+            <button class="tab-button">Question 8</button>
+            <button class="tab-button">Question 9</button>
+        </div>
+
+        <div class="tab-content active">
+            <div class="question-container" data-type="mcq" data-answer="2">
+                <div class="question-text">
+                    At 4-digit accuracy (target = 4), which statement about the cost bar chart is correct?
+                </div>
+                <div class="question-options">
+                    <label class="option">
+                        <input type="radio" name="rk4-q7" value="0">
+                        <span>All three methods require roughly the same number of evaluations</span>
+                    </label>
+                    <label class="option">
+                        <input type="radio" name="rk4-q7" value="1">
+                        <span>RK4 needs more evaluations because each step is more expensive</span>
+                    </label>
+                    <label class="option">
+                        <input type="radio" name="rk4-q7" value="2">
+                        <span>RK4 needs far fewer total evaluations despite costing more per step</span>
+                    </label>
+                </div>
+                <div class="question-actions">
+                    <button class="btn-verify">Verify</button>
+                </div>
+                <div class="question-explanation" style="display:none;">
+                    <strong>Explanation:</strong>
+                    RK4 costs 4× per step, but it can use much larger h for the same accuracy.
+                    For 4-digit accuracy, Euler might need h ~ 10⁻⁴ (100,000 steps × 1 eval),
+                    while RK4 needs h ~ 0.1 (100 steps × 4 evals = 400). RK4 wins by a factor
+                    of ~250. The higher convergence order always dominates the per-step cost.
+                </div>
+            </div>
+        </div>
+
+        <div class="tab-content">
+            <div class="question-container" data-type="mcq" data-answer="1">
+                <div class="question-text">
+                    As you increase the target accuracy from 3 to 6 digits, what happens to RK4's advantage over Euler?
+                </div>
+                <div class="question-options">
+                    <label class="option">
+                        <input type="radio" name="rk4-q8" value="0">
+                        <span>The advantage stays roughly constant</span>
+                    </label>
+                    <label class="option">
+                        <input type="radio" name="rk4-q8" value="1">
+                        <span>The advantage grows dramatically — RK4 becomes relatively much cheaper</span>
+                    </label>
+                    <label class="option">
+                        <input type="radio" name="rk4-q8" value="2">
+                        <span>The advantage shrinks because RK4 also needs more steps</span>
+                    </label>
+                </div>
+                <div class="question-actions">
+                    <button class="btn-verify">Verify</button>
+                </div>
+                <div class="question-explanation" style="display:none;">
+                    <strong>Explanation:</strong>
+                    To go from 3-digit to 6-digit accuracy (1000× tighter):
+                    Euler needs 1000× more steps (error ∝ h). RK4 needs only about 6× more steps
+                    (error ∝ h⁴, so halving error needs \( h → h/\sqrt[4]{2} \)). The higher the accuracy
+                    demanded, the more RK4's efficiency advantage grows.
+                </div>
+            </div>
+        </div>
+
+        <div class="tab-content">
+            <div class="question-container" data-type="msq" data-answer="1,2">
+                <div class="question-text">
+                    Why is RK4 the default choice in scientific computing? (Select all that apply)
+                </div>
+                <div class="question-options">
+                    <label class="option">
+                        <input type="checkbox" value="0">
+                        <span>It is the simplest method to implement</span>
+                    </label>
+                    <label class="option">
+                        <input type="checkbox" value="1">
+                        <span>It offers the best accuracy per function evaluation among low-order methods</span>
+                    </label>
+                    <label class="option">
+                        <input type="checkbox" value="2">
+                        <span>Higher-order methods (RK5, RK6...) have diminishing returns in efficiency</span>
+                    </label>
+                    <label class="option">
+                        <input type="checkbox" value="3">
+                        <span>It exactly conserves energy for all Hamiltonian systems</span>
+                    </label>
+                </div>
+                <div class="question-actions">
+                    <button class="btn-verify">Verify</button>
+                </div>
+                <div class="question-explanation" style="display:none;">
+                    <strong>Explanation:</strong>
+                    <ul>
+                        <li>✗ Euler is simpler to implement. RK4 requires more code (four k-values), but it's still straightforward.</li>
+                        <li>✓ RK4 achieves 4th-order accuracy with only 4 evaluations — an optimal ratio. No lower-order method comes close.</li>
+                        <li>✓ Beyond order 4, each additional order requires more than one extra evaluation (RK5 needs 6, RK6 needs ≥ 7), making higher orders less efficient per evaluation.</li>
+                        <li>✗ RK4 does not exactly conserve energy. For long-time Hamiltonian simulations, symplectic integrators (like Störmer-Verlet) are preferred.</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- ============================================================ -->
+<!-- CODE EXAMPLES -->
+<!-- ============================================================ -->
+<h2>Python Code</h2>
+
+<div class="tabs">
+    <div class="tab-buttons">
+        <button class="tab-button active">RK4 Implementation</button>
+        <button class="tab-button">Three-Way Comparison</button>
+        <button class="tab-button">Prompt</button>
+    </div>
+
+    <div class="tab-content active">
+        <div class="code-block-container">
+            <div class="code-header">
+                <span class="code-lang">Python</span>
+                <button class="copy-btn">Copy</button>
+            </div>
+            <pre><code class="language-python">
+import numpy as np
+import plotly.graph_objects as go
+from plotly.subplots import make_subplots
+
+def rk4(f, y0, T, h):
+    """RK4 method for systems: y' = f(t, y)."""
+    t = np.arange(0, T + h/2, h)
+    y = np.zeros((len(t), len(y0)))
+    y[0] = y0
+    for i in range(len(t) - 1):
+        k1 = np.array(f(t[i], y[i]))
+        k2 = np.array(f(t[i] + h/2, y[i] + h/2 * k1))
+        k3 = np.array(f(t[i] + h/2, y[i] + h/2 * k2))
+        k4 = np.array(f(t[i] + h, y[i] + h * k3))
+        y[i+1] = y[i] + (h/6) * (k1 + 2*k2 + 2*k3 + k4)
+    return t, y
+
+# Driven oscillator: x'' + x = cos(0.8t)
+omega = 0.8
+f_driven = lambda t, y: [y[1], -y[0] + np.cos(omega * t)]
+
+h = 0.20
+T = 50
+t_rk4, y_rk4 = rk4(f_driven, [1, 0], T, h)
+
+# Exact solution
+t_exact = np.linspace(0, T, 2000)
+x_exact = (np.cos(omega * t_exact) - omega**2 * np.cos(t_exact)) / (1 - omega**2)
+
+fig = make_subplots(rows=1, cols=2,
+    subplot_titles=['Position vs Time', 'Phase Portrait'])
+
+fig.add_trace(go.Scatter(x=t_exact, y=x_exact, name='Exact',
+    line=dict(color='#808080', dash='dash')), row=1, col=1)
+fig.add_trace(go.Scatter(x=t_rk4, y=y_rk4[:,0], name='RK4',
+    line=dict(color='#ff00ff')), row=1, col=1)
+
+v_exact = (-omega * np.sin(omega * t_exact) + omega**2 * np.sin(t_exact)) / (1 - omega**2)
+fig.add_trace(go.Scatter(x=x_exact, y=v_exact, name='Exact',
+    line=dict(color='#808080', dash='dash'), showlegend=False), row=1, col=2)
+fig.add_trace(go.Scatter(x=y_rk4[:,0], y=y_rk4[:,1], name='RK4',
+    line=dict(color='#ff00ff'), showlegend=False), row=1, col=2)
+
+fig.update_layout(template='plotly_dark')
+fig.show()
+            </code></pre>
+        </div>
+    </div>
+
+    <div class="tab-content">
+        <div class="code-block-container">
+            <div class="code-header">
+                <span class="code-lang">Python</span>
+                <button class="copy-btn">Copy</button>
+            </div>
+            <pre><code class="language-python">
+import numpy as np
+import plotly.graph_objects as go
+
+def euler(f, y0, T, h):
+    t = np.arange(0, T + h/2, h)
+    y = np.zeros((len(t), len(y0))); y[0] = y0
+    for i in range(len(t) - 1):
+        y[i+1] = y[i] + h * np.array(f(t[i], y[i]))
+    return t, y
+
+def rk2(f, y0, T, h):
+    t = np.arange(0, T + h/2, h)
+    y = np.zeros((len(t), len(y0))); y[0] = y0
+    for i in range(len(t) - 1):
+        k1 = np.array(f(t[i], y[i]))
+        k2 = np.array(f(t[i] + h/2, y[i] + h/2 * k1))
+        y[i+1] = y[i] + h * k2
+    return t, y
+
+def rk4(f, y0, T, h):
+    t = np.arange(0, T + h/2, h)
+    y = np.zeros((len(t), len(y0))); y[0] = y0
+    for i in range(len(t) - 1):
+        k1 = np.array(f(t[i], y[i]))
+        k2 = np.array(f(t[i] + h/2, y[i] + h/2 * k1))
+        k3 = np.array(f(t[i] + h/2, y[i] + h/2 * k2))
+        k4 = np.array(f(t[i] + h, y[i] + h * k3))
+        y[i+1] = y[i] + (h/6) * (k1 + 2*k2 + 2*k3 + k4)
+    return t, y
+
+# Convergence test: SHO x'' = -x, exact x(T) = cos(T)
+f_sho = lambda t, y: [y[1], -y[0]]
+T = 5.0
+
+h_values = np.logspace(-3, 0, 25)
+euler_err, rk2_err, rk4_err = [], [], []
+
+for h in h_values:
+    exact = np.cos(T)
+    _, ye = euler(f_sho, [1, 0], T, h)
+    _, yr = rk2(f_sho, [1, 0], T, h)
+    _, y4 = rk4(f_sho, [1, 0], T, h)
+    euler_err.append(abs(ye[-1, 0] - exact))
+    rk2_err.append(abs(yr[-1, 0] - exact))
+    rk4_err.append(abs(y4[-1, 0] - exact))
+
+fig = go.Figure()
+fig.add_trace(go.Scatter(x=h_values, y=euler_err, name='Euler O(h)',
+    mode='markers+lines', line=dict(color='#00f3ff')))
+fig.add_trace(go.Scatter(x=h_values, y=rk2_err, name='RK2 O(h²)',
+    mode='markers+lines', line=dict(color='#00ff9f')))
+fig.add_trace(go.Scatter(x=h_values, y=rk4_err, name='RK4 O(h⁴)',
+    mode='markers+lines', line=dict(color='#ff00ff')))
+
+# Reference slopes
+fig.add_trace(go.Scatter(x=[1e-3, 1], y=[1e-3, 1],
+    name='slope 1', line=dict(color='#808080', dash='dot')))
+fig.add_trace(go.Scatter(x=[1e-3, 1], y=[1e-6, 1],
+    name='slope 2', line=dict(color='#808080', dash='dot')))
+fig.add_trace(go.Scatter(x=[1e-3, 1], y=[1e-12, 1],
+    name='slope 4', line=dict(color='#808080', dash='dot')))
+
+fig.update_layout(template='plotly_dark',
+    xaxis=dict(type='log', title='Step size h',
+               gridcolor='#2a2f4a', linecolor='#808080'),
+    yaxis=dict(type='log', title='|Error at t=T|',
+               gridcolor='#2a2f4a', linecolor='#808080'),
+    title='Convergence: Euler vs RK2 vs RK4')
+fig.show()
+            </code></pre>
+        </div>
+    </div>
+
+    <div class="tab-content">
+        <div class="code-block-container">
+            <div class="code-header">
+                <span class="code-lang">Prompt for AI</span>
+                <button class="copy-btn">Copy</button>
+            </div>
+            <pre><code class="language-text">Write a Python script comparing Euler, RK2 (midpoint), and RK4 for solving ODEs.
+
+1. Implement all three methods as functions accepting f(t,y), y0, T, h
+2. Test on a driven oscillator: x'' + x = cos(0.8t), exact solution provided
+3. Create a three-panel comparison: time series showing all methods vs exact
+4. Create a log-log convergence plot with slopes 1, 2, 4 clearly visible
+5. Add an efficiency bar chart: total function evaluations needed for 4-digit accuracy
+6. Use plotly_dark theme, cyan for Euler, green for RK2, magenta for RK4
+7. Gray (#808080) axes and reference lines</code></pre>
+        </div>
+
+        <div class="info-box" style="margin-top: var(--spacing-md);">
+            <div class="info-box-title">Pro Tips for Prompting</div>
+            <ul>
+                <li>Ask for both scalar and system (vector) implementations</li>
+                <li>Request slope measurements on the log-log plot for verification</li>
+                <li>Specify the driven oscillator for a richer test than the basic SHO</li>
+                <li>Ask for a cost-benefit comparison table showing evaluations vs accuracy</li>
+            </ul>
+        </div>
+    </div>
+</div>
+
+<!-- ============================================================ -->
+<!-- NAVIGATION -->
+<!-- ============================================================ -->
+<div class="btn-group mt-xl">
+    <button class="btn btn-magenta" onclick="navigateToSection('44-improved-euler')">&larr; Previous: Improved Euler Method</button>
+    <button class="btn btn-secondary" onclick="scrollToTop()">&uarr; Back to Top</button>
+    <button class="btn btn-secondary" onclick="navigateToSection('46-method-comparison')">Next: Choosing Your Method &rarr;</button>
+</div>

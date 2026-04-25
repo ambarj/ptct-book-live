@@ -1,0 +1,684 @@
+<!-- ============================================================
+     Section 6.4: Importance Sampling (Optional)
+     Source: NPTEL Lecture 8_7 (Importance Sampling)
+     Concept: Variance reduction by sampling from a non-uniform
+              distribution that matches the integrand shape
+     Time: 20-25 minutes
+     Prerequisites: Sections 6.1-6.3 (MC basics, integration,
+                    error scaling)
+     ============================================================ -->
+
+<h1>Importance Sampling <span style="color: var(--text-secondary); font-size: 0.6em;">(Optional)</span></h1>
+
+<p>
+    Uniform sampling treats all regions equally &mdash; but most integrands are
+    <em>not</em> uniform. If the function is peaked in one region, most uniform
+    samples land where the function is small, contributing little to the estimate.
+    <strong>Importance sampling</strong> fixes this: sample more where the integrand
+    is large, then reweight to correct for the bias. The result: dramatically
+    lower variance for the same number of samples.
+</p>
+
+<div class="info-box">
+    <div class="info-box-title">Learning Objectives</div>
+    <ul>
+        <li>Understand why uniform sampling is inefficient for peaked integrands</li>
+        <li>Implement importance sampling: sample from \( p(x) \), estimate \( I = \frac{1}{N}\sum \frac{f(x_i)}{p(x_i)} \)</li>
+        <li>See that the optimal \( p(x) \propto |f(x)| \) minimizes variance</li>
+        <li>Compare variance reduction between uniform and importance sampling</li>
+    </ul>
+</div>
+
+<div class="equation-display">
+    <p><strong>Importance Sampling Formula:</strong></p>
+    $$ I = \int_a^b f(x)\,dx = \int_a^b \frac{f(x)}{p(x)}\,p(x)\,dx
+    \approx \frac{1}{N}\sum_{i=1}^{N} \frac{f(x_i)}{p(x_i)}, \qquad x_i \sim p(x) $$
+    <p>
+        Instead of sampling \( x_i \) uniformly, draw them from a <strong>proposal
+        distribution</strong> \( p(x) \). The ratio \( f(x)/p(x) \) corrects for the
+        non-uniform sampling. When \( p(x) \propto |f(x)| \), the ratio is nearly
+        constant and the variance is minimized.
+    </p>
+</div>
+
+<hr>
+
+<!-- ============================================================ -->
+<!-- EXPLORER 1: Uniform vs Importance -->
+<!-- ============================================================ -->
+<div class="interactive-container" id="uniform-vs-importance">
+    <div class="interactive-title">Explorer: Uniform vs Importance Sampling</div>
+
+    <p>
+        Integrate a peaked function using both methods. The left panel shows where
+        samples land (uniform = spread evenly; importance = concentrated near the peak).
+        The right panel compares convergence. Notice how importance sampling
+        reaches the true value much faster.
+    </p>
+
+    <div class="dual-panel">
+        <div class="panel">
+            <div class="plot-container" id="is-samplePlot" style="height: 400px;"></div>
+        </div>
+        <div class="panel">
+            <div class="plot-container" id="is-convergePlot" style="height: 400px;"></div>
+        </div>
+    </div>
+
+    <div id="is-stats1" class="stats-bar"></div>
+
+    <div class="control-panel">
+        <div class="control-group">
+            <label class="control-label" for="is-func-select">Integrand:</label>
+            <select id="is-func-select" class="control-select">
+                <option value="peaked">Peaked: e^(−10(x−0.7)&sup2;) on [0,1]</option>
+                <option value="exponential">Exponential: e^(−3x) on [0,5]</option>
+                <option value="oscillatory">Oscillatory: cos(50x)&sup2; &middot; e^(−x) on [0,3]</option>
+            </select>
+        </div>
+        <div class="control-group">
+            <label class="control-label" for="is-N-slider">Samples N:
+                <span id="is-N-value">2000</span>
+            </label>
+            <input type="range" class="slider" id="is-N-slider"
+                   min="200" max="10000" step="200" value="2000">
+        </div>
+        <div class="control-group">
+            <button class="btn" onclick="isCompareRun()">Run</button>
+            <button class="btn" onclick="isCompareReset()">Reset</button>
+        </div>
+    </div>
+</div>
+
+<div class="info-box">
+    <div class="info-box-title">The Intuition</div>
+    <p>
+        Imagine searching for a needle in a haystack. Uniform sampling checks
+        random locations &mdash; most searches find nothing. Importance sampling
+        uses a metal detector (the proposal distribution \( p(x) \)) to focus
+        the search where the needle is likely to be. You still need random
+        samples, but you concentrate them where they count.
+    </p>
+</div>
+
+<!-- ========== Test Your Understanding #1 ========== -->
+<div class="interactive-container question-section">
+    <div class="interactive-title">Test Your Understanding</div>
+
+    <p style="margin-bottom: var(--spacing-md); color: var(--text-secondary);">
+        Use the Uniform vs Importance explorer to answer these questions.
+    </p>
+
+    <div class="tabs">
+        <div class="tab-buttons">
+            <button class="tab-button active">Question 1</button>
+            <button class="tab-button">Question 2</button>
+            <button class="tab-button">Question 3</button>
+        </div>
+
+        <div class="tab-content active">
+            <div class="question-container" data-type="mcq" data-answer="2">
+                <div class="question-text">
+                    Select <strong>Peaked</strong> and run with N = 2000. Most uniform samples
+                    land where \( f(x) \approx 0 \). Why is this a problem?
+                </div>
+                <div class="question-options">
+                    <label class="option">
+                        <input type="radio" name="is-q1" value="0">
+                        <span>It&rsquo;s not a problem &mdash; all samples are equally useful</span>
+                    </label>
+                    <label class="option">
+                        <input type="radio" name="is-q1" value="1">
+                        <span>The integral becomes negative</span>
+                    </label>
+                    <label class="option">
+                        <input type="radio" name="is-q1" value="2">
+                        <span>Samples where \( f \approx 0 \) contribute almost nothing to the sum &mdash; they&rsquo;re wasted</span>
+                    </label>
+                    <label class="option">
+                        <input type="radio" name="is-q1" value="3">
+                        <span>The function is too steep for random sampling</span>
+                    </label>
+                </div>
+                <div class="question-actions">
+                    <button class="btn-verify">Verify</button>
+                </div>
+                <div class="question-explanation" style="display:none;">
+                    <strong>Explanation:</strong>
+                    In the sample mean method, each term is \( f(x_i) \). When \( f(x_i) \approx 0 \),
+                    that sample contributes essentially zero to the sum. Only the rare samples near
+                    \( x = 0.7 \) (where the peak is) contribute meaningfully. Most of your
+                    computational effort is <strong>wasted</strong>.
+                </div>
+            </div>
+        </div>
+
+        <div class="tab-content">
+            <div class="question-container" data-type="mcq" data-answer="0">
+                <div class="question-text">
+                    Look at the importance sampling result for the same peaked function.
+                    How does the convergence compare?
+                </div>
+                <div class="question-options">
+                    <label class="option">
+                        <input type="radio" name="is-q2" value="0">
+                        <span>Importance sampling converges much faster (narrower error band)</span>
+                    </label>
+                    <label class="option">
+                        <input type="radio" name="is-q2" value="1">
+                        <span>Both converge at the same rate</span>
+                    </label>
+                    <label class="option">
+                        <input type="radio" name="is-q2" value="2">
+                        <span>Uniform is faster because it&rsquo;s simpler</span>
+                    </label>
+                    <label class="option">
+                        <input type="radio" name="is-q2" value="3">
+                        <span>Neither converges for peaked functions</span>
+                    </label>
+                </div>
+                <div class="question-actions">
+                    <button class="btn-verify">Verify</button>
+                </div>
+                <div class="question-explanation" style="display:none;">
+                    <strong>Explanation:</strong>
+                    Importance sampling concentrates samples near the peak, so <em>every</em>
+                    sample contributes meaningfully. The variance is dramatically reduced &mdash;
+                    often by a factor of 10&ndash;100&times;. The convergence plot shows the
+                    importance sampling estimate (green) settling much faster than uniform (cyan).
+                </div>
+            </div>
+        </div>
+
+        <div class="tab-content">
+            <div class="question-container" data-type="fill" data-answer="f(x)">
+                <div class="question-text">
+                    The ideal proposal distribution \( p(x) \) should be proportional to
+                    <select class="fill-blank-select">
+                        <option value=""></option>
+                        <option value="1">1 (uniform)</option>
+                        <option value="f(x)">|f(x)| (the integrand)</option>
+                        <option value="1/f(x)">1/|f(x)| (inverse of integrand)</option>
+                        <option value="x">x (linear)</option>
+                    </select>
+                    to minimize variance.
+                </div>
+                <div class="question-actions">
+                    <button class="btn-verify">Verify</button>
+                </div>
+                <div class="question-explanation" style="display:none;">
+                    <strong>Explanation:</strong>
+                    When \( p(x) \propto |f(x)| \), the ratio \( f(x)/p(x) \) is a constant,
+                    so every sample gives exactly the same value &mdash; <strong>zero variance</strong>!
+                    In practice you can&rsquo;t achieve this perfectly (you&rsquo;d need to know
+                    the integral already), but matching the shape of \( p(x) \) to \( |f(x)| \)
+                    gets you close.
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- ============================================================ -->
+<!-- EXPLORER 2: Variance Reduction -->
+<!-- ============================================================ -->
+<div class="interactive-container" id="variance-reduction">
+    <div class="interactive-title">Explorer: Variance Reduction Factor</div>
+
+    <p>
+        Run many trials of both methods and compare the <strong>spread</strong>
+        of estimates. The histograms show how much tighter importance sampling is.
+        The variance reduction factor tells you how many times fewer samples
+        importance sampling needs for the same accuracy.
+    </p>
+
+    <div class="dual-panel">
+        <div class="panel">
+            <div class="plot-container" id="is-histPlot" style="height: 400px;"></div>
+        </div>
+        <div class="panel">
+            <div class="plot-container" id="is-reductionPlot" style="height: 400px;"></div>
+        </div>
+    </div>
+
+    <div id="is-stats2" class="stats-bar"></div>
+
+    <div class="control-panel">
+        <div class="control-group">
+            <label class="control-label" for="is-vr-N-slider">Samples per trial:
+                <span id="is-vr-N-value">500</span>
+            </label>
+            <input type="range" class="slider" id="is-vr-N-slider"
+                   min="100" max="5000" step="100" value="500">
+        </div>
+        <div class="control-group">
+            <button class="btn" onclick="isVarianceRun()">Run 300 Trials</button>
+            <button class="btn" onclick="isVarianceReset()">Reset</button>
+        </div>
+    </div>
+</div>
+
+<!-- ========== Test Your Understanding #2 ========== -->
+<div class="interactive-container question-section">
+    <div class="interactive-title">Test Your Understanding</div>
+
+    <p style="margin-bottom: var(--spacing-md); color: var(--text-secondary);">
+        Use the Variance Reduction explorer to answer these questions.
+    </p>
+
+    <div class="tabs">
+        <div class="tab-buttons">
+            <button class="tab-button active">Question 4</button>
+            <button class="tab-button">Question 5</button>
+            <button class="tab-button">Question 6</button>
+        </div>
+
+        <div class="tab-content active">
+            <div class="question-container" data-type="mcq" data-answer="1">
+                <div class="question-text">
+                    Run 300 trials with N = 500. The variance reduction factor is about 20&times;.
+                    What does this mean practically?
+                </div>
+                <div class="question-options">
+                    <label class="option">
+                        <input type="radio" name="is-q4" value="0">
+                        <span>Importance sampling uses 20&times; more memory</span>
+                    </label>
+                    <label class="option">
+                        <input type="radio" name="is-q4" value="1">
+                        <span>Importance sampling with 500 samples is as accurate as uniform with 10,000 samples</span>
+                    </label>
+                    <label class="option">
+                        <input type="radio" name="is-q4" value="2">
+                        <span>The integral is 20&times; larger than expected</span>
+                    </label>
+                    <label class="option">
+                        <input type="radio" name="is-q4" value="3">
+                        <span>You need 20&times; more importance samples</span>
+                    </label>
+                </div>
+                <div class="question-actions">
+                    <button class="btn-verify">Verify</button>
+                </div>
+                <div class="question-explanation" style="display:none;">
+                    <strong>Explanation:</strong>
+                    Variance reduction factor R = &sigma;&sup2;_uniform / &sigma;&sup2;_importance.
+                    If R = 20, then importance sampling achieves the same variance with
+                    <strong>1/20th the samples</strong>. So 500 importance samples &asymp;
+                    10,000 uniform samples. This is a huge computational saving.
+                </div>
+            </div>
+        </div>
+
+        <div class="tab-content">
+            <div class="question-container" data-type="msq" data-answer="0,2">
+                <div class="question-text">
+                    Which statements about importance sampling are true? (Select all)
+                </div>
+                <div class="question-options">
+                    <label class="option">
+                        <input type="checkbox" value="0">
+                        <span>A bad choice of p(x) can make the variance <em>worse</em> than uniform sampling</span>
+                    </label>
+                    <label class="option">
+                        <input type="checkbox" value="1">
+                        <span>Importance sampling changes the expected value (introduces bias)</span>
+                    </label>
+                    <label class="option">
+                        <input type="checkbox" value="2">
+                        <span>The reweighting factor f(x)/p(x) corrects for the non-uniform sampling</span>
+                    </label>
+                    <label class="option">
+                        <input type="checkbox" value="3">
+                        <span>Importance sampling only works for positive functions</span>
+                    </label>
+                </div>
+                <div class="question-actions">
+                    <button class="btn-verify">Verify</button>
+                </div>
+                <div class="question-explanation" style="display:none;">
+                    <strong>Explanation:</strong>
+                    <ul>
+                        <li><strong>Bad p(x) can increase variance:</strong> ✓ If p(x) is small where f(x) is large, the ratio f/p is huge, creating spiky estimates. A poorly chosen proposal can be worse than uniform!</li>
+                        <li><strong>Introduces bias:</strong> ✗ The reweighting f(x)/p(x) is exact — the expected value is always correct. Importance sampling is <em>unbiased</em>.</li>
+                        <li><strong>Reweighting corrects:</strong> ✓ Since you oversample some regions, each sample is weighted by the inverse of how much it was oversampled: f(x)/p(x).</li>
+                        <li><strong>Only positive functions:</strong> ✗ Works for any integrable function. The optimal p(x) ∝ |f(x)| handles sign changes.</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <div class="tab-content">
+            <div class="question-container" data-type="fill" data-answer="constant">
+                <div class="question-text">
+                    When p(x) ∝ |f(x)|, the ratio f(x)/p(x) becomes a
+                    <select class="fill-blank-select">
+                        <option value=""></option>
+                        <option value="constant">constant</option>
+                        <option value="random variable">random variable</option>
+                        <option value="zero">zero</option>
+                        <option value="infinity">infinity</option>
+                    </select>,
+                    giving zero variance.
+                </div>
+                <div class="question-actions">
+                    <button class="btn-verify">Verify</button>
+                </div>
+                <div class="question-explanation" style="display:none;">
+                    <strong>Explanation:</strong>
+                    If \( p(x) = |f(x)| / \int |f| \), then \( f(x)/p(x) = f(x) \cdot \int|f| / |f(x)| = \text{sign}(f) \cdot \int |f| \),
+                    a <strong>constant</strong> (for non-negative f, just the integral itself).
+                    Every sample gives the same value, so the variance is exactly zero. This is
+                    the theoretical optimum — but requires knowing the integral to construct p(x).
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- ============================================================ -->
+<!-- EXPLORER 3: Design Your Own p(x) -->
+<!-- ============================================================ -->
+<div class="interactive-container" id="design-proposal">
+    <div class="interactive-title">Explorer: Tuning the Proposal Distribution</div>
+
+    <p>
+        The integrand is \( f(x) = e^{-10(x - 0.7)^2} \) on [0, 1]. The proposal
+        distribution is a Gaussian centered at \( \mu \) with width \( \sigma \).
+        Adjust these to match the integrand shape and watch the variance drop.
+    </p>
+
+    <div class="dual-panel">
+        <div class="panel">
+            <div class="plot-container" id="is-designPlot" style="height: 400px;"></div>
+        </div>
+        <div class="panel">
+            <div class="plot-container" id="is-designVarPlot" style="height: 400px;"></div>
+        </div>
+    </div>
+
+    <div id="is-stats3" class="stats-bar"></div>
+
+    <div class="control-panel">
+        <div class="control-group">
+            <label class="control-label" for="is-mu-slider">Proposal center &mu;:
+                <span id="is-mu-value">0.70</span>
+            </label>
+            <input type="range" class="slider" id="is-mu-slider"
+                   min="0.1" max="0.9" step="0.01" value="0.7">
+        </div>
+        <div class="control-group">
+            <label class="control-label" for="is-sigma-slider">Proposal width &sigma;:
+                <span id="is-sigma-value">0.25</span>
+            </label>
+            <input type="range" class="slider" id="is-sigma-slider"
+                   min="0.05" max="0.8" step="0.01" value="0.25">
+        </div>
+        <div class="control-group">
+            <button class="btn" onclick="isDesignReset()">Reset</button>
+        </div>
+    </div>
+</div>
+
+<!-- ========== Test Your Understanding #3 ========== -->
+<div class="interactive-container question-section">
+    <div class="interactive-title">Test Your Understanding</div>
+
+    <p style="margin-bottom: var(--spacing-md); color: var(--text-secondary);">
+        Use the Design explorer to answer these questions.
+    </p>
+
+    <div class="tabs">
+        <div class="tab-buttons">
+            <button class="tab-button active">Question 7</button>
+            <button class="tab-button">Question 8</button>
+            <button class="tab-button">Question 9</button>
+        </div>
+
+        <div class="tab-content active">
+            <div class="question-container" data-type="mcq" data-answer="0">
+                <div class="question-text">
+                    Set &mu; = 0.7, &sigma; = 0.22 (matching the integrand). What happens to
+                    the variance compared to uniform sampling?
+                </div>
+                <div class="question-options">
+                    <label class="option">
+                        <input type="radio" name="is-q7" value="0">
+                        <span>Variance drops dramatically — the proposal matches the integrand well</span>
+                    </label>
+                    <label class="option">
+                        <input type="radio" name="is-q7" value="1">
+                        <span>Variance stays the same</span>
+                    </label>
+                    <label class="option">
+                        <input type="radio" name="is-q7" value="2">
+                        <span>Variance increases because the proposal is too narrow</span>
+                    </label>
+                    <label class="option">
+                        <input type="radio" name="is-q7" value="3">
+                        <span>The estimate becomes biased</span>
+                    </label>
+                </div>
+                <div class="question-actions">
+                    <button class="btn-verify">Verify</button>
+                </div>
+                <div class="question-explanation" style="display:none;">
+                    <strong>Explanation:</strong>
+                    When the proposal Gaussian matches the integrand Gaussian (same center and
+                    similar width), the ratio \( f(x)/p(x) \) is nearly constant. This is close
+                    to the theoretical optimum, giving <strong>massive variance reduction</strong>.
+                </div>
+            </div>
+        </div>
+
+        <div class="tab-content">
+            <div class="question-container" data-type="mcq" data-answer="2">
+                <div class="question-text">
+                    Now set &mu; = 0.2 (badly mismatched — proposal centered far from the peak).
+                    What happens?
+                </div>
+                <div class="question-options">
+                    <label class="option">
+                        <input type="radio" name="is-q8" value="0">
+                        <span>Variance decreases — any proposal is better than uniform</span>
+                    </label>
+                    <label class="option">
+                        <input type="radio" name="is-q8" value="1">
+                        <span>The estimate converges to a wrong value</span>
+                    </label>
+                    <label class="option">
+                        <input type="radio" name="is-q8" value="2">
+                        <span>Variance increases — worse than uniform! The few samples near the peak have huge f/p ratios</span>
+                    </label>
+                    <label class="option">
+                        <input type="radio" name="is-q8" value="3">
+                        <span>Nothing changes</span>
+                    </label>
+                </div>
+                <div class="question-actions">
+                    <button class="btn-verify">Verify</button>
+                </div>
+                <div class="question-explanation" style="display:none;">
+                    <strong>Explanation:</strong>
+                    When p(x) is centered at 0.2 but f(x) peaks at 0.7, p(x) is tiny where
+                    f(x) is large. The ratio f(x)/p(x) becomes enormous for the rare samples
+                    near 0.7, creating spiky estimates. A <strong>badly mismatched proposal
+                    can be worse than uniform</strong>. This is the danger of importance sampling.
+                </div>
+            </div>
+        </div>
+
+        <div class="tab-content">
+            <div class="question-container" data-type="mcq" data-answer="1">
+                <div class="question-text">
+                    What is the <strong>key practical rule</strong> for choosing a proposal
+                    distribution?
+                </div>
+                <div class="question-options">
+                    <label class="option">
+                        <input type="radio" name="is-q9" value="0">
+                        <span>Make p(x) as narrow as possible</span>
+                    </label>
+                    <label class="option">
+                        <input type="radio" name="is-q9" value="1">
+                        <span>p(x) should have <em>heavier tails</em> than f(x) — never let p(x) be too small where f(x) is large</span>
+                    </label>
+                    <label class="option">
+                        <input type="radio" name="is-q9" value="2">
+                        <span>Always use a uniform distribution</span>
+                    </label>
+                    <label class="option">
+                        <input type="radio" name="is-q9" value="3">
+                        <span>p(x) should be the inverse of f(x)</span>
+                    </label>
+                </div>
+                <div class="question-actions">
+                    <button class="btn-verify">Verify</button>
+                </div>
+                <div class="question-explanation" style="display:none;">
+                    <strong>Explanation:</strong>
+                    The danger is when \( p(x) \to 0 \) but \( f(x) \) is large &mdash; the
+                    ratio \( f/p \to \infty \). To prevent this, \( p(x) \) should have
+                    <strong>heavier tails</strong> than \( f(x) \): it&rsquo;s better to slightly
+                    oversample the tails than to miss the peak entirely. A broader proposal is
+                    safer than a narrower one.
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- ============================================================ -->
+<!-- PYTHON CODE EXAMPLES -->
+<!-- ============================================================ -->
+<h2>Python Code</h2>
+
+<div class="tabs">
+    <div class="tab-buttons">
+        <button class="tab-button active">Importance Sampling</button>
+        <button class="tab-button">Variance Comparison</button>
+        <button class="tab-button">Prompt</button>
+    </div>
+
+    <div class="tab-content active">
+        <div class="code-block-container">
+            <div class="code-header">
+                <span class="code-lang">Python</span>
+                <button class="copy-btn">Copy</button>
+            </div>
+            <pre><code class="language-python">
+import numpy as np
+import plotly.graph_objects as go
+
+# Integrand: peaked Gaussian
+f = lambda x: np.exp(-10*(x - 0.7)**2)
+true_val = np.sqrt(np.pi/10) * 0.5  # ≈ 0.280
+
+N = 5000
+
+# Method 1: Uniform sampling
+x_unif = np.random.uniform(0, 1, N)
+est_unif = np.mean(f(x_unif))
+
+# Method 2: Importance sampling with Gaussian proposal
+mu, sigma = 0.7, 0.22
+x_is = np.random.normal(mu, sigma, N)
+# Keep only samples in [0, 1]
+mask = (x_is >= 0) & (x_is <= 1)
+x_is = x_is[mask]
+
+# Proposal density (truncated Gaussian)
+from scipy.stats import norm
+p_is = norm.pdf(x_is, mu, sigma)
+# Normalize for [0,1] truncation
+Z = norm.cdf(1, mu, sigma) - norm.cdf(0, mu, sigma)
+p_is /= Z
+
+weights = f(x_is) / p_is
+est_is = np.mean(weights)
+
+print(f'Uniform:    {est_unif:.5f} ± {np.std(f(x_unif))/np.sqrt(N):.5f}')
+print(f'Importance: {est_is:.5f} ± {np.std(weights)/np.sqrt(len(x_is)):.5f}')
+print(f'True value: {true_val:.5f}')
+print(f'Variance reduction: {np.var(f(x_unif))/np.var(weights):.1f}×')
+            </code></pre>
+        </div>
+    </div>
+
+    <div class="tab-content">
+        <div class="code-block-container">
+            <div class="code-header">
+                <span class="code-lang">Python</span>
+                <button class="copy-btn">Copy</button>
+            </div>
+            <pre><code class="language-python">
+import numpy as np
+import plotly.graph_objects as go
+
+f = lambda x: np.exp(-10*(x - 0.7)**2)
+
+# Compare variance over 500 trials
+n_trials, N = 500, 1000
+unif_ests, is_ests = [], []
+
+for _ in range(n_trials):
+    # Uniform
+    x = np.random.uniform(0, 1, N)
+    unif_ests.append(np.mean(f(x)))
+
+    # Importance (Gaussian at peak)
+    x = np.clip(np.random.normal(0.7, 0.22, N), 0.001, 0.999)
+    p = np.exp(-0.5*((x-0.7)/0.22)**2) / (0.22*np.sqrt(2*np.pi))
+    is_ests.append(np.mean(f(x) / p))
+
+fig = go.Figure()
+fig.add_trace(go.Histogram(x=unif_ests, opacity=0.6,
+    marker_color='#00f3ff', name='Uniform', nbinsx=30))
+fig.add_trace(go.Histogram(x=is_ests, opacity=0.6,
+    marker_color='#00ff88', name='Importance', nbinsx=30))
+
+ratio = np.var(unif_ests) / np.var(is_ests)
+fig.update_layout(
+    template='plotly_dark',
+    title=f'Variance reduction: {ratio:.0f}×',
+    xaxis=dict(title='Estimate', zerolinecolor='#808080'),
+    yaxis=dict(title='Count', zerolinecolor='#808080'),
+    barmode='overlay', height=450, width=600)
+fig.show()
+            </code></pre>
+        </div>
+    </div>
+
+    <div class="tab-content">
+        <div class="code-block-container">
+            <div class="code-header">
+                <span class="code-lang">Prompt for AI</span>
+                <button class="copy-btn">Copy</button>
+            </div>
+            <pre><code class="language-text">Create a Python script using Plotly to demonstrate importance
+sampling for Monte Carlo integration.
+
+Requirements:
+- Integrand: f(x) = exp(-10(x-0.7)²) on [0,1] (peaked at x=0.7)
+- Compare three approaches:
+  1. Uniform sampling on [0,1]
+  2. Importance sampling with Gaussian proposal (μ=0.7, σ=0.22)
+  3. Bad importance sampling (μ=0.2, σ=0.2 — mismatched)
+- Panel 1: Show f(x), p_good(x), p_bad(x) overlaid
+- Panel 2: Histogram of 500 trial estimates for each method
+  showing how importance sampling narrows the distribution
+- Panel 3: Running variance ratio (importance/uniform) vs N
+- Report variance reduction factor for each approach
+- Use dark theme (plotly_dark) with gray (#808080) axes</code></pre>
+        </div>
+    </div>
+</div>
+
+<!-- ============================================================ -->
+<!-- NAVIGATION -->
+<!-- ============================================================ -->
+<div class="btn-group mt-xl">
+    <button class="btn btn-magenta" onclick="navigateToSection('68-mc-error-scaling')">&larr; Previous: The 1/&radic;N Rule</button>
+    <button class="btn btn-secondary" onclick="scrollToTop()">&uarr; Back to Top</button>
+    <button class="btn btn-secondary" onclick="navigateToSection('70-random-walks')">Next: Random Walks &rarr;</button>
+</div>

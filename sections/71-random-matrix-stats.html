@@ -1,0 +1,688 @@
+<!-- ============================================================
+     Section 6.6: Probability via Sampling — Random Matrices
+     Source: NPTEL Lecture 8_5 (Random Matrix Classification)
+     Concept: Using MC to estimate probability distributions —
+              random 2×2 matrices classified on the τ-Δ plane
+     Time: 20-25 minutes
+     Prerequisites: Sections 5.7-5.8 (eigenvalues, τ-Δ plane),
+                    6.1-6.3 (MC basics)
+     ============================================================ -->
+
+<h1>Probability via Sampling</h1>
+
+<p>
+    Here&rsquo;s a question that connects Chapters 5 and 6: if you pick a 2&times;2
+    matrix <strong>at random</strong>, what kind of fixed point does it produce?
+    Is it more likely to be a saddle, a spiral, or a node? There&rsquo;s no simple
+    analytical answer &mdash; but Monte Carlo gives you one in seconds. Generate
+    thousands of random matrices, classify each on the &tau;-&Delta; plane, and
+    <strong>count</strong>.
+</p>
+
+<div class="info-box">
+    <div class="info-box-title">Learning Objectives</div>
+    <ul>
+        <li>Use Monte Carlo to estimate <strong>probabilities</strong> by counting outcomes over many random trials</li>
+        <li>Generate random 2&times;2 matrices and classify their fixed points using &tau; and &Delta;</li>
+        <li>Build a 2D probability distribution (histogram) in the &tau;-&Delta; plane</li>
+        <li>Discover that saddles are surprisingly common among random matrices</li>
+    </ul>
+</div>
+
+<div class="equation-display">
+    <p><strong>MC Probability Estimation:</strong></p>
+    $$ P(\text{saddle}) \approx \frac{\text{Number of saddles}}{N_{\text{total}}}, \qquad
+    A = \begin{pmatrix} a & b \\ c & d \end{pmatrix},\quad a,b,c,d \sim U(-R, R) $$
+    <p>
+        Generate \( N \) random matrices with entries uniformly distributed in
+        \( [-R, R] \). For each, compute \( \tau = a + d \) and \( \Delta = ad - bc \).
+        Classify using the &tau;-&Delta; plane. The fraction in each region estimates
+        the probability.
+    </p>
+</div>
+
+<hr>
+
+<!-- ============================================================ -->
+<!-- EXPLORER 1: Random Matrix Generator -->
+<!-- ============================================================ -->
+<div class="interactive-container" id="random-matrix-generator">
+    <div class="interactive-title">Explorer: Random Matrix Classifier</div>
+
+    <p>
+        Generate batches of random 2&times;2 matrices. Each matrix is classified
+        by its &tau;-&Delta; values, and the running tally shows the fraction in
+        each category. Watch the fractions converge as you add more matrices.
+    </p>
+
+    <div class="dual-panel">
+        <div class="panel">
+            <div class="plot-container" id="rm-scatterPlot" style="height: 400px;"></div>
+        </div>
+        <div class="panel">
+            <div class="plot-container" id="rm-barPlot" style="height: 400px;"></div>
+        </div>
+    </div>
+
+    <div id="rm-stats1" class="stats-bar"></div>
+
+    <div class="control-panel">
+        <div class="control-group">
+            <label class="control-label" for="rm-R-slider">Entry range R:
+                <span id="rm-R-value">1.0</span>
+            </label>
+            <input type="range" class="slider" id="rm-R-slider"
+                   min="0.5" max="5" step="0.5" value="1">
+        </div>
+        <div class="control-group">
+            <label class="control-label" for="rm-batch-select">Matrices per batch:</label>
+            <select id="rm-batch-select" class="control-select">
+                <option value="100">100</option>
+                <option value="500" selected>500</option>
+                <option value="2000">2,000</option>
+                <option value="10000">10,000</option>
+            </select>
+        </div>
+        <div class="control-group">
+            <button class="btn" onclick="rmGenerate()">Generate</button>
+            <button class="btn" onclick="rmReset()">Reset</button>
+        </div>
+    </div>
+</div>
+
+<div class="info-box">
+    <div class="info-box-title">Why Are Saddles So Common?</div>
+    <p>
+        You might expect the five types (stable node, unstable node, stable spiral,
+        unstable spiral, saddle) to be roughly equal &mdash; 20% each. But saddles
+        dominate! The reason: \( \Delta = ad - bc \). For random entries, \( ad \) and
+        \( bc \) are independent products of random numbers. The probability that
+        \( ad - bc < 0 \) (saddle condition) is surprisingly high &mdash; about 50%
+        for uniform entries. Half of all random linear systems are saddles!
+    </p>
+</div>
+
+<!-- ========== Test Your Understanding #1 ========== -->
+<div class="interactive-container question-section">
+    <div class="interactive-title">Test Your Understanding</div>
+
+    <p style="margin-bottom: var(--spacing-md); color: var(--text-secondary);">
+        Use the Random Matrix Classifier to answer these questions.
+    </p>
+
+    <div class="tabs">
+        <div class="tab-buttons">
+            <button class="tab-button active">Question 1</button>
+            <button class="tab-button">Question 2</button>
+            <button class="tab-button">Question 3</button>
+        </div>
+
+        <div class="tab-content active">
+            <div class="question-container" data-type="mcq" data-answer="2">
+                <div class="question-text">
+                    Generate 10,000 matrices with R = 1. What fraction are saddles?
+                </div>
+                <div class="question-options">
+                    <label class="option">
+                        <input type="radio" name="rm-q1" value="0">
+                        <span>About 20% (equal share of 5 types)</span>
+                    </label>
+                    <label class="option">
+                        <input type="radio" name="rm-q1" value="1">
+                        <span>About 10% (rare)</span>
+                    </label>
+                    <label class="option">
+                        <input type="radio" name="rm-q1" value="2">
+                        <span>About 50% (half of all random matrices)</span>
+                    </label>
+                    <label class="option">
+                        <input type="radio" name="rm-q1" value="3">
+                        <span>About 90% (almost all)</span>
+                    </label>
+                </div>
+                <div class="question-actions">
+                    <button class="btn-verify">Verify</button>
+                </div>
+                <div class="question-explanation" style="display:none;">
+                    <strong>Explanation:</strong>
+                    About <strong>50%</strong> of random matrices have \( \Delta = ad - bc < 0 \),
+                    making them saddles. This is because the product of two uniform random variables
+                    has a symmetric distribution around zero, and the difference of two such products
+                    is negative half the time.
+                </div>
+            </div>
+        </div>
+
+        <div class="tab-content">
+            <div class="question-container" data-type="mcq" data-answer="0">
+                <div class="question-text">
+                    Among the non-saddle matrices (\( \Delta > 0 \)), are stable types
+                    (nodes + spirals) more or less common than unstable types?
+                </div>
+                <div class="question-options">
+                    <label class="option">
+                        <input type="radio" name="rm-q2" value="0">
+                        <span>Equal &mdash; stability depends on the sign of &tau;, which is symmetric around zero</span>
+                    </label>
+                    <label class="option">
+                        <input type="radio" name="rm-q2" value="1">
+                        <span>Stable types are more common</span>
+                    </label>
+                    <label class="option">
+                        <input type="radio" name="rm-q2" value="2">
+                        <span>Unstable types are more common</span>
+                    </label>
+                    <label class="option">
+                        <input type="radio" name="rm-q2" value="3">
+                        <span>All non-saddle matrices are centers</span>
+                    </label>
+                </div>
+                <div class="question-actions">
+                    <button class="btn-verify">Verify</button>
+                </div>
+                <div class="question-explanation" style="display:none;">
+                    <strong>Explanation:</strong>
+                    \( \tau = a + d \) is the sum of two uniform random variables, which is
+                    symmetric around zero. So \( P(\tau < 0) = P(\tau > 0) = 50\% \). Among
+                    non-saddle matrices, stable (\( \tau < 0 \)) and unstable (\( \tau > 0 \))
+                    are <strong>equally likely</strong>.
+                </div>
+            </div>
+        </div>
+
+        <div class="tab-content">
+            <div class="question-container" data-type="fill" data-answer="50[45,55]">
+                <div class="question-text">
+                    Generate 10,000 matrices. The percentage of saddles is approximately
+                    <input type="text" class="fill-blank" style="width: 50px">%.
+                </div>
+                <div class="question-actions">
+                    <button class="btn-verify">Verify</button>
+                </div>
+                <div class="question-explanation" style="display:none;">
+                    <strong>Explanation:</strong>
+                    For uniform entries in [-1, 1], the probability of \( \Delta < 0 \) is
+                    exactly \( \frac{1}{2} + \frac{\ln 2}{3} \approx 0.48 \) for the specific
+                    distribution of \( ad - bc \). In practice, you&rsquo;ll see about
+                    <strong>48&ndash;52%</strong> saddles.
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- ============================================================ -->
+<!-- EXPLORER 2: τ-Δ Probability Map -->
+<!-- ============================================================ -->
+<div class="interactive-container" id="tau-delta-density">
+    <div class="interactive-title">Explorer: &tau;-&Delta; Probability Map</div>
+
+    <p>
+        Where do random matrices land on the &tau;-&Delta; plane? Generate a large
+        sample and see the <strong>2D density</strong>. The density is highest near
+        the origin and spreads out with the entry range R. The parabola and axis
+        boundaries from Chapter 5 are overlaid.
+    </p>
+
+    <div class="plot-container" id="rm-densityPlot" style="height: 440px;"></div>
+
+    <div id="rm-stats2" class="stats-bar"></div>
+
+    <div class="control-panel">
+        <div class="control-group">
+            <label class="control-label" for="rm-density-R-slider">Entry range R:
+                <span id="rm-density-R-value">1.0</span>
+            </label>
+            <input type="range" class="slider" id="rm-density-R-slider"
+                   min="0.5" max="3" step="0.25" value="1">
+        </div>
+        <div class="control-group">
+            <label class="control-label" for="rm-density-N-slider">Sample size:
+                <span id="rm-density-N-value">20000</span>
+            </label>
+            <input type="range" class="slider" id="rm-density-N-slider"
+                   min="5000" max="50000" step="5000" value="20000">
+        </div>
+        <div class="control-group">
+            <button class="btn" onclick="rmDensityRun()">Generate Map</button>
+        </div>
+    </div>
+</div>
+
+<!-- ========== Test Your Understanding #2 ========== -->
+<div class="interactive-container question-section">
+    <div class="interactive-title">Test Your Understanding</div>
+
+    <p style="margin-bottom: var(--spacing-md); color: var(--text-secondary);">
+        Use the Probability Map explorer to answer these questions.
+    </p>
+
+    <div class="tabs">
+        <div class="tab-buttons">
+            <button class="tab-button active">Question 4</button>
+            <button class="tab-button">Question 5</button>
+            <button class="tab-button">Question 6</button>
+        </div>
+
+        <div class="tab-content active">
+            <div class="question-container" data-type="mcq" data-answer="1">
+                <div class="question-text">
+                    Look at the density map. Where is the density highest?
+                </div>
+                <div class="question-options">
+                    <label class="option">
+                        <input type="radio" name="rm-q4" value="0">
+                        <span>In the corners (large |&tau;| and |&Delta;|)</span>
+                    </label>
+                    <label class="option">
+                        <input type="radio" name="rm-q4" value="1">
+                        <span>Near the origin (&tau; &asymp; 0, &Delta; &asymp; 0)</span>
+                    </label>
+                    <label class="option">
+                        <input type="radio" name="rm-q4" value="2">
+                        <span>Along the parabola boundary</span>
+                    </label>
+                    <label class="option">
+                        <input type="radio" name="rm-q4" value="3">
+                        <span>Uniformly distributed everywhere</span>
+                    </label>
+                </div>
+                <div class="question-actions">
+                    <button class="btn-verify">Verify</button>
+                </div>
+                <div class="question-explanation" style="display:none;">
+                    <strong>Explanation:</strong>
+                    \( \tau = a + d \) and \( \Delta = ad - bc \) are sums and products of
+                    uniform variables. Their distributions are peaked near zero (triangular for
+                    &tau;, more complex for &Delta;). The density is highest <strong>near the
+                    origin</strong>, which happens to sit right on the saddle/center boundary.
+                </div>
+            </div>
+        </div>
+
+        <div class="tab-content">
+            <div class="question-container" data-type="mcq" data-answer="2">
+                <div class="question-text">
+                    Increase R from 1 to 3. How does the density map change?
+                </div>
+                <div class="question-options">
+                    <label class="option">
+                        <input type="radio" name="rm-q5" value="0">
+                        <span>It stays exactly the same</span>
+                    </label>
+                    <label class="option">
+                        <input type="radio" name="rm-q5" value="1">
+                        <span>It becomes more concentrated at the origin</span>
+                    </label>
+                    <label class="option">
+                        <input type="radio" name="rm-q5" value="2">
+                        <span>It spreads out &mdash; points cover a larger region of the &tau;-&Delta; plane</span>
+                    </label>
+                    <label class="option">
+                        <input type="radio" name="rm-q5" value="3">
+                        <span>All points move to the saddle region</span>
+                    </label>
+                </div>
+                <div class="question-actions">
+                    <button class="btn-verify">Verify</button>
+                </div>
+                <div class="question-explanation" style="display:none;">
+                    <strong>Explanation:</strong>
+                    Larger R means larger matrix entries, which means larger &tau; and &Delta;
+                    values. The cloud <strong>spreads out</strong> proportionally. But the
+                    <em>shape</em> (relative distribution) stays the same &mdash; the fraction
+                    of saddles doesn&rsquo;t depend on R.
+                </div>
+            </div>
+        </div>
+
+        <div class="tab-content">
+            <div class="question-container" data-type="msq" data-answer="1,2">
+                <div class="question-text">
+                    Which observations from the density map are true? (Select all)
+                </div>
+                <div class="question-options">
+                    <label class="option">
+                        <input type="checkbox" value="0">
+                        <span>The spiral region contains more points than the node region</span>
+                    </label>
+                    <label class="option">
+                        <input type="checkbox" value="1">
+                        <span>The saddle region (&Delta; &lt; 0) contains roughly half of all points</span>
+                    </label>
+                    <label class="option">
+                        <input type="checkbox" value="2">
+                        <span>The density is symmetric in &tau; (left-right symmetric)</span>
+                    </label>
+                    <label class="option">
+                        <input type="checkbox" value="3">
+                        <span>Centers (&tau; = 0 exactly) are common</span>
+                    </label>
+                </div>
+                <div class="question-actions">
+                    <button class="btn-verify">Verify</button>
+                </div>
+                <div class="question-explanation" style="display:none;">
+                    <strong>Explanation:</strong>
+                    <ul>
+                        <li><strong>Spiral &gt; node:</strong> ✗ Inside the parabola (spirals) is not necessarily larger than outside (nodes). It depends on the distribution shape.</li>
+                        <li><strong>Half are saddles:</strong> ✓ About 50% have &Delta; &lt; 0.</li>
+                        <li><strong>Symmetric in &tau;:</strong> ✓ Since a and d are drawn from symmetric distributions, &tau; = a + d is symmetric around 0.</li>
+                        <li><strong>Centers common:</strong> ✗ Centers require &tau; = 0 exactly — a set of measure zero. They&rsquo;re infinitely rare among random matrices.</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- ============================================================ -->
+<!-- EXPLORER 3: Probability Calculator -->
+<!-- ============================================================ -->
+<div class="interactive-container" id="probability-calculator">
+    <div class="interactive-title">Explorer: What Are the Odds?</div>
+
+    <p>
+        The definitive answer: run a massive MC experiment and compute the
+        probability of each fixed-point type. Watch the estimates converge
+        as N increases. The convergence plot shows the 1/&radic;N behavior
+        you know from Section 6.3.
+    </p>
+
+    <div class="dual-panel">
+        <div class="panel">
+            <div class="plot-container" id="rm-probBarPlot" style="height: 400px;"></div>
+        </div>
+        <div class="panel">
+            <div class="plot-container" id="rm-probConvergePlot" style="height: 400px;"></div>
+        </div>
+    </div>
+
+    <div id="rm-stats3" class="stats-bar"></div>
+
+    <div class="control-panel">
+        <div class="control-group">
+            <label class="control-label" for="rm-prob-N-select">Total matrices:</label>
+            <select id="rm-prob-N-select" class="control-select">
+                <option value="5000">5,000</option>
+                <option value="20000" selected>20,000</option>
+                <option value="50000">50,000</option>
+                <option value="100000">100,000</option>
+            </select>
+        </div>
+        <div class="control-group">
+            <button class="btn" onclick="rmProbRun()">Compute Probabilities</button>
+        </div>
+    </div>
+</div>
+
+<!-- ========== Test Your Understanding #3 ========== -->
+<div class="interactive-container question-section">
+    <div class="interactive-title">Test Your Understanding</div>
+
+    <p style="margin-bottom: var(--spacing-md); color: var(--text-secondary);">
+        Use the Probability Calculator to answer these questions.
+    </p>
+
+    <div class="tabs">
+        <div class="tab-buttons">
+            <button class="tab-button active">Question 7</button>
+            <button class="tab-button">Question 8</button>
+            <button class="tab-button">Question 9</button>
+        </div>
+
+        <div class="tab-content active">
+            <div class="question-container" data-type="mcq" data-answer="0">
+                <div class="question-text">
+                    Run with 100,000 matrices. Rank the five types from most to least common.
+                </div>
+                <div class="question-options">
+                    <label class="option">
+                        <input type="radio" name="rm-q7" value="0">
+                        <span>Saddle &gt;&gt; Stable Node &asymp; Unstable Node &gt; Stable Spiral &asymp; Unstable Spiral</span>
+                    </label>
+                    <label class="option">
+                        <input type="radio" name="rm-q7" value="1">
+                        <span>All five types are equally common (~20% each)</span>
+                    </label>
+                    <label class="option">
+                        <input type="radio" name="rm-q7" value="2">
+                        <span>Stable Spiral &gt;&gt; everything else</span>
+                    </label>
+                    <label class="option">
+                        <input type="radio" name="rm-q7" value="3">
+                        <span>Unstable Node &gt;&gt; Saddle &gt; rest</span>
+                    </label>
+                </div>
+                <div class="question-actions">
+                    <button class="btn-verify">Verify</button>
+                </div>
+                <div class="question-explanation" style="display:none;">
+                    <strong>Explanation:</strong>
+                    Saddles dominate (~50%). The remaining ~50% splits between the &Delta; &gt; 0
+                    region. Nodes (outside the parabola) are more common than spirals (inside)
+                    because the parabola &tau;&sup2; = 4&Delta; carves out a relatively small region.
+                    Stable and unstable are symmetric (~equal shares within each type).
+                </div>
+            </div>
+        </div>
+
+        <div class="tab-content">
+            <div class="question-container" data-type="mcq" data-answer="2">
+                <div class="question-text">
+                    This section demonstrated a general technique. What is it?
+                </div>
+                <div class="question-options">
+                    <label class="option">
+                        <input type="radio" name="rm-q8" value="0">
+                        <span>Solving differential equations numerically</span>
+                    </label>
+                    <label class="option">
+                        <input type="radio" name="rm-q8" value="1">
+                        <span>Computing eigenvalues analytically</span>
+                    </label>
+                    <label class="option">
+                        <input type="radio" name="rm-q8" value="2">
+                        <span>Estimating probabilities by generating random samples and counting outcomes</span>
+                    </label>
+                    <label class="option">
+                        <input type="radio" name="rm-q8" value="3">
+                        <span>Proving theorems about random matrices</span>
+                    </label>
+                </div>
+                <div class="question-actions">
+                    <button class="btn-verify">Verify</button>
+                </div>
+                <div class="question-explanation" style="display:none;">
+                    <strong>Explanation:</strong>
+                    This is <strong>Monte Carlo probability estimation</strong>: generate random
+                    instances, evaluate a property for each, and count the fraction with that
+                    property. It works for any question of the form &ldquo;what fraction of
+                    random X has property Y?&rdquo; &mdash; no analytical derivation needed.
+                </div>
+            </div>
+        </div>
+
+        <div class="tab-content">
+            <div class="question-container" data-type="fill" data-answer="node">
+                <div class="question-text">
+                    Among non-saddle matrices (&Delta; &gt; 0), is a random matrix more
+                    likely to be a node or a spiral?
+                    <select class="fill-blank-select">
+                        <option value=""></option>
+                        <option value="node">node (outside parabola)</option>
+                        <option value="spiral">spiral (inside parabola)</option>
+                        <option value="equal">equally likely</option>
+                    </select>
+                </div>
+                <div class="question-actions">
+                    <button class="btn-verify">Verify</button>
+                </div>
+                <div class="question-explanation" style="display:none;">
+                    <strong>Explanation:</strong>
+                    The parabola &tau;&sup2; = 4&Delta; separates nodes (outside) from spirals
+                    (inside). For random matrices, the region outside the parabola is larger than
+                    the region inside, making <strong>nodes</strong> more common than spirals.
+                    Run the experiment and check the bar chart to verify.
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- ============================================================ -->
+<!-- PYTHON CODE EXAMPLES -->
+<!-- ============================================================ -->
+<h2>Python Code</h2>
+
+<div class="tabs">
+    <div class="tab-buttons">
+        <button class="tab-button active">Random Matrix MC</button>
+        <button class="tab-button">&tau;-&Delta; Density</button>
+        <button class="tab-button">Prompt</button>
+    </div>
+
+    <div class="tab-content active">
+        <div class="code-block-container">
+            <div class="code-header">
+                <span class="code-lang">Python</span>
+                <button class="copy-btn">Copy</button>
+            </div>
+            <pre><code class="language-python">
+import numpy as np
+import plotly.graph_objects as go
+
+N = 100000
+R = 1.0
+
+# Generate random matrices
+a = np.random.uniform(-R, R, N)
+b = np.random.uniform(-R, R, N)
+c = np.random.uniform(-R, R, N)
+d = np.random.uniform(-R, R, N)
+
+tau = a + d
+delta = a * d - b * c
+disc = tau**2 - 4 * delta
+
+# Classify
+types = []
+for i in range(N):
+    if delta[i] < 0:
+        types.append('Saddle')
+    elif abs(disc[i]) < 0.01:
+        types.append('Star Node')
+    elif disc[i] > 0:
+        types.append('Stable Node' if tau[i] < 0 else 'Unstable Node')
+    elif abs(tau[i]) < 0.01:
+        types.append('Center')
+    else:
+        types.append('Stable Spiral' if tau[i] < 0 else 'Unstable Spiral')
+
+# Count
+from collections import Counter
+counts = Counter(types)
+for tp in ['Saddle', 'Stable Node', 'Unstable Node',
+           'Stable Spiral', 'Unstable Spiral']:
+    pct = counts.get(tp, 0) / N * 100
+    print(f'{tp:20s}: {pct:.1f}%')
+
+# Bar chart
+labels = list(counts.keys())
+vals = [counts[k]/N*100 for k in labels]
+colors = {'Saddle': '#ff5722', 'Stable Node': '#00f3ff',
+          'Unstable Node': '#ff006e', 'Stable Spiral': '#00ff88',
+          'Unstable Spiral': '#bb86fc', 'Center': '#ffbe0b',
+          'Star Node': '#ffbe0b'}
+
+fig = go.Figure(go.Bar(
+    x=labels, y=vals,
+    marker_color=[colors.get(k, '#aaa') for k in labels]))
+fig.update_layout(
+    template='plotly_dark',
+    yaxis=dict(title='Percentage (%)', zerolinecolor='#808080'),
+    height=400, width=600)
+fig.show()
+            </code></pre>
+        </div>
+    </div>
+
+    <div class="tab-content">
+        <div class="code-block-container">
+            <div class="code-header">
+                <span class="code-lang">Python</span>
+                <button class="copy-btn">Copy</button>
+            </div>
+            <pre><code class="language-python">
+import numpy as np
+import plotly.graph_objects as go
+
+N = 50000
+a = np.random.uniform(-1, 1, N)
+b = np.random.uniform(-1, 1, N)
+c = np.random.uniform(-1, 1, N)
+d = np.random.uniform(-1, 1, N)
+
+tau = a + d
+delta = a * d - b * c
+
+# 2D histogram
+fig = go.Figure()
+fig.add_trace(go.Histogram2d(
+    x=tau, y=delta, nbinsx=60, nbinsy=60,
+    colorscale='Viridis', showscale=True))
+
+# Parabola boundary
+t = np.linspace(-3, 3, 200)
+fig.add_trace(go.Scatter(x=t, y=t**2/4, mode='lines',
+    line=dict(color='white', width=2), name='τ²=4Δ'))
+fig.add_trace(go.Scatter(x=[-3,3], y=[0,0], mode='lines',
+    line=dict(color='#ffbe0b', width=1.5, dash='dash'),
+    name='Δ=0'))
+
+fig.update_layout(
+    template='plotly_dark',
+    xaxis=dict(title='τ (trace)', range=[-3, 3],
+               zerolinecolor='#808080'),
+    yaxis=dict(title='Δ (determinant)', range=[-2, 3],
+               zerolinecolor='#808080'),
+    height=500, width=600)
+fig.show()
+            </code></pre>
+        </div>
+    </div>
+
+    <div class="tab-content">
+        <div class="code-block-container">
+            <div class="code-header">
+                <span class="code-lang">Prompt for AI</span>
+                <button class="copy-btn">Copy</button>
+            </div>
+            <pre><code class="language-text">Create a Python script using Plotly to explore random matrix
+classification via Monte Carlo.
+
+Requirements:
+- Generate N = 100000 random 2×2 matrices with entries uniform in [-1, 1]
+- For each: compute τ = a+d, Δ = ad-bc, classify fixed point type
+- Panel 1: Bar chart of probabilities (%, colored by type)
+  Saddle=orange, Stable Node=cyan, Unstable Node=magenta,
+  Stable Spiral=green, Unstable Spiral=purple
+- Panel 2: 2D histogram (heatmap) in τ-Δ plane with:
+  - Parabola τ²=4Δ (white)
+  - Δ=0 axis (yellow dashed)
+  - Region labels
+- Panel 3: Running probability convergence for saddle fraction
+  vs N on log-x axis, with P ≈ 0.50 reference line
+- Use dark theme (plotly_dark) with gray (#808080) axes</code></pre>
+        </div>
+    </div>
+</div>
+
+<!-- ============================================================ -->
+<!-- NAVIGATION -->
+<!-- ============================================================ -->
+<div class="btn-group mt-xl">
+    <button class="btn btn-magenta" onclick="navigateToSection('70-monte-carlo-pi')">&larr; Previous: Estimating &pi;</button>
+    <button class="btn btn-secondary" onclick="scrollToTop()">&uarr; Back to Top</button>
+    <button class="btn btn-secondary" onclick="navigateToSection('72-ising-model-intro')">Next: Ising Model Introduction &rarr;</button>
+</div>

@@ -1,0 +1,712 @@
+<!-- Section 4.2: The Euler Method Formula -->
+<!-- Source: Module 6 - Implementation of Euler's Method.nb (Part 2) -->
+<!-- Core concept: Euler's method as tangent-line approximation; the recursion formula -->
+<!-- Time: ~22 minutes -->
+<!-- Prerequisites: Section 4.1 (motivation, slope fields, "following the arrows") -->
+
+<h1>The Euler Method Formula</h1>
+
+<p>
+    In Section&nbsp;4.1, you watched a dot step through a slope field,
+    following the arrows one hop at a time.  That was Euler&rsquo;s method
+    in spirit.  Now let&rsquo;s make it precise.
+</p>
+
+<p>
+    The idea is disarmingly simple.  A differential equation
+    \(\dot{x} = f(x, t)\) tells you the <strong>slope</strong> of the
+    solution at every point.  If you know where you are right now, you can
+    draw the <strong>tangent line</strong> and walk along it for a small
+    distance \(h\).  You won&rsquo;t land exactly on the true curve &mdash;
+    but you&rsquo;ll be close.  Then you read the slope again, draw a new
+    tangent, and repeat.
+</p>
+
+<div class="info-box">
+    <div class="info-box-title">Learning Objectives</div>
+    <ul>
+        <li>State the Euler method formula: \(x_{n+1} = x_n + h\,f(x_n, t_n)\)</li>
+        <li>Understand its geometric meaning: walking along tangent lines</li>
+        <li>Execute the algorithm by hand for a simple ODE</li>
+        <li>See how the step size \(h\) controls accuracy</li>
+    </ul>
+</div>
+
+<div class="equation-display">
+    <p><strong>The Euler Method</strong> &mdash; from calculus to arithmetic in one line:</p>
+    $$ x_{n+1} \;=\; x_n \;+\; h\;\cdot f(x_n,\, t_n) $$
+    <p>
+        where \(h\) is the <strong>step size</strong> (a small time interval you choose),
+        \(f(x_n, t_n)\) is the slope at the current point, and
+        \(t_{n+1} = t_n + h\).
+    </p>
+    <p>
+        Why does this work?  Taylor-expand the true solution about \(t_n\):
+    </p>
+    $$ x(t_n + h) = x(t_n) + h\,\underbrace{x'(t_n)}_{=\,f(x_n,\,t_n)} + \underbrace{\tfrac{h^2}{2}\,x''(t_n) + \cdots}_{\text{truncated}} $$
+    <p>
+        Euler&rsquo;s method keeps the first two terms and throws away the rest.
+        The error in each step is \(\mathcal{O}(h^2)\) &mdash; small when \(h\) is small.
+    </p>
+</div>
+
+<hr>
+
+<!-- ========== EXPLORER 1: FROM TANGENT TO FORMULA ========== -->
+
+<div class="interactive-container" id="tangent-to-formula">
+    <div class="interactive-title">Explorer 1: From Tangent to Formula</div>
+
+    <p style="margin-bottom: 0.5rem;">
+        ODE: \(\dot{x} = -2x\), with \(x(0) = 1\).  The exact solution is
+        \(x = e^{-2t}\) (the gray dashed curve).  Click <strong>Next Step</strong>
+        to build the Euler approximation one tangent line at a time.
+    </p>
+
+    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 300px), 1fr)); gap: 1rem;">
+        <div class="plot-container" id="euler-tangent-plot"></div>
+        <div id="euler-calc-table" style="overflow-x: auto;">
+            <table style="width: 100%; border-collapse: collapse; font-size: 0.85em; color: #ccc;">
+                <thead>
+                    <tr style="border-bottom: 2px solid #2a2f4a;">
+                        <th style="padding: 0.4rem; text-align: center;">Step</th>
+                        <th style="padding: 0.4rem; text-align: center;">\(t_n\)</th>
+                        <th style="padding: 0.4rem; text-align: center;">\(x_n\)</th>
+                        <th style="padding: 0.4rem; text-align: center;">\(f(x_n, t_n)\)</th>
+                        <th style="padding: 0.4rem; text-align: center;">\(x_{n+1}\)</th>
+                    </tr>
+                </thead>
+                <tbody id="euler-table-body">
+                    <!-- Filled by JS -->
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <div class="control-panel">
+        <div class="control-group">
+            <label class="control-label">Step size \(h\):
+                <span class="control-label-value" id="euler-h-value">0.50</span>
+            </label>
+            <input type="range" class="slider" id="euler-h-slider"
+                   min="0.2" max="1.0" step="0.1" value="0.5">
+        </div>
+        <div class="btn-group">
+            <button class="btn" id="euler-prev-btn" onclick="eulerFormulaBack()" disabled>&#9664; Previous</button>
+            <button class="btn" id="euler-next-btn" onclick="eulerFormulaNext()">Next Step &#9654;</button>
+            <button class="btn btn-secondary" onclick="eulerFormulaReset()">Reset</button>
+        </div>
+    </div>
+</div>
+
+<!-- Test Your Understanding #1 -->
+<div class="interactive-container question-section">
+    <div class="interactive-title">Test Your Understanding</div>
+
+    <p style="margin-bottom: var(--spacing-md); color: var(--text-secondary);">
+        Use Explorer&nbsp;1 to answer these questions.
+    </p>
+
+    <div class="tabs">
+        <div class="tab-buttons">
+            <button class="tab-button active">Question 1</button>
+            <button class="tab-button">Question 2</button>
+            <button class="tab-button">Question 3</button>
+        </div>
+
+        <!-- Q1: Fill — hand calculation -->
+        <div class="tab-content active">
+            <div class="question-container" data-type="fill" data-answer="0[-.01,.01]|-2[-2.1,-1.9]">
+                <div class="question-text">
+                    For \(\dot{x} = -2x\) with \(x(0) = 1\) and \(h = 0.5\):
+                    <br><br>
+                    At step 0: \(t_0 =\) <input type="text" class="fill-blank" placeholder="?">
+                    and the slope \(f(x_0, t_0) = -2 \times 1 =\) <input type="text" class="fill-blank" placeholder="?">
+                </div>
+                <div class="question-actions">
+                    <button class="btn-verify">Verify</button>
+                </div>
+                <div class="question-explanation" style="display:none;">
+                    <strong>Explanation:</strong>
+                    At \(t_0 = 0\), we have \(x_0 = 1\), so
+                    \(f(x_0, t_0) = -2 \times 1 = -2\).  This is the slope of
+                    the tangent line at the initial point.  Check the table in
+                    Explorer&nbsp;1 to confirm!
+                </div>
+            </div>
+        </div>
+
+        <!-- Q2: Fill — compute x1 -->
+        <div class="tab-content">
+            <div class="question-container" data-type="fill" data-answer="0[-.01,.01]">
+                <div class="question-text">
+                    Continuing: \(x_1 = x_0 + h \cdot f = 1 + 0.5 \times (-2) = \)
+                    <input type="text" class="fill-blank" placeholder="?">
+                    <br><br>
+                    (Click &ldquo;Next Step&rdquo; in Explorer&nbsp;1 to check your answer.)
+                </div>
+                <div class="question-actions">
+                    <button class="btn-verify">Verify</button>
+                </div>
+                <div class="question-explanation" style="display:none;">
+                    <strong>Explanation:</strong>
+                    \(x_1 = 1 + 0.5 \times (-2) = 1 - 1 = 0\).  The Euler method
+                    predicts the function hits zero after one step.  But the true
+                    solution \(e^{-2 \times 0.5} = e^{-1} \approx 0.368\) is still
+                    positive &mdash; so this step overshot significantly.
+                </div>
+            </div>
+        </div>
+
+        <!-- Q3: MCQ -->
+        <div class="tab-content">
+            <div class="question-container" data-type="mcq" data-answer="1">
+                <div class="question-text">
+                    In the geometric view (left panel), each straight segment in the
+                    Euler path represents:
+                </div>
+                <div class="question-options">
+                    <label class="option">
+                        <input type="radio" name="q-ef-3" value="0">
+                        <span>The exact solution between two time points</span>
+                    </label>
+                    <label class="option">
+                        <input type="radio" name="q-ef-3" value="1">
+                        <span>The tangent line at the start of that step, extended for a distance \(h\)</span>
+                    </label>
+                    <label class="option">
+                        <input type="radio" name="q-ef-3" value="2">
+                        <span>A secant line connecting two points on the true curve</span>
+                    </label>
+                    <label class="option">
+                        <input type="radio" name="q-ef-3" value="3">
+                        <span>A random guess that happens to be close</span>
+                    </label>
+                </div>
+                <div class="question-actions">
+                    <button class="btn-verify">Verify</button>
+                </div>
+                <div class="question-explanation" style="display:none;">
+                    <strong>Explanation:</strong>
+                    Each segment is a <em>tangent line</em> at the current Euler point,
+                    extended for time \(h\).  The slope of that tangent is
+                    \(f(x_n, t_n)\), and we walk along it to get \(x_{n+1}\).
+                    That&rsquo;s exactly what the formula
+                    \(x_{n+1} = x_n + h\,f(x_n, t_n)\) computes.
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<hr>
+
+<!-- ========== EXPLORER 2: STEP SIZE SHOWDOWN ========== -->
+
+<p>
+    You&rsquo;ve seen one Euler path.  But how much does the step size
+    matter?  Let&rsquo;s race four different step sizes on the same ODE
+    and find out.
+</p>
+
+<div class="interactive-container" id="step-size-showdown">
+    <div class="interactive-title">Explorer 2: Step Size Showdown</div>
+
+    <p style="margin-bottom: 0.5rem;">
+        Same ODE: \(\dot{x} = -2x\), \(x(0) = 1\).  Four Euler solutions
+        with different step sizes, all compared to the exact curve.  Watch
+        what happens as \(h\) gets smaller.
+    </p>
+
+    <div class="plot-container" id="euler-showdown-plot"></div>
+
+    <div id="euler-showdown-stats" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(120px, 1fr)); gap: 0.5rem; margin: 0.8rem 0; text-align: center; font-size: 0.85em; color: #ccc;">
+        <div>
+            <div style="color: #ff6b6b;">h = 1.0</div>
+            <div>Error: <strong id="euler-err-1">—</strong></div>
+        </div>
+        <div>
+            <div style="color: #ffff00;">h = 0.5</div>
+            <div>Error: <strong id="euler-err-2">—</strong></div>
+        </div>
+        <div>
+            <div style="color: #ff00ff;">h = 0.2</div>
+            <div>Error: <strong id="euler-err-3">—</strong></div>
+        </div>
+        <div>
+            <div style="color: #00f3ff;">h = 0.05</div>
+            <div>Error: <strong id="euler-err-4">—</strong></div>
+        </div>
+    </div>
+</div>
+
+<div class="info-box">
+    <div class="info-box-title">Key Insight</div>
+    <p>
+        Halving the step size roughly halves the final error.  This is because
+        Euler&rsquo;s method is <strong>first-order accurate</strong>: the
+        global error is \(\mathcal{O}(h)\).  To get 10&times; better accuracy,
+        you need 10&times; more steps.  (In Section&nbsp;4.11, you&rsquo;ll
+        meet methods that do much better.)
+    </p>
+</div>
+
+<!-- Test Your Understanding #2 -->
+<div class="interactive-container question-section">
+    <div class="interactive-title">Test Your Understanding</div>
+
+    <p style="margin-bottom: var(--spacing-md); color: var(--text-secondary);">
+        Study the step size comparison above.
+    </p>
+
+    <div class="tabs">
+        <div class="tab-buttons">
+            <button class="tab-button active">Question 1</button>
+            <button class="tab-button">Question 2</button>
+            <button class="tab-button">Question 3</button>
+        </div>
+
+        <!-- Q4: MCQ -->
+        <div class="tab-content active">
+            <div class="question-container" data-type="mcq" data-answer="2">
+                <div class="question-text">
+                    Look at the error values for \(h = 0.5\) and \(h = 0.2\).
+                    When you reduce \(h\) by a factor of 2.5, the error decreases by
+                    roughly:
+                </div>
+                <div class="question-options">
+                    <label class="option">
+                        <input type="radio" name="q-ef-4" value="0">
+                        <span>A factor of 1.5</span>
+                    </label>
+                    <label class="option">
+                        <input type="radio" name="q-ef-4" value="1">
+                        <span>A factor of 6.25 (the square of 2.5)</span>
+                    </label>
+                    <label class="option">
+                        <input type="radio" name="q-ef-4" value="2">
+                        <span>A factor of about 2&ndash;3</span>
+                    </label>
+                    <label class="option">
+                        <input type="radio" name="q-ef-4" value="3">
+                        <span>Exactly 2.5</span>
+                    </label>
+                </div>
+                <div class="question-actions">
+                    <button class="btn-verify">Verify</button>
+                </div>
+                <div class="question-explanation" style="display:none;">
+                    <strong>Explanation:</strong>
+                    For Euler&rsquo;s method the global error is proportional to \(h\),
+                    so cutting \(h\) by 2.5&times; should cut the error by roughly
+                    2&ndash;3&times;.  (It&rsquo;s not <em>exactly</em> 2.5 because the
+                    error constant depends on the equation, but the scaling is linear.)
+                    Compare the numbers in the stats bar to verify.
+                </div>
+            </div>
+        </div>
+
+        <!-- Q5: MSQ -->
+        <div class="tab-content">
+            <div class="question-container" data-type="msq" data-answer="0,3">
+                <div class="question-text">
+                    Which statements about step size are TRUE?  (Select all.)
+                </div>
+                <div class="question-options">
+                    <label class="option">
+                        <input type="checkbox" value="0">
+                        <span>Smaller \(h\) gives a more accurate solution</span>
+                    </label>
+                    <label class="option">
+                        <input type="checkbox" value="1">
+                        <span>Smaller \(h\) always runs faster since there&rsquo;s less error</span>
+                    </label>
+                    <label class="option">
+                        <input type="checkbox" value="2">
+                        <span>There exists some magic \(h\) that gives the exact solution</span>
+                    </label>
+                    <label class="option">
+                        <input type="checkbox" value="3">
+                        <span>Smaller \(h\) requires more computational steps</span>
+                    </label>
+                </div>
+                <div class="question-actions">
+                    <button class="btn-verify">Verify</button>
+                </div>
+                <div class="question-explanation" style="display:none;">
+                    <strong>Explanation:</strong>
+                    <ul>
+                        <li><strong>More accurate:</strong> True &mdash; each step&rsquo;s truncation error is \(\mathcal{O}(h^2)\), and the accumulated error is \(\mathcal{O}(h)\).</li>
+                        <li><strong>Runs faster:</strong> False &mdash; smaller \(h\) means <em>more</em> steps to cover the same time interval, so it takes <em>longer</em>.</li>
+                        <li><strong>Magic \(h\) for exact:</strong> False &mdash; Euler&rsquo;s method always truncates the Taylor series. The error approaches zero only as \(h \to 0\).</li>
+                        <li><strong>More steps:</strong> True &mdash; to go from \(t = 0\) to \(t = 3\) with \(h = 0.05\) requires 60 steps vs. 3 steps with \(h = 1.0\).</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <!-- Q6: Fill -->
+        <div class="tab-content">
+            <div class="question-container" data-type="fill" data-answer="10000[9500,10500]">
+                <div class="question-text">
+                    If you want the Euler solution to have 1000&times; smaller error,
+                    you need to reduce \(h\) by a factor of 1000.  If the original
+                    run took 10 steps, the refined run will take approximately
+                    <input type="text" class="fill-blank" placeholder="?"> steps.
+                    <br><br>
+                    <em>Hint: If \(h\) shrinks by 1000&times;, how many more steps
+                    does the same time interval require?</em>
+                </div>
+                <div class="question-actions">
+                    <button class="btn-verify">Verify</button>
+                </div>
+                <div class="question-explanation" style="display:none;">
+                    <strong>Explanation:</strong>
+                    The number of steps is \(N = T / h\).  Shrinking \(h\) by
+                    1000&times; multiplies \(N\) by 1000: from 10 to
+                    <strong>10,000</strong> steps.  The key takeaway:
+                    <em>first-order methods are expensive</em> &mdash;
+                    1000&times; better accuracy costs 1000&times; more work.
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<hr>
+
+<!-- ========== EXPLORER 3: EULER LAB ========== -->
+
+<p>
+    The beauty of Euler&rsquo;s method is that the formula doesn&rsquo;t care
+    <em>what</em> \(f\) is.  Linear, nonlinear, simple, complicated &mdash;
+    you always do the same thing: read the slope, step, repeat.
+    Try it on three different equations below.
+</p>
+
+<div class="interactive-container" id="euler-lab">
+    <div class="interactive-title">Explorer 3: Euler Lab</div>
+
+    <p style="margin-bottom: 0.5rem;">
+        Choose an ODE, set the step size, and watch Euler&rsquo;s method
+        trace out the solution.  The dashed line is the exact (or high-accuracy
+        reference) solution.
+    </p>
+
+    <div class="plot-container" id="euler-lab-plot"></div>
+
+    <div style="display: flex; justify-content: center; gap: 2rem; margin: 0.8rem 0; font-size: 0.9em; color: #ccc; flex-wrap: wrap;">
+        <span>Final error: <strong id="euler-lab-error">—</strong></span>
+        <span>Steps: <strong id="euler-lab-steps">—</strong></span>
+    </div>
+
+    <div class="control-panel">
+        <div class="control-group">
+            <label class="control-label">Equation:</label>
+            <select id="euler-lab-ode" class="control-select">
+                <option value="0">dx/dt = -2x &nbsp; (exponential decay)</option>
+                <option value="1">dx/dt = t&sup2; &nbsp; (direct integration)</option>
+                <option value="2">dx/dt = -sin(x) &nbsp; (nonlinear!)</option>
+            </select>
+        </div>
+        <div class="control-group">
+            <label class="control-label">Step size \(h\):
+                <span class="control-label-value" id="euler-lab-h-value">0.20</span>
+            </label>
+            <input type="range" class="slider" id="euler-lab-h"
+                   min="0.02" max="0.8" step="0.02" value="0.2">
+        </div>
+    </div>
+</div>
+
+<!-- Test Your Understanding #3 -->
+<div class="interactive-container question-section">
+    <div class="interactive-title">Test Your Understanding</div>
+
+    <p style="margin-bottom: var(--spacing-md); color: var(--text-secondary);">
+        Experiment with different equations and step sizes in the Euler Lab.
+    </p>
+
+    <div class="tabs">
+        <div class="tab-buttons">
+            <button class="tab-button active">Question 1</button>
+            <button class="tab-button">Question 2</button>
+            <button class="tab-button">Question 3</button>
+        </div>
+
+        <!-- Q7: MCQ -->
+        <div class="tab-content active">
+            <div class="question-container" data-type="mcq" data-answer="0">
+                <div class="question-text">
+                    Select &ldquo;dx/dt = t&sup2;&rdquo; and try \(h = 0.2\) vs
+                    \(h = 0.02\).  Why does Euler&rsquo;s method perform especially
+                    well on this equation even with a coarser step?
+                </div>
+                <div class="question-options">
+                    <label class="option">
+                        <input type="radio" name="q-ef-7" value="0">
+                        <span>The slope \(f = t^2\) doesn&rsquo;t depend on \(x\), so errors don&rsquo;t compound</span>
+                    </label>
+                    <label class="option">
+                        <input type="radio" name="q-ef-7" value="1">
+                        <span>The equation is nonlinear, which helps Euler converge</span>
+                    </label>
+                    <label class="option">
+                        <input type="radio" name="q-ef-7" value="2">
+                        <span>Euler&rsquo;s method is always exact for polynomials</span>
+                    </label>
+                    <label class="option">
+                        <input type="radio" name="q-ef-7" value="3">
+                        <span>The step size doesn&rsquo;t matter for this equation</span>
+                    </label>
+                </div>
+                <div class="question-actions">
+                    <button class="btn-verify">Verify</button>
+                </div>
+                <div class="question-explanation" style="display:none;">
+                    <strong>Explanation:</strong>
+                    When \(f\) depends only on \(t\) (not \(x\)), the Euler step
+                    is really just a rectangle-rule integral: \(x_{n+1} = x_n + h\,t_n^2\).
+                    Errors at one step don&rsquo;t feed back into future slopes, so they
+                    don&rsquo;t compound.  For equations where \(f\) depends on \(x\)
+                    (like \(-2x\)), errors <em>do</em> feed back and can grow.
+                </div>
+            </div>
+        </div>
+
+        <!-- Q8: MCQ -->
+        <div class="tab-content">
+            <div class="question-container" data-type="mcq" data-answer="2">
+                <div class="question-text">
+                    Switch to &ldquo;dx/dt = -sin(x)&rdquo; and set \(h = 0.8\).
+                    Compare the Euler path with the reference.  What do you observe?
+                </div>
+                <div class="question-options">
+                    <label class="option">
+                        <input type="radio" name="q-ef-8" value="0">
+                        <span>The Euler path matches the reference perfectly</span>
+                    </label>
+                    <label class="option">
+                        <input type="radio" name="q-ef-8" value="1">
+                        <span>The Euler path diverges to infinity</span>
+                    </label>
+                    <label class="option">
+                        <input type="radio" name="q-ef-8" value="2">
+                        <span>The Euler path has the right shape but drifts from the reference</span>
+                    </label>
+                    <label class="option">
+                        <input type="radio" name="q-ef-8" value="3">
+                        <span>The Euler path oscillates around zero</span>
+                    </label>
+                </div>
+                <div class="question-actions">
+                    <button class="btn-verify">Verify</button>
+                </div>
+                <div class="question-explanation" style="display:none;">
+                    <strong>Explanation:</strong>
+                    The Euler path captures the qualitative shape (decreasing toward
+                    an equilibrium) but drifts noticeably from the true curve.  The
+                    nonlinearity of \(\sin(x)\) means errors compound differently
+                    than for the linear \(-2x\) case.  Reducing \(h\) brings it
+                    back in line &mdash; try \(h = 0.05\) to see!
+                </div>
+            </div>
+        </div>
+
+        <!-- Q9: MSQ -->
+        <div class="tab-content">
+            <div class="question-container" data-type="msq" data-answer="1,2">
+                <div class="question-text">
+                    Which statements about Euler&rsquo;s method are TRUE?
+                    (Select all.)
+                </div>
+                <div class="question-options">
+                    <label class="option">
+                        <input type="checkbox" value="0">
+                        <span>It only works for linear ODEs</span>
+                    </label>
+                    <label class="option">
+                        <input type="checkbox" value="1">
+                        <span>The same formula \(x_{n+1} = x_n + hf\) works for any \(f(x,t)\)</span>
+                    </label>
+                    <label class="option">
+                        <input type="checkbox" value="2">
+                        <span>It requires only the function \(f\) and an initial condition &mdash; no analytical solution needed</span>
+                    </label>
+                    <label class="option">
+                        <input type="checkbox" value="3">
+                        <span>It always converges to the exact solution regardless of step size</span>
+                    </label>
+                </div>
+                <div class="question-actions">
+                    <button class="btn-verify">Verify</button>
+                </div>
+                <div class="question-explanation" style="display:none;">
+                    <strong>Explanation:</strong>
+                    <ul>
+                        <li><strong>Only linear ODEs:</strong> False &mdash; you just used it on \(-\sin(x)\), a nonlinear equation!</li>
+                        <li><strong>Same formula for any \(f\):</strong> True &mdash; the algorithm never &ldquo;looks inside&rdquo; \(f\).  It just evaluates \(f(x_n, t_n)\) at each step.</li>
+                        <li><strong>Only needs \(f\) and IC:</strong> True &mdash; that&rsquo;s the whole point of numerical methods.</li>
+                        <li><strong>Always converges:</strong> False &mdash; with too-large \(h\), the method can overshoot and even become unstable.  Step size matters.</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<hr>
+
+<!-- ========== CODE EXAMPLES ========== -->
+
+<h2 style="margin-top: 2rem;">Python Code Examples</h2>
+
+<div class="tabs">
+    <div class="tab-buttons">
+        <button class="tab-button active">Euler by Hand</button>
+        <button class="tab-button">Step Size Comparison</button>
+        <button class="tab-button">Prompt</button>
+    </div>
+
+    <!-- Tab 1: Euler by hand -->
+    <div class="tab-content active">
+        <div class="code-block-container">
+            <div class="code-header">
+                <span class="code-lang">Python</span>
+                <button class="copy-btn">Copy</button>
+            </div>
+            <pre><code class="language-python">import numpy as np
+import plotly.graph_objects as go
+
+# ODE: dx/dt = -2x,  x(0) = 1
+# Exact solution: x(t) = exp(-2t)
+def f(x, t):
+    return -2 * x
+
+# Euler's method — just three lines of logic!
+h = 0.5
+t, x = [0.0], [1.0]
+while t[-1] < 3.0:
+    x_new = x[-1] + h * f(x[-1], t[-1])
+    t.append(t[-1] + h)
+    x.append(x_new)
+
+# Exact solution for comparison
+t_exact = np.linspace(0, 3, 300)
+x_exact = np.exp(-2 * t_exact)
+
+fig = go.Figure()
+fig.add_trace(go.Scatter(x=t_exact, y=x_exact,
+    mode='lines', name='Exact: exp(-2t)',
+    line=dict(color='#808080', width=2, dash='dash')))
+fig.add_trace(go.Scatter(x=t, y=x,
+    mode='lines+markers', name=f'Euler (h={h})',
+    line=dict(color='#00f3ff', width=2),
+    marker=dict(size=6)))
+
+fig.update_layout(
+    template='plotly_dark',
+    title='Euler Method: dx/dt = -2x',
+    xaxis=dict(title='t', range=[0, 3],
+        gridcolor='#2a2f4a', zerolinecolor='#808080',
+        linecolor='#808080'),
+    yaxis=dict(title='x(t)', range=[-0.5, 1.2],
+        gridcolor='#2a2f4a', zerolinecolor='#808080',
+        linecolor='#808080'))
+fig.show()</code></pre>
+        </div>
+    </div>
+
+    <!-- Tab 2: Step size comparison -->
+    <div class="tab-content">
+        <div class="code-block-container">
+            <div class="code-header">
+                <span class="code-lang">Python</span>
+                <button class="copy-btn">Copy</button>
+            </div>
+            <pre><code class="language-python">import numpy as np
+import plotly.graph_objects as go
+
+def f(x, t):
+    return -2 * x
+
+def euler(h, t_end=3.0):
+    t, x = [0.0], [1.0]
+    while t[-1] < t_end - 1e-10:
+        x.append(x[-1] + h * f(x[-1], t[-1]))
+        t.append(t[-1] + h)
+    return t, x
+
+fig = go.Figure()
+
+# Exact
+t_ex = np.linspace(0, 3, 300)
+fig.add_trace(go.Scatter(x=t_ex, y=np.exp(-2*t_ex),
+    mode='lines', name='Exact',
+    line=dict(color='#808080', width=2, dash='dash')))
+
+# Four step sizes
+colors = ['#ff6b6b', '#ffff00', '#ff00ff', '#00f3ff']
+for h, c in zip([1.0, 0.5, 0.2, 0.05], colors):
+    t, x = euler(h)
+    err = abs(x[-1] - np.exp(-2*t[-1]))
+    fig.add_trace(go.Scatter(x=t, y=x,
+        mode='lines+markers', name=f'h={h} (err={err:.4f})',
+        line=dict(color=c, width=2),
+        marker=dict(size=4)))
+
+fig.update_layout(
+    template='plotly_dark',
+    title='Step Size Showdown',
+    xaxis=dict(title='t', range=[0, 3],
+        gridcolor='#2a2f4a', zerolinecolor='#808080',
+        linecolor='#808080'),
+    yaxis=dict(title='x(t)', range=[-0.5, 1.2],
+        gridcolor='#2a2f4a', zerolinecolor='#808080',
+        linecolor='#808080'))
+fig.show()</code></pre>
+        </div>
+    </div>
+
+    <!-- Tab 3: Prompt -->
+    <div class="tab-content">
+        <div class="code-block-container">
+            <div class="code-header">
+                <span class="code-lang">Prompt for AI</span>
+                <button class="copy-btn">Copy</button>
+            </div>
+            <pre><code class="language-text">Write a Python script that implements Euler's method from scratch.
+
+Requirements:
+1. Solve dx/dt = -2x with x(0) = 1 from t=0 to t=3
+2. Compare four step sizes: h = 1.0, 0.5, 0.2, 0.05
+3. Plot all four Euler solutions + the exact solution exp(-2t)
+4. Print the final error for each step size
+5. Use Plotly (not matplotlib) with dark theme
+6. Colors: exact in gray dashed, data in neon colors
+7. Fixed axis ranges: t [0, 3], x [-0.5, 1.2]
+8. Gray axes (#808080)
+
+Also explain: why does halving h roughly halve the error?
+What does "first-order accurate" mean for Euler's method?</code></pre>
+        </div>
+
+        <div class="info-box" style="margin-top: var(--spacing-md);">
+            <div class="info-box-title">Pro Tips for Prompting</div>
+            <ul>
+                <li>Ask the AI to implement algorithms &ldquo;from scratch&rdquo; &mdash; don&rsquo;t hide behind scipy yet</li>
+                <li>Request error analysis alongside the plot &mdash; numbers make the learning concrete</li>
+                <li>Ask &ldquo;why&rdquo; questions at the end &mdash; the AI can explain the math behind its code</li>
+            </ul>
+        </div>
+    </div>
+</div>
+
+<hr>
+
+<!-- ========== NAVIGATION ========== -->
+<div class="btn-group mt-xl">
+    <button class="btn btn-magenta" onclick="navigateToSection('34-numerical-motivation')">&larr; Previous: Why Can&rsquo;t We Solve All Equations?</button>
+    <button class="btn" onclick="scrollToTop()">&uarr; Back to Top</button>
+    <button class="btn btn-secondary" onclick="navigateToSection('36-for-loops')">Next: Programming Loops &rarr;</button>
+</div>

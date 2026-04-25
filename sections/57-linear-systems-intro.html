@@ -1,0 +1,801 @@
+<!-- ============================================================
+     Section 5.7: Linear Systems & Eigenvalues
+     Source: NPTEL Lecture 8_2 (Linear Systems, Part 1)
+     Concept: Connecting 2D linear ODE systems ẋ = Ax to eigenvalue
+              analysis — eigenvalues determine behavior, eigenvectors
+              determine geometry
+     Time: 20-25 minutes
+     Prerequisites: Sections 5.1-5.6 (phase space, vector fields,
+                    fixed points, classification, trajectories,
+                    love affairs model)
+     ============================================================ -->
+
+<h1>Linear Systems &amp; Eigenvalues</h1>
+
+<p>
+    Every 2D linear system can be written as
+    \( \dot{\mathbf{x}} = A\mathbf{x} \) where \( A \) is a 2&times;2 matrix.
+    In the last section you explored the love-affairs model &mdash; adjusting
+    personality parameters and watching phase portraits change. But <em>why</em>
+    do certain parameter choices give spirals while others give saddles?
+    The answer is <strong>eigenvalues</strong>: two numbers that encode
+    everything about the system&rsquo;s behavior.
+</p>
+
+<div class="info-box">
+    <div class="info-box-title">Learning Objectives</div>
+    <ul>
+        <li>Write any 2D linear system in matrix form \( \dot{\mathbf{x}} = A\mathbf{x} \) and identify the matrix \( A \)</li>
+        <li>Compute eigenvalues and eigenvectors of a 2&times;2 matrix and interpret their meaning in phase space</li>
+        <li>Understand that <strong>eigenvectors</strong> are special directions of pure exponential motion, and <strong>eigenvalues</strong> set the rate</li>
+        <li>See how the general solution \( \mathbf{x}(t) = c_1 e^{\lambda_1 t}\mathbf{v}_1 + c_2 e^{\lambda_2 t}\mathbf{v}_2 \) builds every trajectory from two fundamental modes</li>
+    </ul>
+</div>
+
+<div class="equation-display">
+    <p><strong>The Linear System:</strong></p>
+    $$ \dot{x} = ax + by, \qquad \dot{y} = cx + dy $$
+    <p>In matrix form:</p>
+    $$ \dot{\mathbf{x}} = A\mathbf{x}, \qquad A = \begin{pmatrix} a & b \\ c & d \end{pmatrix} $$
+    <p>
+        The eigenvalues \( \lambda_{1,2} \) satisfy
+        \( \lambda^2 - \tau\lambda + \Delta = 0 \) where \( \tau = a + d \) (trace)
+        and \( \Delta = ad - bc \) (determinant).
+    </p>
+</div>
+
+<hr>
+
+<!-- ============================================================ -->
+<!-- EXPLORER 1: Matrix Explorer -->
+<!-- ============================================================ -->
+<div class="interactive-container" id="matrix-explorer">
+    <div class="interactive-title">Explorer: Matrix Parameter Explorer</div>
+
+    <p>
+        Adjust the four entries of the matrix \( A \) and watch the phase portrait
+        update in real time. The eigenvalues and eigenvectors are computed and
+        displayed live &mdash; notice how the phase portrait <strong>completely
+        changes character</strong> when eigenvalues cross from real to complex
+        or change sign.
+    </p>
+
+    <div class="dual-panel">
+        <div class="panel">
+            <div class="plot-container" id="ls-phasePlot" style="height: 400px;"></div>
+        </div>
+        <div class="panel">
+            <div class="plot-container" id="ls-eigenPlot" style="height: 400px;"></div>
+        </div>
+    </div>
+
+    <div id="ls-stats1" class="stats-bar"></div>
+
+    <div class="control-panel">
+        <div class="control-group">
+            <label class="control-label" for="ls-a-slider">a:
+                <span id="ls-a-value">0.0</span>
+            </label>
+            <input type="range" class="slider" id="ls-a-slider"
+                   min="-3" max="3" step="0.1" value="0">
+        </div>
+        <div class="control-group">
+            <label class="control-label" for="ls-b-slider">b:
+                <span id="ls-b-value">1.0</span>
+            </label>
+            <input type="range" class="slider" id="ls-b-slider"
+                   min="-3" max="3" step="0.1" value="1">
+        </div>
+        <div class="control-group">
+            <label class="control-label" for="ls-c-slider">c:
+                <span id="ls-c-value">-1.0</span>
+            </label>
+            <input type="range" class="slider" id="ls-c-slider"
+                   min="-3" max="3" step="0.1" value="-1">
+        </div>
+        <div class="control-group">
+            <label class="control-label" for="ls-d-slider">d:
+                <span id="ls-d-value">0.0</span>
+            </label>
+            <input type="range" class="slider" id="ls-d-slider"
+                   min="-3" max="3" step="0.1" value="0">
+        </div>
+        <div class="control-group">
+            <label class="control-label" for="ls-preset">Preset:</label>
+            <select id="ls-preset" class="control-select">
+                <option value="center">Center (SHO)</option>
+                <option value="stableNode">Stable Node</option>
+                <option value="unstableNode">Unstable Node</option>
+                <option value="saddle">Saddle</option>
+                <option value="stableSpiral">Stable Spiral</option>
+                <option value="unstableSpiral">Unstable Spiral</option>
+                <option value="custom" selected>Custom</option>
+            </select>
+        </div>
+        <div class="control-group">
+            <button class="btn" onclick="lsMatrixReset()">Reset</button>
+        </div>
+    </div>
+</div>
+
+<!-- ========== Test Your Understanding #1 ========== -->
+<div class="interactive-container question-section">
+    <div class="interactive-title">Test Your Understanding</div>
+
+    <p style="margin-bottom: var(--spacing-md); color: var(--text-secondary);">
+        Use the Matrix Explorer to answer these questions.
+    </p>
+
+    <div class="tabs">
+        <div class="tab-buttons">
+            <button class="tab-button active">Question 1</button>
+            <button class="tab-button">Question 2</button>
+            <button class="tab-button">Question 3</button>
+        </div>
+
+        <div class="tab-content active">
+            <div class="question-container" data-type="mcq" data-answer="2">
+                <div class="question-text">
+                    Select the <strong>Center (SHO)</strong> preset (\( a = 0, b = 1, c = -1, d = 0 \)).
+                    What are the eigenvalues?
+                </div>
+                <div class="question-options">
+                    <label class="option">
+                        <input type="radio" name="ls-q1" value="0">
+                        <span>\( \lambda = 1, -1 \) (real, opposite sign)</span>
+                    </label>
+                    <label class="option">
+                        <input type="radio" name="ls-q1" value="1">
+                        <span>\( \lambda = -1, -1 \) (real, both negative)</span>
+                    </label>
+                    <label class="option">
+                        <input type="radio" name="ls-q1" value="2">
+                        <span>\( \lambda = \pm i \) (pure imaginary)</span>
+                    </label>
+                    <label class="option">
+                        <input type="radio" name="ls-q1" value="3">
+                        <span>\( \lambda = 0, 0 \) (both zero)</span>
+                    </label>
+                </div>
+                <div class="question-actions">
+                    <button class="btn-verify">Verify</button>
+                </div>
+                <div class="question-explanation" style="display:none;">
+                    <strong>Explanation:</strong>
+                    For \( A = \begin{pmatrix} 0 & 1 \\ -1 & 0 \end{pmatrix} \):
+                    \( \tau = 0, \Delta = 1 \). The eigenvalue formula gives
+                    \( \lambda = \frac{0 \pm \sqrt{0 - 4}}{2} = \pm i \). Pure imaginary
+                    eigenvalues mean pure oscillation with no growth or decay &mdash; a
+                    <strong>center</strong>.
+                </div>
+            </div>
+        </div>
+
+        <div class="tab-content">
+            <div class="question-container" data-type="mcq" data-answer="1">
+                <div class="question-text">
+                    Select the <strong>Saddle</strong> preset. Look at the eigenvalue plot on the right.
+                    Where are the eigenvalues located in the complex plane?
+                </div>
+                <div class="question-options">
+                    <label class="option">
+                        <input type="radio" name="ls-q2" value="0">
+                        <span>Both on the positive real axis</span>
+                    </label>
+                    <label class="option">
+                        <input type="radio" name="ls-q2" value="1">
+                        <span>One positive real, one negative real</span>
+                    </label>
+                    <label class="option">
+                        <input type="radio" name="ls-q2" value="2">
+                        <span>On the imaginary axis</span>
+                    </label>
+                    <label class="option">
+                        <input type="radio" name="ls-q2" value="3">
+                        <span>In the left half-plane with imaginary parts</span>
+                    </label>
+                </div>
+                <div class="question-actions">
+                    <button class="btn-verify">Verify</button>
+                </div>
+                <div class="question-explanation" style="display:none;">
+                    <strong>Explanation:</strong>
+                    A saddle has \( \Delta < 0 \), so the discriminant \( \tau^2 - 4\Delta > 0 \)
+                    and both eigenvalues are real. Since \( \Delta = \lambda_1 \lambda_2 < 0 \),
+                    the eigenvalues have <strong>opposite signs</strong>: one positive (unstable
+                    direction) and one negative (stable direction).
+                </div>
+            </div>
+        </div>
+
+        <div class="tab-content">
+            <div class="question-container" data-type="fill" data-answer="spiral">
+                <div class="question-text">
+                    Select the <strong>Stable Spiral</strong> preset. The eigenvalues have a
+                    nonzero imaginary part, which causes oscillation, and a negative real part,
+                    which causes decay. This combination produces a
+                    <select class="fill-blank-select">
+                        <option value=""></option>
+                        <option value="center">center</option>
+                        <option value="node">node</option>
+                        <option value="spiral">spiral</option>
+                        <option value="saddle">saddle</option>
+                    </select>
+                    in the phase portrait.
+                </div>
+                <div class="question-actions">
+                    <button class="btn-verify">Verify</button>
+                </div>
+                <div class="question-explanation" style="display:none;">
+                    <strong>Explanation:</strong>
+                    Complex eigenvalues \( \lambda = \sigma \pm i\omega \) produce oscillation
+                    (from \( \omega \)) with exponential envelope (from \( \sigma \)).
+                    When \( \sigma < 0 \), the envelope decays &mdash; giving a
+                    <strong>spiral</strong> that winds inward. When \( \sigma = 0 \), you get
+                    a center; when \( \sigma > 0 \), an outward spiral.
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- ============================================================ -->
+<!-- EXPLORER 2: Eigenvector Directions -->
+<!-- ============================================================ -->
+<div class="interactive-container" id="eigenvector-directions">
+    <div class="interactive-title">Explorer: Eigenvector Directions</div>
+
+    <p>
+        Eigenvectors are the <strong>special directions</strong> in phase space
+        where motion is purely exponential: a particle launched along an
+        eigenvector stays on that line forever, growing or decaying as
+        \( e^{\lambda t} \). All other trajectories are combinations of
+        motion along both eigenvector directions. Adjust the eigenvalues
+        directly and watch the phase portrait respond.
+    </p>
+
+    <div class="plot-container" id="ls-eigvecPlot" style="height: 440px;"></div>
+
+    <div id="ls-stats2" class="stats-bar"></div>
+
+    <div class="control-panel">
+        <div class="control-group">
+            <label class="control-label" for="ls-lam1-slider">&lambda;&#8321;:
+                <span id="ls-lam1-value">2.0</span>
+            </label>
+            <input type="range" class="slider" id="ls-lam1-slider"
+                   min="-3" max="3" step="0.1" value="2">
+        </div>
+        <div class="control-group">
+            <label class="control-label" for="ls-lam2-slider">&lambda;&#8322;:
+                <span id="ls-lam2-value">-1.0</span>
+            </label>
+            <input type="range" class="slider" id="ls-lam2-slider"
+                   min="-3" max="3" step="0.1" value="-1">
+        </div>
+        <div class="control-group">
+            <label class="control-label" for="ls-angle-slider">Eigenvector angle &theta;:
+                <span id="ls-angle-value">30</span>&deg;
+            </label>
+            <input type="range" class="slider" id="ls-angle-slider"
+                   min="10" max="80" step="5" value="30">
+        </div>
+        <div class="control-group">
+            <button class="btn" onclick="lsEigvecReset()">Reset</button>
+        </div>
+    </div>
+</div>
+
+<div class="info-box">
+    <div class="info-box-title">Why Eigenvectors Matter</div>
+    <p>
+        If you launch a trajectory from a point on an eigenvector line, it stays
+        on that line: \( \mathbf{x}(t) = x_0 e^{\lambda t} \hat{\mathbf{v}} \).
+        The eigenvector is an <strong>invariant line</strong> &mdash; the flow
+        never leaves it. For a saddle, the two eigenvector lines are the stable
+        and unstable manifolds. For a node, both eigenvector lines point toward
+        (or away from) the fixed point, and all other trajectories approach
+        tangent to the <strong>slow eigenvector</strong> (the one with eigenvalue
+        closer to zero).
+    </p>
+</div>
+
+<!-- ========== Test Your Understanding #2 ========== -->
+<div class="interactive-container question-section">
+    <div class="interactive-title">Test Your Understanding</div>
+
+    <p style="margin-bottom: var(--spacing-md); color: var(--text-secondary);">
+        Use the Eigenvector Directions explorer to answer these questions.
+    </p>
+
+    <div class="tabs">
+        <div class="tab-buttons">
+            <button class="tab-button active">Question 4</button>
+            <button class="tab-button">Question 5</button>
+            <button class="tab-button">Question 6</button>
+        </div>
+
+        <div class="tab-content active">
+            <div class="question-container" data-type="mcq" data-answer="0">
+                <div class="question-text">
+                    Set \( \lambda_1 = 2, \lambda_2 = -1 \) (a saddle). Which eigenvector
+                    direction do trajectories <strong>escape along</strong> as \( t \to \infty \)?
+                </div>
+                <div class="question-options">
+                    <label class="option">
+                        <input type="radio" name="ls-q4" value="0">
+                        <span>The \( \mathbf{v}_1 \) direction (positive eigenvalue)</span>
+                    </label>
+                    <label class="option">
+                        <input type="radio" name="ls-q4" value="1">
+                        <span>The \( \mathbf{v}_2 \) direction (negative eigenvalue)</span>
+                    </label>
+                    <label class="option">
+                        <input type="radio" name="ls-q4" value="2">
+                        <span>Both directions equally</span>
+                    </label>
+                    <label class="option">
+                        <input type="radio" name="ls-q4" value="3">
+                        <span>Neither &mdash; they spiral</span>
+                    </label>
+                </div>
+                <div class="question-actions">
+                    <button class="btn-verify">Verify</button>
+                </div>
+                <div class="question-explanation" style="display:none;">
+                    <strong>Explanation:</strong>
+                    The solution is \( \mathbf{x}(t) = c_1 e^{2t}\mathbf{v}_1 + c_2 e^{-t}\mathbf{v}_2 \).
+                    As \( t \to \infty \), the \( e^{2t} \) term dominates and the \( e^{-t} \) term
+                    vanishes. So all generic trajectories eventually align with
+                    \( \mathbf{v}_1 \) &mdash; the <strong>unstable manifold</strong>.
+                </div>
+            </div>
+        </div>
+
+        <div class="tab-content">
+            <div class="question-container" data-type="mcq" data-answer="2">
+                <div class="question-text">
+                    Set \( \lambda_1 = -0.5, \lambda_2 = -3 \) (a stable node). As trajectories
+                    approach the origin, which eigenvector direction do they become
+                    <strong>tangent to</strong>?
+                </div>
+                <div class="question-options">
+                    <label class="option">
+                        <input type="radio" name="ls-q5" value="0">
+                        <span>\( \mathbf{v}_2 \) &mdash; the fast eigenvector (\( \lambda_2 = -3 \))</span>
+                    </label>
+                    <label class="option">
+                        <input type="radio" name="ls-q5" value="1">
+                        <span>Neither &mdash; they approach at 45&deg;</span>
+                    </label>
+                    <label class="option">
+                        <input type="radio" name="ls-q5" value="2">
+                        <span>\( \mathbf{v}_1 \) &mdash; the slow eigenvector (\( \lambda_1 = -0.5 \))</span>
+                    </label>
+                    <label class="option">
+                        <input type="radio" name="ls-q5" value="3">
+                        <span>They spiral inward with no preferred direction</span>
+                    </label>
+                </div>
+                <div class="question-actions">
+                    <button class="btn-verify">Verify</button>
+                </div>
+                <div class="question-explanation" style="display:none;">
+                    <strong>Explanation:</strong>
+                    Near the origin, \( \mathbf{x}(t) \approx c_1 e^{-0.5t}\mathbf{v}_1 + c_2 e^{-3t}\mathbf{v}_2 \).
+                    The \( e^{-3t} \) component dies out much faster than \( e^{-0.5t} \), so
+                    eventually only the \( \mathbf{v}_1 \) component survives. All trajectories
+                    become tangent to the <strong>slow eigenvector</strong> as they approach the
+                    fixed point. The fast direction is &ldquo;used up&rdquo; first.
+                </div>
+            </div>
+        </div>
+
+        <div class="tab-content">
+            <div class="question-container" data-type="msq" data-answer="0,3">
+                <div class="question-text">
+                    Which statements about eigenvectors of 2D linear systems are true?
+                    (Select all that apply)
+                </div>
+                <div class="question-options">
+                    <label class="option">
+                        <input type="checkbox" value="0">
+                        <span>A trajectory starting on an eigenvector line stays on it forever</span>
+                    </label>
+                    <label class="option">
+                        <input type="checkbox" value="1">
+                        <span>Eigenvectors exist only when eigenvalues are real</span>
+                    </label>
+                    <label class="option">
+                        <input type="checkbox" value="2">
+                        <span>Changing the eigenvector angle changes the eigenvalues</span>
+                    </label>
+                    <label class="option">
+                        <input type="checkbox" value="3">
+                        <span>For a stable node, trajectories approach tangent to the slow eigenvector</span>
+                    </label>
+                </div>
+                <div class="question-actions">
+                    <button class="btn-verify">Verify</button>
+                </div>
+                <div class="question-explanation" style="display:none;">
+                    <strong>Explanation:</strong>
+                    <ul>
+                        <li><strong>Stays on eigenvector line:</strong> ✓ By definition: \( A\mathbf{v} = \lambda\mathbf{v} \), so the line through \( \mathbf{v} \) is invariant.</li>
+                        <li><strong>Eigenvectors only for real eigenvalues:</strong> ✗ Complex eigenvalues have complex eigenvectors. In real coordinates, complex eigenvalues produce spirals (no real eigenvector lines).</li>
+                        <li><strong>Angle changes eigenvalues:</strong> ✗ In this explorer, eigenvalues are set independently. The angle rotates the eigenvector directions without changing growth rates.</li>
+                        <li><strong>Tangent to slow eigenvector:</strong> ✓ The fast component decays more quickly, leaving only the slow component near the fixed point.</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- ============================================================ -->
+<!-- EXPLORER 3: Solution Decomposition -->
+<!-- ============================================================ -->
+<div class="interactive-container" id="solution-decomposition">
+    <div class="interactive-title">Explorer: Solution Decomposition</div>
+
+    <p>
+        The general solution is a sum of two <strong>fundamental modes</strong>:
+        \( \mathbf{x}(t) = c_1 e^{\lambda_1 t}\mathbf{v}_1 + c_2 e^{\lambda_2 t}\mathbf{v}_2 \).
+        Each mode evolves independently along its eigenvector direction. Set an
+        initial condition and watch the two modes combine to build the full trajectory.
+    </p>
+
+    <div class="dual-panel">
+        <div class="panel">
+            <div class="plot-container" id="ls-decompPhasePlot" style="height: 400px;"></div>
+        </div>
+        <div class="panel">
+            <div class="plot-container" id="ls-decompTimePlot" style="height: 400px;"></div>
+        </div>
+    </div>
+
+    <div id="ls-stats3" class="stats-bar"></div>
+
+    <div class="control-panel">
+        <div class="control-group">
+            <label class="control-label" for="ls-dec-system">System:</label>
+            <select id="ls-dec-system" class="control-select">
+                <option value="saddle">Saddle (λ = 2, −1)</option>
+                <option value="stableNode">Stable Node (λ = −0.5, −3)</option>
+                <option value="unstableNode">Unstable Node (λ = 1, 3)</option>
+            </select>
+        </div>
+        <div class="control-group">
+            <label class="control-label" for="ls-dec-x0-slider">x&#8320;:
+                <span id="ls-dec-x0-value">1.0</span>
+            </label>
+            <input type="range" class="slider" id="ls-dec-x0-slider"
+                   min="-2.5" max="2.5" step="0.1" value="1">
+        </div>
+        <div class="control-group">
+            <label class="control-label" for="ls-dec-y0-slider">y&#8320;:
+                <span id="ls-dec-y0-value">0.5</span>
+            </label>
+            <input type="range" class="slider" id="ls-dec-y0-slider"
+                   min="-2.5" max="2.5" step="0.1" value="0.5">
+        </div>
+        <div class="control-group">
+            <button class="btn" onclick="lsDecompReset()">Reset</button>
+        </div>
+    </div>
+</div>
+
+<div class="info-box">
+    <div class="info-box-title">The Big Picture</div>
+    <p>
+        Every linear system is just a combination of exponentials along special
+        directions. The eigenvalues tell you the <strong>rates</strong> (growth, decay,
+        or oscillation) and the eigenvectors tell you the <strong>directions</strong>.
+        This is why eigenvalue analysis is so powerful: two numbers
+        (\( \lambda_1, \lambda_2 \)) determine the entire qualitative behavior of
+        the system &mdash; no simulation needed.
+    </p>
+</div>
+
+<!-- ========== Test Your Understanding #3 ========== -->
+<div class="interactive-container question-section">
+    <div class="interactive-title">Test Your Understanding</div>
+
+    <p style="margin-bottom: var(--spacing-md); color: var(--text-secondary);">
+        Use the Solution Decomposition explorer to answer these questions.
+    </p>
+
+    <div class="tabs">
+        <div class="tab-buttons">
+            <button class="tab-button active">Question 7</button>
+            <button class="tab-button">Question 8</button>
+            <button class="tab-button">Question 9</button>
+        </div>
+
+        <div class="tab-content active">
+            <div class="question-container" data-type="mcq" data-answer="1">
+                <div class="question-text">
+                    Select the <strong>Saddle</strong> system and set \( x_0 = 1, y_0 = 0.5 \).
+                    In the time series, which mode dominates at <strong>late times</strong>?
+                </div>
+                <div class="question-options">
+                    <label class="option">
+                        <input type="radio" name="ls-q7" value="0">
+                        <span>Mode 2 (\( e^{-t}\mathbf{v}_2 \)) &mdash; the decaying one</span>
+                    </label>
+                    <label class="option">
+                        <input type="radio" name="ls-q7" value="1">
+                        <span>Mode 1 (\( e^{2t}\mathbf{v}_1 \)) &mdash; the growing one</span>
+                    </label>
+                    <label class="option">
+                        <input type="radio" name="ls-q7" value="2">
+                        <span>Both modes contribute equally at all times</span>
+                    </label>
+                    <label class="option">
+                        <input type="radio" name="ls-q7" value="3">
+                        <span>Neither &mdash; both modes vanish</span>
+                    </label>
+                </div>
+                <div class="question-actions">
+                    <button class="btn-verify">Verify</button>
+                </div>
+                <div class="question-explanation" style="display:none;">
+                    <strong>Explanation:</strong>
+                    Mode 1 grows as \( e^{2t} \) while Mode 2 decays as \( e^{-t} \).
+                    At late times, the growing mode overwhelms the decaying one, and the
+                    trajectory aligns with \( \mathbf{v}_1 \). In the time series you can
+                    see Mode 2 (dashed) shrink to zero while Mode 1 (solid) takes over.
+                </div>
+            </div>
+        </div>
+
+        <div class="tab-content">
+            <div class="question-container" data-type="fill" data-answer="slow">
+                <div class="question-text">
+                    Switch to <strong>Stable Node</strong> (\( \lambda = -0.5, -3 \)).
+                    At late times, the trajectory is dominated by the
+                    <select class="fill-blank-select">
+                        <option value=""></option>
+                        <option value="fast">fast</option>
+                        <option value="slow">slow</option>
+                    </select>
+                    mode because the other mode has already decayed away.
+                </div>
+                <div class="question-actions">
+                    <button class="btn-verify">Verify</button>
+                </div>
+                <div class="question-explanation" style="display:none;">
+                    <strong>Explanation:</strong>
+                    Both modes decay, but the fast mode (\( e^{-3t} \)) vanishes much sooner
+                    than the slow mode (\( e^{-0.5t} \)). Near the fixed point, only the
+                    <strong>slow</strong> mode survives, which is why trajectories approach
+                    tangent to the slow eigenvector.
+                </div>
+            </div>
+        </div>
+
+        <div class="tab-content">
+            <div class="question-container" data-type="mcq" data-answer="3">
+                <div class="question-text">
+                    If both eigenvalues are positive (unstable node), what happens to the
+                    trajectory at large \( t \)?
+                </div>
+                <div class="question-options">
+                    <label class="option">
+                        <input type="radio" name="ls-q9" value="0">
+                        <span>It spirals inward to the origin</span>
+                    </label>
+                    <label class="option">
+                        <input type="radio" name="ls-q9" value="1">
+                        <span>It oscillates at fixed amplitude</span>
+                    </label>
+                    <label class="option">
+                        <input type="radio" name="ls-q9" value="2">
+                        <span>It reaches a stable equilibrium</span>
+                    </label>
+                    <label class="option">
+                        <input type="radio" name="ls-q9" value="3">
+                        <span>It escapes to infinity along the fast eigenvector direction</span>
+                    </label>
+                </div>
+                <div class="question-actions">
+                    <button class="btn-verify">Verify</button>
+                </div>
+                <div class="question-explanation" style="display:none;">
+                    <strong>Explanation:</strong>
+                    With \( \lambda_1 = 1, \lambda_2 = 3 \), both modes grow. The
+                    <strong>fast mode</strong> (\( e^{3t} \)) eventually dominates, so the
+                    trajectory escapes to infinity along the fast eigenvector direction. This
+                    is the mirror image of the stable node: for unstable nodes, trajectories
+                    <em>leave</em> tangent to the slow eigenvector and <em>escape</em> along
+                    the fast one.
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- ============================================================ -->
+<!-- PYTHON CODE EXAMPLES -->
+<!-- ============================================================ -->
+<h2>Python Code</h2>
+
+<div class="tabs">
+    <div class="tab-buttons">
+        <button class="tab-button active">Eigenvalue Analysis</button>
+        <button class="tab-button">Solution Modes</button>
+        <button class="tab-button">Prompt</button>
+    </div>
+
+    <div class="tab-content active">
+        <div class="code-block-container">
+            <div class="code-header">
+                <span class="code-lang">Python</span>
+                <button class="copy-btn">Copy</button>
+            </div>
+            <pre><code class="language-python">
+import numpy as np
+import plotly.graph_objects as go
+
+def rk4_solve(A, x0, T, N):
+    """Solve dx/dt = Ax using RK4."""
+    h = T / N
+    x = np.array(x0, dtype=float)
+    traj = [x.copy()]
+    for _ in range(N):
+        f = lambda u: A @ u
+        k1 = f(x); k2 = f(x + h/2*k1)
+        k3 = f(x + h/2*k2); k4 = f(x + h*k3)
+        x += h/6 * (k1 + 2*k2 + 2*k3 + k4)
+        if np.linalg.norm(x) > 20: break
+        traj.append(x.copy())
+    return np.array(traj)
+
+# Saddle example
+A = np.array([[1, 1], [0, -2]])
+eigenvalues, eigenvectors = np.linalg.eig(A)
+print(f"Eigenvalues: {eigenvalues}")
+print(f"Eigenvectors:\n{eigenvectors}")
+
+fig = go.Figure()
+colors = ['#00f3ff', '#ff006e', '#ffbe0b', '#00ff88',
+          '#bb86fc', '#ff5722', '#76ff03', '#40c4ff']
+
+# Trajectories from multiple ICs
+for k in range(8):
+    th = k * np.pi / 4
+    traj = rk4_solve(A, [1.5*np.cos(th), 1.5*np.sin(th)], 5, 1000)
+    fig.add_trace(go.Scatter(
+        x=traj[:,0], y=traj[:,1], mode='lines',
+        line=dict(color=colors[k], width=1.5),
+        showlegend=False))
+
+# Eigenvector lines
+for i in range(2):
+    v = eigenvectors[:, i]
+    fig.add_trace(go.Scatter(
+        x=[-3*v[0], 3*v[0]], y=[-3*v[1], 3*v[1]],
+        mode='lines',
+        line=dict(color='white', width=1.5, dash='dash'),
+        name=f'v{i+1} (λ={eigenvalues[i]:.1f})'))
+
+fig.update_layout(
+    template='plotly_dark',
+    title=f'A = [[{A[0,0]},{A[0,1]}],[{A[1,0]},{A[1,1]}]]',
+    xaxis=dict(title='x', range=[-3, 3],
+               zerolinecolor='#808080'),
+    yaxis=dict(title='y', range=[-3, 3],
+               zerolinecolor='#808080',
+               scaleanchor='x'),
+    height=500, width=550)
+fig.show()
+            </code></pre>
+        </div>
+    </div>
+
+    <div class="tab-content">
+        <div class="code-block-container">
+            <div class="code-header">
+                <span class="code-lang">Python</span>
+                <button class="copy-btn">Copy</button>
+            </div>
+            <pre><code class="language-python">
+import numpy as np
+import plotly.graph_objects as go
+from plotly.subplots import make_subplots
+
+# Stable node: eigenvalues -0.5 and -3
+# Build matrix with eigenvectors at 30° and 120°
+lam1, lam2 = -0.5, -3.0
+th = np.radians(30)
+V = np.array([[np.cos(th), np.cos(th + np.pi/2)],
+              [np.sin(th), np.sin(th + np.pi/2)]])
+D = np.diag([lam1, lam2])
+A = V @ D @ np.linalg.inv(V)
+
+# Solve from IC and decompose into modes
+x0 = np.array([1.5, 0.5])
+c = np.linalg.solve(V, x0)  # Decomposition coefficients
+
+t = np.linspace(0, 6, 500)
+mode1 = np.outer(c[0] * np.exp(lam1 * t), V[:, 0])
+mode2 = np.outer(c[1] * np.exp(lam2 * t), V[:, 1])
+full = mode1 + mode2
+
+fig = make_subplots(rows=1, cols=2,
+    subplot_titles=['Phase Portrait', 'Mode Decomposition'])
+
+# Phase portrait with eigenvector lines
+fig.add_trace(go.Scatter(
+    x=full[:,0], y=full[:,1], mode='lines',
+    line=dict(color='#00f3ff', width=2),
+    name='Trajectory'), row=1, col=1)
+
+for i, (v, lam, col) in enumerate(zip(
+        V.T, [lam1, lam2], ['#ff5722', '#00ff88'])):
+    fig.add_trace(go.Scatter(
+        x=[-3*v[0], 3*v[0]], y=[-3*v[1], 3*v[1]],
+        mode='lines', line=dict(color=col, dash='dash'),
+        name=f'v{i+1} (λ={lam})'), row=1, col=1)
+
+# Time series of mode amplitudes
+fig.add_trace(go.Scatter(
+    x=t, y=c[0]*np.exp(lam1*t), mode='lines',
+    line=dict(color='#ff5722', width=2),
+    name=f'c₁e^(λ₁t)'), row=1, col=2)
+fig.add_trace(go.Scatter(
+    x=t, y=c[1]*np.exp(lam2*t), mode='lines',
+    line=dict(color='#00ff88', width=2, dash='dash'),
+    name=f'c₂e^(λ₂t)'), row=1, col=2)
+
+fig.update_layout(template='plotly_dark', height=400, width=900)
+fig.update_xaxes(zerolinecolor='#808080', row=1, col=1,
+    range=[-3, 3], title='x')
+fig.update_yaxes(zerolinecolor='#808080', row=1, col=1,
+    range=[-3, 3], title='y', scaleanchor='x')
+fig.update_xaxes(zerolinecolor='#808080', row=1, col=2,
+    title='Time')
+fig.update_yaxes(zerolinecolor='#808080', row=1, col=2,
+    title='Amplitude')
+fig.show()
+            </code></pre>
+        </div>
+    </div>
+
+    <div class="tab-content">
+        <div class="code-block-container">
+            <div class="code-header">
+                <span class="code-lang">Prompt for AI</span>
+                <button class="copy-btn">Copy</button>
+            </div>
+            <pre><code class="language-text">Create a Python script using Plotly to analyze a 2D linear
+dynamical system dx/dt = Ax.
+
+Requirements:
+- Given a 2x2 matrix A, compute eigenvalues and eigenvectors
+  using numpy.linalg.eig
+- Solve trajectories from 8 initial conditions on a circle
+  of radius 1.5 using RK4 (not scipy)
+- Plot phase portrait with eigenvector lines as dashed lines
+- Color eigenvector lines differently (e.g., orange for v1,
+  green for v2), label with eigenvalue
+- Show a second panel: decompose the solution into
+  x(t) = c1*exp(lam1*t)*v1 + c2*exp(lam2*t)*v2
+  and plot each mode amplitude vs time
+- Test with: stable node (lam = -0.5, -3),
+  saddle (lam = 2, -1), unstable node (lam = 1, 3)
+- Use dark theme (plotly_dark) with gray (#808080) axes
+- Fixed axis ranges [-3, 3] for phase portrait
+- Square aspect ratio (scaleanchor)</code></pre>
+        </div>
+    </div>
+</div>
+
+<!-- ============================================================ -->
+<!-- NAVIGATION -->
+<!-- ============================================================ -->
+<div class="btn-group mt-xl">
+    <button class="btn btn-magenta" onclick="navigateToSection('56-love-affairs')">&larr; Previous: Romeo &amp; Juliet</button>
+    <button class="btn btn-secondary" onclick="scrollToTop()">&uarr; Back to Top</button>
+    <button class="btn btn-secondary" onclick="navigateToSection('58-tau-delta-plane')">Next: The &tau;-&Delta; Classification &rarr;</button>
+</div>

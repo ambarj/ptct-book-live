@@ -1,0 +1,800 @@
+<!-- ============================================================
+     Section 5.8: The τ-Δ Classification Framework
+     Source: NPTEL Lecture 8_2 (Linear Systems, Part 2)
+     Concept: The trace-determinant plane as a universal map
+              for classifying all 2D linear systems
+     Time: 20-25 minutes
+     Prerequisites: Sections 5.1-5.7 (phase space, vector fields,
+                    fixed points, classification, eigenvalues)
+     ============================================================ -->
+
+<h1>The &tau;-&Delta; Classification Framework</h1>
+
+<p>
+    In the last section you saw that eigenvalues determine everything about a
+    linear system. But computing eigenvalues requires solving a quadratic &mdash;
+    is there a faster way to classify? Yes: the <strong>trace-determinant plane</strong>.
+    Two numbers, \( \tau = a + d \) (trace) and \( \Delta = ad - bc \) (determinant),
+    carve the plane into regions. Each region corresponds to a fixed-point type.
+    One glance at where \( (\tau, \Delta) \) falls tells you the full story.
+</p>
+
+<div class="info-box">
+    <div class="info-box-title">Learning Objectives</div>
+    <ul>
+        <li>Compute the trace \( \tau = a + d \) and determinant \( \Delta = ad - bc \) of any 2&times;2 matrix</li>
+        <li>Map any linear system to a point in the \( (\tau, \Delta) \) plane and read off the classification</li>
+        <li>Understand the boundaries: \( \Delta = 0 \) (saddle boundary), \( \tau = 0 \) (stability boundary), \( \tau^2 = 4\Delta \) (node-spiral boundary)</li>
+        <li>Use the framework as a <strong>universal classification tool</strong> that works for any 2D linear system</li>
+    </ul>
+</div>
+
+<div class="equation-display">
+    <p><strong>The Classification Formula:</strong></p>
+    $$ \lambda_{1,2} = \frac{\tau \pm \sqrt{\tau^2 - 4\Delta}}{2} $$
+    <p>
+        where \( \tau = \text{tr}(A) = a + d \) and \( \Delta = \det(A) = ad - bc \).
+        The discriminant \( \tau^2 - 4\Delta \) determines whether eigenvalues are real or complex.
+    </p>
+</div>
+
+<hr>
+
+<!-- ============================================================ -->
+<!-- EXPLORER 1: τ-Δ Plane Explorer -->
+<!-- ============================================================ -->
+<div class="interactive-container" id="tau-delta-explorer">
+    <div class="interactive-title">Explorer: The τ-Δ Plane</div>
+
+    <p>
+        Drag the sliders to move through the \( (\tau, \Delta) \) plane. The left
+        panel shows the classification map with colored regions; the right panel
+        shows the <strong>phase portrait</strong> of a system at that point. Watch
+        how the portrait transforms as you cross boundaries.
+    </p>
+
+    <div class="dual-panel">
+        <div class="panel">
+            <div class="plot-container" id="td-mapPlot" style="height: 420px;"></div>
+        </div>
+        <div class="panel">
+            <div class="plot-container" id="td-portraitPlot" style="height: 420px;"></div>
+        </div>
+    </div>
+
+    <div id="td-stats1" class="stats-bar"></div>
+
+    <div class="control-panel">
+        <div class="control-group">
+            <label class="control-label" for="td-tau-slider">&tau; (trace):
+                <span id="td-tau-value">0.0</span>
+            </label>
+            <input type="range" class="slider" id="td-tau-slider"
+                   min="-4" max="4" step="0.1" value="0">
+        </div>
+        <div class="control-group">
+            <label class="control-label" for="td-delta-slider">&Delta; (determinant):
+                <span id="td-delta-value">1.0</span>
+            </label>
+            <input type="range" class="slider" id="td-delta-slider"
+                   min="-3" max="5" step="0.1" value="1">
+        </div>
+        <div class="control-group">
+            <button class="btn" onclick="tdPlaneReset()">Reset</button>
+        </div>
+    </div>
+</div>
+
+<div class="info-box">
+    <div class="info-box-title">Reading the Map</div>
+    <p>
+        The τ-Δ plane is divided into five regions by three curves:
+    </p>
+    <ul>
+        <li><strong>\( \Delta = 0 \)</strong> (horizontal axis): Below this line, eigenvalues have opposite signs → <strong>saddle</strong></li>
+        <li><strong>\( \tau = 0 \)</strong> (vertical axis): Crossing this line flips stability (stable ↔ unstable)</li>
+        <li><strong>\( \tau^2 = 4\Delta \)</strong> (parabola): Inside the parabola, eigenvalues are complex → <strong>spirals/centers</strong>. Outside, eigenvalues are real → <strong>nodes</strong></li>
+    </ul>
+</div>
+
+<!-- ========== Test Your Understanding #1 ========== -->
+<div class="interactive-container question-section">
+    <div class="interactive-title">Test Your Understanding</div>
+
+    <p style="margin-bottom: var(--spacing-md); color: var(--text-secondary);">
+        Use the τ-Δ Plane explorer to answer these questions.
+    </p>
+
+    <div class="tabs">
+        <div class="tab-buttons">
+            <button class="tab-button active">Question 1</button>
+            <button class="tab-button">Question 2</button>
+            <button class="tab-button">Question 3</button>
+        </div>
+
+        <div class="tab-content active">
+            <div class="question-container" data-type="mcq" data-answer="0">
+                <div class="question-text">
+                    Set \( \tau = 0, \Delta = 1 \). This point sits on the \( \tau = 0 \) axis
+                    inside the parabola. What type of fixed point do you see?
+                </div>
+                <div class="question-options">
+                    <label class="option">
+                        <input type="radio" name="td-q1" value="0">
+                        <span>Center &mdash; closed orbits, no growth or decay</span>
+                    </label>
+                    <label class="option">
+                        <input type="radio" name="td-q1" value="1">
+                        <span>Stable spiral &mdash; decaying oscillations</span>
+                    </label>
+                    <label class="option">
+                        <input type="radio" name="td-q1" value="2">
+                        <span>Saddle &mdash; growth along one direction</span>
+                    </label>
+                    <label class="option">
+                        <input type="radio" name="td-q1" value="3">
+                        <span>Stable node &mdash; exponential decay</span>
+                    </label>
+                </div>
+                <div class="question-actions">
+                    <button class="btn-verify">Verify</button>
+                </div>
+                <div class="question-explanation" style="display:none;">
+                    <strong>Explanation:</strong>
+                    With \( \tau = 0 \), the eigenvalues are \( \lambda = \pm\sqrt{-4\Delta}/2 = \pm i \).
+                    Pure imaginary eigenvalues give a <strong>center</strong> &mdash; closed orbits with
+                    no growth or decay. The τ = 0 axis inside the parabola is exactly where centers live.
+                </div>
+            </div>
+        </div>
+
+        <div class="tab-content">
+            <div class="question-container" data-type="fill" data-answer="saddle">
+                <div class="question-text">
+                    Move the determinant slider to \( \Delta = -2 \) (keep any \( \tau \)).
+                    Regardless of the trace value, the fixed point is always a
+                    <select class="fill-blank-select">
+                        <option value=""></option>
+                        <option value="center">center</option>
+                        <option value="node">node</option>
+                        <option value="spiral">spiral</option>
+                        <option value="saddle">saddle</option>
+                    </select>.
+                </div>
+                <div class="question-actions">
+                    <button class="btn-verify">Verify</button>
+                </div>
+                <div class="question-explanation" style="display:none;">
+                    <strong>Explanation:</strong>
+                    When \( \Delta < 0 \), the product of eigenvalues \( \lambda_1 \lambda_2 = \Delta < 0 \),
+                    so eigenvalues have <strong>opposite signs</strong>. This is always a
+                    <strong>saddle</strong>, regardless of the trace. The entire half-plane below
+                    \( \Delta = 0 \) is saddle territory.
+                </div>
+            </div>
+        </div>
+
+        <div class="tab-content">
+            <div class="question-container" data-type="mcq" data-answer="2">
+                <div class="question-text">
+                    Slowly increase \( \tau \) from \( -3 \) to \( +3 \) with \( \Delta = 2 \) fixed.
+                    What sequence of fixed-point types do you pass through?
+                </div>
+                <div class="question-options">
+                    <label class="option">
+                        <input type="radio" name="td-q3" value="0">
+                        <span>Saddle → Center → Saddle</span>
+                    </label>
+                    <label class="option">
+                        <input type="radio" name="td-q3" value="1">
+                        <span>Stable Node → Stable Spiral → Center → Unstable Node</span>
+                    </label>
+                    <label class="option">
+                        <input type="radio" name="td-q3" value="2">
+                        <span>Stable Node → Stable Spiral → Center → Unstable Spiral → Unstable Node</span>
+                    </label>
+                    <label class="option">
+                        <input type="radio" name="td-q3" value="3">
+                        <span>Center → Spiral → Node → Spiral → Center</span>
+                    </label>
+                </div>
+                <div class="question-actions">
+                    <button class="btn-verify">Verify</button>
+                </div>
+                <div class="question-explanation" style="display:none;">
+                    <strong>Explanation:</strong>
+                    At \( \Delta = 2 \), the parabola boundary is at \( \tau^2 = 8 \), i.e.,
+                    \( \tau \approx \pm 2.83 \). Starting from \( \tau = -3 \) (outside parabola,
+                    \( \tau < 0 \)) → <strong>stable node</strong>. Cross into parabola →
+                    <strong>stable spiral</strong>. Cross \( \tau = 0 \) → <strong>center</strong>.
+                    Continue to \( \tau > 0 \) → <strong>unstable spiral</strong>. Exit parabola →
+                    <strong>unstable node</strong>. Five types in sequence!
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- ============================================================ -->
+<!-- EXPLORER 2: Boundary Navigator -->
+<!-- ============================================================ -->
+<div class="interactive-container" id="boundary-navigator">
+    <div class="interactive-title">Explorer: Boundary Navigator</div>
+
+    <p>
+        The boundaries between regions are where the most interesting transitions happen.
+        Choose a boundary and drag the slider to walk along it. Watch how the phase
+        portrait changes right at the transition &mdash; these are the
+        <strong>degenerate</strong> cases that separate qualitatively different behaviors.
+    </p>
+
+    <div class="dual-panel">
+        <div class="panel">
+            <div class="plot-container" id="td-boundaryMapPlot" style="height: 400px;"></div>
+        </div>
+        <div class="panel">
+            <div class="plot-container" id="td-boundaryPortraitPlot" style="height: 400px;"></div>
+        </div>
+    </div>
+
+    <div id="td-stats2" class="stats-bar"></div>
+
+    <div class="control-panel">
+        <div class="control-group">
+            <label class="control-label" for="td-boundary-select">Boundary:</label>
+            <select id="td-boundary-select" class="control-select">
+                <option value="parabola">Parabola (τ² = 4Δ)</option>
+                <option value="tau-axis">τ = 0 axis</option>
+                <option value="delta-axis">Δ = 0 axis</option>
+            </select>
+        </div>
+        <div class="control-group">
+            <label class="control-label" for="td-boundary-param">Position:
+                <span id="td-boundary-param-value">0.0</span>
+            </label>
+            <input type="range" class="slider" id="td-boundary-param"
+                   min="-4" max="4" step="0.1" value="0">
+        </div>
+        <div class="control-group">
+            <label class="control-label" for="td-boundary-offset">Offset from boundary:
+                <span id="td-boundary-offset-value">0.0</span>
+            </label>
+            <input type="range" class="slider" id="td-boundary-offset"
+                   min="-1" max="1" step="0.05" value="0">
+        </div>
+        <div class="control-group">
+            <button class="btn" onclick="tdBoundaryReset()">Reset</button>
+        </div>
+    </div>
+</div>
+
+<div class="info-box">
+    <div class="info-box-title">What Happens on the Boundaries?</div>
+    <p>
+        <strong>On \( \Delta = 0 \):</strong> One eigenvalue is zero. The system has a
+        <strong>line of fixed points</strong> &mdash; an entire line where nothing moves.
+        Trajectories approach or leave this line.
+    </p>
+    <p>
+        <strong>On \( \tau = 0 \) (inside parabola):</strong> Eigenvalues are pure imaginary
+        (\( \pm i\omega \)). The fixed point is a <strong>center</strong> with closed orbits.
+        Any perturbation of \( \tau \) away from zero breaks the center into a spiral.
+    </p>
+    <p>
+        <strong>On \( \tau^2 = 4\Delta \):</strong> The discriminant is zero, giving a
+        <strong>repeated eigenvalue</strong>. This is the boundary between nodes (real eigenvalues)
+        and spirals (complex eigenvalues). The system is a <strong>star node</strong> or
+        <strong>degenerate node</strong>.
+    </p>
+</div>
+
+<!-- ========== Test Your Understanding #2 ========== -->
+<div class="interactive-container question-section">
+    <div class="interactive-title">Test Your Understanding</div>
+
+    <p style="margin-bottom: var(--spacing-md); color: var(--text-secondary);">
+        Use the Boundary Navigator to answer these questions.
+    </p>
+
+    <div class="tabs">
+        <div class="tab-buttons">
+            <button class="tab-button active">Question 4</button>
+            <button class="tab-button">Question 5</button>
+            <button class="tab-button">Question 6</button>
+        </div>
+
+        <div class="tab-content active">
+            <div class="question-container" data-type="mcq" data-answer="1">
+                <div class="question-text">
+                    Select the <strong>Parabola</strong> boundary and set offset = 0. Move the
+                    position slider to a negative value. On the parabola with \( \tau < 0 \),
+                    what do you observe in the phase portrait?
+                </div>
+                <div class="question-options">
+                    <label class="option">
+                        <input type="radio" name="td-q4" value="0">
+                        <span>A saddle with two eigenvector lines</span>
+                    </label>
+                    <label class="option">
+                        <input type="radio" name="td-q4" value="1">
+                        <span>All trajectories converge along the same direction &mdash; a star/degenerate node</span>
+                    </label>
+                    <label class="option">
+                        <input type="radio" name="td-q4" value="2">
+                        <span>Closed orbits like a center</span>
+                    </label>
+                    <label class="option">
+                        <input type="radio" name="td-q4" value="3">
+                        <span>An unstable spiral</span>
+                    </label>
+                </div>
+                <div class="question-actions">
+                    <button class="btn-verify">Verify</button>
+                </div>
+                <div class="question-explanation" style="display:none;">
+                    <strong>Explanation:</strong>
+                    On the parabola \( \tau^2 = 4\Delta \), the eigenvalue is repeated:
+                    \( \lambda = \tau/2 \). With \( \tau < 0 \), this is a negative repeated
+                    eigenvalue. All trajectories converge to the origin along a single
+                    characteristic direction &mdash; a <strong>degenerate node</strong> (or
+                    star node if the matrix is a scalar multiple of the identity).
+                </div>
+            </div>
+        </div>
+
+        <div class="tab-content">
+            <div class="question-container" data-type="fill" data-answer="center">
+                <div class="question-text">
+                    Select the <strong>τ = 0 axis</strong> boundary with offset = 0 and
+                    position = 2 (so \( \Delta = 2 \)). The fixed point is a
+                    <select class="fill-blank-select">
+                        <option value=""></option>
+                        <option value="center">center</option>
+                        <option value="stable spiral">stable spiral</option>
+                        <option value="unstable spiral">unstable spiral</option>
+                        <option value="saddle">saddle</option>
+                    </select>.
+                    Now set offset = −0.3. It becomes a
+                    <select class="fill-blank-select">
+                        <option value=""></option>
+                        <option value="center">center</option>
+                        <option value="stable spiral">stable spiral</option>
+                        <option value="unstable spiral">unstable spiral</option>
+                        <option value="saddle">saddle</option>
+                    </select>.
+                </div>
+                <div class="question-actions">
+                    <button class="btn-verify">Verify</button>
+                </div>
+                <div class="question-explanation" style="display:none;">
+                    <strong>Explanation:</strong>
+                    At \( \tau = 0, \Delta = 2 \): eigenvalues are \( \pm i\sqrt{2} \) (pure imaginary)
+                    → <strong>center</strong>. Offsetting to \( \tau = -0.3 \) makes the real part
+                    slightly negative → <strong>stable spiral</strong>. This shows why centers are
+                    structurally unstable: the tiniest damping turns closed orbits into inward spirals.
+                </div>
+            </div>
+        </div>
+
+        <div class="tab-content">
+            <div class="question-container" data-type="msq" data-answer="1,2">
+                <div class="question-text">
+                    Which statements about the τ-Δ plane boundaries are true? (Select all that apply)
+                </div>
+                <div class="question-options">
+                    <label class="option">
+                        <input type="checkbox" value="0">
+                        <span>Saddles can occur above the \( \Delta = 0 \) axis</span>
+                    </label>
+                    <label class="option">
+                        <input type="checkbox" value="1">
+                        <span>Centers exist only on the \( \tau = 0 \) axis (inside the parabola)</span>
+                    </label>
+                    <label class="option">
+                        <input type="checkbox" value="2">
+                        <span>The parabola \( \tau^2 = 4\Delta \) separates nodes from spirals</span>
+                    </label>
+                    <label class="option">
+                        <input type="checkbox" value="3">
+                        <span>Stable and unstable nodes occupy the same region</span>
+                    </label>
+                </div>
+                <div class="question-actions">
+                    <button class="btn-verify">Verify</button>
+                </div>
+                <div class="question-explanation" style="display:none;">
+                    <strong>Explanation:</strong>
+                    <ul>
+                        <li><strong>Saddles above Δ = 0:</strong> ✗ Saddles require \( \Delta < 0 \). They live entirely below the axis.</li>
+                        <li><strong>Centers on τ = 0:</strong> ✓ Centers need pure imaginary eigenvalues, which requires \( \tau = 0 \) (zero real part) and \( \Delta > 0 \) (inside parabola).</li>
+                        <li><strong>Parabola separates nodes from spirals:</strong> ✓ Outside: real eigenvalues (nodes). Inside: complex eigenvalues (spirals/centers).</li>
+                        <li><strong>Same region:</strong> ✗ Stable nodes have \( \tau < 0 \); unstable nodes have \( \tau > 0 \). They&rsquo;re on opposite sides of the \( \tau = 0 \) axis.</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- ============================================================ -->
+<!-- EXPLORER 3: Matrix Classifier -->
+<!-- ============================================================ -->
+<div class="interactive-container" id="matrix-classifier">
+    <div class="interactive-title">Explorer: Matrix Classifier</div>
+
+    <p>
+        Enter any 2&times;2 matrix and instantly see where it lands on the τ-Δ plane,
+        along with its classification and phase portrait. This is the universal tool:
+        <strong>give me a matrix, I&rsquo;ll tell you everything</strong>.
+    </p>
+
+    <div class="dual-panel">
+        <div class="panel">
+            <div class="plot-container" id="td-classMapPlot" style="height: 400px;"></div>
+        </div>
+        <div class="panel">
+            <div class="plot-container" id="td-classPortraitPlot" style="height: 400px;"></div>
+        </div>
+    </div>
+
+    <div id="td-stats3" class="stats-bar"></div>
+
+    <div class="control-panel">
+        <div class="control-group">
+            <label class="control-label" for="td-ma-slider">a:
+                <span id="td-ma-value">-1.0</span>
+            </label>
+            <input type="range" class="slider" id="td-ma-slider"
+                   min="-3" max="3" step="0.1" value="-1">
+        </div>
+        <div class="control-group">
+            <label class="control-label" for="td-mb-slider">b:
+                <span id="td-mb-value">2.0</span>
+            </label>
+            <input type="range" class="slider" id="td-mb-slider"
+                   min="-3" max="3" step="0.1" value="2">
+        </div>
+        <div class="control-group">
+            <label class="control-label" for="td-mc-slider">c:
+                <span id="td-mc-value">-1.0</span>
+            </label>
+            <input type="range" class="slider" id="td-mc-slider"
+                   min="-3" max="3" step="0.1" value="-1">
+        </div>
+        <div class="control-group">
+            <label class="control-label" for="td-md-slider">d:
+                <span id="td-md-value">-1.0</span>
+            </label>
+            <input type="range" class="slider" id="td-md-slider"
+                   min="-3" max="3" step="0.1" value="-1">
+        </div>
+        <div class="control-group">
+            <label class="control-label" for="td-class-preset">Example:</label>
+            <select id="td-class-preset" class="control-select">
+                <option value="custom" selected>Custom</option>
+                <option value="sho">SHO (center)</option>
+                <option value="dampedSHO">Damped SHO (spiral)</option>
+                <option value="predatorPrey">Predator-Prey</option>
+                <option value="competition">Competition (saddle)</option>
+            </select>
+        </div>
+        <div class="control-group">
+            <button class="btn" onclick="tdClassReset()">Reset</button>
+        </div>
+    </div>
+</div>
+
+<!-- ========== Test Your Understanding #3 ========== -->
+<div class="interactive-container question-section">
+    <div class="interactive-title">Test Your Understanding</div>
+
+    <p style="margin-bottom: var(--spacing-md); color: var(--text-secondary);">
+        Use the Matrix Classifier to answer these questions.
+    </p>
+
+    <div class="tabs">
+        <div class="tab-buttons">
+            <button class="tab-button active">Question 7</button>
+            <button class="tab-button">Question 8</button>
+            <button class="tab-button">Question 9</button>
+        </div>
+
+        <div class="tab-content active">
+            <div class="question-container" data-type="mcq" data-answer="2">
+                <div class="question-text">
+                    Select the <strong>Damped SHO</strong> preset. Where does it land on the
+                    τ-Δ plane?
+                </div>
+                <div class="question-options">
+                    <label class="option">
+                        <input type="radio" name="td-q7" value="0">
+                        <span>Below the Δ = 0 axis (saddle region)</span>
+                    </label>
+                    <label class="option">
+                        <input type="radio" name="td-q7" value="1">
+                        <span>Above the parabola with τ > 0 (unstable node region)</span>
+                    </label>
+                    <label class="option">
+                        <input type="radio" name="td-q7" value="2">
+                        <span>Inside the parabola with τ < 0 (stable spiral region)</span>
+                    </label>
+                    <label class="option">
+                        <input type="radio" name="td-q7" value="3">
+                        <span>On the τ = 0 axis (center)</span>
+                    </label>
+                </div>
+                <div class="question-actions">
+                    <button class="btn-verify">Verify</button>
+                </div>
+                <div class="question-explanation" style="display:none;">
+                    <strong>Explanation:</strong>
+                    The damped SHO has \( \tau = -\gamma < 0 \) (damping) and
+                    \( \Delta = \omega_0^2 > 0 \) (restoring force). With typical light damping,
+                    \( \tau^2 < 4\Delta \), placing it <strong>inside the parabola</strong>
+                    on the left side → <strong>stable spiral</strong>. This is the underdamped regime.
+                </div>
+            </div>
+        </div>
+
+        <div class="tab-content">
+            <div class="question-container" data-type="fill" data-answer="-2|-1">
+                <div class="question-text">
+                    Set the matrix to \( A = \begin{pmatrix} 1 & -1 \\ 2 & -3 \end{pmatrix} \).
+                    Compute: τ = <input type="text" class="fill-blank" style="width: 60px">
+                    and Δ = <input type="text" class="fill-blank" style="width: 60px">.
+                    (Hint: verify with the explorer)
+                </div>
+                <div class="question-actions">
+                    <button class="btn-verify">Verify</button>
+                </div>
+                <div class="question-explanation" style="display:none;">
+                    <strong>Explanation:</strong>
+                    \( \tau = a + d = 1 + (-3) = -2 \).
+                    \( \Delta = ad - bc = (1)(-3) - (-1)(2) = -3 + 2 = -1 \).
+                    Since \( \Delta < 0 \), this is a <strong>saddle</strong> &mdash; regardless of
+                    the trace. Try entering these values in the explorer to confirm.
+                </div>
+            </div>
+        </div>
+
+        <div class="tab-content">
+            <div class="question-container" data-type="mcq" data-answer="0">
+                <div class="question-text">
+                    The <strong>Competition</strong> preset models two competing species
+                    linearized about a coexistence fixed point. It&rsquo;s a saddle. In the
+                    τ-Δ plane, what would you need to change to stabilize the coexistence?
+                </div>
+                <div class="question-options">
+                    <label class="option">
+                        <input type="radio" name="td-q9" value="0">
+                        <span>Move Δ from negative to positive (cross the Δ = 0 axis)</span>
+                    </label>
+                    <label class="option">
+                        <input type="radio" name="td-q9" value="1">
+                        <span>Make τ more negative (more damping)</span>
+                    </label>
+                    <label class="option">
+                        <input type="radio" name="td-q9" value="2">
+                        <span>Move along the parabola</span>
+                    </label>
+                    <label class="option">
+                        <input type="radio" name="td-q9" value="3">
+                        <span>Nothing &mdash; saddles can never be stabilized</span>
+                    </label>
+                </div>
+                <div class="question-actions">
+                    <button class="btn-verify">Verify</button>
+                </div>
+                <div class="question-explanation" style="display:none;">
+                    <strong>Explanation:</strong>
+                    A saddle has \( \Delta < 0 \). To leave the saddle region, you must cross
+                    the \( \Delta = 0 \) boundary into the upper half-plane. Then you also need
+                    \( \tau < 0 \) for stability. Physically, this means changing the interaction
+                    so that the determinant (measuring the &ldquo;strength&rdquo; of the coupling
+                    relative to self-regulation) becomes positive.
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- ============================================================ -->
+<!-- PYTHON CODE EXAMPLES -->
+<!-- ============================================================ -->
+<h2>Python Code</h2>
+
+<div class="tabs">
+    <div class="tab-buttons">
+        <button class="tab-button active">τ-Δ Plane</button>
+        <button class="tab-button">Matrix Classifier</button>
+        <button class="tab-button">Prompt</button>
+    </div>
+
+    <div class="tab-content active">
+        <div class="code-block-container">
+            <div class="code-header">
+                <span class="code-lang">Python</span>
+                <button class="copy-btn">Copy</button>
+            </div>
+            <pre><code class="language-python">
+import numpy as np
+import plotly.graph_objects as go
+
+# Create the τ-Δ classification diagram
+tau = np.linspace(-5, 5, 400)
+
+fig = go.Figure()
+
+# Parabola: Δ = τ²/4
+delta_parabola = tau**2 / 4
+fig.add_trace(go.Scatter(
+    x=tau, y=delta_parabola, mode='lines',
+    line=dict(color='white', width=2),
+    name='τ² = 4Δ'))
+
+# Δ = 0 axis
+fig.add_trace(go.Scatter(
+    x=[-5, 5], y=[0, 0], mode='lines',
+    line=dict(color='#ffbe0b', width=2, dash='dash'),
+    name='Δ = 0'))
+
+# τ = 0 axis
+fig.add_trace(go.Scatter(
+    x=[0, 0], y=[-3, 7], mode='lines',
+    line=dict(color='#00ff88', width=2, dash='dash'),
+    name='τ = 0'))
+
+# Region labels
+labels = [
+    (-2.5, 4, 'Stable\nNode', '#00f3ff'),
+    (2.5, 4, 'Unstable\nNode', '#ff006e'),
+    (-1, 2, 'Stable\nSpiral', '#00f3ff'),
+    (1, 2, 'Unstable\nSpiral', '#ff006e'),
+    (0, 0.8, 'Center', '#ffbe0b'),
+    (0, -1.5, 'Saddle', '#ff5722'),
+]
+for x, y, text, color in labels:
+    fig.add_annotation(x=x, y=y, text=text,
+        font=dict(color=color, size=13),
+        showarrow=False)
+
+fig.update_layout(
+    template='plotly_dark',
+    xaxis=dict(title='τ (trace)', range=[-5, 5],
+               zerolinecolor='#808080'),
+    yaxis=dict(title='Δ (determinant)', range=[-3, 7],
+               zerolinecolor='#808080'),
+    height=550, width=600)
+fig.show()
+            </code></pre>
+        </div>
+    </div>
+
+    <div class="tab-content">
+        <div class="code-block-container">
+            <div class="code-header">
+                <span class="code-lang">Python</span>
+                <button class="copy-btn">Copy</button>
+            </div>
+            <pre><code class="language-python">
+import numpy as np
+import plotly.graph_objects as go
+from plotly.subplots import make_subplots
+
+def classify_and_plot(A, name=''):
+    """Classify matrix and show τ-Δ location + phase portrait."""
+    a, b, c, d = A[0,0], A[0,1], A[1,0], A[1,1]
+    tau = a + d
+    delta = a*d - b*c
+    disc = tau**2 - 4*delta
+
+    # Classify
+    if delta < 0:
+        fp_type = 'Saddle'
+    elif abs(disc) < 0.01:
+        fp_type = 'Star/Degenerate Node'
+    elif disc > 0:
+        fp_type = 'Stable Node' if tau < 0 else 'Unstable Node'
+    elif abs(tau) < 0.01:
+        fp_type = 'Center'
+    else:
+        fp_type = 'Stable Spiral' if tau < 0 else 'Unstable Spiral'
+
+    # RK4 solver
+    def rk4(x0, T=10, N=2000):
+        h = T/N; x = np.array(x0, float); traj = [x.copy()]
+        for _ in range(N):
+            f = lambda u: A @ u
+            k1=f(x); k2=f(x+h/2*k1); k3=f(x+h/2*k2); k4=f(x+h*k3)
+            x += h/6*(k1+2*k2+2*k3+k4)
+            if np.linalg.norm(x) > 20: break
+            traj.append(x.copy())
+        return np.array(traj)
+
+    fig = make_subplots(1, 2, subplot_titles=[
+        f'τ-Δ Plane: {name}', f'Phase Portrait: {fp_type}'])
+
+    # τ-Δ plane with regions
+    t = np.linspace(-5, 5, 200)
+    fig.add_trace(go.Scatter(x=t, y=t**2/4, mode='lines',
+        line=dict(color='white', width=1.5), showlegend=False),
+        row=1, col=1)
+    fig.add_trace(go.Scatter(x=[-5,5], y=[0,0], mode='lines',
+        line=dict(color='#ffbe0b', width=1, dash='dash'),
+        showlegend=False), row=1, col=1)
+    fig.add_trace(go.Scatter(x=[tau], y=[delta], mode='markers',
+        marker=dict(color='#ff006e', size=14,
+            line=dict(color='white', width=2)),
+        showlegend=False), row=1, col=1)
+
+    # Phase portrait
+    colors = ['#00f3ff','#ff006e','#ffbe0b','#00ff88',
+              '#bb86fc','#ff5722','#76ff03','#40c4ff']
+    T = 5 if delta < 0 else 12
+    for k in range(8):
+        th = k*np.pi/4
+        traj = rk4([1.5*np.cos(th), 1.5*np.sin(th)], T)
+        fig.add_trace(go.Scatter(x=traj[:,0], y=traj[:,1],
+            mode='lines', line=dict(color=colors[k], width=1.5),
+            showlegend=False), row=1, col=2)
+
+    fig.update_layout(template='plotly_dark', height=400, width=900)
+    fig.update_xaxes(title='τ', range=[-5,5],
+        zerolinecolor='#808080', row=1, col=1)
+    fig.update_yaxes(title='Δ', range=[-3,7],
+        zerolinecolor='#808080', row=1, col=1)
+    fig.update_xaxes(title='x', range=[-3,3],
+        zerolinecolor='#808080', row=1, col=2)
+    fig.update_yaxes(title='y', range=[-3,3],
+        zerolinecolor='#808080', scaleanchor='x2', row=1, col=2)
+    fig.show()
+    print(f'{name}: τ={tau:.2f}, Δ={delta:.2f} → {fp_type}')
+
+# Test with various systems
+classify_and_plot(np.array([[0,1],[-1,0]]), 'SHO')
+classify_and_plot(np.array([[-0.5,1],[-1,-0.5]]), 'Damped SHO')
+classify_and_plot(np.array([[1,1],[0,-2]]), 'Saddle')
+classify_and_plot(np.array([[-2,0.5],[0.5,-1]]), 'Stable Node')
+            </code></pre>
+        </div>
+    </div>
+
+    <div class="tab-content">
+        <div class="code-block-container">
+            <div class="code-header">
+                <span class="code-lang">Prompt for AI</span>
+                <button class="copy-btn">Copy</button>
+            </div>
+            <pre><code class="language-text">Create a Python script using Plotly that implements a
+universal classifier for 2x2 linear dynamical systems.
+
+Requirements:
+- Input: a 2x2 matrix A
+- Compute: τ = trace(A), Δ = det(A), eigenvalues
+- Classify: saddle, stable/unstable node, stable/unstable
+  spiral, center, degenerate node
+- Show two panels side by side:
+  Panel 1: τ-Δ classification diagram with:
+    - Parabola τ² = 4Δ (white, solid)
+    - Δ = 0 axis (yellow, dashed)
+    - τ = 0 axis (green, dashed)
+    - Region labels (Stable Node, Unstable Node, etc.)
+    - Current (τ,Δ) point as large marker
+  Panel 2: Phase portrait of the system with:
+    - 8 trajectories from circle of ICs (RK4, not scipy)
+    - Eigenvector lines (dashed) for real eigenvalue cases
+- Test with: SHO, damped SHO, saddle, stable node
+- Use dark theme (plotly_dark) with gray (#808080) axes
+- Fixed ranges: τ-Δ plane [-5,5]x[-3,7], phase [-3,3]x[-3,3]</code></pre>
+        </div>
+    </div>
+</div>
+
+<!-- ============================================================ -->
+<!-- NAVIGATION -->
+<!-- ============================================================ -->
+<div class="btn-group mt-xl">
+    <button class="btn btn-magenta" onclick="navigateToSection('57-linear-systems-intro')">&larr; Previous: Linear Systems &amp; Eigenvalues</button>
+    <button class="btn btn-secondary" onclick="scrollToTop()">&uarr; Back to Top</button>
+    <button class="btn btn-secondary" onclick="navigateToSection('59-oscillator-phase-space')">Next: Damped Oscillator Revisited &rarr;</button>
+</div>

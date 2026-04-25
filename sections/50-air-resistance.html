@@ -1,0 +1,757 @@
+<!-- ============================================================
+     Section 4.17: Adding Air Resistance (Optional)
+     Source: NPTEL Lecture 6 (Escaping the Earth, Part 4)
+     Concept: Velocity-dependent drag, exponential atmosphere model,
+              how drag raises escape velocity, RK4 + bisection
+     Time: 15-20 minutes
+     Prerequisites: Sections 4.14-4.16 (escape physics, non-dim, RK4)
+     ============================================================ -->
+
+<h1>Adding Air Resistance</h1>
+
+<p>
+    Real rockets don't fly through vacuum. Earth's atmosphere exerts drag that opposes motion
+    and decays exponentially with altitude (air gets thinner as you go up). This is a problem
+    with <strong>no analytical solution</strong> — the only way forward is numerical.
+</p>
+
+<div class="info-box">
+    <div class="info-box-title">Learning Objectives</div>
+    <ul>
+        <li>Model atmospheric drag as \( F_{\text{drag}} = -\alpha\,e^{-\beta(X-1)}\,V \) with two dimensionless parameters</li>
+        <li>See how drag steals energy and prevents escape at \( V_0 = \sqrt{2} \)</li>
+        <li>Use RK4 + bisection to find the new escape velocity — a problem with no analytical answer</li>
+        <li>Explore how drag strength (\( \alpha \)) and atmosphere thickness (\( \beta \)) affect escape</li>
+    </ul>
+</div>
+
+<p>
+    In dimensionless units, the ODE becomes:
+</p>
+
+<div class="equation-display">
+    <p><strong>Escape with air resistance:</strong></p>
+    $$ \ddot{X} = -\frac{1}{X^2} \;-\; \alpha\,e^{-\beta(X-1)}\,\dot{X} $$
+    <p>where \( \alpha = \tfrac{k}{m}\sqrt{R/g} \) controls drag strength, and
+    \( \beta = \lambda R \) controls atmosphere thickness.
+    At \( X = 1 \) (surface), drag is \( \alpha V \). At altitude, it decays as \( e^{-\beta(X-1)} \).</p>
+</div>
+
+<div class="info-box">
+    <div class="info-box-title">Why This Matters</div>
+    <p>
+        <strong>No analytical solution exists.</strong> The energy trick from Section 4.14 fails because
+        drag is velocity-dependent and dissipative — energy is not conserved. The only way forward
+        is numerical: RK4 to compute trajectories, bisection to find the new escape threshold.
+        This is exactly the workflow real engineers use.
+    </p>
+</div>
+
+<!-- ============================================================ -->
+<!-- EXPLORER 1: Drag Force Visualizer -->
+<!-- ============================================================ -->
+<div class="interactive-container" id="drag-visualizer">
+    <div class="interactive-title">Explorer: Drag Force Visualizer</div>
+
+    <p>
+        Compare trajectories with and without atmospheric drag. The left plot shows
+        how the drag coefficient decays with altitude. The right plot shows the impact on trajectories.
+    </p>
+
+    <div class="control-panel">
+        <div class="control-group">
+            <label class="control-label" for="ar-v0-slider">V₀:</label>
+            <input type="range" class="slider" id="ar-v0-slider"
+                   min="1.0" max="3.5" step="0.01" value="1.80">
+            <span id="ar-v0-value">1.80</span>
+        </div>
+        <div class="control-group">
+            <label class="control-label" for="ar-alpha-slider">α (drag strength):</label>
+            <input type="range" class="slider" id="ar-alpha-slider"
+                   min="0" max="3" step="0.05" value="1.0">
+            <span id="ar-alpha-value">1.00</span>
+        </div>
+        <div class="control-group">
+            <label class="control-label" for="ar-beta-slider">β (atm. thickness):</label>
+            <input type="range" class="slider" id="ar-beta-slider"
+                   min="0.5" max="5" step="0.1" value="1.0">
+            <span id="ar-beta-value">1.0</span>
+        </div>
+        <button class="btn btn-sm" onclick="arDragReset()">Reset</button>
+    </div>
+
+    <div class="stats-bar">
+        <div class="stat-item">
+            <span class="stat-label">Drag at surface</span>
+            <span class="stat-value" id="ar-dragSurf">α V₀ = 1.80</span>
+        </div>
+        <div class="stat-item">
+            <span class="stat-label">Scale height</span>
+            <span class="stat-value" id="ar-scaleH">1/β = 1.00 R</span>
+        </div>
+        <div class="stat-item">
+            <span class="stat-label">No drag</span>
+            <span class="stat-value" id="ar-classNoDrag">Unbound</span>
+        </div>
+        <div class="stat-item">
+            <span class="stat-label">With drag</span>
+            <span class="stat-value" id="ar-classDrag">—</span>
+        </div>
+    </div>
+
+    <div class="dual-panel">
+        <div class="plot-container" id="ar-dragPlot"></div>
+        <div class="plot-container" id="ar-trajPlot"></div>
+    </div>
+
+    <div class="info-box">
+        <div class="info-box-title">What to Try</div>
+        <ul>
+            <li>At V₀ = 1.80, α = 1, β = 1: without drag, the projectile escapes. With drag, it falls back! Drag stole enough energy to prevent escape.</li>
+            <li>Increase V₀ until the drag trajectory also escapes — that's the new, higher escape velocity.</li>
+            <li>Set α = 0: both trajectories are identical (no drag).</li>
+            <li>Increase β to 5: the atmosphere is thin (drag only near surface). The effect is weaker.</li>
+            <li>Decrease β to 0.5: a thick atmosphere extends far from the surface. The effect is dramatic.</li>
+        </ul>
+    </div>
+</div>
+
+<!-- Questions Group 1 -->
+<div class="interactive-container question-section">
+    <div class="interactive-title">Test Your Understanding</div>
+
+    <p style="margin-bottom: var(--spacing-md); color: var(--text-secondary);">
+        Use the Drag Force Visualizer to answer these questions.
+    </p>
+
+    <div class="tabs">
+        <div class="tab-buttons">
+            <button class="tab-button active">Question 1</button>
+            <button class="tab-button">Question 2</button>
+            <button class="tab-button">Question 3</button>
+        </div>
+
+        <div class="tab-content active">
+            <div class="question-container" data-type="mcq" data-answer="2">
+                <div class="question-text">
+                    With α = 1, β = 1, a launch speed of V₀ = √2 ≈ 1.41 (the vacuum escape velocity):
+                </div>
+                <div class="question-options">
+                    <label class="option">
+                        <input type="radio" name="ar-q1" value="0">
+                        <span>The projectile still escapes — drag is too weak to matter</span>
+                    </label>
+                    <label class="option">
+                        <input type="radio" name="ar-q1" value="1">
+                        <span>The projectile reaches infinity but very slowly</span>
+                    </label>
+                    <label class="option">
+                        <input type="radio" name="ar-q1" value="2">
+                        <span>The projectile falls back — drag has stolen enough energy to prevent escape</span>
+                    </label>
+                </div>
+                <div class="question-actions">
+                    <button class="btn-verify">Verify</button>
+                </div>
+                <div class="question-explanation" style="display:none;">
+                    <strong>Explanation:</strong>
+                    At the vacuum escape velocity V₀ = √2, the total energy is exactly zero — there's
+                    no energy margin. Any drag at all removes energy from the system, making the total
+                    energy negative. The projectile is now bound. To escape with drag, you need to
+                    launch faster than √2 to compensate for the energy lost to air resistance.
+                </div>
+            </div>
+        </div>
+
+        <div class="tab-content">
+            <div class="question-container" data-type="mcq" data-answer="1">
+                <div class="question-text">
+                    What happens when you increase β (keeping α fixed)?
+                </div>
+                <div class="question-options">
+                    <label class="option">
+                        <input type="radio" name="ar-q2" value="0">
+                        <span>Escape becomes harder (need higher V₀)</span>
+                    </label>
+                    <label class="option">
+                        <input type="radio" name="ar-q2" value="1">
+                        <span>Escape becomes easier (drag concentrated near surface, less total energy loss)</span>
+                    </label>
+                    <label class="option">
+                        <input type="radio" name="ar-q2" value="2">
+                        <span>No effect — β doesn't change the escape velocity</span>
+                    </label>
+                </div>
+                <div class="question-actions">
+                    <button class="btn-verify">Verify</button>
+                </div>
+                <div class="question-explanation" style="display:none;">
+                    <strong>Explanation:</strong>
+                    Large β means the atmosphere is thin — it drops off quickly with altitude.
+                    The drag acts strongly only near the surface and fades fast. The projectile
+                    loses less total energy to drag, so escape is easier. A thin atmosphere is
+                    less of an obstacle than a thick one.
+                </div>
+            </div>
+        </div>
+
+        <div class="tab-content">
+            <div class="question-container" data-type="msq" data-answer="0,2">
+                <div class="question-text">
+                    Why can't we use the energy conservation trick from Section 4.14 when drag is present? (Select all)
+                </div>
+                <div class="question-options">
+                    <label class="option">
+                        <input type="checkbox" value="0">
+                        <span>Drag is dissipative — mechanical energy is not conserved</span>
+                    </label>
+                    <label class="option">
+                        <input type="checkbox" value="1">
+                        <span>The gravitational force changes when drag is added</span>
+                    </label>
+                    <label class="option">
+                        <input type="checkbox" value="2">
+                        <span>The drag force depends on velocity, making the ODE non-separable</span>
+                    </label>
+                    <label class="option">
+                        <input type="checkbox" value="3">
+                        <span>Newton's second law doesn't apply with drag</span>
+                    </label>
+                </div>
+                <div class="question-actions">
+                    <button class="btn-verify">Verify</button>
+                </div>
+                <div class="question-explanation" style="display:none;">
+                    <strong>Explanation:</strong>
+                    <ul>
+                        <li>✓ Drag converts kinetic energy to heat. Total mechanical energy (KE + PE) decreases over time.</li>
+                        <li>Gravity is unchanged. The drag is an <em>additional</em> force.</li>
+                        <li>✓ The chain-rule trick gave v dv/dx = -1/x², which is separable. With drag, we get v dv/dx = -1/x² - α e^{-β(x-1)} v, which mixes x and v non-separably.</li>
+                        <li>Newton's second law absolutely applies — that's how we wrote the ODE!</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- ============================================================ -->
+<!-- EXPLORER 2: Escape Threshold with Drag -->
+<!-- ============================================================ -->
+<h2>Finding the New Escape Velocity</h2>
+
+<p>
+    With drag, the escape velocity is higher than \( \sqrt{2} \). By how much? Use bisection:
+    run RK4, check if the projectile escapes, and narrow the bracket.
+</p>
+
+<div class="interactive-container" id="drag-threshold">
+    <div class="interactive-title">Explorer: Escape Threshold with Drag</div>
+
+    <p>
+        Set the drag parameters, then use bisection to find the escape velocity.
+        Compare with the drag-free value √2 ≈ 1.414.
+    </p>
+
+    <div class="control-panel">
+        <div class="control-group">
+            <label class="control-label" for="ar-alpha2-slider">α:</label>
+            <input type="range" class="slider" id="ar-alpha2-slider"
+                   min="0" max="3" step="0.1" value="1.0">
+            <span id="ar-alpha2-value">1.0</span>
+        </div>
+        <div class="control-group">
+            <label class="control-label" for="ar-beta2-slider">β:</label>
+            <input type="range" class="slider" id="ar-beta2-slider"
+                   min="0.5" max="5" step="0.1" value="1.0">
+            <span id="ar-beta2-value">1.0</span>
+        </div>
+        <div class="control-group">
+            <label class="control-label">Bisection:</label>
+            <button class="btn btn-sm" onclick="arBisectStep()">Step</button>
+            <button class="btn btn-sm" onclick="arBisectAuto()">Auto (20 steps)</button>
+            <button class="btn btn-sm" onclick="arBisectReset()">Reset</button>
+        </div>
+    </div>
+
+    <div class="stats-bar">
+        <div class="stat-item">
+            <span class="stat-label">Bracket</span>
+            <span class="stat-value" id="ar-bracket2">[1.000, 4.000]</span>
+        </div>
+        <div class="stat-item">
+            <span class="stat-label">Midpoint V₀</span>
+            <span class="stat-value" id="ar-midV02">2.500</span>
+        </div>
+        <div class="stat-item">
+            <span class="stat-label">Step</span>
+            <span class="stat-value" id="ar-bisectStep2">0</span>
+        </div>
+        <div class="stat-item">
+            <span class="stat-label">v_esc / √2</span>
+            <span class="stat-value" id="ar-vescRatio">—</span>
+        </div>
+    </div>
+
+    <div class="dual-panel">
+        <div class="plot-container" id="ar-bisectPlot2"></div>
+        <div class="plot-container" id="ar-bisectTrajPlot2"></div>
+    </div>
+
+    <div class="info-box">
+        <div class="info-box-title">What to Try</div>
+        <ul>
+            <li>Click "Auto" with α = 1, β = 1: the escape velocity converges to about 2.05 — nearly 45% higher than √2!</li>
+            <li>Set α = 0, click Auto: should recover √2 exactly (no drag).</li>
+            <li>Try α = 3 (heavy drag): escape velocity jumps to ~3.5. The atmosphere is a serious obstacle.</li>
+            <li>After Auto, change α or β sliders — the bisection resets automatically for new parameters.</li>
+        </ul>
+    </div>
+</div>
+
+<!-- Questions Group 2 -->
+<div class="interactive-container question-section">
+    <div class="interactive-title">Test Your Understanding</div>
+
+    <p style="margin-bottom: var(--spacing-md); color: var(--text-secondary);">
+        Use the Escape Threshold explorer to answer these questions.
+    </p>
+
+    <div class="tabs">
+        <div class="tab-buttons">
+            <button class="tab-button active">Question 4</button>
+            <button class="tab-button">Question 5</button>
+            <button class="tab-button">Question 6</button>
+        </div>
+
+        <div class="tab-content active">
+            <div class="question-container" data-type="fill" data-answer="2.05[1.95,2.15]">
+                <div class="question-text">
+                    With α = 1, β = 1, the escape velocity is approximately V₀ ≈
+                    <input type="text" class="fill-blank" placeholder="?">
+                    (Run Auto and read the midpoint.)
+                </div>
+                <div class="question-actions">
+                    <button class="btn-verify">Verify</button>
+                </div>
+                <div class="question-explanation" style="display:none;">
+                    <strong>Explanation:</strong>
+                    With moderate drag (α = 1) and a moderately thick atmosphere (β = 1),
+                    the escape velocity rises from √2 ≈ 1.414 to about 2.05 — a ~45% increase.
+                    This is why rocket launches require so much fuel: overcoming air resistance
+                    is a significant part of the energy budget.
+                </div>
+            </div>
+        </div>
+
+        <div class="tab-content">
+            <div class="question-container" data-type="fill" data-answer="1.41[1.39,1.43]">
+                <div class="question-text">
+                    With α = 0 (no drag), the bisection should converge to V₀ ≈
+                    <input type="text" class="fill-blank" placeholder="?">
+                    (This validates that our solver reproduces the known vacuum result.)
+                </div>
+                <div class="question-actions">
+                    <button class="btn-verify">Verify</button>
+                </div>
+                <div class="question-explanation" style="display:none;">
+                    <strong>Explanation:</strong>
+                    With α = 0, the drag term vanishes and we're back to the vacuum problem.
+                    The bisection should converge to √2 ≈ 1.4142. This is the validation step —
+                    always test a solver on a known case before applying it to new problems.
+                </div>
+            </div>
+        </div>
+
+        <div class="tab-content">
+            <div class="question-container" data-type="mcq" data-answer="0">
+                <div class="question-text">
+                    You've just solved a problem that has no analytical solution. What made it possible?
+                </div>
+                <div class="question-options">
+                    <label class="option">
+                        <input type="radio" name="ar-q6" value="0">
+                        <span>RK4 computes trajectories, bisection searches for the threshold — no formula needed</span>
+                    </label>
+                    <label class="option">
+                        <input type="radio" name="ar-q6" value="1">
+                        <span>We approximated the drag as constant, making the problem solvable</span>
+                    </label>
+                    <label class="option">
+                        <input type="radio" name="ar-q6" value="2">
+                        <span>We found a new analytical formula for escape with drag</span>
+                    </label>
+                </div>
+                <div class="question-actions">
+                    <button class="btn-verify">Verify</button>
+                </div>
+                <div class="question-explanation" style="display:none;">
+                    <strong>Explanation:</strong>
+                    No approximation, no new formula. We solved the <em>exact</em> ODE numerically using RK4,
+                    and searched for the escape threshold using bisection. This is the power of computational
+                    thinking: combine a generic ODE solver with a root-finding strategy to answer questions
+                    that are beyond the reach of analytical methods.
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- ============================================================ -->
+<!-- EXPLORER 3: Parameter Space Exploration -->
+<!-- ============================================================ -->
+<h2>How Drag Parameters Affect Escape</h2>
+
+<p>
+    How does the escape velocity depend on drag strength and atmosphere thickness?
+    Let's sweep across parameter values to build a complete picture.
+</p>
+
+<div class="interactive-container" id="parameter-sweep">
+    <div class="interactive-title">Explorer: Drag Parameter Space</div>
+
+    <p>
+        The left plot sweeps α (drag strength) at fixed β. The right plot sweeps β (atmosphere thickness)
+        at fixed α. Each point requires a full bisection search — computed in real time.
+    </p>
+
+    <div class="control-panel">
+        <div class="control-group">
+            <label class="control-label" for="ar-alpha3-slider">α (for β sweep):</label>
+            <input type="range" class="slider" id="ar-alpha3-slider"
+                   min="0.1" max="3" step="0.1" value="1.0">
+            <span id="ar-alpha3-value">1.0</span>
+        </div>
+        <div class="control-group">
+            <label class="control-label" for="ar-beta3-slider">β (for α sweep):</label>
+            <input type="range" class="slider" id="ar-beta3-slider"
+                   min="0.5" max="5" step="0.1" value="1.0">
+            <span id="ar-beta3-value">1.0</span>
+        </div>
+        <button class="btn btn-sm" onclick="arSweepReset()">Reset</button>
+    </div>
+
+    <div class="stats-bar">
+        <div class="stat-item">
+            <span class="stat-label">v_esc(α, β)</span>
+            <span class="stat-value" id="ar-vescCurrent">—</span>
+        </div>
+        <div class="stat-item">
+            <span class="stat-label">v_esc / √2</span>
+            <span class="stat-value" id="ar-ratCurrent">—</span>
+        </div>
+        <div class="stat-item">
+            <span class="stat-label">% increase</span>
+            <span class="stat-value" id="ar-pctIncrease">—</span>
+        </div>
+    </div>
+
+    <div class="dual-panel">
+        <div class="plot-container" id="ar-alphaSweepPlot"></div>
+        <div class="plot-container" id="ar-betaSweepPlot"></div>
+    </div>
+
+    <div class="info-box">
+        <div class="info-box-title">What to Try</div>
+        <ul>
+            <li>Left plot: as α increases (stronger drag), escape velocity rises sharply. At α = 3, it's more than double √2.</li>
+            <li>Right plot: as β increases (thinner atmosphere), escape velocity drops toward √2. A thin atmosphere barely matters.</li>
+            <li>At β = 0.5 (thick atmosphere): even moderate α creates a big increase in escape velocity.</li>
+            <li>The √2 reference line (dashed) shows the vacuum limit — all curves approach this as α → 0 or β → ∞.</li>
+        </ul>
+    </div>
+</div>
+
+<!-- Questions Group 3 -->
+<div class="interactive-container question-section">
+    <div class="interactive-title">Test Your Understanding</div>
+
+    <p style="margin-bottom: var(--spacing-md); color: var(--text-secondary);">
+        Use the Parameter Space explorer to answer these questions.
+    </p>
+
+    <div class="tabs">
+        <div class="tab-buttons">
+            <button class="tab-button active">Question 7</button>
+            <button class="tab-button">Question 8</button>
+            <button class="tab-button">Question 9</button>
+        </div>
+
+        <div class="tab-content active">
+            <div class="question-container" data-type="mcq" data-answer="2">
+                <div class="question-text">
+                    As β → ∞ (infinitely thin atmosphere), the escape velocity approaches:
+                </div>
+                <div class="question-options">
+                    <label class="option">
+                        <input type="radio" name="ar-q7" value="0">
+                        <span>Zero — no atmosphere means no gravity</span>
+                    </label>
+                    <label class="option">
+                        <input type="radio" name="ar-q7" value="1">
+                        <span>Infinity — some drag always remains</span>
+                    </label>
+                    <label class="option">
+                        <input type="radio" name="ar-q7" value="2">
+                        <span>\( \sqrt{2} \) — the vacuum escape velocity (drag vanishes everywhere)</span>
+                    </label>
+                </div>
+                <div class="question-actions">
+                    <button class="btn-verify">Verify</button>
+                </div>
+                <div class="question-explanation" style="display:none;">
+                    <strong>Explanation:</strong>
+                    When β → ∞, the exponential e^{−β(X−1)} drops to zero for any X > 1.
+                    Drag vanishes everywhere except at the exact surface (a set of measure zero).
+                    The problem reduces to the drag-free case with escape velocity √2.
+                </div>
+            </div>
+        </div>
+
+        <div class="tab-content">
+            <div class="question-container" data-type="msq" data-answer="0,1,3">
+                <div class="question-text">
+                    Which parameters make escape harder (higher v_esc)? (Select all)
+                </div>
+                <div class="question-options">
+                    <label class="option">
+                        <input type="checkbox" value="0">
+                        <span>Increasing α (stronger drag force)</span>
+                    </label>
+                    <label class="option">
+                        <input type="checkbox" value="1">
+                        <span>Decreasing β (thicker atmosphere)</span>
+                    </label>
+                    <label class="option">
+                        <input type="checkbox" value="2">
+                        <span>Increasing β (thinner atmosphere)</span>
+                    </label>
+                    <label class="option">
+                        <input type="checkbox" value="3">
+                        <span>Both α and β contribute: a strong, thick atmosphere is worst</span>
+                    </label>
+                </div>
+                <div class="question-actions">
+                    <button class="btn-verify">Verify</button>
+                </div>
+                <div class="question-explanation" style="display:none;">
+                    <strong>Explanation:</strong>
+                    <ul>
+                        <li>✓ Larger α = stronger drag at any altitude = more energy lost = harder to escape.</li>
+                        <li>✓ Smaller β = drag persists to higher altitudes = more total energy loss.</li>
+                        <li>Larger β = thinner atmosphere = drag fades quickly = easier escape.</li>
+                        <li>✓ The worst case is high α (strong drag) with low β (thick atmosphere).</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <div class="tab-content">
+            <div class="question-container" data-type="mcq" data-answer="2">
+                <div class="question-text">
+                    What computational tools from this chapter did you combine to solve this problem?
+                </div>
+                <div class="question-options">
+                    <label class="option">
+                        <input type="radio" name="ar-q9" value="0">
+                        <span>Only RK4</span>
+                    </label>
+                    <label class="option">
+                        <input type="radio" name="ar-q9" value="1">
+                        <span>Only bisection</span>
+                    </label>
+                    <label class="option">
+                        <input type="radio" name="ar-q9" value="2">
+                        <span>Non-dimensionalization + RK4 + bisection — the complete computational toolkit</span>
+                    </label>
+                </div>
+                <div class="question-actions">
+                    <button class="btn-verify">Verify</button>
+                </div>
+                <div class="question-explanation" style="display:none;">
+                    <strong>Explanation:</strong>
+                    All three ingredients were essential:
+                    <strong>Non-dimensionalization</strong> (Section 4.15) reduced the problem to two parameters (α, β).
+                    <strong>RK4</strong> (Sections 4.12, 4.16) computed individual trajectories.
+                    <strong>Bisection</strong> (Section 4.16) searched for the escape threshold.
+                    This combination of tools is far more powerful than any single technique — and it
+                    generalizes to problems of arbitrary complexity.
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- ============================================================ -->
+<!-- CODE EXAMPLES -->
+<!-- ============================================================ -->
+<h2>Python Code</h2>
+
+<div class="tabs">
+    <div class="tab-buttons">
+        <button class="tab-button active">Drag Trajectories</button>
+        <button class="tab-button">Escape Finder</button>
+        <button class="tab-button">Prompt</button>
+    </div>
+
+    <div class="tab-content active">
+        <div class="code-block-container">
+            <div class="code-header">
+                <span class="code-lang">Python</span>
+                <button class="copy-btn">Copy</button>
+            </div>
+            <pre><code class="language-python">
+import numpy as np
+import plotly.graph_objects as go
+from plotly.subplots import make_subplots
+
+def rk4_step(f, y, t, h):
+    k1 = f(y, t)
+    k2 = f(y + h/2 * k1, t + h/2)
+    k3 = f(y + h/2 * k2, t + h/2)
+    k4 = f(y + h * k3, t + h)
+    return y + (h/6) * (k1 + 2*k2 + 2*k3 + k4)
+
+def make_ode(alpha, beta):
+    def f(y, t):
+        X, V = y
+        gravity = -1 / X**2
+        drag = -alpha * np.exp(-beta * (X - 1)) * V
+        return np.array([V, gravity + drag])
+    return f
+
+def solve(V0, alpha, beta, T=20, N=1000):
+    f = make_ode(alpha, beta)
+    h = T / N
+    t = np.zeros(N+1); Y = np.zeros((N+1, 2))
+    Y[0] = [1, V0]
+    for i in range(N):
+        Y[i+1] = rk4_step(f, Y[i], t[i], h)
+        t[i+1] = t[i] + h
+        if Y[i+1, 0] < 0.01 or Y[i+1, 0] > 50:
+            break
+    return t[:i+2], Y[:i+2]
+
+# Compare with and without drag
+alpha, beta = 1.0, 1.0
+V0 = 1.8
+
+fig = make_subplots(rows=1, cols=2,
+    subplot_titles=['X(T) Trajectory', 'V(T) Velocity'])
+
+for a, label, color in [(0, 'No drag', '#00f3ff'),
+                          (alpha, f'α={alpha}, β={beta}', '#ff6b6b')]:
+    t, Y = solve(V0, a, beta)
+    fig.add_trace(go.Scatter(x=t, y=Y[:,0], name=f'{label}',
+        line=dict(color=color, width=2)), row=1, col=1)
+    fig.add_trace(go.Scatter(x=t, y=Y[:,1], name=f'{label}',
+        line=dict(color=color, width=2), showlegend=False), row=1, col=2)
+
+fig.update_layout(template='plotly_dark')
+fig.update_xaxes(title='T', linecolor='#808080')
+fig.update_yaxes(title='X', linecolor='#808080', row=1, col=1)
+fig.update_yaxes(title='V', linecolor='#808080', row=1, col=2)
+fig.show()
+            </code></pre>
+        </div>
+    </div>
+
+    <div class="tab-content">
+        <div class="code-block-container">
+            <div class="code-header">
+                <span class="code-lang">Python</span>
+                <button class="copy-btn">Copy</button>
+            </div>
+            <pre><code class="language-python">
+import numpy as np
+
+def rk4_step(f, y, t, h):
+    k1 = f(y, t)
+    k2 = f(y + h/2 * k1, t + h/2)
+    k3 = f(y + h/2 * k2, t + h/2)
+    k4 = f(y + h * k3, t + h)
+    return y + (h/6) * (k1 + 2*k2 + 2*k3 + k4)
+
+def escapes(V0, alpha, beta, T=30, N=1500, X_thresh=10):
+    def f(y, t):
+        X, V = y
+        return np.array([V, -1/X**2 - alpha*np.exp(-beta*(X-1))*V])
+    h = T / N
+    y = np.array([1.0, V0])
+    for i in range(N):
+        y = rk4_step(f, y, i*h, h)
+        if y[0] > X_thresh: return True
+        if y[0] < 0.01: return False
+    return False
+
+# Bisection for escape velocity
+def find_vesc(alpha, beta, lo=1.0, hi=4.0, steps=25):
+    for _ in range(steps):
+        mid = (lo + hi) / 2
+        if escapes(mid, alpha, beta):
+            hi = mid
+        else:
+            lo = mid
+    return (lo + hi) / 2
+
+# Sweep alpha
+print(f"{'alpha':>6s}  {'beta':>5s}  {'v_esc':>8s}  {'v_esc/√2':>8s}")
+print("-" * 32)
+for alpha in np.arange(0, 3.5, 0.5):
+    ve = find_vesc(alpha, beta=1.0)
+    print(f"{alpha:6.1f}  {1.0:5.1f}  {ve:8.3f}  {ve/np.sqrt(2):8.3f}")
+            </code></pre>
+        </div>
+    </div>
+
+    <div class="tab-content">
+        <div class="code-block-container">
+            <div class="code-header">
+                <span class="code-lang">Prompt for AI</span>
+                <button class="copy-btn">Copy</button>
+            </div>
+            <pre><code class="language-text">Add air resistance to the escape velocity problem:
+  X'' = -1/X² - alpha * exp(-beta*(X-1)) * X'
+
+1. Implement RK4 from scratch (no scipy)
+2. Compare trajectories with and without drag for V₀ = 1.8
+3. Use bisection to find the escape velocity for alpha=1, beta=1
+4. Sweep alpha from 0 to 3 and plot v_esc(alpha) at fixed beta=1
+5. Sweep beta from 0.5 to 5 and plot v_esc(beta) at fixed alpha=1
+6. Show that v_esc → √2 as alpha → 0 or beta → ∞
+
+This problem has NO analytical solution — only numerical methods work.
+Use plotly_dark theme, gray axes (#808080), neon colors.</code></pre>
+        </div>
+
+        <div class="info-box" style="margin-top: var(--spacing-md);">
+            <div class="info-box-title">Pro Tips for Prompting</div>
+            <ul>
+                <li>Ask for a 2D heatmap of v_esc(α, β) — the full parameter landscape</li>
+                <li>Request physical interpretation: what are realistic α and β for Earth?</li>
+                <li>Challenge: find the drag parameters that double the escape velocity</li>
+                <li>Extension: replace exponential atmosphere with realistic altitude-dependent density</li>
+            </ul>
+        </div>
+    </div>
+</div>
+
+<div class="info-box">
+    <div class="info-box-title">Chapter 4 Complete!</div>
+    <p>
+        You've come a long way — from Euler's simple first step to solving a problem that has
+        no analytical solution. The computational toolkit you've built
+        (non-dimensionalization + RK4 + bisection) is the same foundation used by engineers
+        designing real rocket trajectories. The physics may get more complex, but the method
+        stays the same: write the ODE, choose good scales, integrate numerically, and search
+        for the answer.
+    </p>
+</div>
+
+<!-- ============================================================ -->
+<!-- NAVIGATION -->
+<!-- ============================================================ -->
+<div class="btn-group mt-xl">
+    <button class="btn btn-magenta" onclick="navigateToSection('49-escape-rk4')">&larr; Previous: RK4 for Escape Velocity</button>
+    <button class="btn btn-secondary" onclick="scrollToTop()">&uarr; Back to Top</button>
+</div>

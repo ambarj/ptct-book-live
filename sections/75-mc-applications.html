@@ -1,0 +1,671 @@
+<!-- ============================================================
+     Section 6.10: Monte Carlo in Science (Optional)
+     Source: Supplementary material
+     Concept: Breadth of MC applications — physics, finance,
+              ML, biology — plus random walks as a unifying example
+     Time: 15-20 minutes
+     Prerequisites: Sections 6.1-6.9 (MC foundations, integration,
+                    Metropolis, Ising)
+     ============================================================ -->
+
+<h1>Monte Carlo in Science <span style="color: var(--text-secondary); font-size: 0.6em;">(Optional)</span></h1>
+
+<p>
+    You&rsquo;ve learned the MC toolkit: random sampling, integration, error analysis,
+    importance sampling, and the Metropolis algorithm. These aren&rsquo;t academic
+    exercises &mdash; they&rsquo;re the backbone of modern computational science.
+    From predicting stock prices to simulating protein folding to training neural
+    networks, Monte Carlo is <strong>everywhere</strong>. This section surveys the
+    landscape and shows you the big picture.
+</p>
+
+<div class="info-box">
+    <div class="info-box-title">Learning Objectives</div>
+    <ul>
+        <li>See Monte Carlo applied across disciplines: physics, finance, machine learning, biology</li>
+        <li>Understand <strong>random walks</strong> as a unifying MC concept connecting diffusion, Brownian motion, and MCMC</li>
+        <li>Appreciate why MC is the method of choice for high-dimensional, complex problems</li>
+        <li>Connect the chapter&rsquo;s techniques (sampling, integration, Metropolis) into a coherent toolkit</li>
+    </ul>
+</div>
+
+<hr>
+
+<!-- ============================================================ -->
+<!-- EXPLORER 1: Application Gallery -->
+<!-- ============================================================ -->
+<div class="interactive-container" id="application-gallery">
+    <div class="interactive-title">Explorer: MC Application Gallery</div>
+
+    <p>
+        Choose a field and see a simple Monte Carlo demonstration relevant to that
+        discipline. Each example uses the same core idea &mdash; <strong>random
+        sampling to estimate something hard</strong> &mdash; just applied in a
+        different context.
+    </p>
+
+    <div class="dual-panel">
+        <div class="panel">
+            <div class="plot-container" id="app-demoPlot" style="height: 400px;"></div>
+        </div>
+        <div class="panel">
+            <div class="plot-container" id="app-resultPlot" style="height: 400px;"></div>
+        </div>
+    </div>
+
+    <div id="app-stats1" class="stats-bar"></div>
+
+    <div class="control-panel">
+        <div class="control-group">
+            <label class="control-label" for="app-field-select">Application:</label>
+            <select id="app-field-select" class="control-select">
+                <option value="diffusion">Physics: Diffusion (Random Walk)</option>
+                <option value="finance">Finance: Stock Price (Geometric BM)</option>
+                <option value="buffon">Geometry: Buffon&rsquo;s Needle (&pi;)</option>
+                <option value="percolation">Materials: Percolation Threshold</option>
+            </select>
+        </div>
+        <div class="control-group">
+            <button class="btn" onclick="appRun()">Run Demo</button>
+        </div>
+    </div>
+</div>
+
+<div class="info-box">
+    <div class="info-box-title">The Common Thread</div>
+    <p>
+        Every MC application follows the same pattern: (1) define a random process,
+        (2) run many trials, (3) average the results. Whether you&rsquo;re estimating
+        &pi; from needle drops, pricing options from stock simulations, or computing
+        magnetization from spin flips &mdash; it&rsquo;s all <strong>sampling and
+        averaging</strong>. The power of MC is that this simple recipe works for
+        problems of arbitrary complexity.
+    </p>
+</div>
+
+<!-- ========== Test Your Understanding #1 ========== -->
+<div class="interactive-container question-section">
+    <div class="interactive-title">Test Your Understanding</div>
+
+    <p style="margin-bottom: var(--spacing-md); color: var(--text-secondary);">
+        Use the Application Gallery to answer these questions.
+    </p>
+
+    <div class="tabs">
+        <div class="tab-buttons">
+            <button class="tab-button active">Question 1</button>
+            <button class="tab-button">Question 2</button>
+            <button class="tab-button">Question 3</button>
+        </div>
+
+        <div class="tab-content active">
+            <div class="question-container" data-type="mcq" data-answer="2">
+                <div class="question-text">
+                    Run <strong>Diffusion</strong>. What quantity does the random walk estimate?
+                </div>
+                <div class="question-options">
+                    <label class="option">
+                        <input type="radio" name="app-q1" value="0">
+                        <span>The speed of a particle</span>
+                    </label>
+                    <label class="option">
+                        <input type="radio" name="app-q1" value="1">
+                        <span>The temperature of the system</span>
+                    </label>
+                    <label class="option">
+                        <input type="radio" name="app-q1" value="2">
+                        <span>The mean-squared displacement &langle;x&sup2;&rangle;, which grows as &radic;t (diffusion law)</span>
+                    </label>
+                    <label class="option">
+                        <input type="radio" name="app-q1" value="3">
+                        <span>The exact trajectory of a molecule</span>
+                    </label>
+                </div>
+                <div class="question-actions">
+                    <button class="btn-verify">Verify</button>
+                </div>
+                <div class="question-explanation" style="display:none;">
+                    <strong>Explanation:</strong>
+                    A random walk models diffusion: at each step, the particle moves randomly.
+                    The key statistical quantity is \( \langle x^2 \rangle \propto t \) &mdash;
+                    the <strong>diffusion law</strong>. MC simulates many walks and averages
+                    \( x^2 \) to estimate the diffusion coefficient.
+                </div>
+            </div>
+        </div>
+
+        <div class="tab-content">
+            <div class="question-container" data-type="mcq" data-answer="1">
+                <div class="question-text">
+                    Run <strong>Finance</strong>. The stock price model uses random steps.
+                    How is this similar to the Ising model simulation?
+                </div>
+                <div class="question-options">
+                    <label class="option">
+                        <input type="radio" name="app-q2" value="0">
+                        <span>Both use the trapezoidal rule</span>
+                    </label>
+                    <label class="option">
+                        <input type="radio" name="app-q2" value="1">
+                        <span>Both generate random trajectories and compute averages over many trials</span>
+                    </label>
+                    <label class="option">
+                        <input type="radio" name="app-q2" value="2">
+                        <span>Both solve differential equations exactly</span>
+                    </label>
+                    <label class="option">
+                        <input type="radio" name="app-q2" value="3">
+                        <span>They are completely unrelated methods</span>
+                    </label>
+                </div>
+                <div class="question-actions">
+                    <button class="btn-verify">Verify</button>
+                </div>
+                <div class="question-explanation" style="display:none;">
+                    <strong>Explanation:</strong>
+                    Both are Monte Carlo: generate random trajectories (spin configurations or
+                    stock price paths), then average over many trials. The Ising model averages
+                    energy; the finance model averages option payoff. Same technique, different domain.
+                </div>
+            </div>
+        </div>
+
+        <div class="tab-content">
+            <div class="question-container" data-type="msq" data-answer="0,1,3">
+                <div class="question-text">
+                    In which fields is Monte Carlo widely used? (Select all)
+                </div>
+                <div class="question-options">
+                    <label class="option">
+                        <input type="checkbox" value="0">
+                        <span>Statistical physics (Ising model, phase transitions)</span>
+                    </label>
+                    <label class="option">
+                        <input type="checkbox" value="1">
+                        <span>Finance (option pricing, risk assessment)</span>
+                    </label>
+                    <label class="option">
+                        <input type="checkbox" value="2">
+                        <span>Exact arithmetic (computing 1 + 1)</span>
+                    </label>
+                    <label class="option">
+                        <input type="checkbox" value="3">
+                        <span>Machine learning (Bayesian inference, generative models)</span>
+                    </label>
+                </div>
+                <div class="question-actions">
+                    <button class="btn-verify">Verify</button>
+                </div>
+                <div class="question-explanation" style="display:none;">
+                    <strong>Explanation:</strong>
+                    <ul>
+                        <li><strong>Physics:</strong> ✓ MC was invented for physics (Manhattan Project). Ising, lattice QCD, molecular dynamics.</li>
+                        <li><strong>Finance:</strong> ✓ Option pricing (Black-Scholes MC), VaR, portfolio optimization.</li>
+                        <li><strong>Exact arithmetic:</strong> ✗ MC is for estimation, not exact computation. 1+1=2 doesn&rsquo;t need sampling!</li>
+                        <li><strong>Machine learning:</strong> ✓ MCMC for Bayesian posteriors, variational inference, diffusion models.</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- ============================================================ -->
+<!-- EXPLORER 2: Random Walk Lab -->
+<!-- ============================================================ -->
+<div class="interactive-container" id="random-walk-lab">
+    <div class="interactive-title">Explorer: Random Walk Laboratory</div>
+
+    <p>
+        The <strong>random walk</strong> is the simplest MC process and the
+        foundation of diffusion, Brownian motion, and MCMC. Launch multiple
+        walkers and watch them spread out. The RMS distance grows as \( \sqrt{N} \)
+        &mdash; the same \( 1/\sqrt{N} \) scaling you saw in MC error!
+    </p>
+
+    <div class="dual-panel">
+        <div class="panel">
+            <div class="plot-container" id="app-walkPlot" style="height: 400px;"></div>
+        </div>
+        <div class="panel">
+            <div class="plot-container" id="app-rmsPlot" style="height: 400px;"></div>
+        </div>
+    </div>
+
+    <div id="app-stats2" class="stats-bar"></div>
+
+    <div class="control-panel">
+        <div class="control-group">
+            <label class="control-label" for="app-dim-select">Dimension:</label>
+            <select id="app-dim-select" class="control-select">
+                <option value="1">1D</option>
+                <option value="2" selected>2D</option>
+            </select>
+        </div>
+        <div class="control-group">
+            <label class="control-label" for="app-walkers-slider">Walkers:
+                <span id="app-walkers-value">20</span>
+            </label>
+            <input type="range" class="slider" id="app-walkers-slider"
+                   min="5" max="50" step="5" value="20">
+        </div>
+        <div class="control-group">
+            <label class="control-label" for="app-steps-slider">Steps:
+                <span id="app-steps-value">500</span>
+            </label>
+            <input type="range" class="slider" id="app-steps-slider"
+                   min="100" max="2000" step="100" value="500">
+        </div>
+        <div class="control-group">
+            <button class="btn" onclick="appWalkRun()">Launch Walkers</button>
+        </div>
+    </div>
+</div>
+
+<!-- ========== Test Your Understanding #2 ========== -->
+<div class="interactive-container question-section">
+    <div class="interactive-title">Test Your Understanding</div>
+
+    <p style="margin-bottom: var(--spacing-md); color: var(--text-secondary);">
+        Use the Random Walk Lab to answer these questions.
+    </p>
+
+    <div class="tabs">
+        <div class="tab-buttons">
+            <button class="tab-button active">Question 4</button>
+            <button class="tab-button">Question 5</button>
+            <button class="tab-button">Question 6</button>
+        </div>
+
+        <div class="tab-content active">
+            <div class="question-container" data-type="mcq" data-answer="0">
+                <div class="question-text">
+                    Launch 20 walkers for 500 steps in 2D. The RMS distance plot shows
+                    \( \sqrt{\langle r^2 \rangle} \) vs step number. What shape is this curve?
+                </div>
+                <div class="question-options">
+                    <label class="option">
+                        <input type="radio" name="app-q4" value="0">
+                        <span>Square root (\( \propto \sqrt{N} \)) &mdash; the diffusion law</span>
+                    </label>
+                    <label class="option">
+                        <input type="radio" name="app-q4" value="1">
+                        <span>Linear (\( \propto N \))</span>
+                    </label>
+                    <label class="option">
+                        <input type="radio" name="app-q4" value="2">
+                        <span>Constant (doesn&rsquo;t grow)</span>
+                    </label>
+                    <label class="option">
+                        <input type="radio" name="app-q4" value="3">
+                        <span>Exponential</span>
+                    </label>
+                </div>
+                <div class="question-actions">
+                    <button class="btn-verify">Verify</button>
+                </div>
+                <div class="question-explanation" style="display:none;">
+                    <strong>Explanation:</strong>
+                    For a random walk, \( \langle r^2 \rangle = N \) (in appropriate units), so
+                    \( \sqrt{\langle r^2 \rangle} = \sqrt{N} \). This is the <strong>diffusion
+                    law</strong>: distance grows as the square root of time (steps). The same
+                    \( \sqrt{N} \) appears in MC error because MC <em>is</em> a random walk
+                    through sample space.
+                </div>
+            </div>
+        </div>
+
+        <div class="tab-content">
+            <div class="question-container" data-type="fill" data-answer="0">
+                <div class="question-text">
+                    The <em>average</em> displacement \( \langle x \rangle \) of a symmetric
+                    random walk is
+                    <input type="text" class="fill-blank" style="width: 50px">
+                    (the walk is unbiased &mdash; equally likely to go left or right).
+                </div>
+                <div class="question-actions">
+                    <button class="btn-verify">Verify</button>
+                </div>
+                <div class="question-explanation" style="display:none;">
+                    <strong>Explanation:</strong>
+                    A symmetric random walk has \( \langle x \rangle = 0 \) by symmetry. The
+                    walker is equally likely to be at +x as at &minus;x. But the <em>spread</em>
+                    \( \sqrt{\langle x^2 \rangle} \) grows as \( \sqrt{N} \). Zero mean, growing
+                    variance &mdash; this is diffusion.
+                </div>
+            </div>
+        </div>
+
+        <div class="tab-content">
+            <div class="question-container" data-type="mcq" data-answer="2">
+                <div class="question-text">
+                    How is a random walk related to the Metropolis algorithm?
+                </div>
+                <div class="question-options">
+                    <label class="option">
+                        <input type="radio" name="app-q6" value="0">
+                        <span>They are unrelated</span>
+                    </label>
+                    <label class="option">
+                        <input type="radio" name="app-q6" value="1">
+                        <span>Metropolis is a random walk in physical space</span>
+                    </label>
+                    <label class="option">
+                        <input type="radio" name="app-q6" value="2">
+                        <span>Metropolis is a <em>biased</em> random walk through configuration space that prefers low-energy states</span>
+                    </label>
+                    <label class="option">
+                        <input type="radio" name="app-q6" value="3">
+                        <span>Random walks always reject uphill moves</span>
+                    </label>
+                </div>
+                <div class="question-actions">
+                    <button class="btn-verify">Verify</button>
+                </div>
+                <div class="question-explanation" style="display:none;">
+                    <strong>Explanation:</strong>
+                    Metropolis is a <strong>random walk in configuration space</strong> with
+                    a bias: downhill moves (lower energy) are always accepted, uphill moves
+                    are accepted with probability \( e^{-\Delta E/kT} \). This bias makes the
+                    walk spend more time in low-energy configurations, sampling the Boltzmann
+                    distribution. It&rsquo;s a random walk with a purpose.
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- ============================================================ -->
+<!-- EXPLORER 3: Chapter Summary Toolkit -->
+<!-- ============================================================ -->
+<div class="interactive-container" id="chapter-toolkit">
+    <div class="interactive-title">Explorer: The MC Toolkit Summary</div>
+
+    <p>
+        The complete Monte Carlo toolkit from Chapter 6. Choose a technique and see
+        a quick recap with a mini-demo. This is your reference card for the
+        computational thinking skills you&rsquo;ve built.
+    </p>
+
+    <div class="plot-container" id="app-toolkitPlot" style="height: 420px;"></div>
+
+    <div id="app-stats3" class="stats-bar"></div>
+
+    <div class="control-panel">
+        <div class="control-group">
+            <label class="control-label" for="app-tool-select">Technique:</label>
+            <select id="app-tool-select" class="control-select">
+                <option value="sampleMean">Sample Mean Integration (6.2)</option>
+                <option value="errorScaling">1/&radic;N Error Law (6.3)</option>
+                <option value="importance">Importance Sampling (6.4)</option>
+                <option value="hypersphere">Hypersphere Volumes (6.5)</option>
+                <option value="metropolis">Metropolis MCMC (6.8)</option>
+            </select>
+        </div>
+        <div class="control-group">
+            <button class="btn" onclick="appToolRun()">Run Demo</button>
+        </div>
+    </div>
+</div>
+
+<!-- ========== Test Your Understanding #3 ========== -->
+<div class="interactive-container question-section">
+    <div class="interactive-title">Test Your Understanding</div>
+
+    <p style="margin-bottom: var(--spacing-md); color: var(--text-secondary);">
+        Final review questions for Chapter 6.
+    </p>
+
+    <div class="tabs">
+        <div class="tab-buttons">
+            <button class="tab-button active">Question 7</button>
+            <button class="tab-button">Question 8</button>
+            <button class="tab-button">Question 9</button>
+        </div>
+
+        <div class="tab-content active">
+            <div class="question-container" data-type="msq" data-answer="1,2,3">
+                <div class="question-text">
+                    Which are valid reasons to choose Monte Carlo over deterministic methods? (Select all)
+                </div>
+                <div class="question-options">
+                    <label class="option">
+                        <input type="checkbox" value="0">
+                        <span>You need 15-digit precision for a 1D integral</span>
+                    </label>
+                    <label class="option">
+                        <input type="checkbox" value="1">
+                        <span>The problem is in 20 dimensions</span>
+                    </label>
+                    <label class="option">
+                        <input type="checkbox" value="2">
+                        <span>You need to sample from a complex probability distribution</span>
+                    </label>
+                    <label class="option">
+                        <input type="checkbox" value="3">
+                        <span>The integration region has an irregular, hard-to-mesh boundary</span>
+                    </label>
+                </div>
+                <div class="question-actions">
+                    <button class="btn-verify">Verify</button>
+                </div>
+                <div class="question-explanation" style="display:none;">
+                    <strong>Explanation:</strong>
+                    <ul>
+                        <li><strong>15-digit 1D:</strong> ✗ Use Gaussian quadrature. MC converges as 1/&radic;N &mdash; too slow for high precision.</li>
+                        <li><strong>20 dimensions:</strong> ✓ Grid methods need \( n^{20} \) points. MC needs the same N regardless of dimension.</li>
+                        <li><strong>Complex distribution:</strong> ✓ Metropolis MCMC was designed exactly for this &mdash; sampling without knowing Z.</li>
+                        <li><strong>Irregular boundary:</strong> ✓ MC just needs a point-in-region test. No meshing needed.</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <div class="tab-content">
+            <div class="question-container" data-type="fill" data-answer="4[3,5]">
+                <div class="question-text">
+                    To halve MC error, you multiply samples by
+                    <input type="text" class="fill-blank" style="width: 50px">.
+                    To get 10&times; better accuracy, you multiply by
+                    <input type="text" class="fill-blank" style="width: 50px">.
+                </div>
+                <div class="question-actions">
+                    <button class="btn-verify">Verify</button>
+                </div>
+                <div class="question-explanation" style="display:none;">
+                    <strong>Explanation:</strong>
+                    Error &propto; \( 1/\sqrt{N} \). Halve error: \( N \to 4N \) (×4).
+                    10× better: \( N \to 100N \) (×100). This is the fundamental cost of MC:
+                    slow convergence, but dimension-independent.
+                </div>
+            </div>
+        </div>
+
+        <div class="tab-content">
+            <div class="question-container" data-type="mcq" data-answer="0">
+                <div class="question-text">
+                    What is the single most important computational thinking skill from
+                    Chapter 6?
+                </div>
+                <div class="question-options">
+                    <label class="option">
+                        <input type="radio" name="app-q9" value="0">
+                        <span>Turning hard deterministic problems into random sampling problems that converge to the right answer</span>
+                    </label>
+                    <label class="option">
+                        <input type="radio" name="app-q9" value="1">
+                        <span>Memorizing the Metropolis acceptance formula</span>
+                    </label>
+                    <label class="option">
+                        <input type="radio" name="app-q9" value="2">
+                        <span>Computing exact integrals analytically</span>
+                    </label>
+                    <label class="option">
+                        <input type="radio" name="app-q9" value="3">
+                        <span>Avoiding random numbers in computation</span>
+                    </label>
+                </div>
+                <div class="question-actions">
+                    <button class="btn-verify">Verify</button>
+                </div>
+                <div class="question-explanation" style="display:none;">
+                    <strong>Explanation:</strong>
+                    The core insight: <strong>randomness is a computational tool</strong>.
+                    When a problem is too complex for deterministic methods (high dimensions,
+                    complex boundaries, intractable sums), you can often reformulate it as
+                    &ldquo;generate random samples and average.&rdquo; This is the Monte Carlo
+                    philosophy, and it works across all of science.
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- ============================================================ -->
+<!-- PYTHON CODE EXAMPLES -->
+<!-- ============================================================ -->
+<h2>Python Code</h2>
+
+<div class="tabs">
+    <div class="tab-buttons">
+        <button class="tab-button active">Random Walk</button>
+        <button class="tab-button">MC Toolkit</button>
+        <button class="tab-button">Prompt</button>
+    </div>
+
+    <div class="tab-content active">
+        <div class="code-block-container">
+            <div class="code-header">
+                <span class="code-lang">Python</span>
+                <button class="copy-btn">Copy</button>
+            </div>
+            <pre><code class="language-python">
+import numpy as np
+import plotly.graph_objects as go
+from plotly.subplots import make_subplots
+
+# 2D Random Walk
+n_walkers, n_steps = 20, 1000
+fig = make_subplots(1, 2, subplot_titles=['2D Walks', 'RMS Distance'])
+
+colors = ['#00f3ff','#ff006e','#ffbe0b','#00ff88','#bb86fc']
+
+# Store all positions for RMS
+all_r2 = np.zeros(n_steps + 1)
+
+for w in range(n_walkers):
+    steps = np.random.choice([-1, 1], (n_steps, 2))
+    pos = np.cumsum(steps, axis=0)
+    pos = np.vstack([[0, 0], pos])
+    all_r2 += pos[:, 0]**2 + pos[:, 1]**2
+
+    if w < 5:  # show first 5
+        fig.add_trace(go.Scatter(
+            x=pos[:, 0], y=pos[:, 1], mode='lines',
+            line=dict(color=colors[w], width=1),
+            showlegend=False), row=1, col=1)
+
+# RMS distance
+rms = np.sqrt(all_r2 / n_walkers)
+steps_arr = np.arange(n_steps + 1)
+fig.add_trace(go.Scatter(x=steps_arr, y=rms, mode='lines',
+    line=dict(color='#00f3ff', width=2), name='MC RMS'), row=1, col=2)
+fig.add_trace(go.Scatter(x=steps_arr, y=np.sqrt(steps_arr), mode='lines',
+    line=dict(color='white', width=1.5, dash='dash'),
+    name='√N theory'), row=1, col=2)
+
+fig.update_layout(template='plotly_dark', height=400, width=900)
+fig.update_xaxes(zerolinecolor='#808080', row=1, col=1)
+fig.update_yaxes(zerolinecolor='#808080', row=1, col=1)
+fig.update_xaxes(title='Steps', zerolinecolor='#808080', row=1, col=2)
+fig.update_yaxes(title='RMS distance', zerolinecolor='#808080', row=1, col=2)
+fig.show()
+            </code></pre>
+        </div>
+    </div>
+
+    <div class="tab-content">
+        <div class="code-block-container">
+            <div class="code-header">
+                <span class="code-lang">Python</span>
+                <button class="copy-btn">Copy</button>
+            </div>
+            <pre><code class="language-python">
+import numpy as np
+
+print("=== Chapter 6 MC Toolkit Summary ===\n")
+
+# 1. Sample mean integration
+N = 10000
+x = np.random.uniform(0, 1, N)
+integral = np.mean(1 / (1 + x))
+print(f"1. Sample Mean: ∫₀¹ 1/(1+x) dx")
+print(f"   MC = {integral:.5f}, Exact = {np.log(2):.5f}\n")
+
+# 2. Error scaling
+errors = []
+for n in [100, 1000, 10000]:
+    trials = [np.mean(1/(1+np.random.uniform(0,1,n))) for _ in range(200)]
+    errors.append((n, np.std(trials)))
+print("2. Error Scaling:")
+for n, e in errors:
+    print(f"   N={n:6d}: error = {e:.5f} (predicted: {0.29/np.sqrt(n):.5f})")
+
+# 3. Metropolis 1D Ising
+print("\n3. Metropolis Ising (N=50, T=1.0):")
+N_spin, T = 50, 1.0
+spins = np.random.choice([-1,1], N_spin)
+E = -np.sum(spins[:-1]*spins[1:])
+Es = []
+for _ in range(5000):
+    i = np.random.randint(N_spin)
+    dE = 0
+    if i>0: dE += 2*spins[i]*spins[i-1]
+    if i<N_spin-1: dE += 2*spins[i]*spins[i+1]
+    if dE<=0 or np.random.random()<np.exp(-dE/T):
+        spins[i]*=-1; E+=dE
+    Es.append(E)
+print(f"   MC ⟨E⟩/N = {np.mean(Es[1000:])/N_spin:.3f}")
+print(f"   Exact     = {-np.tanh(1/T):.3f}")
+            </code></pre>
+        </div>
+    </div>
+
+    <div class="tab-content">
+        <div class="code-block-container">
+            <div class="code-header">
+                <span class="code-lang">Prompt for AI</span>
+                <button class="copy-btn">Copy</button>
+            </div>
+            <pre><code class="language-text">Create a Python script showcasing Monte Carlo applications
+across different fields.
+
+Requirements:
+- Demo 1: 2D Random Walk (diffusion)
+  Launch 20 walkers for 1000 steps
+  Panel 1: 2D trajectories (first 5 colored)
+  Panel 2: RMS distance vs steps with √N reference
+
+- Demo 2: Financial MC (geometric Brownian motion)
+  Simulate 100 stock price paths: S(t+1) = S(t)*exp(μdt + σ√dt*Z)
+  μ=0.05, σ=0.2, S0=100, T=1yr, 252 trading days
+  Show paths + histogram of final prices
+
+- Demo 3: Buffon's Needle (π estimation)
+  Drop N=10000 needles of length 1 on lines spaced 1 apart
+  π ≈ 2N / (crossings), compare with true π
+
+- Use dark theme (plotly_dark) with gray (#808080) axes
+- Print summary of all results</code></pre>
+        </div>
+    </div>
+</div>
+
+<!-- ============================================================ -->
+<!-- NAVIGATION -->
+<!-- ============================================================ -->
+<div class="btn-group mt-xl">
+    <button class="btn btn-magenta" onclick="navigateToSection('74-ising-simulation')">&larr; Previous: Ising Simulation &amp; Results</button>
+    <button class="btn btn-secondary" onclick="scrollToTop()">&uarr; Back to Top</button>
+    <button class="btn btn-secondary" onclick="navigateToSection('76-drunkards-walk')">Next: The Drunkard&rsquo;s Walk &rarr;</button>
+</div>

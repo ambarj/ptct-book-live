@@ -1,0 +1,694 @@
+<!--
+    Section 4.4: Coding Euler's Method
+    Source: Module 6 — Implementation of Euler's Method (Part 4)
+    Concept: Assemble a complete, working Euler solver from pieces
+    Time: ~25 minutes
+    Prerequisites: Euler formula (4.2), for-loops (4.3)
+-->
+
+<h1>Coding Euler's Method</h1>
+
+<p>
+    You know the formula: \( x_{n+1} = x_n + h \cdot f(x_n, t_n) \).
+    You know how loops work. Now it&rsquo;s time to assemble the pieces into a
+    <strong>complete, working solver</strong> &mdash; one that can tackle any first-order ODE
+    you throw at it.
+</p>
+
+<div class="info-box">
+    <div class="info-box-title">Learning Objectives</div>
+    <ul>
+        <li>Assemble a complete Euler solver from initialization, loop, and storage</li>
+        <li>Solve any first-order ODE \( dx/dt = f(x, t) \) by changing one line of code</li>
+        <li>Explore how initial conditions, step size, and the ODE itself shape the solution</li>
+    </ul>
+</div>
+
+<div class="equation-display">
+    <p><strong>The Three Phases:</strong></p>
+    <p style="text-align: left; padding-left: 2rem;">
+        <strong>1. Initialize:</strong> set \(t_0\), \(x_0\), \(h\), \(N\); create storage arrays<br>
+        <strong>2. Loop:</strong> repeat the update rule \(N\) times<br>
+        <strong>3. Plot:</strong> visualize the result
+    </p>
+</div>
+
+<hr>
+
+<!-- ========== EXPLORER 1: Code Builder ========== -->
+<div class="interactive-container" id="code-builder">
+    <div class="interactive-title">Explorer 1: The Code Builder</div>
+
+    <p style="margin-bottom: var(--spacing-sm); color: var(--text-secondary);">
+        Arrange the code blocks in the correct order to build a working Euler solver.
+        Click each block in sequence &mdash; get it right and the solution plot appears.
+    </p>
+
+    <div class="dual-panel">
+        <div class="panel">
+            <div id="codeEuler-builderArea" style="min-height: 400px; background: rgba(0,0,0,0.3); border-radius: 8px; padding: 1rem;">
+                <!-- Scrambled code blocks, populated by JS -->
+            </div>
+        </div>
+        <div class="panel">
+            <div class="plot-container" id="codeEuler-builderPlot"></div>
+        </div>
+    </div>
+
+    <div class="control-panel">
+        <div class="btn-group">
+            <button class="btn" onclick="codeEulerCheck()">Check Order</button>
+            <button class="btn btn-secondary" onclick="codeEulerBuilderReset()">Reset</button>
+        </div>
+    </div>
+
+    <div id="codeEuler-builderFeedback" style="margin-top: var(--spacing-sm); font-size: 0.95rem; min-height: 1.5em;"></div>
+</div>
+
+<!-- ===== Test Your Understanding #1 ===== -->
+<div class="interactive-container question-section">
+    <div class="interactive-title">Test Your Understanding</div>
+
+    <p style="margin-bottom: var(--spacing-md); color: var(--text-secondary);">
+        Think about how the Euler solver is structured.
+    </p>
+
+    <div class="tabs">
+        <div class="tab-buttons">
+            <button class="tab-button active">Question 1</button>
+            <button class="tab-button">Question 2</button>
+            <button class="tab-button">Question 3</button>
+        </div>
+
+        <!-- Q1: MCQ -->
+        <div class="tab-content active">
+            <div class="question-container" data-type="mcq" data-answer="2">
+                <div class="question-text">
+                    In a correctly structured Euler solver, what must happen <em>before</em> the loop starts?
+                </div>
+                <div class="question-options">
+                    <label class="option">
+                        <input type="radio" name="q-ce-1" value="0">
+                        <span>Plot the solution</span>
+                    </label>
+                    <label class="option">
+                        <input type="radio" name="q-ce-1" value="1">
+                        <span>Compute the error</span>
+                    </label>
+                    <label class="option">
+                        <input type="radio" name="q-ce-1" value="2">
+                        <span>Set initial conditions \(t_0\), \(x_0\) and create storage arrays</span>
+                    </label>
+                    <label class="option">
+                        <input type="radio" name="q-ce-1" value="3">
+                        <span>Define the step size inside the loop body</span>
+                    </label>
+                </div>
+                <div class="question-actions">
+                    <button class="btn-verify">Verify</button>
+                </div>
+                <div class="question-explanation" style="display:none;">
+                    <strong>Explanation:</strong>
+                    The loop needs initial values to start from. You must define \(t_0\), \(x_0\),
+                    the step size \(h\), and empty arrays to store results <em>before</em> entering the loop.
+                </div>
+            </div>
+        </div>
+
+        <!-- Q2: Fill -->
+        <div class="tab-content">
+            <div class="question-container" data-type="fill" data-answer="16[15,17]">
+                <div class="question-text">
+                    If you want to solve from \(t = 0\) to \(t = 4\) with step size \(h = 0.25\),
+                    how many loop iterations \(N\) do you need?
+                    <br><br>
+                    \(N = t_{\max} / h = \) <input type="text" class="fill-blank" placeholder="?">
+                </div>
+                <div class="question-actions">
+                    <button class="btn-verify">Verify</button>
+                </div>
+                <div class="question-explanation" style="display:none;">
+                    <strong>Explanation:</strong>
+                    \(N = 4 / 0.25 = 16\). Each step advances time by \(h\), so you need
+                    \(t_{\max}/h\) steps to reach the end. The solution array will have
+                    \(N + 1 = 17\) entries (including the initial value).
+                </div>
+            </div>
+        </div>
+
+        <!-- Q3: MSQ -->
+        <div class="tab-content">
+            <div class="question-container" data-type="msq" data-answer="0,1,3">
+                <div class="question-text">
+                    Which of the following are updated <strong>inside</strong> the loop body?
+                    (Select all that apply.)
+                </div>
+                <div class="question-options">
+                    <label class="option">
+                        <input type="checkbox" value="0">
+                        <span>The current state \(x\)</span>
+                    </label>
+                    <label class="option">
+                        <input type="checkbox" value="1">
+                        <span>The current time \(t\)</span>
+                    </label>
+                    <label class="option">
+                        <input type="checkbox" value="2">
+                        <span>The step size \(h\)</span>
+                    </label>
+                    <label class="option">
+                        <input type="checkbox" value="3">
+                        <span>The storage arrays (via <code>append</code>)</span>
+                    </label>
+                </div>
+                <div class="question-actions">
+                    <button class="btn-verify">Verify</button>
+                </div>
+                <div class="question-explanation" style="display:none;">
+                    <strong>Explanation:</strong>
+                    <ul>
+                        <li><strong>x:</strong> Updated via \(x = x + h \cdot f(x, t)\) &mdash; the core Euler step.</li>
+                        <li><strong>t:</strong> Updated via \(t = t + h\) &mdash; advance time.</li>
+                        <li><strong>h:</strong> Fixed before the loop; it does NOT change inside.</li>
+                        <li><strong>Arrays:</strong> <code>t_list.append(t)</code> and <code>x_list.append(x)</code> store each new value.</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<hr>
+
+<!-- ========== EXPLORER 2: Live Solver ========== -->
+<div class="interactive-container" id="live-solver">
+    <div class="interactive-title">Explorer 2: The Live Solver</div>
+
+    <p style="margin-bottom: var(--spacing-sm); color: var(--text-secondary);">
+        A complete Euler solver running in real time. Choose an ODE, set the parameters,
+        and watch the numerical solution build alongside the exact answer.
+    </p>
+
+    <div class="dual-panel">
+        <div class="panel">
+            <div class="plot-container" id="codeEuler-solverPlot"></div>
+        </div>
+        <div class="panel">
+            <div class="plot-container" id="codeEuler-phasePlot"></div>
+        </div>
+    </div>
+
+    <div style="display: flex; gap: 1rem; justify-content: center; flex-wrap: wrap; margin: 0.5rem 0; font-size: 0.9rem; color: var(--text-secondary);">
+        <span>Steps: <strong id="codeEuler-solver-steps" style="color: #00f3ff;">—</strong></span>
+        <span>Final error: <strong id="codeEuler-solver-error" style="color: #ff6b6b;">—</strong></span>
+        <span>Final t: <strong id="codeEuler-solver-tFinal" style="color: #ffff00;">—</strong></span>
+    </div>
+
+    <div class="control-panel">
+        <div class="control-group">
+            <label class="control-label">ODE:</label>
+            <select id="codeEuler-solver-ode" class="control-select">
+                <option value="0">dx/dt = &minus;2x &nbsp; (exponential decay)</option>
+                <option value="1">dx/dt = x(1 &minus; x) &nbsp; (logistic growth)</option>
+                <option value="2">dx/dt = &minus;sin(x) &nbsp; (nonlinear pendulum)</option>
+            </select>
+        </div>
+        <div class="control-group">
+            <label class="control-label">Step size \(h\):
+                <span class="control-label-value" id="codeEuler-solver-h-value">0.20</span>
+            </label>
+            <input type="range" class="slider" id="codeEuler-solver-h-slider"
+                   min="0.02" max="0.8" step="0.02" value="0.2">
+        </div>
+        <div class="control-group">
+            <label class="control-label">Initial value \(x_0\):
+                <span class="control-label-value" id="codeEuler-solver-x0-value">1.00</span>
+            </label>
+            <input type="range" class="slider" id="codeEuler-solver-x0-slider"
+                   min="0.1" max="3.0" step="0.1" value="1.0">
+        </div>
+        <div class="btn-group">
+            <button class="btn btn-secondary" onclick="codeEulerSolverReset()">Reset</button>
+        </div>
+    </div>
+</div>
+
+<div class="info-box">
+    <div class="info-box-title">Key Insight: One Solver, Many ODEs</div>
+    <p>
+        The <em>same</em> code structure solves all three equations. The only thing that changes
+        is the function <code>f(x, t)</code>. This is the power of numerical methods &mdash;
+        once you have a working solver, you can explore <strong>any</strong> first-order ODE
+        by swapping one line.
+    </p>
+</div>
+
+<!-- ===== Test Your Understanding #2 ===== -->
+<div class="interactive-container question-section">
+    <div class="interactive-title">Test Your Understanding</div>
+
+    <p style="margin-bottom: var(--spacing-md); color: var(--text-secondary);">
+        Use Explorer 2 to answer these questions.
+    </p>
+
+    <div class="tabs">
+        <div class="tab-buttons">
+            <button class="tab-button active">Question 4</button>
+            <button class="tab-button">Question 5</button>
+            <button class="tab-button">Question 6</button>
+        </div>
+
+        <!-- Q4: Fill -->
+        <div class="tab-content active">
+            <div class="question-container" data-type="fill" data-answer="1[0.9,1.1]">
+                <div class="question-text">
+                    Select the <strong>logistic</strong> ODE (\(dx/dt = x(1-x)\)) with \(x_0 = 0.1\) and small \(h\).
+                    As \(t \to \infty\), the solution approaches \(x = \)
+                    <input type="text" class="fill-blank" placeholder="?">.
+                    <br><em>(Read the steady-state value from the plot.)</em>
+                </div>
+                <div class="question-actions">
+                    <button class="btn-verify">Verify</button>
+                </div>
+                <div class="question-explanation" style="display:none;">
+                    <strong>Explanation:</strong>
+                    The logistic equation \(dx/dt = x(1-x)\) has a stable equilibrium at \(x = 1\).
+                    When \(x &lt; 1\), the derivative is positive (growth). When \(x &gt; 1\), the derivative
+                    is negative (decay). So \(x \to 1\) regardless of starting point (as long as \(x_0 &gt; 0\)).
+                    This is the <em>carrying capacity</em> in population dynamics.
+                </div>
+            </div>
+        </div>
+
+        <!-- Q5: MCQ -->
+        <div class="tab-content">
+            <div class="question-container" data-type="mcq" data-answer="1">
+                <div class="question-text">
+                    With the <strong>decay</strong> ODE, set \(x_0 = 1.0\) and compare \(h = 0.20\) vs \(h = 0.02\).
+                    Look at the phase plot (right panel). What shape does the Euler trajectory trace?
+                </div>
+                <div class="question-options">
+                    <label class="option">
+                        <input type="radio" name="q-ce-5" value="0">
+                        <span>A straight line in both cases</span>
+                    </label>
+                    <label class="option">
+                        <input type="radio" name="q-ce-5" value="1">
+                        <span>A staircase pattern that becomes smoother with smaller \(h\)</span>
+                    </label>
+                    <label class="option">
+                        <input type="radio" name="q-ce-5" value="2">
+                        <span>A circle in both cases</span>
+                    </label>
+                </div>
+                <div class="question-actions">
+                    <button class="btn-verify">Verify</button>
+                </div>
+                <div class="question-explanation" style="display:none;">
+                    <strong>Explanation:</strong>
+                    The phase plot shows \((x, f(x))\) at each Euler step. With large \(h\), the discrete
+                    jumps create visible staircase steps. With small \(h\), the points are so close together
+                    they trace out the smooth curve \(f(x) = -2x\). This is why smaller steps
+                    are more accurate &mdash; they better approximate the continuous dynamics.
+                </div>
+            </div>
+        </div>
+
+        <!-- Q6: Fill with dropdowns -->
+        <div class="tab-content">
+            <div class="question-container" data-type="fill" data-answer="increases|decreases">
+                <div class="question-text">
+                    For the <strong>logistic</strong> ODE, start with \(x_0 = 0.5\) and \(h = 0.10\).
+                    Now increase \(h\) to 0.60. The number of steps
+                    <select class="fill-blank-select">
+                        <option value=""></option>
+                        <option value="increases">increases</option>
+                        <option value="decreases">decreases</option>
+                        <option value="stays the same">stays the same</option>
+                    </select>
+                    and the final error
+                    <select class="fill-blank-select">
+                        <option value=""></option>
+                        <option value="increases">increases</option>
+                        <option value="decreases">decreases</option>
+                        <option value="stays the same">stays the same</option>
+                    </select>.
+                </div>
+                <div class="question-actions">
+                    <button class="btn-verify">Verify</button>
+                </div>
+                <div class="question-explanation" style="display:none;">
+                    <strong>Explanation:</strong>
+                    Larger \(h\) means fewer steps (the step count \(N = t_{\max}/h\) decreases).
+                    But fewer, bigger steps means the tangent-line approximation overshoots more at
+                    each step, so the accumulated error increases. This is the fundamental
+                    accuracy&ndash;speed tradeoff in numerical methods.
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<hr>
+
+<!-- ========== EXPLORER 3: Function Lab ========== -->
+<div class="interactive-container" id="function-lab">
+    <div class="interactive-title">Explorer 3: The Function Lab</div>
+
+    <p style="margin-bottom: var(--spacing-sm); color: var(--text-secondary);">
+        The real power of a solver: change the function \(f(x, t)\) and get a completely
+        different solution. Try the preset equations or build your own combinations.
+    </p>
+
+    <div class="plot-container" id="codeEuler-labPlot"></div>
+
+    <div style="display: flex; gap: 1rem; justify-content: center; flex-wrap: wrap; margin: 0.5rem 0; font-size: 0.9rem; color: var(--text-secondary);">
+        <span>Final value: <strong id="codeEuler-lab-final" style="color: #00f3ff;">—</strong></span>
+        <span>Steps: <strong id="codeEuler-lab-steps" style="color: #ffff00;">—</strong></span>
+    </div>
+
+    <div class="control-panel">
+        <div class="control-group">
+            <label class="control-label">Function \(f(x, t)\):</label>
+            <select id="codeEuler-lab-func" class="control-select">
+                <option value="0">f = &minus;2x &nbsp; (decay)</option>
+                <option value="1">f = x(1 &minus; x) &nbsp; (logistic)</option>
+                <option value="2">f = cos(t) &nbsp; (forced)</option>
+                <option value="3">f = &minus;x + sin(t) &nbsp; (driven decay)</option>
+                <option value="4">f = x&sup2; &minus; t &nbsp; (nonlinear)</option>
+            </select>
+        </div>
+        <div class="control-group">
+            <label class="control-label">Initial value \(x_0\):
+                <span class="control-label-value" id="codeEuler-lab-x0-value">1.00</span>
+            </label>
+            <input type="range" class="slider" id="codeEuler-lab-x0-slider"
+                   min="-2.0" max="3.0" step="0.1" value="1.0">
+        </div>
+        <div class="control-group">
+            <label class="control-label">Step size \(h\):
+                <span class="control-label-value" id="codeEuler-lab-h-value">0.10</span>
+            </label>
+            <input type="range" class="slider" id="codeEuler-lab-h-slider"
+                   min="0.02" max="0.5" step="0.02" value="0.1">
+        </div>
+        <div class="btn-group">
+            <button class="btn btn-secondary" onclick="codeEulerLabReset()">Reset</button>
+        </div>
+    </div>
+</div>
+
+<div class="warning-box">
+    <div class="warning-icon">&#9888;&#65039;</div>
+    <div class="warning-content">
+        <strong>Blow-up alert!</strong>
+        Try \(f = x^2 - t\) with \(x_0 = 2\) and large \(h\). The solution can
+        explode to infinity &mdash; a <em>finite-time singularity</em>. This is a real
+        physical phenomenon (not a numerical bug!), but Euler&rsquo;s method can make it
+        happen sooner than it should. Always check whether your solution looks physically reasonable.
+    </div>
+</div>
+
+<!-- ===== Test Your Understanding #3 ===== -->
+<div class="interactive-container question-section">
+    <div class="interactive-title">Test Your Understanding</div>
+
+    <p style="margin-bottom: var(--spacing-md); color: var(--text-secondary);">
+        Use Explorer 3 to answer these questions.
+    </p>
+
+    <div class="tabs">
+        <div class="tab-buttons">
+            <button class="tab-button active">Question 7</button>
+            <button class="tab-button">Question 8</button>
+            <button class="tab-button">Question 9</button>
+        </div>
+
+        <!-- Q7: MCQ -->
+        <div class="tab-content active">
+            <div class="question-container" data-type="mcq" data-answer="0">
+                <div class="question-text">
+                    Select \(f = \cos(t)\) with \(x_0 = 0\). The exact solution is \(x(t) = \sin(t)\).
+                    What does the Euler solution look like?
+                </div>
+                <div class="question-options">
+                    <label class="option">
+                        <input type="radio" name="q-ce-7" value="0">
+                        <span>A sine-like wave that slightly lags and undershoots the exact curve</span>
+                    </label>
+                    <label class="option">
+                        <input type="radio" name="q-ce-7" value="1">
+                        <span>A straight line</span>
+                    </label>
+                    <label class="option">
+                        <input type="radio" name="q-ce-7" value="2">
+                        <span>An exponentially growing oscillation</span>
+                    </label>
+                </div>
+                <div class="question-actions">
+                    <button class="btn-verify">Verify</button>
+                </div>
+                <div class="question-explanation" style="display:none;">
+                    <strong>Explanation:</strong>
+                    Since \(dx/dt = \cos(t)\) and \(x(0) = 0\), the exact solution is \(\sin(t)\).
+                    Euler approximates it with tangent-line steps. The numerical curve tracks the
+                    sine wave but slightly lags because each step uses the <em>old</em> slope
+                    instead of the average slope over the interval.
+                </div>
+            </div>
+        </div>
+
+        <!-- Q8: Fill -->
+        <div class="tab-content">
+            <div class="question-container" data-type="fill" data-answer="0[-0.15,0.15]">
+                <div class="question-text">
+                    Select \(f = -x + \sin(t)\) (driven decay) with \(x_0 = 0\) and small \(h\).
+                    After many oscillations, the solution settles into a steady pattern.
+                    What is the approximate <em>mean</em> value it oscillates around?
+                    <br><br>
+                    Mean \(\approx\) <input type="text" class="fill-blank" placeholder="?">
+                    <br><em>(Read from the plot after \(t &gt; 5\).)</em>
+                </div>
+                <div class="question-actions">
+                    <button class="btn-verify">Verify</button>
+                </div>
+                <div class="question-explanation" style="display:none;">
+                    <strong>Explanation:</strong>
+                    The driven decay \(dx/dt = -x + \sin(t)\) has a transient that dies away
+                    (the \(-x\) term damps it) and a steady-state response to the \(\sin(t)\) forcing.
+                    The steady-state oscillation is centered around \(x = 0\) &mdash; the forcing has
+                    zero mean, and the decay term pulls toward zero.
+                </div>
+            </div>
+        </div>
+
+        <!-- Q9: MSQ -->
+        <div class="tab-content">
+            <div class="question-container" data-type="msq" data-answer="1,2">
+                <div class="question-text">
+                    Which of the following statements are true about Euler&rsquo;s method as a
+                    general-purpose solver? (Select all that apply.)
+                </div>
+                <div class="question-options">
+                    <label class="option">
+                        <input type="checkbox" value="0">
+                        <span>You need to know the exact solution to use Euler&rsquo;s method</span>
+                    </label>
+                    <label class="option">
+                        <input type="checkbox" value="1">
+                        <span>The same loop structure works for any \(f(x, t)\)</span>
+                    </label>
+                    <label class="option">
+                        <input type="checkbox" value="2">
+                        <span>Some ODEs can cause the numerical solution to blow up</span>
+                    </label>
+                    <label class="option">
+                        <input type="checkbox" value="3">
+                        <span>Euler&rsquo;s method always gives the exact answer if \(h\) is small enough</span>
+                    </label>
+                </div>
+                <div class="question-actions">
+                    <button class="btn-verify">Verify</button>
+                </div>
+                <div class="question-explanation" style="display:none;">
+                    <strong>Explanation:</strong>
+                    <ul>
+                        <li><strong>False:</strong> The whole point of numerical methods is solving ODEs where you <em>don&rsquo;t</em> know the exact solution!</li>
+                        <li><strong>True:</strong> Just change the <code>f(x, t)</code> function &mdash; the loop is identical.</li>
+                        <li><strong>True:</strong> ODEs with rapid growth (like \(f = x^2\)) can cause blow-up, especially with large \(h\).</li>
+                        <li><strong>False:</strong> Euler always has <em>some</em> truncation error. Smaller \(h\) reduces it but never eliminates it.</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<hr>
+
+<!-- ========== CODE EXAMPLES ========== -->
+<h2>Python: Your First Euler Solver</h2>
+
+<div class="tabs">
+    <div class="tab-buttons">
+        <button class="tab-button active">Complete Solver</button>
+        <button class="tab-button">Multiple ODEs</button>
+        <button class="tab-button">Prompt</button>
+    </div>
+
+    <!-- Tab 1: Complete solver -->
+    <div class="tab-content active">
+        <div class="code-block-container">
+            <div class="code-header">
+                <span class="code-lang">Python</span>
+                <button class="copy-btn">Copy</button>
+            </div>
+            <pre><code class="language-python">
+import numpy as np
+import plotly.graph_objects as go
+
+# ---- PHASE 1: Initialize ----
+def f(x, t):
+    return -2 * x          # The ODE: dx/dt = -2x
+
+x0 = 1.0                   # Initial condition
+t_max = 3.0                # Solve from t=0 to t=3
+h = 0.2                    # Step size
+N = int(t_max / h)         # Number of steps
+
+# Storage arrays
+t_list = [0.0]
+x_list = [x0]
+
+# ---- PHASE 2: Loop ----
+t, x = 0.0, x0
+for i in range(N):
+    x = x + h * f(x, t)    # Euler update
+    t = t + h               # Advance time
+    t_list.append(t)
+    x_list.append(x)
+
+# ---- PHASE 3: Plot ----
+t_exact = np.linspace(0, t_max, 300)
+x_exact = np.exp(-2 * t_exact)
+
+fig = go.Figure()
+fig.add_trace(go.Scatter(x=t_exact, y=x_exact, name='Exact',
+    line=dict(color='#808080', width=2, dash='dash')))
+fig.add_trace(go.Scatter(x=t_list, y=x_list, name=f'Euler (h={h})',
+    line=dict(color='#00f3ff', width=2), mode='lines+markers',
+    marker=dict(size=5)))
+
+fig.update_layout(
+    template='plotly_dark',
+    title='Euler Solver: dx/dt = -2x',
+    xaxis=dict(title='t', range=[0, t_max],
+        gridcolor='#2a2f4a', zerolinecolor='#808080', linecolor='#808080'),
+    yaxis=dict(title='x(t)', range=[-0.2, 1.2],
+        gridcolor='#2a2f4a', zerolinecolor='#808080', linecolor='#808080'),
+)
+fig.show()
+
+print(f"Steps: {N}")
+print(f"Final Euler: x({t_max}) = {x_list[-1]:.6f}")
+print(f"Exact:       x({t_max}) = {np.exp(-2*t_max):.6f}")
+print(f"Error:       {abs(x_list[-1] - np.exp(-2*t_max)):.6f}")
+            </code></pre>
+        </div>
+    </div>
+
+    <!-- Tab 2: Multiple ODEs -->
+    <div class="tab-content">
+        <div class="code-block-container">
+            <div class="code-header">
+                <span class="code-lang">Python</span>
+                <button class="copy-btn">Copy</button>
+            </div>
+            <pre><code class="language-python">
+import numpy as np
+import plotly.graph_objects as go
+
+def euler_solve(f, x0, t_max, h):
+    """Reusable Euler solver — change f to solve any ODE."""
+    t_list, x_list = [0.0], [x0]
+    t, x = 0.0, x0
+    for i in range(int(t_max / h)):
+        x = x + h * f(x, t)
+        t = t + h
+        t_list.append(t)
+        x_list.append(x)
+    return np.array(t_list), np.array(x_list)
+
+# Three different ODEs, same solver
+odes = {
+    'Decay':    (lambda x, t: -2*x,        1.0),
+    'Logistic': (lambda x, t: x*(1-x),     0.1),
+    'Driven':   (lambda x, t: -x + np.sin(t), 0.0),
+}
+
+colors = {'Decay': '#00f3ff', 'Logistic': '#ff00ff', 'Driven': '#ffff00'}
+
+fig = go.Figure()
+for name, (f, x0) in odes.items():
+    t, x = euler_solve(f, x0, t_max=6.0, h=0.05)
+    fig.add_trace(go.Scatter(x=t, y=x, name=name,
+        line=dict(color=colors[name], width=2)))
+
+fig.update_layout(
+    template='plotly_dark',
+    title='One Solver, Three ODEs',
+    xaxis=dict(title='t', range=[0, 6],
+        gridcolor='#2a2f4a', zerolinecolor='#808080', linecolor='#808080'),
+    yaxis=dict(title='x(t)', range=[-0.5, 1.5],
+        gridcolor='#2a2f4a', zerolinecolor='#808080', linecolor='#808080'),
+)
+fig.show()
+            </code></pre>
+        </div>
+    </div>
+
+    <!-- Tab 3: Prompt -->
+    <div class="tab-content">
+        <div class="code-block-container">
+            <div class="code-header">
+                <span class="code-lang">Prompt for AI</span>
+                <button class="copy-btn">Copy</button>
+            </div>
+            <pre><code class="language-text">Write a complete Euler method solver in Python.
+
+Requirements:
+1. Create a reusable function euler_solve(f, x0, t_max, h) that returns arrays
+2. Use simple for loops with .append() (no pre-allocated arrays)
+3. Solve three ODEs with the SAME function:
+   - dx/dt = -2x (decay), x0=1
+   - dx/dt = x(1-x) (logistic growth), x0=0.1
+   - dx/dt = cos(t) (forced oscillation), x0=0
+4. Plot all three on the same figure using Plotly (not matplotlib)
+5. Dark theme (plotly_dark), cyan/magenta/yellow lines
+6. Gray axes (#808080), grid color #2a2f4a
+7. Fixed axis ranges, step markers for visibility
+8. Print final values and errors where exact solutions exist
+
+Key point to demonstrate: the SAME solver handles all three equations —
+only f(x,t) changes.</code></pre>
+        </div>
+
+        <div class="info-box" style="margin-top: var(--spacing-md);">
+            <div class="info-box-title">Pro Tips for Prompting</div>
+            <ul>
+                <li>Ask for a <em>reusable function</em> &mdash; this teaches good software design</li>
+                <li>Request multiple ODEs to see the power of abstraction</li>
+                <li>Include error printing to build verification habits</li>
+            </ul>
+        </div>
+    </div>
+</div>
+
+<hr>
+
+<!-- ========== NAVIGATION ========== -->
+<div class="btn-group mt-xl">
+    <button class="btn btn-magenta" onclick="navigateToSection('36-for-loops')">&larr; Previous: Programming Loops</button>
+    <button class="btn" onclick="scrollToTop()">&uarr; Back to Top</button>
+    <button class="btn btn-secondary" onclick="navigateToSection('38-euler-validation')">Next: Testing &amp; Validation &rarr;</button>
+</div>

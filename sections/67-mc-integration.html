@@ -1,0 +1,683 @@
+<!-- ============================================================
+     Section 6.2: Monte Carlo Integration Basics
+     Source: NPTEL Lecture 8_6 (Monte Carlo, Part 2)
+     Concept: Two methods of MC integration — hit-or-miss and
+              sample mean — with convergence comparison
+     Time: 20-25 minutes
+     Prerequisites: Section 6.1 (MC philosophy, dart board π)
+     ============================================================ -->
+
+<h1>Monte Carlo Integration Basics</h1>
+
+<p>
+    In Section 6.1 you estimated &pi; by throwing darts. That was the
+    <strong>hit-or-miss</strong> method: random points, count the fraction inside.
+    There&rsquo;s a better way. The <strong>sample mean</strong> method directly
+    averages the function values at random points &mdash; it&rsquo;s simpler,
+    more general, and converges faster. This section teaches you both methods
+    and shows why sample mean wins.
+</p>
+
+<div class="info-box">
+    <div class="info-box-title">Learning Objectives</div>
+    <ul>
+        <li>Implement the <strong>hit-or-miss</strong> method: throw points in a bounding box, count hits under the curve</li>
+        <li>Implement the <strong>sample mean</strong> method: \( I \approx (b-a) \cdot \frac{1}{N}\sum f(x_i) \)</li>
+        <li>Understand why sample mean is more efficient (lower variance) than hit-or-miss</li>
+        <li>Apply MC integration to functions with known analytical answers and verify convergence</li>
+    </ul>
+</div>
+
+<div class="equation-display">
+    <p><strong>Two Monte Carlo Integration Methods:</strong></p>
+    <p><em>Hit-or-miss:</em></p>
+    $$ I \approx A_{\text{box}} \times \frac{N_{\text{under curve}}}{N_{\text{total}}} $$
+    <p><em>Sample mean (preferred):</em></p>
+    $$ I = \int_a^b f(x)\,dx \approx (b - a)\,\frac{1}{N}\sum_{i=1}^{N} f(x_i), \qquad x_i \sim \text{Uniform}(a, b) $$
+</div>
+
+<hr>
+
+<!-- ============================================================ -->
+<!-- EXPLORER 1: Visual MC Integrator -->
+<!-- ============================================================ -->
+<div class="interactive-container" id="visual-integrator">
+    <div class="interactive-title">Explorer: Visual MC Integrator</div>
+
+    <p>
+        Choose a function and watch both MC methods in action. <strong>Left panel:</strong>
+        hit-or-miss (cyan = under curve, magenta = above). <strong>Right panel:</strong>
+        sample mean running estimate with error band. Click <strong>Sample</strong> to
+        add points.
+    </p>
+
+    <div class="dual-panel">
+        <div class="panel">
+            <div class="plot-container" id="mi-hitMissPlot" style="height: 400px;"></div>
+        </div>
+        <div class="panel">
+            <div class="plot-container" id="mi-sampleMeanPlot" style="height: 400px;"></div>
+        </div>
+    </div>
+
+    <div id="mi-stats1" class="stats-bar"></div>
+
+    <div class="control-panel">
+        <div class="control-group">
+            <label class="control-label" for="mi-func-select">Function:</label>
+            <select id="mi-func-select" class="control-select">
+                <option value="inv">1/(1+x) on [0,1] (= ln 2)</option>
+                <option value="sin">sin(x) on [0, &pi;] (= 2)</option>
+                <option value="gauss">e^(−x&sup2;) on [0,2] (&asymp; 0.882)</option>
+                <option value="poly">x&sup2; on [0,1] (= 1/3)</option>
+            </select>
+        </div>
+        <div class="control-group">
+            <label class="control-label" for="mi-batch-select">Points per click:</label>
+            <select id="mi-batch-select" class="control-select">
+                <option value="50">50</option>
+                <option value="200" selected>200</option>
+                <option value="1000">1,000</option>
+            </select>
+        </div>
+        <div class="control-group">
+            <button class="btn" onclick="miSample()">Sample</button>
+            <button class="btn" onclick="miReset()">Reset</button>
+        </div>
+    </div>
+</div>
+
+<div class="info-box">
+    <div class="info-box-title">Why Sample Mean Beats Hit-or-Miss</div>
+    <p>
+        Hit-or-miss wastes information: each point only contributes a 0 or 1 (miss or hit).
+        Sample mean uses the <em>actual function value</em> at each point, extracting more
+        information per sample. The result: sample mean has lower variance and converges
+        faster for the same number of random points. In practice, always use sample mean.
+    </p>
+</div>
+
+<!-- ========== Test Your Understanding #1 ========== -->
+<div class="interactive-container question-section">
+    <div class="interactive-title">Test Your Understanding</div>
+
+    <p style="margin-bottom: var(--spacing-md); color: var(--text-secondary);">
+        Use the Visual MC Integrator to answer these questions.
+    </p>
+
+    <div class="tabs">
+        <div class="tab-buttons">
+            <button class="tab-button active">Question 1</button>
+            <button class="tab-button">Question 2</button>
+            <button class="tab-button">Question 3</button>
+        </div>
+
+        <div class="tab-content active">
+            <div class="question-container" data-type="mcq" data-answer="1">
+                <div class="question-text">
+                    Select <strong>1/(1+x)</strong> and sample 1,000 points. Compare the
+                    hit-or-miss estimate with the sample mean estimate. Which is typically
+                    closer to the true value ln(2) &asymp; 0.6931?
+                </div>
+                <div class="question-options">
+                    <label class="option">
+                        <input type="radio" name="mi-q1" value="0">
+                        <span>Hit-or-miss &mdash; it uses more information</span>
+                    </label>
+                    <label class="option">
+                        <input type="radio" name="mi-q1" value="1">
+                        <span>Sample mean &mdash; it has lower variance</span>
+                    </label>
+                    <label class="option">
+                        <input type="radio" name="mi-q1" value="2">
+                        <span>They are always identical</span>
+                    </label>
+                    <label class="option">
+                        <input type="radio" name="mi-q1" value="3">
+                        <span>Neither converges to the right answer</span>
+                    </label>
+                </div>
+                <div class="question-actions">
+                    <button class="btn-verify">Verify</button>
+                </div>
+                <div class="question-explanation" style="display:none;">
+                    <strong>Explanation:</strong>
+                    The <strong>sample mean</strong> typically gives a more accurate estimate for
+                    the same N. Hit-or-miss reduces each sample to binary (0 or 1), discarding
+                    information about how far under the curve each point is. Sample mean uses the
+                    full function value, giving lower variance and faster convergence.
+                </div>
+            </div>
+        </div>
+
+        <div class="tab-content">
+            <div class="question-container" data-type="fill" data-answer="0.693[0.6,0.8]">
+                <div class="question-text">
+                    Select <strong>1/(1+x)</strong> and sample 2,000 points. The sample mean
+                    estimate of \( \int_0^1 \frac{1}{1+x}\,dx \) is approximately
+                    <input type="text" class="fill-blank" style="width: 70px">.
+                    (The true value is ln(2) &asymp; 0.6931)
+                </div>
+                <div class="question-actions">
+                    <button class="btn-verify">Verify</button>
+                </div>
+                <div class="question-explanation" style="display:none;">
+                    <strong>Explanation:</strong>
+                    With 2,000 samples, the estimate should be within about 0.01&ndash;0.02 of the
+                    true value 0.6931. The exact number varies each run (randomness!), but
+                    it should be in the range 0.67&ndash;0.72 almost always.
+                </div>
+            </div>
+        </div>
+
+        <div class="tab-content">
+            <div class="question-container" data-type="mcq" data-answer="0">
+                <div class="question-text">
+                    The sample mean formula is \( I \approx (b-a) \cdot \frac{1}{N}\sum f(x_i) \).
+                    What role does the factor \( (b - a) \) play?
+                </div>
+                <div class="question-options">
+                    <label class="option">
+                        <input type="radio" name="mi-q3" value="0">
+                        <span>It scales the average function value by the interval length to get an area</span>
+                    </label>
+                    <label class="option">
+                        <input type="radio" name="mi-q3" value="1">
+                        <span>It counts the number of points inside the interval</span>
+                    </label>
+                    <label class="option">
+                        <input type="radio" name="mi-q3" value="2">
+                        <span>It normalizes the probability distribution</span>
+                    </label>
+                    <label class="option">
+                        <input type="radio" name="mi-q3" value="3">
+                        <span>It has no purpose &mdash; it&rsquo;s always 1</span>
+                    </label>
+                </div>
+                <div class="question-actions">
+                    <button class="btn-verify">Verify</button>
+                </div>
+                <div class="question-explanation" style="display:none;">
+                    <strong>Explanation:</strong>
+                    The average of \( f(x_i) \) estimates the <em>mean height</em> of the function.
+                    To get the <em>area</em> (integral), you multiply by the <em>width</em>
+                    \( (b - a) \). Think of it as: area = average height &times; width. For
+                    [0, 1] the factor is 1, but for [0, &pi;] it&rsquo;s &pi;.
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- ============================================================ -->
+<!-- EXPLORER 2: Method Comparison -->
+<!-- ============================================================ -->
+<div class="interactive-container" id="method-comparison">
+    <div class="interactive-title">Explorer: Hit-or-Miss vs Sample Mean</div>
+
+    <p>
+        Run both methods side-by-side on the same integral and compare their
+        convergence. The <strong>error</strong> (deviation from the true value)
+        is plotted as a function of N. Sample mean (cyan) consistently beats
+        hit-or-miss (magenta).
+    </p>
+
+    <div class="plot-container" id="mi-comparisonPlot" style="height: 420px;"></div>
+
+    <div id="mi-stats2" class="stats-bar"></div>
+
+    <div class="control-panel">
+        <div class="control-group">
+            <label class="control-label" for="mi-cmp-func">Function:</label>
+            <select id="mi-cmp-func" class="control-select">
+                <option value="inv">1/(1+x) on [0,1]</option>
+                <option value="sin">sin(x) on [0, &pi;]</option>
+                <option value="gauss">e^(−x&sup2;) on [0,2]</option>
+            </select>
+        </div>
+        <div class="control-group">
+            <label class="control-label" for="mi-cmp-N-slider">Max N:
+                <span id="mi-cmp-N-value">5000</span>
+            </label>
+            <input type="range" class="slider" id="mi-cmp-N-slider"
+                   min="1000" max="20000" step="1000" value="5000">
+        </div>
+        <div class="control-group">
+            <button class="btn" onclick="miCompareRun()">Run Comparison</button>
+            <button class="btn" onclick="miCompareReset()">Reset</button>
+        </div>
+    </div>
+</div>
+
+<!-- ========== Test Your Understanding #2 ========== -->
+<div class="interactive-container question-section">
+    <div class="interactive-title">Test Your Understanding</div>
+
+    <p style="margin-bottom: var(--spacing-md); color: var(--text-secondary);">
+        Use the Method Comparison explorer to answer these questions.
+    </p>
+
+    <div class="tabs">
+        <div class="tab-buttons">
+            <button class="tab-button active">Question 4</button>
+            <button class="tab-button">Question 5</button>
+            <button class="tab-button">Question 6</button>
+        </div>
+
+        <div class="tab-content active">
+            <div class="question-container" data-type="mcq" data-answer="2">
+                <div class="question-text">
+                    Run the comparison for <strong>sin(x) on [0, &pi;]</strong>. The hit-or-miss
+                    method needs a bounding box of height 1 (max of sin). What fraction of
+                    points are &ldquo;wasted&rdquo; (above the curve)?
+                </div>
+                <div class="question-options">
+                    <label class="option">
+                        <input type="radio" name="mi-q4" value="0">
+                        <span>None &mdash; all points contribute</span>
+                    </label>
+                    <label class="option">
+                        <input type="radio" name="mi-q4" value="1">
+                        <span>About 1/4 (25%)</span>
+                    </label>
+                    <label class="option">
+                        <input type="radio" name="mi-q4" value="2">
+                        <span>About 1/3 (36%) &mdash; since area = 2 out of box area &pi; &times; 1 &asymp; 3.14</span>
+                    </label>
+                    <label class="option">
+                        <input type="radio" name="mi-q4" value="3">
+                        <span>About 3/4 (75%)</span>
+                    </label>
+                </div>
+                <div class="question-actions">
+                    <button class="btn-verify">Verify</button>
+                </div>
+                <div class="question-explanation" style="display:none;">
+                    <strong>Explanation:</strong>
+                    The bounding box has area \( \pi \times 1 \approx 3.14 \). The integral
+                    (area under sin) is 2. So the fraction under the curve is \( 2/3.14 \approx 0.64 \),
+                    meaning about <strong>36%</strong> of points land above the curve and contribute
+                    no information. Sample mean uses <em>all</em> points productively.
+                </div>
+            </div>
+        </div>
+
+        <div class="tab-content">
+            <div class="question-container" data-type="msq" data-answer="1,3">
+                <div class="question-text">
+                    Which statements about the two MC methods are true? (Select all)
+                </div>
+                <div class="question-options">
+                    <label class="option">
+                        <input type="checkbox" value="0">
+                        <span>Hit-or-miss is always more accurate than sample mean</span>
+                    </label>
+                    <label class="option">
+                        <input type="checkbox" value="1">
+                        <span>Sample mean uses the actual function value, not just 0/1</span>
+                    </label>
+                    <label class="option">
+                        <input type="checkbox" value="2">
+                        <span>Hit-or-miss doesn&rsquo;t require knowing the maximum of f(x)</span>
+                    </label>
+                    <label class="option">
+                        <input type="checkbox" value="3">
+                        <span>Both methods converge as \( 1/\sqrt{N} \), but sample mean has a smaller constant</span>
+                    </label>
+                </div>
+                <div class="question-actions">
+                    <button class="btn-verify">Verify</button>
+                </div>
+                <div class="question-explanation" style="display:none;">
+                    <strong>Explanation:</strong>
+                    <ul>
+                        <li><strong>Hit-or-miss more accurate:</strong> ✗ It&rsquo;s the opposite &mdash; sample mean is more accurate.</li>
+                        <li><strong>Sample mean uses f values:</strong> ✓ Each sample contributes its full f(x_i), not just a binary hit/miss.</li>
+                        <li><strong>No max needed for hit-or-miss:</strong> ✗ Hit-or-miss needs a bounding box, which requires knowing (or bounding) max f(x).</li>
+                        <li><strong>Same rate, different constant:</strong> ✓ Both converge as \( 1/\sqrt{N} \), but sample mean has lower variance (smaller constant in front).</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <div class="tab-content">
+            <div class="question-container" data-type="fill" data-answer="sample mean">
+                <div class="question-text">
+                    In practice, you should almost always use the
+                    <select class="fill-blank-select">
+                        <option value=""></option>
+                        <option value="hit-or-miss">hit-or-miss</option>
+                        <option value="sample mean">sample mean</option>
+                        <option value="trapezoidal rule">trapezoidal rule</option>
+                    </select>
+                    method for Monte Carlo integration.
+                </div>
+                <div class="question-actions">
+                    <button class="btn-verify">Verify</button>
+                </div>
+                <div class="question-explanation" style="display:none;">
+                    <strong>Explanation:</strong>
+                    The <strong>sample mean</strong> method is always preferred: it&rsquo;s simpler
+                    (no bounding box needed), more efficient (lower variance), and more general
+                    (works for any function, including negative ones). Hit-or-miss is mainly
+                    useful as a teaching tool to build intuition.
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- ============================================================ -->
+<!-- EXPLORER 3: Multi-Function Integrator -->
+<!-- ============================================================ -->
+<div class="interactive-container" id="multi-integrator">
+    <div class="interactive-title">Explorer: Integrate Anything</div>
+
+    <p>
+        Apply the sample mean method to several functions. For each, the true value
+        is known analytically &mdash; watch the MC estimate converge. The bar chart
+        shows how close each estimate is to the truth.
+    </p>
+
+    <div class="dual-panel">
+        <div class="panel">
+            <div class="plot-container" id="mi-multiCurvePlot" style="height: 400px;"></div>
+        </div>
+        <div class="panel">
+            <div class="plot-container" id="mi-multiBarPlot" style="height: 400px;"></div>
+        </div>
+    </div>
+
+    <div id="mi-stats3" class="stats-bar"></div>
+
+    <div class="control-panel">
+        <div class="control-group">
+            <label class="control-label" for="mi-multi-N-slider">Samples N:
+                <span id="mi-multi-N-value">2000</span>
+            </label>
+            <input type="range" class="slider" id="mi-multi-N-slider"
+                   min="100" max="10000" step="100" value="2000">
+        </div>
+        <div class="control-group">
+            <button class="btn" onclick="miMultiRun()">Run All</button>
+            <button class="btn" onclick="miMultiReset()">Reset</button>
+        </div>
+    </div>
+</div>
+
+<!-- ========== Test Your Understanding #3 ========== -->
+<div class="interactive-container question-section">
+    <div class="interactive-title">Test Your Understanding</div>
+
+    <p style="margin-bottom: var(--spacing-md); color: var(--text-secondary);">
+        Use the Multi-Function Integrator to answer these questions.
+    </p>
+
+    <div class="tabs">
+        <div class="tab-buttons">
+            <button class="tab-button active">Question 7</button>
+            <button class="tab-button">Question 8</button>
+            <button class="tab-button">Question 9</button>
+        </div>
+
+        <div class="tab-content active">
+            <div class="question-container" data-type="mcq" data-answer="1">
+                <div class="question-text">
+                    Run with N = 100, then N = 10,000. How do the error bars change?
+                </div>
+                <div class="question-options">
+                    <label class="option">
+                        <input type="radio" name="mi-q7" value="0">
+                        <span>They stay the same &mdash; more points don&rsquo;t help</span>
+                    </label>
+                    <label class="option">
+                        <input type="radio" name="mi-q7" value="1">
+                        <span>They shrink by about a factor of 10 (\( \sqrt{100} = 10 \))</span>
+                    </label>
+                    <label class="option">
+                        <input type="radio" name="mi-q7" value="2">
+                        <span>They shrink by a factor of 100</span>
+                    </label>
+                    <label class="option">
+                        <input type="radio" name="mi-q7" value="3">
+                        <span>They grow because more points means more noise</span>
+                    </label>
+                </div>
+                <div class="question-actions">
+                    <button class="btn-verify">Verify</button>
+                </div>
+                <div class="question-explanation" style="display:none;">
+                    <strong>Explanation:</strong>
+                    Error scales as \( \sigma / \sqrt{N} \). Going from N = 100 to N = 10,000 is
+                    a 100&times; increase, so the error shrinks by \( \sqrt{100} = 10 \). This is the
+                    \( 1/\sqrt{N} \) law in action.
+                </div>
+            </div>
+        </div>
+
+        <div class="tab-content">
+            <div class="question-container" data-type="fill" data-answer="0.333[0.3,0.37]">
+                <div class="question-text">
+                    Run with N = 5,000. The MC estimate for \( \int_0^1 x^2\,dx \) is approximately
+                    <input type="text" class="fill-blank" style="width: 70px">.
+                    (True value = 1/3 &asymp; 0.333)
+                </div>
+                <div class="question-actions">
+                    <button class="btn-verify">Verify</button>
+                </div>
+                <div class="question-explanation" style="display:none;">
+                    <strong>Explanation:</strong>
+                    With 5,000 samples, the estimate should be within about 0.005&ndash;0.01 of
+                    1/3 = 0.3333. The sample mean computes \( \frac{1}{N}\sum x_i^2 \) where
+                    \( x_i \sim U(0,1) \), and since the interval length is 1, no extra factor
+                    is needed.
+                </div>
+            </div>
+        </div>
+
+        <div class="tab-content">
+            <div class="question-container" data-type="mcq" data-answer="3">
+                <div class="question-text">
+                    Which function has the <strong>largest</strong> MC error for the same N?
+                </div>
+                <div class="question-options">
+                    <label class="option">
+                        <input type="radio" name="mi-q9" value="0">
+                        <span>\( x^2 \) on [0, 1] &mdash; it&rsquo;s the simplest function</span>
+                    </label>
+                    <label class="option">
+                        <input type="radio" name="mi-q9" value="1">
+                        <span>\( 1/(1+x) \) on [0, 1] &mdash; it has a singularity-like peak</span>
+                    </label>
+                    <label class="option">
+                        <input type="radio" name="mi-q9" value="2">
+                        <span>\( \sin(x) \) on [0, &pi;] &mdash; it&rsquo;s smooth and symmetric</span>
+                    </label>
+                    <label class="option">
+                        <input type="radio" name="mi-q9" value="3">
+                        <span>The one with the largest variance in f(x) values &mdash; error = &sigma;/&radic;N</span>
+                    </label>
+                </div>
+                <div class="question-actions">
+                    <button class="btn-verify">Verify</button>
+                </div>
+                <div class="question-explanation" style="display:none;">
+                    <strong>Explanation:</strong>
+                    The MC error is \( \sigma_f / \sqrt{N} \) where \( \sigma_f \) is the standard
+                    deviation of the integrand. Functions with more variation (large &sigma;) have
+                    larger MC errors. The specific answer depends on the function and interval &mdash;
+                    run the explorer and compare the error bars to see which function has the most
+                    variance.
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- ============================================================ -->
+<!-- PYTHON CODE EXAMPLES -->
+<!-- ============================================================ -->
+<h2>Python Code</h2>
+
+<div class="tabs">
+    <div class="tab-buttons">
+        <button class="tab-button active">Sample Mean Method</button>
+        <button class="tab-button">Hit-or-Miss</button>
+        <button class="tab-button">Prompt</button>
+    </div>
+
+    <div class="tab-content active">
+        <div class="code-block-container">
+            <div class="code-header">
+                <span class="code-lang">Python</span>
+                <button class="copy-btn">Copy</button>
+            </div>
+            <pre><code class="language-python">
+import numpy as np
+import plotly.graph_objects as go
+
+def mc_integrate(f, a, b, N):
+    """Monte Carlo integration using sample mean method."""
+    x = np.random.uniform(a, b, N)
+    f_vals = f(x)
+    estimate = (b - a) * np.mean(f_vals)
+    error = (b - a) * np.std(f_vals) / np.sqrt(N)
+    return estimate, error
+
+# Test: ∫₀¹ 1/(1+x) dx = ln(2)
+f = lambda x: 1 / (1 + x)
+true_val = np.log(2)
+
+# Convergence study
+Ns = [100, 500, 1000, 2000, 5000, 10000]
+estimates, errors = [], []
+for N in Ns:
+    est, err = mc_integrate(f, 0, 1, N)
+    estimates.append(est)
+    errors.append(err)
+    print(f'N={N:6d}: I = {est:.5f} ± {err:.5f}  '
+          f'(true = {true_val:.5f})')
+
+fig = go.Figure()
+fig.add_trace(go.Scatter(
+    x=Ns, y=estimates, mode='markers+lines',
+    error_y=dict(type='data', array=errors, visible=True,
+                 color='rgba(0,243,255,0.5)'),
+    line=dict(color='#00f3ff', width=2),
+    marker=dict(color='#00f3ff', size=8),
+    name='MC estimate ± 1σ'))
+fig.add_trace(go.Scatter(
+    x=[Ns[0], Ns[-1]], y=[true_val, true_val],
+    mode='lines',
+    line=dict(color='white', width=2, dash='dash'),
+    name=f'True = {true_val:.4f}'))
+
+fig.update_layout(
+    template='plotly_dark',
+    xaxis=dict(title='N (samples)', type='log',
+               zerolinecolor='#808080'),
+    yaxis=dict(title='Estimate', range=[0.6, 0.8],
+               zerolinecolor='#808080'),
+    height=450, width=600)
+fig.show()
+            </code></pre>
+        </div>
+    </div>
+
+    <div class="tab-content">
+        <div class="code-block-container">
+            <div class="code-header">
+                <span class="code-lang">Python</span>
+                <button class="copy-btn">Copy</button>
+            </div>
+            <pre><code class="language-python">
+import numpy as np
+import plotly.graph_objects as go
+
+def mc_hit_miss(f, a, b, f_max, N):
+    """Monte Carlo integration using hit-or-miss method."""
+    x = np.random.uniform(a, b, N)
+    y = np.random.uniform(0, f_max, N)
+    hits = np.sum(y <= f(x))
+    box_area = (b - a) * f_max
+    estimate = box_area * hits / N
+    return estimate, x, y, y <= f(x)
+
+# Compare both methods on sin(x) over [0, π]
+f = lambda x: np.sin(x)
+a, b, f_max = 0, np.pi, 1.0
+true_val = 2.0
+N = 5000
+
+# Hit-or-miss
+hm_est, x_hm, y_hm, inside = mc_hit_miss(f, a, b, f_max, N)
+
+# Sample mean
+x_sm = np.random.uniform(a, b, N)
+sm_est = (b - a) * np.mean(f(x_sm))
+
+print(f'Hit-or-miss: {hm_est:.4f}')
+print(f'Sample mean: {sm_est:.4f}')
+print(f'True value:  {true_val:.4f}')
+
+# Visualize hit-or-miss
+x_curve = np.linspace(a, b, 200)
+fig = go.Figure()
+fig.add_trace(go.Scatter(
+    x=x_curve, y=f(x_curve), mode='lines',
+    line=dict(color='white', width=2), name='sin(x)'))
+fig.add_trace(go.Scatter(
+    x=x_hm[inside], y=y_hm[inside], mode='markers',
+    marker=dict(color='#00f3ff', size=2, opacity=0.5),
+    name='Hits'))
+fig.add_trace(go.Scatter(
+    x=x_hm[~inside], y=y_hm[~inside], mode='markers',
+    marker=dict(color='#ff006e', size=2, opacity=0.3),
+    name='Misses'))
+
+fig.update_layout(
+    template='plotly_dark',
+    xaxis=dict(title='x', range=[0, np.pi],
+               zerolinecolor='#808080'),
+    yaxis=dict(title='y', range=[0, 1.1],
+               zerolinecolor='#808080'),
+    height=450, width=600)
+fig.show()
+            </code></pre>
+        </div>
+    </div>
+
+    <div class="tab-content">
+        <div class="code-block-container">
+            <div class="code-header">
+                <span class="code-lang">Prompt for AI</span>
+                <button class="copy-btn">Copy</button>
+            </div>
+            <pre><code class="language-text">Create a Python script using Plotly to compare two Monte
+Carlo integration methods.
+
+Requirements:
+- Implement both methods for ∫₀¹ 1/(1+x) dx = ln(2):
+  1. Hit-or-miss: throw points in [0,1]×[0,1], count below curve
+  2. Sample mean: average f(x_i) at random x_i
+- Run both with N = 100, 500, 1000, 5000, 10000
+- Panel 1: Convergence comparison (both estimates vs N, log-x)
+  with true value as dashed line
+- Panel 2: |Error| vs N on log-log scale, showing both follow
+  1/√N but sample mean has smaller constant
+- Panel 3: Visual hit-or-miss scatter (hits=cyan, misses=magenta)
+  with function curve overlaid
+- Use numpy for random numbers
+- Use dark theme (plotly_dark) with gray (#808080) axes</code></pre>
+        </div>
+    </div>
+</div>
+
+<!-- ============================================================ -->
+<!-- NAVIGATION -->
+<!-- ============================================================ -->
+<div class="btn-group mt-xl">
+    <button class="btn btn-magenta" onclick="navigateToSection('66-monte-carlo-intro')">&larr; Previous: Why Use Randomness?</button>
+    <button class="btn btn-secondary" onclick="scrollToTop()">&uarr; Back to Top</button>
+    <button class="btn btn-secondary" onclick="navigateToSection('68-mc-error-scaling')">Next: Error Analysis: The 1/&radic;N Rule &rarr;</button>
+</div>

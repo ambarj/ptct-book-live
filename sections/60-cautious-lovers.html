@@ -1,0 +1,742 @@
+<!-- ============================================================
+     Section 5.10: Cautious Lovers Model (Optional)
+     Source: NPTEL Lecture 8_2 (Linear Systems, Part 4)
+     Concept: Symmetric love-affairs model with A = [[a,b],[b,a]],
+              eigenvalues λ = a ± b, exploring cautiousness vs
+              responsiveness in a clean analytically solvable system
+     Time: 20-25 minutes
+     Prerequisites: Sections 5.6-5.8 (love affairs, eigenvalues,
+                    τ-Δ classification)
+     ============================================================ -->
+
+<h1>Cautious Lovers Model <span style="color: var(--text-secondary); font-size: 0.6em;">(Optional)</span></h1>
+
+<p>
+    In Section 5.6 you explored general love-affair dynamics with four personality
+    parameters. Here we study a beautifully symmetric special case: both partners
+    have identical personalities. The matrix becomes symmetric, the eigenvalues
+    simplify to \( \lambda = a \pm b \), and the entire relationship fate reduces
+    to a single question: <strong>does cautiousness beat responsiveness?</strong>
+</p>
+
+<div class="info-box">
+    <div class="info-box-title">Learning Objectives</div>
+    <ul>
+        <li>Model symmetric relationships with \( A = \begin{pmatrix} a & b \\ b & a \end{pmatrix} \) where \( a \) is cautiousness and \( b \) is responsiveness</li>
+        <li>Derive that eigenvalues are simply \( \lambda_1 = a + b \) and \( \lambda_2 = a - b \), with eigenvectors along the diagonals</li>
+        <li>Map the \( (a, b) \) parameter space into regions of different relationship fates</li>
+        <li>Understand why symmetric matrices always have <strong>perpendicular eigenvectors</strong> and what this means physically</li>
+    </ul>
+</div>
+
+<div class="equation-display">
+    <p><strong>The Symmetric Love Model:</strong></p>
+    $$ \dot{R} = aR + bJ, \qquad \dot{J} = bR + aJ $$
+    <p>
+        Both partners have cautiousness \( a \) (self-response) and responsiveness \( b \)
+        (response to partner). The matrix is symmetric:
+        \( A = \begin{pmatrix} a & b \\ b & a \end{pmatrix} \).
+    </p>
+    <p>
+        Eigenvalues: \( \lambda_1 = a + b \) (eigenvector \( (1, 1) \) &mdash; mutual feelings) and
+        \( \lambda_2 = a - b \) (eigenvector \( (1, -1) \) &mdash; opposite feelings).
+    </p>
+</div>
+
+<hr>
+
+<!-- ============================================================ -->
+<!-- EXPLORER 1: Personality Explorer -->
+<!-- ============================================================ -->
+<div class="interactive-container" id="personality-explorer">
+    <div class="interactive-title">Explorer: Cautiousness vs Responsiveness</div>
+
+    <p>
+        Adjust the two personality parameters. Cautiousness \( a < 0 \) means
+        strong feelings fade on their own; responsiveness \( b > 0 \) means
+        each partner&rsquo;s feelings amplify the other&rsquo;s. The battle
+        between these two forces determines everything.
+    </p>
+
+    <div class="dual-panel">
+        <div class="panel">
+            <div class="plot-container" id="cl-phasePlot" style="height: 400px;"></div>
+        </div>
+        <div class="panel">
+            <div class="plot-container" id="cl-timePlot" style="height: 400px;"></div>
+        </div>
+    </div>
+
+    <div id="cl-stats1" class="stats-bar"></div>
+
+    <div class="control-panel">
+        <div class="control-group">
+            <label class="control-label" for="cl-a-slider">Cautiousness a:
+                <span id="cl-a-value">-1.5</span>
+            </label>
+            <input type="range" class="slider" id="cl-a-slider"
+                   min="-3" max="1" step="0.1" value="-1.5">
+        </div>
+        <div class="control-group">
+            <label class="control-label" for="cl-b-slider">Responsiveness b:
+                <span id="cl-b-value">0.8</span>
+            </label>
+            <input type="range" class="slider" id="cl-b-slider"
+                   min="-1" max="3" step="0.1" value="0.8">
+        </div>
+        <div class="control-group">
+            <button class="btn" onclick="clPersonalityReset()">Reset</button>
+        </div>
+    </div>
+</div>
+
+<div class="info-box">
+    <div class="info-box-title">Perpendicular Eigenvectors</div>
+    <p>
+        Because \( A \) is symmetric, its eigenvectors are always <strong>perpendicular</strong>.
+        The mutual-feelings direction \( (1, 1) \) and the opposite-feelings direction
+        \( (1, -1) \) are at right angles. This means the two modes are completely
+        independent: changing one doesn&rsquo;t affect the other. Symmetric matrices
+        always decompose motion into independent perpendicular modes &mdash; this is
+        why physicists love them (normal modes of vibration work the same way).
+    </p>
+</div>
+
+<!-- ========== Test Your Understanding #1 ========== -->
+<div class="interactive-container question-section">
+    <div class="interactive-title">Test Your Understanding</div>
+
+    <p style="margin-bottom: var(--spacing-md); color: var(--text-secondary);">
+        Use the Personality Explorer to answer these questions.
+    </p>
+
+    <div class="tabs">
+        <div class="tab-buttons">
+            <button class="tab-button active">Question 1</button>
+            <button class="tab-button">Question 2</button>
+            <button class="tab-button">Question 3</button>
+        </div>
+
+        <div class="tab-content active">
+            <div class="question-container" data-type="mcq" data-answer="0">
+                <div class="question-text">
+                    Set \( a = -2, b = 1 \). Both eigenvalues are negative
+                    (\( \lambda_1 = -1, \lambda_2 = -3 \)). What happens to all
+                    initial conditions?
+                </div>
+                <div class="question-options">
+                    <label class="option">
+                        <input type="radio" name="cl-q1" value="0">
+                        <span>All feelings decay to zero &mdash; cautiousness wins</span>
+                    </label>
+                    <label class="option">
+                        <input type="radio" name="cl-q1" value="1">
+                        <span>Feelings grow without bound</span>
+                    </label>
+                    <label class="option">
+                        <input type="radio" name="cl-q1" value="2">
+                        <span>Feelings oscillate forever</span>
+                    </label>
+                    <label class="option">
+                        <input type="radio" name="cl-q1" value="3">
+                        <span>Outcome depends on starting point</span>
+                    </label>
+                </div>
+                <div class="question-actions">
+                    <button class="btn-verify">Verify</button>
+                </div>
+                <div class="question-explanation" style="display:none;">
+                    <strong>Explanation:</strong>
+                    Both \( \lambda_1 = a + b = -1 \) and \( \lambda_2 = a - b = -3 \) are negative.
+                    This is a <strong>stable node</strong>. All trajectories converge to the origin:
+                    both Romeo and Juliet become indifferent. Cautiousness (\( |a| = 2 \)) overwhelms
+                    responsiveness (\( b = 1 \)), so the flame dies out.
+                </div>
+            </div>
+        </div>
+
+        <div class="tab-content">
+            <div class="question-container" data-type="fill" data-answer="saddle">
+                <div class="question-text">
+                    Now set \( a = -1, b = 2 \), so \( \lambda_1 = 1, \lambda_2 = -3 \).
+                    Since the eigenvalues have <strong>opposite signs</strong>, the fixed
+                    point is a
+                    <select class="fill-blank-select">
+                        <option value=""></option>
+                        <option value="stable node">stable node</option>
+                        <option value="center">center</option>
+                        <option value="saddle">saddle</option>
+                        <option value="unstable node">unstable node</option>
+                    </select>.
+                </div>
+                <div class="question-actions">
+                    <button class="btn-verify">Verify</button>
+                </div>
+                <div class="question-explanation" style="display:none;">
+                    <strong>Explanation:</strong>
+                    \( \lambda_1 = 1 > 0 \) and \( \lambda_2 = -3 < 0 \) &mdash; opposite signs mean
+                    <strong>saddle</strong>. Responsiveness (\( b = 2 \)) exceeds cautiousness
+                    (\( |a| = 1 \)), so mutual feelings grow while opposite feelings decay.
+                    The couple either falls deeply in love or sinks into mutual hate,
+                    depending on initial conditions.
+                </div>
+            </div>
+        </div>
+
+        <div class="tab-content">
+            <div class="question-container" data-type="mcq" data-answer="2">
+                <div class="question-text">
+                    The transition from stable node to saddle occurs exactly when&hellip;
+                </div>
+                <div class="question-options">
+                    <label class="option">
+                        <input type="radio" name="cl-q3" value="0">
+                        <span>\( a = 0 \) (no cautiousness)</span>
+                    </label>
+                    <label class="option">
+                        <input type="radio" name="cl-q3" value="1">
+                        <span>\( b = 0 \) (no responsiveness)</span>
+                    </label>
+                    <label class="option">
+                        <input type="radio" name="cl-q3" value="2">
+                        <span>\( b = |a| \) (responsiveness equals cautiousness)</span>
+                    </label>
+                    <label class="option">
+                        <input type="radio" name="cl-q3" value="3">
+                        <span>\( a = b \) (both parameters equal)</span>
+                    </label>
+                </div>
+                <div class="question-actions">
+                    <button class="btn-verify">Verify</button>
+                </div>
+                <div class="question-explanation" style="display:none;">
+                    <strong>Explanation:</strong>
+                    The transition happens when \( \lambda_1 = a + b = 0 \), i.e., \( b = -a = |a| \)
+                    (since \( a < 0 \) for cautiousness). At this boundary, \( \lambda_2 = 2a < 0 \)
+                    is still negative, so we go from two negative eigenvalues (stable node) to one
+                    positive + one negative (saddle). Responsiveness matching cautiousness is the tipping point.
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- ============================================================ -->
+<!-- EXPLORER 2: Parameter Space Map -->
+<!-- ============================================================ -->
+<div class="interactive-container" id="parameter-space-map">
+    <div class="interactive-title">Explorer: Parameter Space Map</div>
+
+    <p>
+        The \( (a, b) \) plane is divided into regions by the lines
+        \( b = -a \) and \( b = a \). Each region gives a different relationship
+        fate. Drag the sliders to move through parameter space and see the
+        corresponding phase portrait.
+    </p>
+
+    <div class="dual-panel">
+        <div class="panel">
+            <div class="plot-container" id="cl-paramMapPlot" style="height: 400px;"></div>
+        </div>
+        <div class="panel">
+            <div class="plot-container" id="cl-paramPortraitPlot" style="height: 400px;"></div>
+        </div>
+    </div>
+
+    <div id="cl-stats2" class="stats-bar"></div>
+
+    <div class="control-panel">
+        <div class="control-group">
+            <label class="control-label" for="cl-map-a-slider">a:
+                <span id="cl-map-a-value">-1.0</span>
+            </label>
+            <input type="range" class="slider" id="cl-map-a-slider"
+                   min="-3" max="2" step="0.1" value="-1">
+        </div>
+        <div class="control-group">
+            <label class="control-label" for="cl-map-b-slider">b:
+                <span id="cl-map-b-value">0.5</span>
+            </label>
+            <input type="range" class="slider" id="cl-map-b-slider"
+                   min="-2" max="3" step="0.1" value="0.5">
+        </div>
+        <div class="control-group">
+            <button class="btn" onclick="clMapReset()">Reset</button>
+        </div>
+    </div>
+</div>
+
+<!-- ========== Test Your Understanding #2 ========== -->
+<div class="interactive-container question-section">
+    <div class="interactive-title">Test Your Understanding</div>
+
+    <p style="margin-bottom: var(--spacing-md); color: var(--text-secondary);">
+        Use the Parameter Space Map to answer these questions.
+    </p>
+
+    <div class="tabs">
+        <div class="tab-buttons">
+            <button class="tab-button active">Question 4</button>
+            <button class="tab-button">Question 5</button>
+            <button class="tab-button">Question 6</button>
+        </div>
+
+        <div class="tab-content active">
+            <div class="question-container" data-type="msq" data-answer="0,2">
+                <div class="question-text">
+                    Which regions of the \( (a, b) \) parameter space lead to a
+                    <strong>stable node</strong> (both eigenvalues negative)?
+                    (Select all that apply)
+                </div>
+                <div class="question-options">
+                    <label class="option">
+                        <input type="checkbox" value="0">
+                        <span>\( a < 0 \) and \( b < |a| \) (cautiousness dominates, positive responsiveness)</span>
+                    </label>
+                    <label class="option">
+                        <input type="checkbox" value="1">
+                        <span>\( a > 0 \) and \( b > 0 \) (both self-reinforcing and responsive)</span>
+                    </label>
+                    <label class="option">
+                        <input type="checkbox" value="2">
+                        <span>\( a < 0 \) and \( b < 0 \) with \( |b| < |a| \) (cautious and contrarian)</span>
+                    </label>
+                    <label class="option">
+                        <input type="checkbox" value="3">
+                        <span>\( a > 0 \) and \( b < 0 \) (self-reinforcing but contrarian)</span>
+                    </label>
+                </div>
+                <div class="question-actions">
+                    <button class="btn-verify">Verify</button>
+                </div>
+                <div class="question-explanation" style="display:none;">
+                    <strong>Explanation:</strong>
+                    <ul>
+                        <li><strong>\( a < 0, b < |a| \):</strong> ✓ \( \lambda_1 = a+b < 0 \) (since \( b < -a \)) and \( \lambda_2 = a-b \). If \( b > 0 \): \( a - b < a < 0 \) ✓. Stable node.</li>
+                        <li><strong>\( a > 0, b > 0 \):</strong> ✗ \( \lambda_1 = a + b > 0 \). At least one positive eigenvalue &mdash; not stable.</li>
+                        <li><strong>\( a < 0, b < 0, |b| < |a| \):</strong> ✓ \( \lambda_1 = a + b < 0 \) and \( \lambda_2 = a - b = a + |b| \). Since \( |b| < |a| \): \( a + |b| < 0 \) ✓. Both negative.</li>
+                        <li><strong>\( a > 0, b < 0 \):</strong> ✗ \( \lambda_2 = a - b = a + |b| > 0 \). Not stable.</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <div class="tab-content">
+            <div class="question-container" data-type="fill" data-answer="-a|a">
+                <div class="question-text">
+                    For the symmetric model, the two boundary lines in parameter space
+                    are \( b = \)
+                    <select class="fill-blank-select">
+                        <option value=""></option>
+                        <option value="-a">−a</option>
+                        <option value="a">a</option>
+                        <option value="0">0</option>
+                        <option value="2a">2a</option>
+                    </select>
+                    (where \( \lambda_1 = 0 \)) and \( b = \)
+                    <select class="fill-blank-select">
+                        <option value=""></option>
+                        <option value="-a">−a</option>
+                        <option value="a">a</option>
+                        <option value="0">0</option>
+                        <option value="2a">2a</option>
+                    </select>
+                    (where \( \lambda_2 = 0 \)).
+                </div>
+                <div class="question-actions">
+                    <button class="btn-verify">Verify</button>
+                </div>
+                <div class="question-explanation" style="display:none;">
+                    <strong>Explanation:</strong>
+                    \( \lambda_1 = a + b = 0 \) gives \( b = -a \).
+                    \( \lambda_2 = a - b = 0 \) gives \( b = a \).
+                    These two lines divide the \( (a, b) \) plane into four regions with
+                    different eigenvalue sign combinations: stable node, saddle, and unstable node.
+                </div>
+            </div>
+        </div>
+
+        <div class="tab-content">
+            <div class="question-container" data-type="mcq" data-answer="1">
+                <div class="question-text">
+                    Move the point to the \( b = -a \) boundary (e.g., \( a = -1, b = 1 \)).
+                    What special structure appears in the phase portrait?
+                </div>
+                <div class="question-options">
+                    <label class="option">
+                        <input type="radio" name="cl-q6" value="0">
+                        <span>Closed orbits (center)</span>
+                    </label>
+                    <label class="option">
+                        <input type="radio" name="cl-q6" value="1">
+                        <span>A line of fixed points along R = J (mutual feelings direction)</span>
+                    </label>
+                    <label class="option">
+                        <input type="radio" name="cl-q6" value="2">
+                        <span>A single unstable fixed point</span>
+                    </label>
+                    <label class="option">
+                        <input type="radio" name="cl-q6" value="3">
+                        <span>An unstable spiral</span>
+                    </label>
+                </div>
+                <div class="question-actions">
+                    <button class="btn-verify">Verify</button>
+                </div>
+                <div class="question-explanation" style="display:none;">
+                    <strong>Explanation:</strong>
+                    At \( b = -a \): \( \lambda_1 = 0 \) (along \( (1,1) \)) and \( \lambda_2 = 2a < 0 \).
+                    The zero eigenvalue means there is a <strong>line of fixed points</strong> along the
+                    \( R = J \) direction. Every point on this line is an equilibrium! Trajectories
+                    approach this line (from the \( \lambda_2 < 0 \) mode) but don&rsquo;t converge to
+                    the origin &mdash; they settle at whatever mutual-feeling level they project onto.
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- ============================================================ -->
+<!-- EXPLORER 3: Scenario Gallery -->
+<!-- ============================================================ -->
+<div class="interactive-container" id="scenario-gallery">
+    <div class="interactive-title">Explorer: Relationship Scenarios</div>
+
+    <p>
+        Choose a personality scenario to see its phase portrait and story.
+        Each scenario represents a different balance between cautiousness and
+        responsiveness, producing a different relationship fate.
+    </p>
+
+    <div class="plot-container" id="cl-scenarioPlot" style="height: 440px;"></div>
+
+    <div id="cl-stats3" class="stats-bar"></div>
+
+    <div class="control-panel">
+        <div class="control-group">
+            <label class="control-label" for="cl-scenario-select">Scenario:</label>
+            <select id="cl-scenario-select" class="control-select">
+                <option value="guarded">Guarded Couple (a=−2, b=0.5)</option>
+                <option value="tipping">Tipping Point (a=−1, b=1)</option>
+                <option value="passionate">Passionate Couple (a=−0.5, b=2)</option>
+                <option value="narcissists">Mutual Narcissists (a=1, b=0.3)</option>
+                <option value="contrarian">Contrarian Couple (a=−1, b=−0.5)</option>
+            </select>
+        </div>
+        <div class="control-group">
+            <button class="btn" onclick="clScenarioReset()">Reset</button>
+        </div>
+    </div>
+</div>
+
+<!-- ========== Test Your Understanding #3 ========== -->
+<div class="interactive-container question-section">
+    <div class="interactive-title">Test Your Understanding</div>
+
+    <p style="margin-bottom: var(--spacing-md); color: var(--text-secondary);">
+        Use the Scenario Gallery to answer these questions.
+    </p>
+
+    <div class="tabs">
+        <div class="tab-buttons">
+            <button class="tab-button active">Question 7</button>
+            <button class="tab-button">Question 8</button>
+            <button class="tab-button">Question 9</button>
+        </div>
+
+        <div class="tab-content active">
+            <div class="question-container" data-type="mcq" data-answer="2">
+                <div class="question-text">
+                    Select <strong>Passionate Couple</strong> (\( a = -0.5, b = 2 \)).
+                    This is a saddle. Along which direction do feelings <strong>grow</strong>?
+                </div>
+                <div class="question-options">
+                    <label class="option">
+                        <input type="radio" name="cl-q7" value="0">
+                        <span>The \( R = -J \) line (opposite feelings)</span>
+                    </label>
+                    <label class="option">
+                        <input type="radio" name="cl-q7" value="1">
+                        <span>The R-axis only</span>
+                    </label>
+                    <label class="option">
+                        <input type="radio" name="cl-q7" value="2">
+                        <span>The \( R = J \) line (mutual feelings)</span>
+                    </label>
+                    <label class="option">
+                        <input type="radio" name="cl-q7" value="3">
+                        <span>All directions equally</span>
+                    </label>
+                </div>
+                <div class="question-actions">
+                    <button class="btn-verify">Verify</button>
+                </div>
+                <div class="question-explanation" style="display:none;">
+                    <strong>Explanation:</strong>
+                    \( \lambda_1 = a + b = 1.5 > 0 \) with eigenvector \( (1, 1) \). This is the
+                    <strong>mutual feelings</strong> direction. If both start loving (or both hating),
+                    that shared feeling amplifies. The opposite-feelings direction (\( \lambda_2 = -2.5 \))
+                    decays rapidly. Responsiveness amplifies whatever sentiment the couple shares.
+                </div>
+            </div>
+        </div>
+
+        <div class="tab-content">
+            <div class="question-container" data-type="mcq" data-answer="0">
+                <div class="question-text">
+                    Select <strong>Contrarian Couple</strong> (\( a = -1, b = -0.5 \)).
+                    Both parameters are negative. What is the classification?
+                </div>
+                <div class="question-options">
+                    <label class="option">
+                        <input type="radio" name="cl-q8" value="0">
+                        <span>Stable node &mdash; feelings decay to indifference</span>
+                    </label>
+                    <label class="option">
+                        <input type="radio" name="cl-q8" value="1">
+                        <span>Saddle &mdash; depends on initial conditions</span>
+                    </label>
+                    <label class="option">
+                        <input type="radio" name="cl-q8" value="2">
+                        <span>Unstable node &mdash; feelings grow</span>
+                    </label>
+                    <label class="option">
+                        <input type="radio" name="cl-q8" value="3">
+                        <span>Center &mdash; oscillating feelings</span>
+                    </label>
+                </div>
+                <div class="question-actions">
+                    <button class="btn-verify">Verify</button>
+                </div>
+                <div class="question-explanation" style="display:none;">
+                    <strong>Explanation:</strong>
+                    \( \lambda_1 = -1 + (-0.5) = -1.5 \) and \( \lambda_2 = -1 - (-0.5) = -0.5 \).
+                    Both negative → <strong>stable node</strong>. When both partners are cautious
+                    <em>and</em> contrarian (\( b < 0 \): the partner&rsquo;s love repels rather
+                    than attracts), all feelings decay even faster. Indifference is doubly inevitable.
+                </div>
+            </div>
+        </div>
+
+        <div class="tab-content">
+            <div class="question-container" data-type="msq" data-answer="1,3">
+                <div class="question-text">
+                    Which statements about the symmetric love model are true? (Select all)
+                </div>
+                <div class="question-options">
+                    <label class="option">
+                        <input type="checkbox" value="0">
+                        <span>Spirals are possible in the symmetric model</span>
+                    </label>
+                    <label class="option">
+                        <input type="checkbox" value="1">
+                        <span>Eigenvectors are always \( (1, 1) \) and \( (1, -1) \) regardless of parameters</span>
+                    </label>
+                    <label class="option">
+                        <input type="checkbox" value="2">
+                        <span>The model can produce oscillating feelings</span>
+                    </label>
+                    <label class="option">
+                        <input type="checkbox" value="3">
+                        <span>A symmetric matrix always has real eigenvalues</span>
+                    </label>
+                </div>
+                <div class="question-actions">
+                    <button class="btn-verify">Verify</button>
+                </div>
+                <div class="question-explanation" style="display:none;">
+                    <strong>Explanation:</strong>
+                    <ul>
+                        <li><strong>Spirals possible:</strong> ✗ Symmetric matrices have real eigenvalues (spectral theorem). Complex eigenvalues (needed for spirals) are impossible.</li>
+                        <li><strong>Fixed eigenvectors:</strong> ✓ For \( A = \begin{pmatrix} a & b \\ b & a \end{pmatrix} \), the eigenvectors are always \( (1, 1) \) and \( (1, -1) \), regardless of \( a \) and \( b \).</li>
+                        <li><strong>Oscillations:</strong> ✗ No complex eigenvalues → no oscillations. Only exponential growth or decay.</li>
+                        <li><strong>Real eigenvalues always:</strong> ✓ This is the <strong>spectral theorem</strong>: symmetric real matrices always have real eigenvalues and orthogonal eigenvectors.</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- ============================================================ -->
+<!-- PYTHON CODE EXAMPLES -->
+<!-- ============================================================ -->
+<h2>Python Code</h2>
+
+<div class="tabs">
+    <div class="tab-buttons">
+        <button class="tab-button active">Symmetric Model</button>
+        <button class="tab-button">Parameter Space</button>
+        <button class="tab-button">Prompt</button>
+    </div>
+
+    <div class="tab-content active">
+        <div class="code-block-container">
+            <div class="code-header">
+                <span class="code-lang">Python</span>
+                <button class="copy-btn">Copy</button>
+            </div>
+            <pre><code class="language-python">
+import numpy as np
+import plotly.graph_objects as go
+from plotly.subplots import make_subplots
+
+def rk4(A, x0, T, N):
+    h = T/N; x = np.array(x0, float)
+    xs, ts = [x.copy()], [0.0]
+    for i in range(N):
+        f = lambda u: A @ u
+        k1=f(x); k2=f(x+h/2*k1); k3=f(x+h/2*k2); k4=f(x+h*k3)
+        x += h/6*(k1+2*k2+2*k3+k4)
+        if np.linalg.norm(x) > 20: break
+        xs.append(x.copy()); ts.append((i+1)*h)
+    return np.array(xs), np.array(ts)
+
+# Cautious lovers: a = -1.5, b = 0.8
+a, b = -1.5, 0.8
+A = np.array([[a, b], [b, a]])
+lam1, lam2 = a + b, a - b
+print(f'λ₁ = {lam1:.2f}, λ₂ = {lam2:.2f}')
+
+fig = make_subplots(1, 2, subplot_titles=[
+    'Phase Portrait', 'Time Series'])
+
+colors = ['#00f3ff','#ff006e','#ffbe0b','#00ff88',
+          '#bb86fc','#ff5722','#76ff03','#40c4ff']
+
+for k in range(8):
+    th = k * np.pi / 4
+    traj, t = rk4(A, [2*np.cos(th), 2*np.sin(th)], 8, 1500)
+    fig.add_trace(go.Scatter(
+        x=traj[:,0], y=traj[:,1], mode='lines',
+        line=dict(color=colors[k], width=1.5),
+        showlegend=False), row=1, col=1)
+
+# Eigenvector lines
+for v, lam, col in [([1,1], lam1, '#ff5722'),
+                     ([1,-1], lam2, '#00ff88')]:
+    fig.add_trace(go.Scatter(
+        x=[-3*v[0], 3*v[0]], y=[-3*v[1], 3*v[1]],
+        mode='lines', line=dict(color=col, dash='dash'),
+        name=f'λ={lam:.1f}'), row=1, col=1)
+
+# One time series
+traj, t = rk4(A, [2, 0.5], 8, 1500)
+fig.add_trace(go.Scatter(x=t, y=traj[:,0], mode='lines',
+    line=dict(color='#00f3ff', width=2), name='Romeo'),
+    row=1, col=2)
+fig.add_trace(go.Scatter(x=t, y=traj[:,1], mode='lines',
+    line=dict(color='#ff006e', width=2), name='Juliet'),
+    row=1, col=2)
+
+fig.update_layout(template='plotly_dark', height=400, width=900)
+fig.update_xaxes(title='Romeo R', range=[-3,3],
+    zerolinecolor='#808080', row=1, col=1)
+fig.update_yaxes(title='Juliet J', range=[-3,3],
+    zerolinecolor='#808080', scaleanchor='x', row=1, col=1)
+fig.update_xaxes(title='Time', zerolinecolor='#808080',
+    row=1, col=2)
+fig.update_yaxes(title='Feelings', zerolinecolor='#808080',
+    row=1, col=2)
+fig.show()
+            </code></pre>
+        </div>
+    </div>
+
+    <div class="tab-content">
+        <div class="code-block-container">
+            <div class="code-header">
+                <span class="code-lang">Python</span>
+                <button class="copy-btn">Copy</button>
+            </div>
+            <pre><code class="language-python">
+import numpy as np
+import plotly.graph_objects as go
+
+# Parameter space map for symmetric model
+na, nb = 100, 100
+a_vals = np.linspace(-3, 2, na)
+b_vals = np.linspace(-2, 3, nb)
+z = np.zeros((nb, na))
+
+for j, bv in enumerate(b_vals):
+    for i, av in enumerate(a_vals):
+        l1, l2 = av + bv, av - bv
+        if l1 < 0 and l2 < 0:
+            z[j, i] = 0  # stable node
+        elif l1 > 0 and l2 > 0:
+            z[j, i] = 2  # unstable node
+        else:
+            z[j, i] = 1  # saddle
+
+fig = go.Figure()
+fig.add_trace(go.Heatmap(
+    z=z, x=a_vals, y=b_vals, opacity=0.5,
+    colorscale=[[0, '#00f3ff'], [0.5, '#ff5722'], [1, '#ff006e']],
+    showscale=False))
+
+# Boundary lines: b = -a and b = a
+fig.add_trace(go.Scatter(
+    x=[-3, 2], y=[3, -2], mode='lines',
+    line=dict(color='white', width=2, dash='dash'),
+    name='b = −a (λ₁ = 0)'))
+fig.add_trace(go.Scatter(
+    x=[-3, 2], y=[-3, 2], mode='lines',
+    line=dict(color='#ffbe0b', width=2, dash='dash'),
+    name='b = a (λ₂ = 0)'))
+
+fig.add_annotation(x=-2, y=0, text='Stable Node',
+    font=dict(color='#00f3ff', size=13), showarrow=False)
+fig.add_annotation(x=0, y=2, text='Saddle',
+    font=dict(color='#ff5722', size=13), showarrow=False)
+fig.add_annotation(x=1.5, y=1, text='Unstable\nNode',
+    font=dict(color='#ff006e', size=12), showarrow=False)
+
+fig.update_layout(
+    template='plotly_dark',
+    xaxis=dict(title='Cautiousness a', range=[-3, 2],
+               zerolinecolor='#808080'),
+    yaxis=dict(title='Responsiveness b', range=[-2, 3],
+               zerolinecolor='#808080'),
+    height=500, width=550)
+fig.show()
+            </code></pre>
+        </div>
+    </div>
+
+    <div class="tab-content">
+        <div class="code-block-container">
+            <div class="code-header">
+                <span class="code-lang">Prompt for AI</span>
+                <button class="copy-btn">Copy</button>
+            </div>
+            <pre><code class="language-text">Create a Python script using Plotly to explore the "cautious
+lovers" model — a symmetric 2D linear system.
+
+Requirements:
+- Model: R' = aR + bJ, J' = bR + aJ (symmetric matrix)
+- Parameters: a = cautiousness (negative), b = responsiveness
+- Eigenvalues are λ₁ = a+b, λ₂ = a-b (derive and verify)
+- Eigenvectors always (1,1) and (1,-1) — show as dashed lines
+- Panel 1: Phase portrait with 8 trajectories from circle ICs
+- Panel 2: (a,b) parameter space map showing:
+  - Stable node region (both λ < 0): cyan
+  - Saddle region (one positive, one negative): orange
+  - Unstable node region (both λ > 0): magenta
+  - Boundary lines b = -a and b = a (dashed)
+- Test scenarios: guarded (a=-2,b=0.5), passionate (a=-0.5,b=2),
+  tipping point (a=-1,b=1)
+- Use dark theme (plotly_dark) with gray (#808080) axes
+- Fixed ranges: phase [-3,3]x[-3,3], param [-3,2]x[-2,3]</code></pre>
+        </div>
+    </div>
+</div>
+
+<!-- ============================================================ -->
+<!-- NAVIGATION -->
+<!-- ============================================================ -->
+<div class="btn-group mt-xl">
+    <button class="btn btn-magenta" onclick="navigateToSection('59-oscillator-phase-space')">&larr; Previous: Damped Oscillator Revisited</button>
+    <button class="btn btn-secondary" onclick="scrollToTop()">&uarr; Back to Top</button>
+    <button class="btn btn-secondary" onclick="navigateToSection('61-linearization-1d')">Next: 1D Linearization &rarr;</button>
+</div>

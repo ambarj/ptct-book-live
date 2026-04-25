@@ -1,0 +1,745 @@
+<!-- ============================================================
+     Section 5.1: What is Phase Space?
+     Source: NPTEL Lecture 8_1 (Linear Systems & Phase Space, Part 1)
+     Concept: Phase space as geometric representation of dynamics,
+              state = point, velocity = arrow, evolution = trajectory
+     Time: 15-20 minutes
+     Prerequisites: Chapter 3 (oscillations, SHO phase portraits),
+                    Chapter 4 (RK4 for trajectory computation)
+     ============================================================ -->
+
+<h1>What is Phase Space?</h1>
+
+<p>
+    In Chapter 3, we briefly saw that plotting \( (x, \dot{x}) \) turns oscillator motion into
+    ellipses. That was a glimpse of something much deeper. <strong>Phase space</strong> is a
+    geometric framework that lets you see <em>every possible behavior</em> of a system in a
+    single picture — no equations to solve, no time axis needed.
+</p>
+
+<div class="info-box">
+    <div class="info-box-title">Learning Objectives</div>
+    <ul>
+        <li>Understand phase space: each point represents the <strong>complete state</strong> of a system</li>
+        <li>Read vector fields: arrows show where the system moves next</li>
+        <li>Trace trajectories: time evolution becomes a curve through phase space</li>
+        <li>Recognize the fundamental trajectory types: closed orbits, spirals, saddle paths</li>
+    </ul>
+</div>
+
+<p>
+    The idea is beautifully simple: if a system has two variables \( x \) and \( y \),
+    then at any moment its state is a point \( (x, y) \). The differential equations
+    \( \dot{x} = f(x,y) \) and \( \dot{y} = g(x,y) \) assign a <strong>velocity arrow</strong>
+    to each point, telling the system where to go next. Follow the arrows, and you trace
+    out a <strong>trajectory</strong> — the system's entire future (and past).
+</p>
+
+<div class="equation-display">
+    <p><strong>A 2D autonomous system:</strong></p>
+    $$ \dot{x} = f(x, y), \qquad \dot{y} = g(x, y) $$
+    <p>At every point \( (x,y) \), the velocity vector is \( \bigl(f(x,y),\; g(x,y)\bigr) \).
+    These arrows fill the plane — that's the <strong>vector field</strong>.</p>
+</div>
+
+
+<!-- ============================================================ -->
+<!-- EXPLORER 1: State Space Viewer -->
+<!-- ============================================================ -->
+<div class="interactive-container" id="state-viewer">
+    <div class="interactive-title">Explorer: The Phase Space Idea</div>
+
+    <p>
+        Choose a dynamical system and set an initial condition. The left panel shows the
+        <strong>phase portrait</strong> — arrows indicate the velocity field, and the colored
+        curve is the trajectory from your chosen starting point. The right panel shows
+        the corresponding time series \( x(t) \) and \( y(t) \).
+    </p>
+
+    <div class="dual-panel">
+        <div class="plot-container" id="ps-fieldPlot"></div>
+        <div class="plot-container" id="ps-timePlot"></div>
+    </div>
+
+    <div id="ps-stats1" class="stats-bar"></div>
+
+    <div class="control-panel">
+        <div class="control-group">
+            <label class="control-label" for="ps-system1">System:</label>
+            <select id="ps-system1" class="control-select">
+                <option value="center">Center (SHO)</option>
+                <option value="saddle">Saddle Point</option>
+                <option value="stableSpiral">Stable Spiral</option>
+                <option value="source">Unstable Source</option>
+                <option value="sink">Stable Sink</option>
+            </select>
+        </div>
+        <div class="control-group">
+            <label class="control-label" for="ps-x0-slider">x₀:</label>
+            <input type="range" class="slider" id="ps-x0-slider" min="-3" max="3" step="0.1" value="2">
+            <span id="ps-x0-value" class="control-value">2.0</span>
+        </div>
+        <div class="control-group">
+            <label class="control-label" for="ps-y0-slider">y₀:</label>
+            <input type="range" class="slider" id="ps-y0-slider" min="-3" max="3" step="0.1" value="0">
+            <span id="ps-y0-value" class="control-value">0.0</span>
+        </div>
+        <div class="control-group">
+            <button class="btn" onclick="psStateReset()">Reset</button>
+        </div>
+    </div>
+</div>
+
+<div class="info-box">
+    <div class="info-box-title">Key Insight</div>
+    <p>
+        <strong>A phase portrait is a map of all possible futures.</strong> Once you know
+        where a system starts (the initial condition), you can read off its entire evolution
+        by following the trajectory. No equations to solve — the geometry tells you everything.
+    </p>
+</div>
+
+
+<!-- Test Your Understanding #1 -->
+<div class="interactive-container question-section">
+    <div class="interactive-title">Test Your Understanding</div>
+
+    <p style="margin-bottom: var(--spacing-md); color: var(--text-secondary);">
+        Use the State Space Viewer above to answer these questions.
+    </p>
+
+    <div class="tabs">
+        <div class="tab-buttons">
+            <button class="tab-button active">Question 1</button>
+            <button class="tab-button">Question 2</button>
+            <button class="tab-button">Question 3</button>
+        </div>
+
+        <div class="tab-content active">
+            <div class="question-container" data-type="mcq" data-answer="2">
+                <div class="question-text">
+                    What does a single point in phase space represent?
+                </div>
+                <div class="question-options">
+                    <label class="option">
+                        <input type="radio" name="ps-q1" value="0">
+                        <span>The position of the system at one moment</span>
+                    </label>
+                    <label class="option">
+                        <input type="radio" name="ps-q1" value="1">
+                        <span>The velocity of the system at one moment</span>
+                    </label>
+                    <label class="option">
+                        <input type="radio" name="ps-q1" value="2">
+                        <span>The complete state of the system — both position and velocity</span>
+                    </label>
+                    <label class="option">
+                        <input type="radio" name="ps-q1" value="3">
+                        <span>The energy of the system</span>
+                    </label>
+                </div>
+                <div class="question-actions">
+                    <button class="btn-verify">Verify</button>
+                </div>
+                <div class="question-explanation" style="display:none;">
+                    <strong>Explanation:</strong>
+                    A point \( (x, y) \) in phase space encodes the <em>complete</em> state: both
+                    the position variable and the velocity variable. Knowing both is enough to
+                    determine the entire future evolution via the differential equations.
+                </div>
+            </div>
+        </div>
+
+        <div class="tab-content">
+            <div class="question-container" data-type="fill" data-answer="closed|ellipses|circles">
+                <div class="question-text">
+                    Set the system to "Center (SHO)" and try different initial conditions.
+                    The trajectories form
+                    <select class="fill-blank-select">
+                        <option value=""></option>
+                        <option value="closed">closed curves</option>
+                        <option value="spirals">spirals</option>
+                        <option value="straight">straight lines</option>
+                    </select>
+                    , which are specifically
+                    <select class="fill-blank-select">
+                        <option value=""></option>
+                        <option value="ellipses">ellipses (or circles)</option>
+                        <option value="parabolas">parabolas</option>
+                        <option value="hyperbolas">hyperbolas</option>
+                    </select>.
+                </div>
+                <div class="question-actions">
+                    <button class="btn-verify">Verify</button>
+                </div>
+                <div class="question-explanation" style="display:none;">
+                    <strong>Explanation:</strong>
+                    The SHO system \( \dot{x} = y,\; \dot{y} = -x \) conserves the quantity
+                    \( x^2 + y^2 \), so trajectories are circles centered at the origin.
+                    For a general SHO with \( \dot{y} = -\omega^2 x \), they become ellipses.
+                    Closed curves = periodic motion that repeats forever.
+                </div>
+            </div>
+        </div>
+
+        <div class="tab-content">
+            <div class="question-container" data-type="msq" data-answer="0,2,3">
+                <div class="question-text">
+                    Which statements about phase space are true? (Select all that apply)
+                </div>
+                <div class="question-options">
+                    <label class="option">
+                        <input type="checkbox" value="0">
+                        <span>The arrows in the vector field show the instantaneous velocity of the system</span>
+                    </label>
+                    <label class="option">
+                        <input type="checkbox" value="1">
+                        <span>The time axis is one of the axes in 2D phase space</span>
+                    </label>
+                    <label class="option">
+                        <input type="checkbox" value="2">
+                        <span>Knowing the initial point determines the entire trajectory</span>
+                    </label>
+                    <label class="option">
+                        <input type="checkbox" value="3">
+                        <span>A fixed point is where the velocity vector is zero</span>
+                    </label>
+                </div>
+                <div class="question-actions">
+                    <button class="btn-verify">Verify</button>
+                </div>
+                <div class="question-explanation" style="display:none;">
+                    <strong>Explanation:</strong>
+                    <ul>
+                        <li><strong>Arrows = velocity:</strong> TRUE. At each point, \( (f,g) \) gives the rate of change.</li>
+                        <li><strong>Time axis:</strong> FALSE. Phase space eliminates time — each axis is a state variable (\( x \) and \( y \)), not time. Time is implicit in how you move along the trajectory.</li>
+                        <li><strong>IC determines trajectory:</strong> TRUE. This is the existence and uniqueness theorem for ODEs.</li>
+                        <li><strong>Fixed point:</strong> TRUE. Where \( f = 0 \) and \( g = 0 \), the system doesn't move.</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+<!-- ============================================================ -->
+<!-- EXPLORER 2: Time ↔ Phase Space Connection -->
+<!-- ============================================================ -->
+<h2>Time Meets Geometry</h2>
+
+<p>
+    The real power of phase space is this: <strong>time disappears</strong>. A time-series plot
+    shows \( x(t) \) on a timeline, which is useful — but you can only see one variable at once.
+    Phase space shows both variables simultaneously, and every point on the trajectory has an
+    implicit time. Watch the animated dot below to see how the two views are connected.
+</p>
+
+<div class="interactive-container" id="time-meets-space">
+    <div class="interactive-title">Explorer: Time ↔ Phase Space</div>
+
+    <p>
+        Press <strong>Play</strong> to watch a dot trace the trajectory in both views simultaneously.
+        The left panel shows phase space \( (x, y) \); the right shows \( x(t) \) and \( y(t) \)
+        with a vertical cursor marking the current time.
+    </p>
+
+    <div class="dual-panel">
+        <div class="plot-container" id="ps-phasePlot"></div>
+        <div class="plot-container" id="ps-xtPlot"></div>
+    </div>
+
+    <div id="ps-stats2" class="stats-bar"></div>
+
+    <div class="control-panel">
+        <div class="control-group">
+            <label class="control-label" for="ps-system2">System:</label>
+            <select id="ps-system2" class="control-select">
+                <option value="center">Center (SHO)</option>
+                <option value="stableSpiral">Stable Spiral</option>
+                <option value="saddle">Saddle Point</option>
+            </select>
+        </div>
+        <div class="control-group">
+            <label class="control-label" for="ps-time-slider">Time:</label>
+            <input type="range" class="slider" id="ps-time-slider" min="0" max="500" step="1" value="0">
+            <span id="ps-time-value" class="control-value">0.0</span>
+        </div>
+        <div class="control-group">
+            <button class="btn" id="ps-play-btn" onclick="psPlayPause()">Play</button>
+            <button class="btn" onclick="psTimeReset()">Reset</button>
+        </div>
+    </div>
+</div>
+
+<div class="info-box">
+    <div class="info-box-title">Why Phase Space?</div>
+    <p>
+        A time-series plot of \( x(t) \) tells you <em>what happens</em>. A phase portrait tells
+        you <em>why</em> — the geometry of the flow determines the dynamics. Once you learn to
+        read phase portraits, you can predict qualitative behavior without solving a single equation.
+    </p>
+</div>
+
+
+<!-- Test Your Understanding #2 -->
+<div class="interactive-container question-section">
+    <div class="interactive-title">Test Your Understanding</div>
+
+    <p style="margin-bottom: var(--spacing-md); color: var(--text-secondary);">
+        Use the Time ↔ Phase Space explorer above to answer these questions.
+    </p>
+
+    <div class="tabs">
+        <div class="tab-buttons">
+            <button class="tab-button active">Question 1</button>
+            <button class="tab-button">Question 2</button>
+            <button class="tab-button">Question 3</button>
+        </div>
+
+        <div class="tab-content active">
+            <div class="question-container" data-type="mcq" data-answer="1">
+                <div class="question-text">
+                    If a trajectory in phase space is a single stationary point (the dot never moves),
+                    what is the physical system doing?
+                </div>
+                <div class="question-options">
+                    <label class="option">
+                        <input type="radio" name="ps-q4" value="0">
+                        <span>Oscillating with zero amplitude</span>
+                    </label>
+                    <label class="option">
+                        <input type="radio" name="ps-q4" value="1">
+                        <span>Sitting at a fixed point — in equilibrium</span>
+                    </label>
+                    <label class="option">
+                        <input type="radio" name="ps-q4" value="2">
+                        <span>Moving at constant velocity</span>
+                    </label>
+                </div>
+                <div class="question-actions">
+                    <button class="btn-verify">Verify</button>
+                </div>
+                <div class="question-explanation" style="display:none;">
+                    <strong>Explanation:</strong>
+                    A stationary point means \( \dot{x} = 0 \) and \( \dot{y} = 0 \) — both
+                    variables are constant. The system is at equilibrium (a <em>fixed point</em>).
+                    Try setting \( x_0 = 0, y_0 = 0 \) in the Center system to see this.
+                </div>
+            </div>
+        </div>
+
+        <div class="tab-content">
+            <div class="question-container" data-type="fill" data-answer="inward|fixed point|origin">
+                <div class="question-text">
+                    Select "Stable Spiral" and press Play. The trajectory spirals
+                    <select class="fill-blank-select">
+                        <option value=""></option>
+                        <option value="inward">inward</option>
+                        <option value="outward">outward</option>
+                        <option value="neither">neither</option>
+                    </select>
+                    toward the
+                    <select class="fill-blank-select">
+                        <option value=""></option>
+                        <option value="fixed point">fixed point</option>
+                        <option value="edge">edge of the plot</option>
+                        <option value="limit cycle">limit cycle</option>
+                    </select>.
+                </div>
+                <div class="question-actions">
+                    <button class="btn-verify">Verify</button>
+                </div>
+                <div class="question-explanation" style="display:none;">
+                    <strong>Explanation:</strong>
+                    The stable spiral has damping, so energy is dissipated. The trajectory winds
+                    inward toward the origin (the fixed point). In the time series, you see
+                    oscillations with decreasing amplitude — exactly the damped oscillator from Chapter 3.
+                </div>
+            </div>
+        </div>
+
+        <div class="tab-content">
+            <div class="question-container" data-type="msq" data-answer="1,2">
+                <div class="question-text">
+                    What advantages does phase space have over time-series plots? (Select all that apply)
+                </div>
+                <div class="question-options">
+                    <label class="option">
+                        <input type="checkbox" value="0">
+                        <span>Phase space shows the explicit time at each point</span>
+                    </label>
+                    <label class="option">
+                        <input type="checkbox" value="1">
+                        <span>Phase space shows the relationship between variables simultaneously</span>
+                    </label>
+                    <label class="option">
+                        <input type="checkbox" value="2">
+                        <span>Phase space reveals the global structure of all possible behaviors</span>
+                    </label>
+                    <label class="option">
+                        <input type="checkbox" value="3">
+                        <span>Phase space gives more precise numerical values than time series</span>
+                    </label>
+                </div>
+                <div class="question-actions">
+                    <button class="btn-verify">Verify</button>
+                </div>
+                <div class="question-explanation" style="display:none;">
+                    <strong>Explanation:</strong>
+                    <ul>
+                        <li><strong>Explicit time:</strong> FALSE — time is implicit in phase space. You lose the time axis but gain the inter-variable relationship.</li>
+                        <li><strong>Variable relationships:</strong> TRUE — you see how \( x \) and \( y \) relate to each other, which time-series plots cannot show directly.</li>
+                        <li><strong>Global structure:</strong> TRUE — a single phase portrait shows all possible trajectories from all initial conditions. A time-series only shows one trajectory at a time.</li>
+                        <li><strong>More precise values:</strong> FALSE — both representations contain the same numerical information, just displayed differently.</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+<!-- ============================================================ -->
+<!-- EXPLORER 3: Trajectory Zoo -->
+<!-- ============================================================ -->
+<h2>The Phase Portrait: Many Trajectories, One Picture</h2>
+
+<p>
+    A <strong>phase portrait</strong> is the complete collection of trajectories from all
+    possible initial conditions. It's a map that tells you what happens no matter where the
+    system starts. One of the most important properties: <strong>trajectories never cross</strong>.
+    Why? Because at any point, the velocity is uniquely determined — the system can only go
+    one direction. If two trajectories crossed, the system would face a choice at the
+    intersection, violating the uniqueness theorem for differential equations.
+</p>
+
+<div class="interactive-container" id="trajectory-zoo">
+    <div class="interactive-title">Explorer: Trajectory Zoo</div>
+
+    <p>
+        Click <strong>Add Trajectory</strong> to launch trajectories from random initial conditions.
+        Watch how they fill up phase space without ever crossing. Try different systems to see
+        the distinct portrait shapes.
+    </p>
+
+    <div class="plot-container" id="ps-zooPlot" style="height: 420px;"></div>
+
+    <div id="ps-stats3" class="stats-bar"></div>
+
+    <div class="control-panel">
+        <div class="control-group">
+            <label class="control-label" for="ps-system3">System:</label>
+            <select id="ps-system3" class="control-select">
+                <option value="center">Center (SHO)</option>
+                <option value="saddle">Saddle Point</option>
+                <option value="stableSpiral">Stable Spiral</option>
+                <option value="unstableSpiral">Unstable Spiral</option>
+                <option value="source">Unstable Source</option>
+                <option value="sink">Stable Sink</option>
+            </select>
+        </div>
+        <div class="control-group">
+            <button class="btn" onclick="psAddTrajectory()">Add Trajectory</button>
+            <button class="btn" onclick="psZooReset()">Reset</button>
+        </div>
+    </div>
+</div>
+
+<div class="warning-box">
+    <div class="warning-icon">⚠️</div>
+    <div class="warning-content">
+        <strong>Trajectories Never Cross!</strong>
+        <p>
+            This is a consequence of the uniqueness theorem for ODEs: if two trajectories met at a
+            point, the system would have two different futures from the same state — impossible for
+            a deterministic system. This constraint is what makes phase portraits so powerful.
+        </p>
+    </div>
+</div>
+
+
+<!-- Test Your Understanding #3 -->
+<div class="interactive-container question-section">
+    <div class="interactive-title">Test Your Understanding</div>
+
+    <p style="margin-bottom: var(--spacing-md); color: var(--text-secondary);">
+        Use the Trajectory Zoo above to answer these questions.
+    </p>
+
+    <div class="tabs">
+        <div class="tab-buttons">
+            <button class="tab-button active">Question 1</button>
+            <button class="tab-button">Question 2</button>
+            <button class="tab-button">Question 3</button>
+        </div>
+
+        <div class="tab-content active">
+            <div class="question-container" data-type="mcq" data-answer="2">
+                <div class="question-text">
+                    Why can two different trajectories never cross in phase space?
+                </div>
+                <div class="question-options">
+                    <label class="option">
+                        <input type="radio" name="ps-q7" value="0">
+                        <span>Because the system conserves energy</span>
+                    </label>
+                    <label class="option">
+                        <input type="radio" name="ps-q7" value="1">
+                        <span>Because the equations are linear</span>
+                    </label>
+                    <label class="option">
+                        <input type="radio" name="ps-q7" value="2">
+                        <span>Because at each point the velocity is unique — uniqueness theorem</span>
+                    </label>
+                    <label class="option">
+                        <input type="radio" name="ps-q7" value="3">
+                        <span>Because phase space has only two dimensions</span>
+                    </label>
+                </div>
+                <div class="question-actions">
+                    <button class="btn-verify">Verify</button>
+                </div>
+                <div class="question-explanation" style="display:none;">
+                    <strong>Explanation:</strong>
+                    The uniqueness theorem guarantees that given any initial condition, there is
+                    exactly one trajectory. If two trajectories met at a point \( (x^*, y^*) \),
+                    then that point would be an initial condition with two different futures —
+                    contradicting uniqueness. This applies to all autonomous systems, whether
+                    linear or nonlinear, conservative or dissipative.
+                </div>
+            </div>
+        </div>
+
+        <div class="tab-content">
+            <div class="question-container" data-type="fill" data-answer="saddle">
+                <div class="question-text">
+                    Add several trajectories for each system type. Which system has trajectories
+                    that approach the origin along one direction but flee along another?
+                    <select class="fill-blank-select">
+                        <option value=""></option>
+                        <option value="center">Center (SHO)</option>
+                        <option value="saddle">Saddle Point</option>
+                        <option value="stableSpiral">Stable Spiral</option>
+                        <option value="source">Unstable Source</option>
+                    </select>
+                </div>
+                <div class="question-actions">
+                    <button class="btn-verify">Verify</button>
+                </div>
+                <div class="question-explanation" style="display:none;">
+                    <strong>Explanation:</strong>
+                    The <strong>saddle point</strong> has this characteristic behavior: trajectories
+                    approach along one axis (the stable direction) and flee along the other (the
+                    unstable direction). This creates the distinctive hyperbolic portrait. In matrix
+                    language, the eigenvalues have opposite signs.
+                </div>
+            </div>
+        </div>
+
+        <div class="tab-content">
+            <div class="question-container" data-type="msq" data-answer="0,1,3">
+                <div class="question-text">
+                    Which of the following can you determine from a phase portrait alone?
+                    (Select all that apply)
+                </div>
+                <div class="question-options">
+                    <label class="option">
+                        <input type="checkbox" value="0">
+                        <span>Whether the system has periodic motion</span>
+                    </label>
+                    <label class="option">
+                        <input type="checkbox" value="1">
+                        <span>Whether a fixed point is stable or unstable</span>
+                    </label>
+                    <label class="option">
+                        <input type="checkbox" value="2">
+                        <span>The exact time it takes to complete one orbit</span>
+                    </label>
+                    <label class="option">
+                        <input type="checkbox" value="3">
+                        <span>Whether the system is dissipative (loses energy)</span>
+                    </label>
+                </div>
+                <div class="question-actions">
+                    <button class="btn-verify">Verify</button>
+                </div>
+                <div class="question-explanation" style="display:none;">
+                    <strong>Explanation:</strong>
+                    <ul>
+                        <li><strong>Periodic motion:</strong> TRUE — closed loops in phase space mean periodic motion.</li>
+                        <li><strong>Stability:</strong> TRUE — if trajectories converge to a fixed point, it's stable; if they diverge, it's unstable.</li>
+                        <li><strong>Exact orbit time:</strong> FALSE — phase portraits don't encode time directly. You need the equations to compute the period.</li>
+                        <li><strong>Dissipative:</strong> TRUE — spiraling inward means the system loses energy. Closed orbits mean energy is conserved.</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+<!-- ============================================================ -->
+<!-- PYTHON CODE EXAMPLES -->
+<!-- ============================================================ -->
+<h2>Python Code</h2>
+
+<div class="tabs">
+    <div class="tab-buttons">
+        <button class="tab-button active">Vector Field</button>
+        <button class="tab-button">Trajectory</button>
+        <button class="tab-button">Prompt</button>
+    </div>
+
+    <div class="tab-content active">
+        <div class="code-block-container">
+            <div class="code-header">
+                <span class="code-lang">Python</span>
+                <button class="copy-btn">Copy</button>
+            </div>
+            <pre><code class="language-python">
+import numpy as np
+import plotly.figure_factory as ff
+
+# Define the system: SHO (center)
+# dx/dt = y,  dy/dt = -x
+x = np.linspace(-4, 4, 20)
+y = np.linspace(-4, 4, 20)
+X, Y = np.meshgrid(x, y)
+U = Y         # dx/dt = y
+V = -X        # dy/dt = -x
+
+# Create quiver (vector field) plot
+fig = ff.create_quiver(X, Y, U, V,
+    scale=0.15, arrow_scale=0.3,
+    line=dict(color='#00f3ff', width=1))
+
+fig.update_layout(
+    template='plotly_dark',
+    title='Phase Portrait: Simple Harmonic Oscillator',
+    xaxis=dict(range=[-4, 4], title='x',
+        zerolinecolor='#808080', linecolor='#808080',
+        gridcolor='#2a2f4a'),
+    yaxis=dict(range=[-4, 4], title='y = dx/dt',
+        zerolinecolor='#808080', linecolor='#808080',
+        gridcolor='#2a2f4a'),
+    width=600, height=600
+)
+fig.show()
+            </code></pre>
+        </div>
+    </div>
+
+    <div class="tab-content">
+        <div class="code-block-container">
+            <div class="code-header">
+                <span class="code-lang">Python</span>
+                <button class="copy-btn">Copy</button>
+            </div>
+            <pre><code class="language-python">
+import numpy as np
+import plotly.graph_objects as go
+
+def rk4_step(f, y, h):
+    """Single RK4 step for system dy/dt = f(y)."""
+    k1 = f(y)
+    k2 = f(y + h/2 * k1)
+    k3 = f(y + h/2 * k2)
+    k4 = f(y + h * k3)
+    return y + (h/6) * (k1 + 2*k2 + 2*k3 + k4)
+
+# Stable spiral: dx/dt = -0.2x + y, dy/dt = -x - 0.2y
+def f_spiral(y):
+    return np.array([
+        -0.2 * y[0] + y[1],
+        -y[0] - 0.2 * y[1]
+    ])
+
+# Integrate from multiple ICs
+fig = go.Figure()
+colors = ['#00f3ff', '#ff006e', '#ffbe0b', '#00ff88']
+ics = [(2, 0), (0, 2), (-2, 0), (0, -2)]
+
+for ic, color in zip(ics, colors):
+    y = np.array(ic, dtype=float)
+    xs, ys = [y[0]], [y[1]]
+    for _ in range(2000):
+        y = rk4_step(f_spiral, y, 0.02)
+        xs.append(y[0])
+        ys.append(y[1])
+
+    fig.add_trace(go.Scatter(
+        x=xs, y=ys, mode='lines',
+        line=dict(color=color, width=2),
+        name=f'IC = {ic}'))
+
+fig.update_layout(
+    template='plotly_dark',
+    title='Stable Spiral: Multiple Trajectories',
+    xaxis=dict(range=[-3, 3], title='x',
+        zerolinecolor='#808080', linecolor='#808080',
+        gridcolor='#2a2f4a'),
+    yaxis=dict(range=[-3, 3], title='y',
+        zerolinecolor='#808080', linecolor='#808080',
+        gridcolor='#2a2f4a'),
+    width=600, height=600
+)
+fig.show()
+            </code></pre>
+        </div>
+    </div>
+
+    <div class="tab-content">
+        <div class="code-block-container">
+            <div class="code-header">
+                <span class="code-lang">Prompt for AI</span>
+                <button class="copy-btn">Copy</button>
+            </div>
+            <pre><code class="language-text">Create a Python script using Plotly to visualize phase space for a 2D
+dynamical system.
+
+Requirements:
+- Implement RK4 integration for systems of the form dx/dt = f(x,y),
+  dy/dt = g(x,y)
+- Show a quiver/arrow plot for the vector field
+- Overlay 4-6 trajectories from different initial conditions
+- Include these systems: SHO (center), stable spiral, saddle point
+- Use plotly_dark template
+- Color trajectories: cyan (#00f3ff), magenta (#ff006e), yellow (#ffbe0b),
+  green (#00ff88)
+- Gray axes (#808080), fixed ranges [-4, 4] on both axes
+- Label axes as x and y (or dx/dt)
+- Add a legend showing initial conditions</code></pre>
+        </div>
+
+        <div class="info-box" style="margin-top: var(--spacing-md);">
+            <div class="info-box-title">Pro Tips for Prompting</div>
+            <ul>
+                <li>Specify the ODE system explicitly — AI may choose different conventions</li>
+                <li>Request RK4 for accuracy (Euler will produce visibly wrong spirals)</li>
+                <li>Ask for fixed axis ranges so all trajectories are properly framed</li>
+                <li>For vector fields, use <code>plotly.figure_factory.create_quiver</code></li>
+            </ul>
+        </div>
+    </div>
+</div>
+
+
+<!-- What's Next -->
+<div class="info-box">
+    <div class="info-box-title">What's Next?</div>
+    <p>
+        You've learned to read phase portraits — the geometric language of dynamics. In Section 5.2,
+        we'll build our own vector fields and streamline plots, learning to visualize any system.
+        Then in Sections 5.3-5.4, we'll classify fixed points — the "landmarks" that organize every
+        phase portrait.
+    </p>
+</div>
+
+
+<!-- Navigation -->
+<div class="btn-group mt-xl">
+    <button class="btn btn-magenta" onclick="navigateToSection('50-air-resistance')">&larr; Previous: Adding Air Resistance</button>
+    <button class="btn btn-secondary" onclick="scrollToTop()">&uarr; Back to Top</button>
+    <button class="btn btn-secondary" onclick="navigateToSection('52-vector-fields-viz')">Next: Vector Fields &amp; Streamlines &rarr;</button>
+</div>

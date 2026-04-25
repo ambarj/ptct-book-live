@@ -1,0 +1,346 @@
+<!-- ============================================================
+     Section 7.7: Higher Dimensions: 2D & 3D Diffusion
+     Source: NPTEL Lecture 10_2 (Part 3)
+     Concept: Extending diffusion to 2D and 3D — Laplacian,
+              circular/spherical Gaussians, RMS = √(2dDt)
+     Time: 20-25 minutes
+     Prerequisites: Sections 7.5-7.6 (continuum limit, diffusion
+                    equation, Gaussian solutions)
+     ============================================================ -->
+
+<h1>Higher Dimensions: 2D &amp; 3D Diffusion</h1>
+
+<p>
+    Real diffusion happens in 2D and 3D: ink spreading in water, heat flowing through
+    a metal plate, molecules diffusing through a cell. The diffusion equation
+    generalizes naturally: replace \( \partial^2/\partial x^2 \) with the
+    <strong>Laplacian</strong> \( \nabla^2 \). The Gaussian solution becomes a
+    circular (2D) or spherical (3D) cloud, and the RMS displacement picks up a
+    factor of \( \sqrt{d} \) for dimension \( d \).
+</p>
+
+<div class="info-box">
+    <div class="info-box-title">Learning Objectives</div>
+    <ul>
+        <li>Write the diffusion equation in \( d \) dimensions: \( \partial\rho/\partial t = D\nabla^2\rho \)</li>
+        <li>Know the \( d \)-dimensional Gaussian: \( \rho = (4\pi Dt)^{-d/2}\exp(-r^2/(4Dt)) \)</li>
+        <li>Compute the RMS displacement: \( \sqrt{\langle r^2 \rangle} = \sqrt{2dDt} \) (factor of \( \sqrt{d} \) from 1D)</li>
+        <li>Visualize 2D diffusion as a spreading circular cloud</li>
+    </ul>
+</div>
+
+<div class="equation-display">
+    <p><strong>Diffusion in \( d \) Dimensions:</strong></p>
+    $$ \frac{\partial\rho}{\partial t} = D\nabla^2\rho, \qquad \rho(\mathbf{r}, t) = \frac{1}{(4\pi Dt)^{d/2}}\exp\!\left(-\frac{r^2}{4Dt}\right) $$
+    <p>
+        RMS displacement: \( \sqrt{\langle r^2 \rangle} = \sqrt{2dDt} \).
+        In 1D: \( \sqrt{2Dt} \). In 2D: \( \sqrt{4Dt} \). In 3D: \( \sqrt{6Dt} \).
+    </p>
+</div>
+
+<hr>
+
+<!-- ============================================================ -->
+<!-- EXPLORER 1: 2D Diffusion Heatmap -->
+<!-- ============================================================ -->
+<div class="interactive-container" id="diffusion-2d">
+    <div class="interactive-title">Explorer: 2D Diffusion</div>
+
+    <p>
+        Watch a point source spread in 2D. The heatmap shows the concentration
+        \( \rho(x, y, t) \) at each point. As time advances, the bright central
+        peak fades and the cloud expands as a circle.
+    </p>
+
+    <div class="plot-container" id="hd-heatmapPlot" style="height: 440px;"></div>
+
+    <div id="hd-stats1" class="stats-bar"></div>
+
+    <div class="control-panel">
+        <div class="control-group">
+            <label class="control-label" for="hd-t-slider">Time t:
+                <span id="hd-t-value">0.50</span>
+            </label>
+            <input type="range" class="slider" id="hd-t-slider"
+                   min="0.05" max="3" step="0.05" value="0.5">
+        </div>
+        <div class="control-group">
+            <label class="control-label" for="hd-D-slider">D:
+                <span id="hd-D-value">1.0</span>
+            </label>
+            <input type="range" class="slider" id="hd-D-slider"
+                   min="0.2" max="3" step="0.1" value="1">
+        </div>
+        <div class="control-group">
+            <button class="btn" onclick="hdHeatReset()">Reset</button>
+        </div>
+    </div>
+</div>
+
+<!-- ========== Test Your Understanding #1 ========== -->
+<div class="interactive-container question-section">
+    <div class="interactive-title">Test Your Understanding</div>
+    <p style="margin-bottom: var(--spacing-md); color: var(--text-secondary);">Use the 2D Diffusion explorer to answer these questions.</p>
+    <div class="tabs">
+        <div class="tab-buttons">
+            <button class="tab-button active">Question 1</button>
+            <button class="tab-button">Question 2</button>
+            <button class="tab-button">Question 3</button>
+        </div>
+        <div class="tab-content active">
+            <div class="question-container" data-type="mcq" data-answer="0">
+                <div class="question-text">The 2D diffusion cloud is shaped like&hellip;</div>
+                <div class="question-options">
+                    <label class="option"><input type="radio" name="hd-q1" value="0"><span>A circular Gaussian &mdash; spreading equally in all directions</span></label>
+                    <label class="option"><input type="radio" name="hd-q1" value="1"><span>A square &mdash; aligning with the grid</span></label>
+                    <label class="option"><input type="radio" name="hd-q1" value="2"><span>A line &mdash; spreading only in x</span></label>
+                    <label class="option"><input type="radio" name="hd-q1" value="3"><span>A ring &mdash; hollow in the center</span></label>
+                </div>
+                <div class="question-actions"><button class="btn-verify">Verify</button></div>
+                <div class="question-explanation" style="display:none;"><strong>Explanation:</strong> The 2D Gaussian \( \rho \propto e^{-(x^2+y^2)/(4Dt)} \) has <strong>circular symmetry</strong>. The contours are circles centered at the origin, with radius growing as \( \sqrt{t} \).</div>
+            </div>
+        </div>
+        <div class="tab-content">
+            <div class="question-container" data-type="fill" data-answer="2[1.8,2.2]">
+                <div class="question-text">In 2D with D = 1, t = 1: the RMS distance is \( \sqrt{2 \times 2 \times 1 \times 1} = \sqrt{4} = \) <input type="text" class="fill-blank" style="width: 50px">.</div>
+                <div class="question-actions"><button class="btn-verify">Verify</button></div>
+                <div class="question-explanation" style="display:none;"><strong>Explanation:</strong> \( \sqrt{\langle r^2 \rangle} = \sqrt{2dDt} = \sqrt{2 \times 2 \times 1 \times 1} = \sqrt{4} = 2 \). Compare with 1D: \( \sqrt{2 \times 1} \approx 1.41 \). Higher dimensions spread <em>farther</em> because there are more directions to explore.</div>
+            </div>
+        </div>
+        <div class="tab-content">
+            <div class="question-container" data-type="mcq" data-answer="2">
+                <div class="question-text">The peak of the 2D Gaussian decreases as \( 1/t \) (not \( 1/\sqrt{t} \) like 1D). Why?</div>
+                <div class="question-options">
+                    <label class="option"><input type="radio" name="hd-q3" value="0"><span>Energy is lost in 2D</span></label>
+                    <label class="option"><input type="radio" name="hd-q3" value="1"><span>The 2D equation is different from 1D</span></label>
+                    <label class="option"><input type="radio" name="hd-q3" value="2"><span>Probability spreads over area (\( \propto t \)), not length (\( \propto \sqrt{t} \))</span></label>
+                    <label class="option"><input type="radio" name="hd-q3" value="3"><span>It doesn&rsquo;t &mdash; the peak decreases as \( 1/\sqrt{t} \) in all dimensions</span></label>
+                </div>
+                <div class="question-actions"><button class="btn-verify">Verify</button></div>
+                <div class="question-explanation" style="display:none;"><strong>Explanation:</strong> Peak \( = (4\pi Dt)^{-d/2} \). In 1D: \( \propto t^{-1/2} \). In 2D: \( \propto t^{-1} \). In 3D: \( \propto t^{-3/2} \). Higher dimensions dilute the peak faster because probability spreads into more directions (area grows as \( t \), volume as \( t^{3/2} \)).</div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- ============================================================ -->
+<!-- EXPLORER 2: Dimensional Comparison -->
+<!-- ============================================================ -->
+<div class="interactive-container" id="dim-comparison">
+    <div class="interactive-title">Explorer: 1D vs 2D vs 3D</div>
+    <p>Compare radial profiles and RMS displacements across dimensions. The peak drops faster and the cloud spreads faster in higher dimensions.</p>
+    <div class="dual-panel">
+        <div class="panel"><div class="plot-container" id="hd-radialPlot" style="height: 400px;"></div></div>
+        <div class="panel"><div class="plot-container" id="hd-rmsPlot" style="height: 400px;"></div></div>
+    </div>
+    <div id="hd-stats2" class="stats-bar"></div>
+    <div class="control-panel">
+        <div class="control-group">
+            <label class="control-label" for="hd-cmp-t-slider">Time t: <span id="hd-cmp-t-value">1.0</span></label>
+            <input type="range" class="slider" id="hd-cmp-t-slider" min="0.1" max="5" step="0.1" value="1">
+        </div>
+        <div class="control-group"><button class="btn" onclick="hdCmpReset()">Reset</button></div>
+    </div>
+</div>
+
+<!-- ========== Test Your Understanding #2 ========== -->
+<div class="interactive-container question-section">
+    <div class="interactive-title">Test Your Understanding</div>
+    <p style="margin-bottom: var(--spacing-md); color: var(--text-secondary);">Use the Dimensional Comparison explorer.</p>
+    <div class="tabs">
+        <div class="tab-buttons">
+            <button class="tab-button active">Question 4</button>
+            <button class="tab-button">Question 5</button>
+            <button class="tab-button">Question 6</button>
+        </div>
+        <div class="tab-content active">
+            <div class="question-container" data-type="fill" data-answer="6[5.5,6.5]">
+                <div class="question-text">In 3D with D = 1, t = 1: \( \langle r^2 \rangle = 2dDt = 2 \times 3 \times 1 \times 1 = \) <input type="text" class="fill-blank" style="width: 50px">.</div>
+                <div class="question-actions"><button class="btn-verify">Verify</button></div>
+                <div class="question-explanation" style="display:none;"><strong>Explanation:</strong> \( \langle r^2 \rangle = 2dDt = 6 \) in 3D. RMS = \( \sqrt{6} \approx 2.45 \). Each dimension contributes independently to the mean-squared displacement.</div>
+            </div>
+        </div>
+        <div class="tab-content">
+            <div class="question-container" data-type="mcq" data-answer="1">
+                <div class="question-text">Which dimension has the tallest peak at fixed t?</div>
+                <div class="question-options">
+                    <label class="option"><input type="radio" name="hd-q5" value="0"><span>3D &mdash; more dimensions means taller</span></label>
+                    <label class="option"><input type="radio" name="hd-q5" value="1"><span>1D &mdash; spreading into fewer directions preserves height</span></label>
+                    <label class="option"><input type="radio" name="hd-q5" value="2"><span>All the same</span></label>
+                    <label class="option"><input type="radio" name="hd-q5" value="3"><span>2D</span></label>
+                </div>
+                <div class="question-actions"><button class="btn-verify">Verify</button></div>
+                <div class="question-explanation" style="display:none;"><strong>Explanation:</strong> Peak \( = (4\pi Dt)^{-d/2} \). Larger d → lower peak. <strong>1D</strong> has the tallest peak because probability only spreads in one direction. In 3D it spreads into three, diluting faster.</div>
+            </div>
+        </div>
+        <div class="tab-content">
+            <div class="question-container" data-type="msq" data-answer="1,2">
+                <div class="question-text">Which statements are true? (Select all)</div>
+                <div class="question-options">
+                    <label class="option"><input type="checkbox" value="0"><span>The diffusion equation changes form in different dimensions</span></label>
+                    <label class="option"><input type="checkbox" value="1"><span>RMS ∝ √(2dDt) — each dimension adds independently to ⟨r²⟩</span></label>
+                    <label class="option"><input type="checkbox" value="2"><span>The solution is always a Gaussian, in any dimension</span></label>
+                    <label class="option"><input type="checkbox" value="3"><span>3D diffusion is faster than 1D diffusion (for same D)</span></label>
+                </div>
+                <div class="question-actions"><button class="btn-verify">Verify</button></div>
+                <div class="question-explanation" style="display:none;"><strong>Explanation:</strong><ul><li><strong>Different form:</strong> ✗ Same form: ∂ρ/∂t = D∇²ρ. The Laplacian just has more terms.</li><li><strong>RMS ∝ √(2dDt):</strong> ✓ Each dimension contributes 2Dt independently.</li><li><strong>Gaussian:</strong> ✓ The fundamental solution is Gaussian in any d: just (4πDt)^{-d/2} exp(-r²/(4Dt)).</li><li><strong>3D faster:</strong> ✗ D is the same. The <em>radial</em> RMS is larger (√6Dt vs √2Dt), but that's because there are more directions to explore, not because each direction spreads faster.</li></ul></div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- ============================================================ -->
+<!-- EXPLORER 3: 2D Random Walk Cloud -->
+<!-- ============================================================ -->
+<div class="interactive-container" id="walk-cloud-2d">
+    <div class="interactive-title">Explorer: 2D Random Walk Cloud</div>
+    <p>Launch many 2D random walkers and watch the cloud spread into a circle. The final positions form a 2D Gaussian — connecting the microscopic walks to the macroscopic diffusion equation.</p>
+    <div class="plot-container" id="hd-cloudPlot" style="height: 440px;"></div>
+    <div id="hd-stats3" class="stats-bar"></div>
+    <div class="control-panel">
+        <div class="control-group">
+            <label class="control-label" for="hd-cloud-nw-slider">Walkers: <span id="hd-cloud-nw-value">500</span></label>
+            <input type="range" class="slider" id="hd-cloud-nw-slider" min="100" max="2000" step="100" value="500">
+        </div>
+        <div class="control-group">
+            <label class="control-label" for="hd-cloud-ns-slider">Steps: <span id="hd-cloud-ns-value">200</span></label>
+            <input type="range" class="slider" id="hd-cloud-ns-slider" min="50" max="1000" step="50" value="200">
+        </div>
+        <div class="control-group"><button class="btn" onclick="hdCloudRun()">Launch</button></div>
+    </div>
+</div>
+
+<!-- ========== Test Your Understanding #3 ========== -->
+<div class="interactive-container question-section">
+    <div class="interactive-title">Test Your Understanding</div>
+    <p style="margin-bottom: var(--spacing-md); color: var(--text-secondary);">Use the 2D Walk Cloud explorer.</p>
+    <div class="tabs">
+        <div class="tab-buttons">
+            <button class="tab-button active">Question 7</button>
+            <button class="tab-button">Question 8</button>
+            <button class="tab-button">Question 9</button>
+        </div>
+        <div class="tab-content active">
+            <div class="question-container" data-type="mcq" data-answer="0">
+                <div class="question-text">Launch 500 walkers for 200 steps. The cloud of final positions has what shape?</div>
+                <div class="question-options">
+                    <label class="option"><input type="radio" name="hd-q7" value="0"><span>A circular blob centered at the origin &mdash; the 2D Gaussian</span></label>
+                    <label class="option"><input type="radio" name="hd-q7" value="1"><span>A square aligned with the grid axes</span></label>
+                    <label class="option"><input type="radio" name="hd-q7" value="2"><span>A thin line along the x-axis</span></label>
+                    <label class="option"><input type="radio" name="hd-q7" value="3"><span>A ring (hollow in center)</span></label>
+                </div>
+                <div class="question-actions"><button class="btn-verify">Verify</button></div>
+                <div class="question-explanation" style="display:none;"><strong>Explanation:</strong> The x and y steps are independent, each with Gaussian distribution. The joint distribution is a 2D Gaussian — a <strong>circular blob</strong> with density highest at the center.</div>
+            </div>
+        </div>
+        <div class="tab-content">
+            <div class="question-container" data-type="fill" data-answer="20[17,23]">
+                <div class="question-text">After 200 steps in 2D, the RMS distance is \( \sqrt{2 \times 2 \times 1 \times 200} = \sqrt{800} \approx \) <input type="text" class="fill-blank" style="width: 50px"> (with step size a = 1, each step along one of 4 directions).</div>
+                <div class="question-actions"><button class="btn-verify">Verify</button></div>
+                <div class="question-explanation" style="display:none;"><strong>Explanation:</strong> For lattice walks with step size 1: each step adds 1 to one coordinate. After N steps, \( \langle x^2 \rangle = \langle y^2 \rangle = N/2 \), so \( \langle r^2 \rangle = N \) and RMS = \( \sqrt{200} \approx 14.1 \). For the 4-direction walk, RMS ≈ 14. The answer depends on the exact walk model.</div>
+            </div>
+        </div>
+        <div class="tab-content">
+            <div class="question-container" data-type="mcq" data-answer="2">
+                <div class="question-text">What physical process does 2D diffusion describe?</div>
+                <div class="question-options">
+                    <label class="option"><input type="radio" name="hd-q9" value="0"><span>A ball rolling down a hill</span></label>
+                    <label class="option"><input type="radio" name="hd-q9" value="1"><span>A pendulum swinging</span></label>
+                    <label class="option"><input type="radio" name="hd-q9" value="2"><span>Ink spreading on a wet surface, or heat flowing through a thin plate</span></label>
+                    <label class="option"><input type="radio" name="hd-q9" value="3"><span>Light traveling in a vacuum</span></label>
+                </div>
+                <div class="question-actions"><button class="btn-verify">Verify</button></div>
+                <div class="question-explanation" style="display:none;"><strong>Explanation:</strong> 2D diffusion describes spreading in a plane: <strong>ink on a surface</strong>, heat in a thin plate, molecules diffusing on a cell membrane. The circular Gaussian cloud is the universal shape of 2D diffusion from a point source.</div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- ============================================================ -->
+<!-- PYTHON CODE -->
+<!-- ============================================================ -->
+<h2>Python Code</h2>
+<div class="tabs">
+    <div class="tab-buttons">
+        <button class="tab-button active">2D Diffusion</button>
+        <button class="tab-button">Dimensional Comparison</button>
+        <button class="tab-button">Prompt</button>
+    </div>
+    <div class="tab-content active">
+        <div class="code-block-container"><div class="code-header"><span class="code-lang">Python</span><button class="copy-btn">Copy</button></div>
+            <pre><code class="language-python">
+import numpy as np
+import plotly.graph_objects as go
+
+D, t = 1.0, 1.0
+n = 100
+x = np.linspace(-5, 5, n)
+y = np.linspace(-5, 5, n)
+X, Y = np.meshgrid(x, y)
+R2 = X**2 + Y**2
+rho = np.exp(-R2 / (4*D*t)) / (4*np.pi*D*t)
+
+fig = go.Figure(go.Heatmap(
+    z=rho, x=x, y=y,
+    colorscale='Viridis', showscale=True))
+fig.update_layout(template='plotly_dark',
+    xaxis=dict(title='x', zerolinecolor='#808080'),
+    yaxis=dict(title='y', zerolinecolor='#808080',
+        scaleanchor='x'),
+    height=500, width=550)
+fig.show()
+            </code></pre>
+        </div>
+    </div>
+    <div class="tab-content">
+        <div class="code-block-container"><div class="code-header"><span class="code-lang">Python</span><button class="copy-btn">Copy</button></div>
+            <pre><code class="language-python">
+import numpy as np
+import plotly.graph_objects as go
+
+D, t = 1.0, 1.0
+r = np.linspace(0, 6, 200)
+
+fig = go.Figure()
+for d, color, label in [(1,'#00f3ff','1D'), (2,'#ffbe0b','2D'), (3,'#ff006e','3D')]:
+    rho = np.exp(-r**2 / (4*D*t)) / (4*np.pi*D*t)**(d/2)
+    fig.add_trace(go.Scatter(x=r, y=rho, mode='lines',
+        line=dict(color=color, width=2.5), name=f'{label}: peak={(4*np.pi*D*t)**(-d/2):.3f}'))
+
+fig.update_layout(template='plotly_dark',
+    xaxis=dict(title='r', zerolinecolor='#808080'),
+    yaxis=dict(title='ρ(r,t)', zerolinecolor='#808080'),
+    height=400, width=550)
+fig.show()
+            </code></pre>
+        </div>
+    </div>
+    <div class="tab-content">
+        <div class="code-block-container"><div class="code-header"><span class="code-lang">Prompt for AI</span><button class="copy-btn">Copy</button></div>
+            <pre><code class="language-text">Create a Python script using Plotly for higher-dimensional diffusion.
+
+Requirements:
+- Part 1: 2D diffusion heatmap
+  ρ(x,y,t) = exp(-(x²+y²)/(4Dt))/(4πDt) at several times
+  Animate or show side-by-side for t = 0.1, 0.5, 2.0
+- Part 2: Radial profile comparison (1D, 2D, 3D)
+  Plot ρ(r,t) vs r for d = 1, 2, 3 at fixed t
+  Show peak height decreases with d
+- Part 3: RMS displacement vs dimension
+  Bar chart of √(2dDt) for d = 1, 2, 3, 5, 10
+- Part 4: 2D random walk simulation
+  500 walkers, 200 steps, scatter plot of final (x,y)
+  Overlay circle at RMS radius
+- Use dark theme (plotly_dark) with gray (#808080) axes</code></pre>
+        </div>
+    </div>
+</div>
+
+<!-- ============================================================ -->
+<!-- NAVIGATION -->
+<!-- ============================================================ -->
+<div class="btn-group mt-xl">
+    <button class="btn btn-magenta" onclick="navigateToSection('81-diffusion-equation')">&larr; Previous: The Diffusion Equation</button>
+    <button class="btn btn-secondary" onclick="scrollToTop()">&uarr; Back to Top</button>
+    <button class="btn btn-secondary" onclick="navigateToSection('83-walk-simulations')">Next: Numerical Walk Simulations &rarr;</button>
+</div>

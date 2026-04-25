@@ -1,0 +1,700 @@
+<!--
+    Section 4.5: Testing and Validation
+    Source: Module 6 — Implementation of Euler's Method (Part 5)
+    Concept: Verify numerical solutions and understand error behavior
+    Time: ~23 minutes
+    Prerequisites: Working Euler solver (4.4)
+-->
+
+<h1>Testing and Validation</h1>
+
+<p>
+    You&rsquo;ve built a working Euler solver. How do you know it&rsquo;s giving the <em>right</em> answer?
+    For equations with known solutions, you can compare directly. For equations without closed forms,
+    you need <strong>convergence testing</strong> &mdash; if the answer changes less and less as you
+    shrink \(h\), it&rsquo;s probably converging to the truth.
+    This section teaches you the physicist&rsquo;s verification toolkit: plot against known solutions,
+    measure how errors grow, and confirm the expected convergence rate.
+</p>
+
+<div class="info-box">
+    <div class="info-box-title">Learning Objectives</div>
+    <ul>
+        <li>Validate a numerical solution against a known exact answer</li>
+        <li>Understand how Euler error grows over time and scales with step size</li>
+        <li>Confirm the first-order convergence: halving \(h\) roughly halves the global error</li>
+    </ul>
+</div>
+
+<hr>
+
+<!-- ========== EXPLORER 1: Solution Comparator ========== -->
+<div class="interactive-container" id="solution-comparator">
+    <div class="interactive-title">Explorer 1: Solution Comparator</div>
+
+    <p style="margin-bottom: var(--spacing-sm); color: var(--text-secondary);">
+        Compare the Euler solution (cyan) to the exact solution (gray dashed) for three
+        test equations. Adjust \(h\) and watch the numerical curve snap closer to the truth.
+    </p>
+
+    <div class="dual-panel">
+        <div class="panel">
+            <div class="plot-container" id="eulerVal-comparePlot"></div>
+        </div>
+        <div class="panel">
+            <div class="plot-container" id="eulerVal-residualPlot"></div>
+        </div>
+    </div>
+
+    <div style="display: flex; gap: 1rem; justify-content: center; flex-wrap: wrap; margin: 0.5rem 0; font-size: 0.9rem; color: var(--text-secondary);">
+        <span>Max error: <strong id="eulerVal-maxErr" style="color: #ff6b6b;">—</strong></span>
+        <span>Final error: <strong id="eulerVal-finalErr" style="color: #ffff00;">—</strong></span>
+        <span>Steps: <strong id="eulerVal-steps" style="color: #00f3ff;">—</strong></span>
+    </div>
+
+    <div class="control-panel">
+        <div class="control-group">
+            <label class="control-label">Test equation:</label>
+            <select id="eulerVal-compare-ode" class="control-select">
+                <option value="0">dx/dt = &minus;2x &nbsp; (exact: exp(&minus;2t))</option>
+                <option value="1">dx/dt = x &nbsp; (exact: exp(t))</option>
+                <option value="2">dx/dt = cos(t) &nbsp; (exact: sin(t))</option>
+            </select>
+        </div>
+        <div class="control-group">
+            <label class="control-label">Step size \(h\):
+                <span class="control-label-value" id="eulerVal-compare-h-value">0.20</span>
+            </label>
+            <input type="range" class="slider" id="eulerVal-compare-h-slider"
+                   min="0.02" max="0.5" step="0.02" value="0.2">
+        </div>
+        <div class="btn-group">
+            <button class="btn btn-secondary" onclick="eulerValCompareReset()">Reset</button>
+        </div>
+    </div>
+</div>
+
+<!-- ===== Test Your Understanding #1 ===== -->
+<div class="interactive-container question-section">
+    <div class="interactive-title">Test Your Understanding</div>
+
+    <p style="margin-bottom: var(--spacing-md); color: var(--text-secondary);">
+        Use Explorer 1 to answer these questions.
+    </p>
+
+    <div class="tabs">
+        <div class="tab-buttons">
+            <button class="tab-button active">Question 1</button>
+            <button class="tab-button">Question 2</button>
+            <button class="tab-button">Question 3</button>
+        </div>
+
+        <!-- Q1: MCQ -->
+        <div class="tab-content active">
+            <div class="question-container" data-type="mcq" data-answer="2">
+                <div class="question-text">
+                    For the <strong>decay</strong> equation (\(dx/dt = -2x\)), look at the residual plot (right panel).
+                    How does the error change over time?
+                </div>
+                <div class="question-options">
+                    <label class="option">
+                        <input type="radio" name="q-ev-1" value="0">
+                        <span>Error stays constant throughout</span>
+                    </label>
+                    <label class="option">
+                        <input type="radio" name="q-ev-1" value="1">
+                        <span>Error grows exponentially without bound</span>
+                    </label>
+                    <label class="option">
+                        <input type="radio" name="q-ev-1" value="2">
+                        <span>Error grows initially then levels off as the solution decays to zero</span>
+                    </label>
+                </div>
+                <div class="question-actions">
+                    <button class="btn-verify">Verify</button>
+                </div>
+                <div class="question-explanation" style="display:none;">
+                    <strong>Explanation:</strong>
+                    For the decay ODE, both the exact and numerical solutions approach zero.
+                    The absolute error grows at first (errors accumulate) but then shrinks because
+                    both solutions are heading toward zero. The <em>relative</em> error actually
+                    grows, but the absolute error is bounded. This is a stable ODE &mdash; errors
+                    don&rsquo;t blow up.
+                </div>
+            </div>
+        </div>
+
+        <!-- Q2: Fill -->
+        <div class="tab-content">
+            <div class="question-container" data-type="fill" data-answer="grows|shrinks">
+                <div class="question-text">
+                    Now switch to the <strong>growth</strong> equation (\(dx/dt = x\)).
+                    Compare the residual patterns:
+                    <br><br>
+                    For growth (\(dx/dt = x\)), error over time
+                    <select class="fill-blank-select">
+                        <option value=""></option>
+                        <option value="grows">grows</option>
+                        <option value="shrinks">shrinks</option>
+                        <option value="stays constant">stays constant</option>
+                    </select>
+                    continuously.
+                    <br>
+                    For decay (\(dx/dt = -2x\)), error eventually
+                    <select class="fill-blank-select">
+                        <option value=""></option>
+                        <option value="grows">grows</option>
+                        <option value="shrinks">shrinks</option>
+                        <option value="stays constant">stays constant</option>
+                    </select>.
+                </div>
+                <div class="question-actions">
+                    <button class="btn-verify">Verify</button>
+                </div>
+                <div class="question-explanation" style="display:none;">
+                    <strong>Explanation:</strong>
+                    Growth ODEs amplify errors because the derivative increases with \(x\) &mdash;
+                    a small overshoot leads to a bigger slope, which leads to a bigger overshoot.
+                    Decay ODEs damp errors because the derivative decreases as \(x\) shrinks.
+                    This is why growth equations are <em>harder</em> to solve numerically.
+                </div>
+            </div>
+        </div>
+
+        <!-- Q3: MCQ -->
+        <div class="tab-content">
+            <div class="question-container" data-type="mcq" data-answer="0">
+                <div class="question-text">
+                    For the <strong>forced</strong> equation (\(dx/dt = \cos(t)\), exact: \(\sin(t)\)),
+                    what shape does the error curve have?
+                </div>
+                <div class="question-options">
+                    <label class="option">
+                        <input type="radio" name="q-ev-3" value="0">
+                        <span>An oscillating pattern with growing amplitude</span>
+                    </label>
+                    <label class="option">
+                        <input type="radio" name="q-ev-3" value="1">
+                        <span>A smooth exponential decay</span>
+                    </label>
+                    <label class="option">
+                        <input type="radio" name="q-ev-3" value="2">
+                        <span>A perfectly flat line</span>
+                    </label>
+                </div>
+                <div class="question-actions">
+                    <button class="btn-verify">Verify</button>
+                </div>
+                <div class="question-explanation" style="display:none;">
+                    <strong>Explanation:</strong>
+                    The forcing function \(\cos(t)\) oscillates, so the local truncation error
+                    oscillates too. But errors accumulate over time, so the envelope of the
+                    oscillating error grows. The error is largest near the peaks and troughs of
+                    the sine curve where the curvature (second derivative) is highest.
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<hr>
+
+<!-- ========== EXPLORER 2: Error Analyzer ========== -->
+<div class="interactive-container" id="error-analyzer">
+    <div class="interactive-title">Explorer 2: Error Analyzer</div>
+
+    <p style="margin-bottom: var(--spacing-sm); color: var(--text-secondary);">
+        How does error depend on step size? Solve the same ODE with four different \(h\) values
+        and compare the error curves side by side.
+    </p>
+
+    <div class="dual-panel">
+        <div class="panel">
+            <div class="plot-container" id="eulerVal-multiPlot"></div>
+        </div>
+        <div class="panel">
+            <div class="plot-container" id="eulerVal-multiErrPlot"></div>
+        </div>
+    </div>
+
+    <div id="eulerVal-errTable" style="display: flex; gap: 1rem; justify-content: center; flex-wrap: wrap; margin: 0.5rem 0; font-size: 0.85rem;">
+        <span style="color: #ff6b6b;">h=0.50: <strong id="eulerVal-err1">—</strong></span>
+        <span style="color: #ffff00;">h=0.25: <strong id="eulerVal-err2">—</strong></span>
+        <span style="color: #ff00ff;">h=0.10: <strong id="eulerVal-err3">—</strong></span>
+        <span style="color: #00f3ff;">h=0.05: <strong id="eulerVal-err4">—</strong></span>
+    </div>
+
+    <div class="control-panel">
+        <div class="control-group">
+            <label class="control-label">Test equation:</label>
+            <select id="eulerVal-multi-ode" class="control-select">
+                <option value="0">dx/dt = &minus;2x &nbsp; (decay)</option>
+                <option value="1">dx/dt = x &nbsp; (growth)</option>
+                <option value="2">dx/dt = cos(t) &nbsp; (oscillatory)</option>
+            </select>
+        </div>
+        <div class="btn-group">
+            <button class="btn btn-secondary" onclick="eulerValMultiReset()">Reset</button>
+        </div>
+    </div>
+</div>
+
+<div class="info-box">
+    <div class="info-box-title">Key Insight: The Halving Test</div>
+    <p>
+        Look at the final error values above. When you halve \(h\) (from 0.50 to 0.25, or
+        0.10 to 0.05), the final error also roughly halves. This is the signature of a
+        <strong>first-order</strong> method: error \(\sim O(h)\). Euler&rsquo;s method is
+        first-order accurate.
+    </p>
+    <div class="equation-display">
+        $$ \text{Global error} \approx C \cdot h $$
+        <p>where \(C\) depends on the ODE, the time interval, and the exact solution&rsquo;s curvature.</p>
+    </div>
+</div>
+
+<!-- ===== Test Your Understanding #2 ===== -->
+<div class="interactive-container question-section">
+    <div class="interactive-title">Test Your Understanding</div>
+
+    <p style="margin-bottom: var(--spacing-md); color: var(--text-secondary);">
+        Use Explorer 2 to answer these questions.
+    </p>
+
+    <div class="tabs">
+        <div class="tab-buttons">
+            <button class="tab-button active">Question 4</button>
+            <button class="tab-button">Question 5</button>
+            <button class="tab-button">Question 6</button>
+        </div>
+
+        <!-- Q4: Fill -->
+        <div class="tab-content active">
+            <div class="question-container" data-type="fill" data-answer="2[1.5,2.5]">
+                <div class="question-text">
+                    For the <strong>decay</strong> ODE, divide the final error at \(h = 0.50\) by the
+                    final error at \(h = 0.25\). This ratio is approximately:
+                    <br><br>
+                    Error ratio \(\approx\) <input type="text" class="fill-blank" placeholder="?">
+                    <br><em>(This confirms the method is first-order: halving \(h\) halves the error.)</em>
+                </div>
+                <div class="question-actions">
+                    <button class="btn-verify">Verify</button>
+                </div>
+                <div class="question-explanation" style="display:none;">
+                    <strong>Explanation:</strong>
+                    For a first-order method, error \(\propto h\). So
+                    \(\text{error}(h) / \text{error}(h/2) \approx 2\).
+                    This is the <em>halving test</em> &mdash; the simplest way to verify
+                    convergence order experimentally.
+                </div>
+            </div>
+        </div>
+
+        <!-- Q5: MCQ -->
+        <div class="tab-content">
+            <div class="question-container" data-type="mcq" data-answer="1">
+                <div class="question-text">
+                    Switch to the <strong>growth</strong> ODE and compare the four error curves.
+                    How do the curves differ from the decay case?
+                </div>
+                <div class="question-options">
+                    <label class="option">
+                        <input type="radio" name="q-ev-5" value="0">
+                        <span>They look identical to the decay case</span>
+                    </label>
+                    <label class="option">
+                        <input type="radio" name="q-ev-5" value="1">
+                        <span>All errors grow exponentially, with larger \(h\) growing much faster</span>
+                    </label>
+                    <label class="option">
+                        <input type="radio" name="q-ev-5" value="2">
+                        <span>Errors decrease over time for all step sizes</span>
+                    </label>
+                </div>
+                <div class="question-actions">
+                    <button class="btn-verify">Verify</button>
+                </div>
+                <div class="question-explanation" style="display:none;">
+                    <strong>Explanation:</strong>
+                    The growth ODE \(dx/dt = x\) amplifies errors exponentially. Larger \(h\)
+                    introduces bigger local errors, which then get amplified more. The result:
+                    the \(h = 0.50\) error grows much faster than \(h = 0.05\). Growth ODEs
+                    demand smaller step sizes for reliability.
+                </div>
+            </div>
+        </div>
+
+        <!-- Q6: Fill -->
+        <div class="tab-content">
+            <div class="question-container" data-type="fill" data-answer="10|100">
+                <div class="question-text">
+                    To achieve 10&times; smaller error with Euler&rsquo;s method,
+                    you need to use a step size that is <input type="text" class="fill-blank" placeholder="?">&times;
+                    smaller, which means <input type="text" class="fill-blank" placeholder="?">&times;
+                    more computation (steps).
+                    <br><em>(Since error \(\propto h\) and steps \(\propto 1/h\).)</em>
+                </div>
+                <div class="question-actions">
+                    <button class="btn-verify">Verify</button>
+                </div>
+                <div class="question-explanation" style="display:none;">
+                    <strong>Explanation:</strong>
+                    Error \(\propto h\), so 10&times; less error requires \(h/10\).
+                    Steps \(= t_{\max}/h\), so 10&times; smaller \(h\) means 10&times; more steps.
+                    But each step does the same work, so total cost scales as \(1/h\).
+                    For 10&times; less error you pay 10&times; in compute &mdash;
+                    but for 100&times; less error you pay 100&times;. This is why higher-order
+                    methods (RK4) are preferred in practice.
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<hr>
+
+<!-- ========== EXPLORER 3: Convergence Tester ========== -->
+<div class="interactive-container" id="convergence-tester">
+    <div class="interactive-title">Explorer 3: Convergence Tester</div>
+
+    <p style="margin-bottom: var(--spacing-sm); color: var(--text-secondary);">
+        The <strong>log-log</strong> plot reveals the convergence order. A slope of 1 confirms
+        first-order accuracy. Drag the evaluation time to see how convergence holds across
+        the entire solution.
+    </p>
+
+    <div class="dual-panel">
+        <div class="panel">
+            <div class="plot-container" id="eulerVal-convergePlot"></div>
+        </div>
+        <div class="panel">
+            <div class="plot-container" id="eulerVal-slopePlot"></div>
+        </div>
+    </div>
+
+    <div class="control-panel">
+        <div class="control-group">
+            <label class="control-label">Test equation:</label>
+            <select id="eulerVal-converge-ode" class="control-select">
+                <option value="0">dx/dt = &minus;2x &nbsp; (decay)</option>
+                <option value="1">dx/dt = x &nbsp; (growth)</option>
+                <option value="2">dx/dt = cos(t) &nbsp; (oscillatory)</option>
+            </select>
+        </div>
+        <div class="control-group">
+            <label class="control-label">Evaluate error at \(t\):
+                <span class="control-label-value" id="eulerVal-converge-t-value">2.0</span>
+            </label>
+            <input type="range" class="slider" id="eulerVal-converge-t-slider"
+                   min="0.5" max="4.0" step="0.5" value="2.0">
+        </div>
+        <div class="btn-group">
+            <button class="btn btn-secondary" onclick="eulerValConvergeReset()">Reset</button>
+        </div>
+    </div>
+</div>
+
+<div class="equation-display">
+    <p><strong>Reading the Log-Log Plot:</strong></p>
+    $$
+    \log(\text{error}) = \log(C) + p \cdot \log(h)
+    $$
+    <p>
+        On a log-log plot, this is a straight line with <strong>slope = \(p\)</strong>
+        (the convergence order). For Euler, \(p = 1\). The right panel shows
+        the measured slope &mdash; it should hover near 1.0.
+    </p>
+</div>
+
+<!-- ===== Test Your Understanding #3 ===== -->
+<div class="interactive-container question-section">
+    <div class="interactive-title">Test Your Understanding</div>
+
+    <p style="margin-bottom: var(--spacing-md); color: var(--text-secondary);">
+        Use Explorer 3 to answer these questions.
+    </p>
+
+    <div class="tabs">
+        <div class="tab-buttons">
+            <button class="tab-button active">Question 7</button>
+            <button class="tab-button">Question 8</button>
+            <button class="tab-button">Question 9</button>
+        </div>
+
+        <!-- Q7: Fill -->
+        <div class="tab-content active">
+            <div class="question-container" data-type="fill" data-answer="1[0.8,1.2]">
+                <div class="question-text">
+                    For the <strong>decay</strong> ODE at \(t = 2.0\), read the slope of the
+                    log-log line from the right panel. The measured convergence order is approximately:
+                    <br><br>
+                    \(p \approx\) <input type="text" class="fill-blank" placeholder="?">
+                </div>
+                <div class="question-actions">
+                    <button class="btn-verify">Verify</button>
+                </div>
+                <div class="question-explanation" style="display:none;">
+                    <strong>Explanation:</strong>
+                    Euler&rsquo;s method is first-order: \(p = 1\). The log-log slope confirms
+                    this experimentally. This means error \(\propto h^1\) &mdash; a straight line
+                    with slope 1 on a log-log plot.
+                </div>
+            </div>
+        </div>
+
+        <!-- Q8: MCQ -->
+        <div class="tab-content">
+            <div class="question-container" data-type="mcq" data-answer="2">
+                <div class="question-text">
+                    A hypothetical method with convergence order \(p = 4\) (like RK4) would appear
+                    on the log-log plot as:
+                </div>
+                <div class="question-options">
+                    <label class="option">
+                        <input type="radio" name="q-ev-8" value="0">
+                        <span>A flatter line (slope near 0)</span>
+                    </label>
+                    <label class="option">
+                        <input type="radio" name="q-ev-8" value="1">
+                        <span>A line with the same slope as Euler</span>
+                    </label>
+                    <label class="option">
+                        <input type="radio" name="q-ev-8" value="2">
+                        <span>A steeper line (slope = 4), meaning error drops much faster with smaller \(h\)</span>
+                    </label>
+                </div>
+                <div class="question-actions">
+                    <button class="btn-verify">Verify</button>
+                </div>
+                <div class="question-explanation" style="display:none;">
+                    <strong>Explanation:</strong>
+                    On a log-log plot, slope = convergence order. A slope of 4 means halving \(h\)
+                    reduces the error by \(2^4 = 16\times\). This is why RK4 is so popular &mdash;
+                    you get dramatically better accuracy for the same step size. You&rsquo;ll explore
+                    this in the Runge&ndash;Kutta section.
+                </div>
+            </div>
+        </div>
+
+        <!-- Q9: MSQ -->
+        <div class="tab-content">
+            <div class="question-container" data-type="msq" data-answer="0,2,3">
+                <div class="question-text">
+                    Which of the following are valid ways to verify a numerical solver?
+                    (Select all that apply.)
+                </div>
+                <div class="question-options">
+                    <label class="option">
+                        <input type="checkbox" value="0">
+                        <span>Compare to a known exact solution</span>
+                    </label>
+                    <label class="option">
+                        <input type="checkbox" value="1">
+                        <span>Run once with large \(h\) and assume correctness</span>
+                    </label>
+                    <label class="option">
+                        <input type="checkbox" value="2">
+                        <span>Check that halving \(h\) halves the error (convergence test)</span>
+                    </label>
+                    <label class="option">
+                        <input type="checkbox" value="3">
+                        <span>Verify a conserved quantity is preserved (e.g., energy)</span>
+                    </label>
+                </div>
+                <div class="question-actions">
+                    <button class="btn-verify">Verify</button>
+                </div>
+                <div class="question-explanation" style="display:none;">
+                    <strong>Explanation:</strong>
+                    <ul>
+                        <li><strong>True:</strong> Direct comparison is the gold standard when an exact solution exists.</li>
+                        <li><strong>False:</strong> Large \(h\) gives poor accuracy &mdash; never trust a single run without validation.</li>
+                        <li><strong>True:</strong> The halving test works even without a known solution. If halving \(h\) halves the error, your method is converging at the expected rate.</li>
+                        <li><strong>True:</strong> Energy conservation is a powerful check for Hamiltonian systems (like the harmonic oscillator).</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<hr>
+
+<!-- ========== CODE EXAMPLES ========== -->
+<h2>Python: Validation Toolkit</h2>
+
+<div class="tabs">
+    <div class="tab-buttons">
+        <button class="tab-button active">Error Analysis</button>
+        <button class="tab-button">Convergence Plot</button>
+        <button class="tab-button">Prompt</button>
+    </div>
+
+    <!-- Tab 1: Error analysis -->
+    <div class="tab-content active">
+        <div class="code-block-container">
+            <div class="code-header">
+                <span class="code-lang">Python</span>
+                <button class="copy-btn">Copy</button>
+            </div>
+            <pre><code class="language-python">
+import numpy as np
+import plotly.graph_objects as go
+from plotly.subplots import make_subplots
+
+def euler_solve(f, x0, t_max, h):
+    t_list, x_list = [0.0], [x0]
+    t, x = 0.0, x0
+    for i in range(int(t_max / h)):
+        x = x + h * f(x, t)
+        t = t + h
+        t_list.append(t)
+        x_list.append(x)
+    return np.array(t_list), np.array(x_list)
+
+# Solve with two step sizes
+f = lambda x, t: -2 * x
+exact = lambda t: np.exp(-2 * t)
+
+t1, x1 = euler_solve(f, 1.0, 3.0, h=0.5)
+t2, x2 = euler_solve(f, 1.0, 3.0, h=0.1)
+t_ex = np.linspace(0, 3, 300)
+
+fig = make_subplots(rows=1, cols=2,
+    subplot_titles=['Solution', 'Absolute Error'])
+
+# Left: solutions
+fig.add_trace(go.Scatter(x=t_ex, y=exact(t_ex), name='Exact',
+    line=dict(color='#808080', dash='dash')), row=1, col=1)
+fig.add_trace(go.Scatter(x=t1, y=x1, name='h=0.5',
+    line=dict(color='#ff6b6b'), mode='lines+markers'), row=1, col=1)
+fig.add_trace(go.Scatter(x=t2, y=x2, name='h=0.1',
+    line=dict(color='#00f3ff'), mode='lines+markers',
+    marker=dict(size=3)), row=1, col=1)
+
+# Right: errors
+fig.add_trace(go.Scatter(x=t1, y=np.abs(x1 - exact(t1)),
+    name='|err| h=0.5', line=dict(color='#ff6b6b'),
+    fill='tozeroy', fillcolor='rgba(255,107,107,0.15)'), row=1, col=2)
+fig.add_trace(go.Scatter(x=t2, y=np.abs(x2 - exact(t2)),
+    name='|err| h=0.1', line=dict(color='#00f3ff'),
+    fill='tozeroy', fillcolor='rgba(0,243,255,0.15)'), row=1, col=2)
+
+fig.update_layout(template='plotly_dark')
+fig.show()
+
+# Print error ratio
+e1 = abs(x1[-1] - exact(t1[-1]))
+e2 = abs(x2[-1] - exact(t2[-1]))
+print(f"Error (h=0.5): {e1:.6f}")
+print(f"Error (h=0.1): {e2:.6f}")
+print(f"Ratio: {e1/e2:.1f}x (expect ~5x for 5x smaller h)")
+            </code></pre>
+        </div>
+    </div>
+
+    <!-- Tab 2: Convergence plot -->
+    <div class="tab-content">
+        <div class="code-block-container">
+            <div class="code-header">
+                <span class="code-lang">Python</span>
+                <button class="copy-btn">Copy</button>
+            </div>
+            <pre><code class="language-python">
+import numpy as np
+import plotly.graph_objects as go
+
+def euler_solve(f, x0, t_max, h):
+    t_list, x_list = [0.0], [x0]
+    t, x = 0.0, x0
+    for i in range(int(t_max / h)):
+        x = x + h * f(x, t)
+        t = t + h
+        t_list.append(t)
+        x_list.append(x)
+    return np.array(t_list), np.array(x_list)
+
+# Convergence study: error vs h on log-log scale
+f = lambda x, t: -2 * x
+exact_final = np.exp(-2 * 3.0)  # x(3) = e^-6
+
+h_values = [0.5, 0.25, 0.1, 0.05, 0.025, 0.01]
+errors = []
+
+for h in h_values:
+    t, x = euler_solve(f, 1.0, 3.0, h)
+    errors.append(abs(x[-1] - exact_final))
+
+fig = go.Figure()
+fig.add_trace(go.Scatter(x=h_values, y=errors, name='Euler error',
+    mode='lines+markers', line=dict(color='#00f3ff', width=2),
+    marker=dict(size=8)))
+
+# Reference: O(h) line
+fig.add_trace(go.Scatter(x=h_values, y=[e*h_values[0]/h_values[0] for e in [errors[0]]*len(h_values)],
+    name='O(h) reference', line=dict(color='#808080', dash='dot')))
+# Better: use actual O(h) slope
+h_ref = np.array(h_values)
+fig.add_trace(go.Scatter(x=h_ref, y=errors[0] * h_ref / h_ref[0],
+    name='slope = 1', line=dict(color='#ffff00', dash='dash', width=1.5)))
+
+fig.update_layout(
+    template='plotly_dark',
+    title='Convergence: Error vs Step Size (log-log)',
+    xaxis=dict(title='h (step size)', type='log',
+        gridcolor='#2a2f4a', zerolinecolor='#808080', linecolor='#808080'),
+    yaxis=dict(title='|Error at t=3|', type='log',
+        gridcolor='#2a2f4a', zerolinecolor='#808080', linecolor='#808080'),
+)
+fig.show()
+
+# Compute slopes
+for i in range(1, len(h_values)):
+    slope = np.log(errors[i]/errors[i-1]) / np.log(h_values[i]/h_values[i-1])
+    print(f"h={h_values[i]:.3f}: slope = {slope:.2f}")
+            </code></pre>
+        </div>
+    </div>
+
+    <!-- Tab 3: Prompt -->
+    <div class="tab-content">
+        <div class="code-block-container">
+            <div class="code-header">
+                <span class="code-lang">Prompt for AI</span>
+                <button class="copy-btn">Copy</button>
+            </div>
+            <pre><code class="language-text">Write a Python script to validate Euler's method convergence.
+
+Requirements:
+1. Implement euler_solve(f, x0, t_max, h) with simple for loop
+2. Solve dx/dt = -2x from t=0 to t=3, exact solution exp(-2t)
+3. Run with h = 0.5, 0.25, 0.1, 0.05, 0.025, 0.01
+4. Create a LOG-LOG plot of final error vs h using Plotly
+5. Add a reference line with slope 1 (for O(h) comparison)
+6. Compute and print the convergence slope between each pair of h values
+7. Explain: slope ≈ 1 confirms first-order accuracy
+
+Style: plotly_dark, cyan data, gray axes (#808080), grid #2a2f4a
+Also show: error ratio when h is halved (should be ~2)</code></pre>
+        </div>
+
+        <div class="info-box" style="margin-top: var(--spacing-md);">
+            <div class="info-box-title">Pro Tips for Prompting</div>
+            <ul>
+                <li>Ask for log-log plots explicitly &mdash; they reveal power-law relationships</li>
+                <li>Request reference slopes (O(h), O(h&sup2;)) for visual comparison</li>
+                <li>Ask for numerical slope computation to get precise convergence order</li>
+            </ul>
+        </div>
+    </div>
+</div>
+
+<hr>
+
+<!-- ========== NAVIGATION ========== -->
+<div class="btn-group mt-xl">
+    <button class="btn btn-magenta" onclick="navigateToSection('37-coding-euler')">&larr; Previous: Coding Euler&rsquo;s Method</button>
+    <button class="btn" onclick="scrollToTop()">&uarr; Back to Top</button>
+    <button class="btn btn-secondary" onclick="navigateToSection('39-order-reduction')">Next: From Second-Order to First-Order &rarr;</button>
+</div>

@@ -1,0 +1,607 @@
+<!-- ============================================================
+     Section 7.6: The Diffusion Equation & Gaussian Solutions
+     Source: NPTEL Lecture 10_2 (Part 2)
+     Concept: Solving the diffusion PDE — Gaussian fundamental
+              solution, width growth as √t, different ICs
+     Time: 20-25 minutes
+     Prerequisites: Section 7.5 (continuum limit, diffusion PDE)
+     ============================================================ -->
+
+<h1>The Diffusion Equation &amp; Gaussian Solutions</h1>
+
+<p>
+    The previous section derived the diffusion equation \( \partial\rho/\partial t = D\,\partial^2\rho/\partial x^2 \).
+    Now we <strong>solve</strong> it. For a point source at the origin, the solution
+    is a Gaussian that spreads over time: tall and narrow at early times, short and
+    wide at late times. The width grows as \( \sqrt{t} \) &mdash; exactly the same
+    \( \sqrt{N} \) scaling from random walks, now emerging from a PDE.
+</p>
+
+<div class="info-box">
+    <div class="info-box-title">Learning Objectives</div>
+    <ul>
+        <li>Know the fundamental solution: \( \rho(x,t) = \frac{1}{\sqrt{4\pi Dt}}\,e^{-x^2/(4Dt)} \)</li>
+        <li>Verify that the width grows as \( \sigma(t) = \sqrt{2Dt} \) and the peak decreases as \( 1/\sqrt{t} \)</li>
+        <li>Understand <strong>conservation of probability</strong>: \( \int \rho\,dx = 1 \) for all time</li>
+        <li>Explore how different initial conditions (step, double peak) evolve under diffusion</li>
+    </ul>
+</div>
+
+<div class="equation-display">
+    <p><strong>The Fundamental Solution (Green&rsquo;s Function):</strong></p>
+    $$ \rho(x, t) = \frac{1}{\sqrt{4\pi D t}}\,\exp\!\left(-\frac{x^2}{4Dt}\right) $$
+    <p>
+        This is the probability density of finding a particle at position \( x \) at
+        time \( t \), given it started at the origin. Width: \( \sigma = \sqrt{2Dt} \).
+        Peak: \( \rho(0,t) = 1/\sqrt{4\pi Dt} \propto 1/\sqrt{t} \).
+    </p>
+</div>
+
+<hr>
+
+<!-- ============================================================ -->
+<!-- EXPLORER 1: Gaussian Spreading -->
+<!-- ============================================================ -->
+<div class="interactive-container" id="gaussian-spreading">
+    <div class="interactive-title">Explorer: Watching Diffusion</div>
+
+    <p>
+        Drag the time slider to watch the Gaussian spread. At \( t = 0 \) the
+        distribution is a sharp peak (delta function). As time advances, it
+        broadens and lowers &mdash; but the area under the curve stays exactly 1.
+    </p>
+
+    <div class="plot-container" id="de-spreadPlot" style="height: 420px;"></div>
+
+    <div id="de-stats1" class="stats-bar"></div>
+
+    <div class="control-panel">
+        <div class="control-group">
+            <label class="control-label" for="de-t-slider">Time t:
+                <span id="de-t-value">0.50</span>
+            </label>
+            <input type="range" class="slider" id="de-t-slider"
+                   min="0.05" max="5" step="0.05" value="0.5">
+        </div>
+        <div class="control-group">
+            <label class="control-label" for="de-D-slider">Diffusion constant D:
+                <span id="de-D-value">1.0</span>
+            </label>
+            <input type="range" class="slider" id="de-D-slider"
+                   min="0.2" max="3" step="0.1" value="1">
+        </div>
+        <div class="control-group">
+            <button class="btn" onclick="deSpreadReset()">Reset</button>
+        </div>
+    </div>
+</div>
+
+<!-- ========== Test Your Understanding #1 ========== -->
+<div class="interactive-container question-section">
+    <div class="interactive-title">Test Your Understanding</div>
+
+    <p style="margin-bottom: var(--spacing-md); color: var(--text-secondary);">
+        Use the Watching Diffusion explorer to answer these questions.
+    </p>
+
+    <div class="tabs">
+        <div class="tab-buttons">
+            <button class="tab-button active">Question 1</button>
+            <button class="tab-button">Question 2</button>
+            <button class="tab-button">Question 3</button>
+        </div>
+
+        <div class="tab-content active">
+            <div class="question-container" data-type="mcq" data-answer="0">
+                <div class="question-text">
+                    Set D = 1 and move time from 0.1 to 2.0. How does the peak height change?
+                </div>
+                <div class="question-options">
+                    <label class="option">
+                        <input type="radio" name="de-q1" value="0">
+                        <span>Peak decreases as \( 1/\sqrt{t} \) &mdash; spreading conserves total probability</span>
+                    </label>
+                    <label class="option">
+                        <input type="radio" name="de-q1" value="1">
+                        <span>Peak stays constant</span>
+                    </label>
+                    <label class="option">
+                        <input type="radio" name="de-q1" value="2">
+                        <span>Peak increases with time</span>
+                    </label>
+                    <label class="option">
+                        <input type="radio" name="de-q1" value="3">
+                        <span>Peak oscillates</span>
+                    </label>
+                </div>
+                <div class="question-actions">
+                    <button class="btn-verify">Verify</button>
+                </div>
+                <div class="question-explanation" style="display:none;">
+                    <strong>Explanation:</strong>
+                    \( \rho(0,t) = 1/\sqrt{4\pi Dt} \propto 1/\sqrt{t} \). As the Gaussian
+                    widens, it must lower to keep the total area = 1. The probability
+                    <em>spreads out</em> but is never created or destroyed.
+                </div>
+            </div>
+        </div>
+
+        <div class="tab-content">
+            <div class="question-container" data-type="fill" data-answer="2[1.8,2.2]">
+                <div class="question-text">
+                    At t = 2, D = 1: the width is \( \sigma = \sqrt{2Dt} = \sqrt{4} = \)
+                    <input type="text" class="fill-blank" style="width: 50px">.
+                </div>
+                <div class="question-actions">
+                    <button class="btn-verify">Verify</button>
+                </div>
+                <div class="question-explanation" style="display:none;">
+                    <strong>Explanation:</strong>
+                    \( \sigma = \sqrt{2 \times 1 \times 2} = \sqrt{4} = 2 \). At t = 2, about
+                    68% of the probability lies within &plusmn;2 of the origin. At t = 8:
+                    &sigma; = 4, so the cloud has doubled in width &mdash; but it took 4&times;
+                    the time (diffusion is slow!).
+                </div>
+            </div>
+        </div>
+
+        <div class="tab-content">
+            <div class="question-container" data-type="msq" data-answer="0,2">
+                <div class="question-text">
+                    Which properties of the diffusion solution are true? (Select all)
+                </div>
+                <div class="question-options">
+                    <label class="option">
+                        <input type="checkbox" value="0">
+                        <span>Total probability \( \int \rho\,dx = 1 \) is conserved for all t</span>
+                    </label>
+                    <label class="option">
+                        <input type="checkbox" value="1">
+                        <span>The solution becomes a delta function at large t</span>
+                    </label>
+                    <label class="option">
+                        <input type="checkbox" value="2">
+                        <span>Width grows as \( \sqrt{t} \), not linearly</span>
+                    </label>
+                    <label class="option">
+                        <input type="checkbox" value="3">
+                        <span>The center of mass moves to the right</span>
+                    </label>
+                </div>
+                <div class="question-actions">
+                    <button class="btn-verify">Verify</button>
+                </div>
+                <div class="question-explanation" style="display:none;">
+                    <strong>Explanation:</strong>
+                    <ul>
+                        <li><strong>Conservation:</strong> ✓ The diffusion equation conserves total probability (integral of &rho; is constant).</li>
+                        <li><strong>Delta at large t:</strong> ✗ The opposite: the solution spreads out and flattens. At t &rarr; &infin;, &rho; &rarr; 0 everywhere (uniform spread).</li>
+                        <li><strong>Width ∝ √t:</strong> ✓ &sigma; = &radic;(2Dt). Doubling the width takes 4× the time.</li>
+                        <li><strong>Center moves:</strong> ✗ For unbiased diffusion, the center stays at x = 0. Drift would require an extra term in the PDE.</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- ============================================================ -->
+<!-- EXPLORER 2: Width Tracker -->
+<!-- ============================================================ -->
+<div class="interactive-container" id="width-tracker">
+    <div class="interactive-title">Explorer: Tracking the Width</div>
+
+    <p>
+        Measure the Gaussian width at several times and plot &sigma; vs t. The
+        result should follow \( \sigma = \sqrt{2Dt} \) &mdash; a square-root
+        curve, confirming the diffusive scaling law from a PDE perspective.
+    </p>
+
+    <div class="dual-panel">
+        <div class="panel">
+            <div class="plot-container" id="de-snapPlot" style="height: 400px;"></div>
+        </div>
+        <div class="panel">
+            <div class="plot-container" id="de-widthPlot" style="height: 400px;"></div>
+        </div>
+    </div>
+
+    <div id="de-stats2" class="stats-bar"></div>
+
+    <div class="control-panel">
+        <div class="control-group">
+            <label class="control-label" for="de-width-D-slider">D:
+                <span id="de-width-D-value">1.0</span>
+            </label>
+            <input type="range" class="slider" id="de-width-D-slider"
+                   min="0.5" max="3" step="0.1" value="1">
+        </div>
+        <div class="control-group">
+            <button class="btn" onclick="deWidthRun()">Compute</button>
+        </div>
+    </div>
+</div>
+
+<!-- ========== Test Your Understanding #2 ========== -->
+<div class="interactive-container question-section">
+    <div class="interactive-title">Test Your Understanding</div>
+
+    <p style="margin-bottom: var(--spacing-md); color: var(--text-secondary);">
+        Use the Width Tracker to answer these questions.
+    </p>
+
+    <div class="tabs">
+        <div class="tab-buttons">
+            <button class="tab-button active">Question 4</button>
+            <button class="tab-button">Question 5</button>
+            <button class="tab-button">Question 6</button>
+        </div>
+
+        <div class="tab-content active">
+            <div class="question-container" data-type="mcq" data-answer="2">
+                <div class="question-text">
+                    On the &sigma; vs t plot, what shape is the curve?
+                </div>
+                <div class="question-options">
+                    <label class="option">
+                        <input type="radio" name="de-q4" value="0">
+                        <span>Straight line (&sigma; &propto; t)</span>
+                    </label>
+                    <label class="option">
+                        <input type="radio" name="de-q4" value="1">
+                        <span>Exponential</span>
+                    </label>
+                    <label class="option">
+                        <input type="radio" name="de-q4" value="2">
+                        <span>Square root (&sigma; = &radic;(2Dt))</span>
+                    </label>
+                    <label class="option">
+                        <input type="radio" name="de-q4" value="3">
+                        <span>Constant</span>
+                    </label>
+                </div>
+                <div class="question-actions">
+                    <button class="btn-verify">Verify</button>
+                </div>
+                <div class="question-explanation" style="display:none;">
+                    <strong>Explanation:</strong>
+                    \( \sigma = \sqrt{2Dt} \) is a <strong>square root</strong> curve. Fast
+                    initial growth that slows down &mdash; the same &radic;N from random walks,
+                    now from the PDE. Diffusion is fast at short times, slow at long times.
+                </div>
+            </div>
+        </div>
+
+        <div class="tab-content">
+            <div class="question-container" data-type="fill" data-answer="4[3.5,4.5]">
+                <div class="question-text">
+                    To double the width from &sigma; = 2 to &sigma; = 4, you must wait
+                    <input type="text" class="fill-blank" style="width: 50px">&times;
+                    as long (since &sigma; &propto; &radic;t, doubling &sigma; requires 4&times; t).
+                </div>
+                <div class="question-actions">
+                    <button class="btn-verify">Verify</button>
+                </div>
+                <div class="question-explanation" style="display:none;">
+                    <strong>Explanation:</strong>
+                    \( \sigma \propto \sqrt{t} \), so \( 2\sigma \propto \sqrt{4t} \). Doubling
+                    the width requires <strong>4 times</strong> the time. This is why diffusion
+                    is practical at small scales (nanometers in microseconds) but impractical at
+                    large scales (a room takes hours to fill with perfume).
+                </div>
+            </div>
+        </div>
+
+        <div class="tab-content">
+            <div class="question-container" data-type="mcq" data-answer="1">
+                <div class="question-text">
+                    Increase D from 1 to 2. How does the &sigma; vs t curve change?
+                </div>
+                <div class="question-options">
+                    <label class="option">
+                        <input type="radio" name="de-q6" value="0">
+                        <span>Same curve &mdash; D doesn&rsquo;t affect width</span>
+                    </label>
+                    <label class="option">
+                        <input type="radio" name="de-q6" value="1">
+                        <span>Steeper curve &mdash; larger D means faster spreading</span>
+                    </label>
+                    <label class="option">
+                        <input type="radio" name="de-q6" value="2">
+                        <span>Flatter curve &mdash; larger D means slower spreading</span>
+                    </label>
+                    <label class="option">
+                        <input type="radio" name="de-q6" value="3">
+                        <span>The curve becomes linear</span>
+                    </label>
+                </div>
+                <div class="question-actions">
+                    <button class="btn-verify">Verify</button>
+                </div>
+                <div class="question-explanation" style="display:none;">
+                    <strong>Explanation:</strong>
+                    \( \sigma = \sqrt{2Dt} \). Larger D &rarr; larger &sigma; at the same t.
+                    The curve is <strong>steeper</strong>: the distribution spreads faster.
+                    Physically, a larger diffusion constant means the microscopic steps are
+                    bigger or faster.
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- ============================================================ -->
+<!-- EXPLORER 3: Different Initial Conditions -->
+<!-- ============================================================ -->
+<div class="interactive-container" id="different-ics">
+    <div class="interactive-title">Explorer: Different Starting Distributions</div>
+
+    <p>
+        Diffusion doesn&rsquo;t just apply to point sources. Start with a step
+        function, a double peak, or a square pulse &mdash; watch each smooth out
+        over time. Diffusion <strong>erases structure</strong>: sharp features
+        are destroyed first, broad features persist longer.
+    </p>
+
+    <div class="plot-container" id="de-icPlot" style="height: 420px;"></div>
+
+    <div id="de-stats3" class="stats-bar"></div>
+
+    <div class="control-panel">
+        <div class="control-group">
+            <label class="control-label" for="de-ic-select">Initial condition:</label>
+            <select id="de-ic-select" class="control-select">
+                <option value="delta">Point source (&delta;-function)</option>
+                <option value="step">Step function (half-space)</option>
+                <option value="double">Double peak</option>
+                <option value="square">Square pulse</option>
+            </select>
+        </div>
+        <div class="control-group">
+            <label class="control-label" for="de-ic-t-slider">Time t:
+                <span id="de-ic-t-value">0.10</span>
+            </label>
+            <input type="range" class="slider" id="de-ic-t-slider"
+                   min="0.01" max="3" step="0.01" value="0.1">
+        </div>
+        <div class="control-group">
+            <button class="btn" onclick="deICReset()">Reset</button>
+        </div>
+    </div>
+</div>
+
+<!-- ========== Test Your Understanding #3 ========== -->
+<div class="interactive-container question-section">
+    <div class="interactive-title">Test Your Understanding</div>
+
+    <p style="margin-bottom: var(--spacing-md); color: var(--text-secondary);">
+        Use the Different ICs explorer to answer these questions.
+    </p>
+
+    <div class="tabs">
+        <div class="tab-buttons">
+            <button class="tab-button active">Question 7</button>
+            <button class="tab-button">Question 8</button>
+            <button class="tab-button">Question 9</button>
+        </div>
+
+        <div class="tab-content active">
+            <div class="question-container" data-type="mcq" data-answer="0">
+                <div class="question-text">
+                    Select <strong>Step function</strong> and advance time. What happens
+                    to the sharp edge?
+                </div>
+                <div class="question-options">
+                    <label class="option">
+                        <input type="radio" name="de-q7" value="0">
+                        <span>The sharp edge smooths into an error-function (S-curve) profile</span>
+                    </label>
+                    <label class="option">
+                        <input type="radio" name="de-q7" value="1">
+                        <span>The edge moves to the right</span>
+                    </label>
+                    <label class="option">
+                        <input type="radio" name="de-q7" value="2">
+                        <span>The step stays sharp forever</span>
+                    </label>
+                    <label class="option">
+                        <input type="radio" name="de-q7" value="3">
+                        <span>The step becomes a delta function</span>
+                    </label>
+                </div>
+                <div class="question-actions">
+                    <button class="btn-verify">Verify</button>
+                </div>
+                <div class="question-explanation" style="display:none;">
+                    <strong>Explanation:</strong>
+                    Diffusion smooths sharp features. The step function evolves into an
+                    <strong>error function</strong> (complementary error function, erfc). The
+                    transition region widens as &radic;t. This is exactly what happens when you
+                    open a door between a hot room and a cold one &mdash; the temperature
+                    gradient smooths out diffusively.
+                </div>
+            </div>
+        </div>
+
+        <div class="tab-content">
+            <div class="question-container" data-type="mcq" data-answer="2">
+                <div class="question-text">
+                    Select <strong>Double peak</strong> and advance time. What happens
+                    to the two peaks?
+                </div>
+                <div class="question-options">
+                    <label class="option">
+                        <input type="radio" name="de-q8" value="0">
+                        <span>They move apart</span>
+                    </label>
+                    <label class="option">
+                        <input type="radio" name="de-q8" value="1">
+                        <span>They stay separate forever</span>
+                    </label>
+                    <label class="option">
+                        <input type="radio" name="de-q8" value="2">
+                        <span>They broaden, overlap, and eventually merge into a single broad peak</span>
+                    </label>
+                    <label class="option">
+                        <input type="radio" name="de-q8" value="3">
+                        <span>One peak absorbs the other</span>
+                    </label>
+                </div>
+                <div class="question-actions">
+                    <button class="btn-verify">Verify</button>
+                </div>
+                <div class="question-explanation" style="display:none;">
+                    <strong>Explanation:</strong>
+                    Each peak spreads independently as a Gaussian. Once the widths exceed the
+                    separation, they <strong>overlap and merge</strong> into a single broad bump.
+                    Diffusion erases the memory of the initial two-peak structure. The time to
+                    merge depends on the initial separation and D.
+                </div>
+            </div>
+        </div>
+
+        <div class="tab-content">
+            <div class="question-container" data-type="fill" data-answer="erases|destroys|smooths">
+                <div class="question-text">
+                    Diffusion
+                    <select class="fill-blank-select">
+                        <option value=""></option>
+                        <option value="erases">erases</option>
+                        <option value="sharpens">sharpens</option>
+                        <option value="preserves">preserves</option>
+                    </select>
+                    spatial structure over time. Sharp features are
+                    destroyed first; broad features persist longer.
+                </div>
+                <div class="question-actions">
+                    <button class="btn-verify">Verify</button>
+                </div>
+                <div class="question-explanation" style="display:none;">
+                    <strong>Explanation:</strong>
+                    Diffusion <strong>erases</strong> structure: it acts as a spatial low-pass
+                    filter, removing high-frequency (sharp) features first. The second derivative
+                    in the diffusion equation penalizes curvature &mdash; wherever the distribution
+                    is curved, diffusion smooths it out.
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- ============================================================ -->
+<!-- PYTHON CODE -->
+<!-- ============================================================ -->
+<h2>Python Code</h2>
+
+<div class="tabs">
+    <div class="tab-buttons">
+        <button class="tab-button active">Gaussian Solution</button>
+        <button class="tab-button">Different ICs</button>
+        <button class="tab-button">Prompt</button>
+    </div>
+
+    <div class="tab-content active">
+        <div class="code-block-container">
+            <div class="code-header">
+                <span class="code-lang">Python</span>
+                <button class="copy-btn">Copy</button>
+            </div>
+            <pre><code class="language-python">
+import numpy as np
+import plotly.graph_objects as go
+
+D = 1.0
+x = np.linspace(-8, 8, 500)
+
+fig = go.Figure()
+times = [0.1, 0.3, 1.0, 3.0]
+colors = ['#ff006e', '#ffbe0b', '#00f3ff', '#00ff88']
+
+for t, color in zip(times, colors):
+    rho = np.exp(-x**2 / (4*D*t)) / np.sqrt(4*np.pi*D*t)
+    sigma = np.sqrt(2*D*t)
+    fig.add_trace(go.Scatter(x=x, y=rho, mode='lines',
+        line=dict(color=color, width=2),
+        name=f't={t} (σ={sigma:.2f})'))
+
+fig.update_layout(template='plotly_dark',
+    xaxis=dict(title='x', range=[-8, 8], zerolinecolor='#808080'),
+    yaxis=dict(title='ρ(x,t)', range=[0, 1.5], zerolinecolor='#808080'),
+    height=450, width=600)
+fig.show()
+            </code></pre>
+        </div>
+    </div>
+
+    <div class="tab-content">
+        <div class="code-block-container">
+            <div class="code-header">
+                <span class="code-lang">Python</span>
+                <button class="copy-btn">Copy</button>
+            </div>
+            <pre><code class="language-python">
+import numpy as np
+import plotly.graph_objects as go
+from scipy.special import erfc
+
+D = 1.0
+x = np.linspace(-8, 8, 500)
+
+# Step function IC: rho(x,0) = 1 for x<0, 0 for x>0
+# Solution: rho(x,t) = 0.5 * erfc(x / sqrt(4Dt))
+
+fig = go.Figure()
+times = [0.01, 0.1, 0.5, 2.0]
+colors = ['#ff006e', '#ffbe0b', '#00f3ff', '#00ff88']
+
+for t, color in zip(times, colors):
+    rho = 0.5 * erfc(x / np.sqrt(4*D*t))
+    fig.add_trace(go.Scatter(x=x, y=rho, mode='lines',
+        line=dict(color=color, width=2), name=f't={t}'))
+
+fig.update_layout(template='plotly_dark',
+    xaxis=dict(title='x', range=[-8, 8], zerolinecolor='#808080'),
+    yaxis=dict(title='ρ(x,t)', range=[-0.05, 1.1], zerolinecolor='#808080'),
+    height=450, width=600)
+fig.show()
+            </code></pre>
+        </div>
+    </div>
+
+    <div class="tab-content">
+        <div class="code-block-container">
+            <div class="code-header">
+                <span class="code-lang">Prompt for AI</span>
+                <button class="copy-btn">Copy</button>
+            </div>
+            <pre><code class="language-text">Create a Python script using Plotly to explore solutions of the
+diffusion equation ∂ρ/∂t = D ∂²ρ/∂x².
+
+Requirements:
+- Part 1: Gaussian fundamental solution
+  Plot ρ(x,t) = exp(-x²/(4Dt))/√(4πDt) at t = 0.1, 0.3, 1, 3
+  Show peak decreasing as 1/√t, width growing as √(2Dt)
+
+- Part 2: Width tracking
+  Plot σ(t) = √(2Dt) vs t for D = 0.5, 1, 2
+  Verify √t scaling
+
+- Part 3: Different initial conditions
+  Step function: ρ(x,0) = Θ(-x) → 0.5*erfc(x/√(4Dt))
+  Double peak: two Gaussians separated by distance d
+  Square pulse: erf solution
+  Show each at t = 0.01, 0.1, 0.5, 2.0
+
+- Use dark theme (plotly_dark) with gray (#808080) axes</code></pre>
+        </div>
+    </div>
+</div>
+
+<!-- ============================================================ -->
+<!-- NAVIGATION -->
+<!-- ============================================================ -->
+<div class="btn-group mt-xl">
+    <button class="btn btn-magenta" onclick="navigateToSection('80-continuum-limit')">&larr; Previous: From Discrete to Continuous</button>
+    <button class="btn btn-secondary" onclick="scrollToTop()">&uarr; Back to Top</button>
+    <button class="btn btn-secondary" onclick="navigateToSection('82-diffusion-higher-d')">Next: Higher Dimensions &rarr;</button>
+</div>

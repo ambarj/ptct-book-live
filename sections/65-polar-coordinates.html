@@ -1,0 +1,715 @@
+<!-- ============================================================
+     Section 5.15: Polar Coordinates & Advanced Cases (Optional)
+     Source: NPTEL Lecture 8_4 (Part 2)
+     Concept: Using polar coordinates to analyze radially
+              symmetric systems — resolving center/spiral
+              ambiguity, finding limit cycles
+     Time: 20-25 minutes
+     Prerequisites: Sections 5.13-5.14 (linearization stability,
+                    failure cases), trig (sin, cos, polar coords)
+     ============================================================ -->
+
+<h1>Polar Coordinates <span style="color: var(--text-secondary); font-size: 0.6em;">(Optional)</span></h1>
+
+<p>
+    Section 5.14 showed that linearization cannot distinguish a true center from
+    a spiral. How do you resolve the ambiguity? For systems with <strong>radial
+    symmetry</strong>, the answer is elegant: switch to polar coordinates. The
+    equations for \( r \) and \( \theta \) often <strong>decouple</strong>,
+    turning a hard 2D problem into a simple 1D problem for the radius.
+</p>
+
+<div class="info-box">
+    <div class="info-box-title">Learning Objectives</div>
+    <ul>
+        <li>Transform a 2D Cartesian system \( (\dot{x}, \dot{y}) \) into polar form \( (\dot{r}, \dot{\theta}) \)</li>
+        <li>Recognize when radial symmetry causes the \( r \) and \( \theta \) equations to <strong>decouple</strong></li>
+        <li>Analyze the 1D radial equation \( \dot{r} = h(r) \) to find limit cycles and resolve center/spiral ambiguity</li>
+        <li>Understand <strong>limit cycles</strong> as isolated closed orbits at radii where \( \dot{r} = 0 \)</li>
+    </ul>
+</div>
+
+<div class="equation-display">
+    <p><strong>The Polar Transformation:</strong></p>
+    $$ x = r\cos\theta, \quad y = r\sin\theta $$
+    $$ \dot{r} = \frac{x\dot{x} + y\dot{y}}{r}, \qquad
+       \dot{\theta} = \frac{x\dot{y} - y\dot{x}}{r^2} $$
+    <p>
+        If the system has radial symmetry (terms involving only \( r^2 = x^2 + y^2 \)),
+        then \( \dot{r} \) depends only on \( r \) and \( \dot{\theta} \) depends only
+        on \( r \). The equations <strong>decouple</strong>: solve the radius first,
+        then the angle follows.
+    </p>
+</div>
+
+<hr>
+
+<!-- ============================================================ -->
+<!-- EXPLORER 1: Polar Transformer -->
+<!-- ============================================================ -->
+<div class="interactive-container" id="polar-transformer">
+    <div class="interactive-title">Explorer: Cartesian to Polar</div>
+
+    <p>
+        Choose a system and see the Cartesian equations alongside their polar
+        equivalents. For radially symmetric systems, the polar form is dramatically
+        simpler. The phase portrait shows trajectories in both coordinate systems.
+    </p>
+
+    <div class="dual-panel">
+        <div class="panel">
+            <div class="plot-container" id="pc-cartPlot" style="height: 400px;"></div>
+        </div>
+        <div class="panel">
+            <div class="plot-container" id="pc-radialPlot" style="height: 400px;"></div>
+        </div>
+    </div>
+
+    <div id="pc-stats1" class="stats-bar"></div>
+
+    <div class="control-panel">
+        <div class="control-group">
+            <label class="control-label" for="pc-system-select">System:</label>
+            <select id="pc-system-select" class="control-select">
+                <option value="stableSpiral">Stable spiral: ṙ = −r, θ̇ = 1</option>
+                <option value="unstableSpiral">Unstable spiral: ṙ = 0.3r, θ̇ = 1</option>
+                <option value="center">True center: ṙ = 0, θ̇ = 1</option>
+                <option value="limitCycle">Limit cycle: ṙ = r(1−r²), θ̇ = 1</option>
+                <option value="brokenCenter">Broken center: ṙ = εr³, θ̇ = 1</option>
+            </select>
+        </div>
+        <div class="control-group">
+            <label class="control-label" for="pc-eps-slider">&epsilon; (for broken center):
+                <span id="pc-eps-value">0.10</span>
+            </label>
+            <input type="range" class="slider" id="pc-eps-slider"
+                   min="-0.3" max="0.3" step="0.01" value="0.1">
+        </div>
+        <div class="control-group">
+            <button class="btn" onclick="pcTransformReset()">Reset</button>
+        </div>
+    </div>
+</div>
+
+<div class="info-box">
+    <div class="info-box-title">Why Polar Coordinates Work</div>
+    <p>
+        In Cartesian coordinates, \( \dot{x} = -y + \epsilon x(x^2+y^2) \) looks
+        complicated. In polar: \( \dot{r} = \epsilon r^3 \) and \( \dot{\theta} = 1 \).
+        The radial equation is now a simple 1D ODE! If \( \epsilon > 0 \), \( r \) grows
+        (unstable spiral). If \( \epsilon < 0 \), \( r \) shrinks (stable spiral).
+        If \( \epsilon = 0 \), \( r \) is constant (true center). The ambiguity is
+        <strong>completely resolved</strong>.
+    </p>
+</div>
+
+<!-- ========== Test Your Understanding #1 ========== -->
+<div class="interactive-container question-section">
+    <div class="interactive-title">Test Your Understanding</div>
+
+    <p style="margin-bottom: var(--spacing-md); color: var(--text-secondary);">
+        Use the Polar Transformer to answer these questions.
+    </p>
+
+    <div class="tabs">
+        <div class="tab-buttons">
+            <button class="tab-button active">Question 1</button>
+            <button class="tab-button">Question 2</button>
+            <button class="tab-button">Question 3</button>
+        </div>
+
+        <div class="tab-content active">
+            <div class="question-container" data-type="mcq" data-answer="2">
+                <div class="question-text">
+                    Select <strong>True center</strong> (\( \dot{r} = 0, \dot{\theta} = 1 \)).
+                    What does \( \dot{r} = 0 \) mean geometrically?
+                </div>
+                <div class="question-options">
+                    <label class="option">
+                        <input type="radio" name="pc-q1" value="0">
+                        <span>The system is at equilibrium everywhere</span>
+                    </label>
+                    <label class="option">
+                        <input type="radio" name="pc-q1" value="1">
+                        <span>All trajectories are straight lines</span>
+                    </label>
+                    <label class="option">
+                        <input type="radio" name="pc-q1" value="2">
+                        <span>The radius never changes &mdash; every trajectory is a perfect circle</span>
+                    </label>
+                    <label class="option">
+                        <input type="radio" name="pc-q1" value="3">
+                        <span>The angular velocity is zero</span>
+                    </label>
+                </div>
+                <div class="question-actions">
+                    <button class="btn-verify">Verify</button>
+                </div>
+                <div class="question-explanation" style="display:none;">
+                    <strong>Explanation:</strong>
+                    \( \dot{r} = 0 \) means the distance from the origin is constant for all
+                    time. Combined with \( \dot{\theta} = 1 \) (constant angular velocity), every
+                    trajectory is a <strong>circle</strong> at its initial radius. This is the
+                    hallmark of a true center &mdash; confirmed by polar analysis, not just
+                    linearization.
+                </div>
+            </div>
+        </div>
+
+        <div class="tab-content">
+            <div class="question-container" data-type="fill" data-answer="unstable spiral">
+                <div class="question-text">
+                    Select <strong>Broken center</strong> and set \( \epsilon = 0.1 \).
+                    The polar equation is \( \dot{r} = 0.1 r^3 > 0 \), so \( r \) is
+                    always increasing. This means the origin is a(n)
+                    <select class="fill-blank-select">
+                        <option value=""></option>
+                        <option value="center">center</option>
+                        <option value="stable spiral">stable spiral</option>
+                        <option value="unstable spiral">unstable spiral</option>
+                        <option value="saddle">saddle</option>
+                    </select>.
+                </div>
+                <div class="question-actions">
+                    <button class="btn-verify">Verify</button>
+                </div>
+                <div class="question-explanation" style="display:none;">
+                    <strong>Explanation:</strong>
+                    \( \dot{r} = \epsilon r^3 > 0 \) for any \( r > 0 \) when \( \epsilon > 0 \).
+                    The radius grows monotonically &mdash; trajectories spiral outward. The origin
+                    is an <strong>unstable spiral</strong>. The Jacobian at the origin gives
+                    \( \lambda = \pm i \) (center), but polar analysis reveals the truth.
+                </div>
+            </div>
+        </div>
+
+        <div class="tab-content">
+            <div class="question-container" data-type="mcq" data-answer="0">
+                <div class="question-text">
+                    Select <strong>Limit cycle</strong> (\( \dot{r} = r(1 - r^2) \)). What
+                    happens at \( r = 1 \)?
+                </div>
+                <div class="question-options">
+                    <label class="option">
+                        <input type="radio" name="pc-q3" value="0">
+                        <span>\( \dot{r} = 0 \) &mdash; the radius is constant, forming a closed orbit at \( r = 1 \)</span>
+                    </label>
+                    <label class="option">
+                        <input type="radio" name="pc-q3" value="1">
+                        <span>The trajectory escapes to infinity</span>
+                    </label>
+                    <label class="option">
+                        <input type="radio" name="pc-q3" value="2">
+                        <span>The trajectory collapses to the origin</span>
+                    </label>
+                    <label class="option">
+                        <input type="radio" name="pc-q3" value="3">
+                        <span>The system has no solution</span>
+                    </label>
+                </div>
+                <div class="question-actions">
+                    <button class="btn-verify">Verify</button>
+                </div>
+                <div class="question-explanation" style="display:none;">
+                    <strong>Explanation:</strong>
+                    At \( r = 1 \): \( \dot{r} = 1(1 - 1) = 0 \). The radius stays at 1 forever
+                    &mdash; a closed orbit. For \( r < 1 \): \( \dot{r} > 0 \) (radius grows
+                    toward 1). For \( r > 1 \): \( \dot{r} < 0 \) (radius shrinks toward 1).
+                    This is a <strong>stable limit cycle</strong>: an isolated closed orbit that
+                    attracts all nearby trajectories.
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- ============================================================ -->
+<!-- EXPLORER 2: Radial Dynamics Analyzer -->
+<!-- ============================================================ -->
+<div class="interactive-container" id="radial-analyzer">
+    <div class="interactive-title">Explorer: Radial Dynamics (1D Analysis)</div>
+
+    <p>
+        The radial equation \( \dot{r} = h(r) \) is a <strong>1D system</strong>.
+        Plot \( h(r) \) vs \( r \): zeros are radial fixed points (closed orbits or
+        the origin). The sign of \( h(r) \) tells you whether \( r \) grows or shrinks.
+        Stable limit cycles are zeros where \( h \) crosses from positive to negative.
+    </p>
+
+    <div class="dual-panel">
+        <div class="panel">
+            <div class="plot-container" id="pc-hrPlot" style="height: 400px;"></div>
+        </div>
+        <div class="panel">
+            <div class="plot-container" id="pc-rTimePlot" style="height: 400px;"></div>
+        </div>
+    </div>
+
+    <div id="pc-stats2" class="stats-bar"></div>
+
+    <div class="control-panel">
+        <div class="control-group">
+            <label class="control-label" for="pc-radial-system">Radial equation:</label>
+            <select id="pc-radial-system" class="control-select">
+                <option value="limitCycle">ṙ = r(1 − r²) — stable limit cycle at r=1</option>
+                <option value="cubic">ṙ = −r + r³ — unstable limit cycle at r=1</option>
+                <option value="bistable">ṙ = r(1−r²)(r²−4) — two limit cycles</option>
+                <option value="decay">ṙ = −0.5r — pure decay</option>
+            </select>
+        </div>
+        <div class="control-group">
+            <label class="control-label" for="pc-r0-slider">Initial radius r&#8320;:
+                <span id="pc-r0-value">0.3</span>
+            </label>
+            <input type="range" class="slider" id="pc-r0-slider"
+                   min="0.1" max="3" step="0.05" value="0.3">
+        </div>
+        <div class="control-group">
+            <button class="btn" onclick="pcRadialReset()">Reset</button>
+        </div>
+    </div>
+</div>
+
+<div class="info-box">
+    <div class="info-box-title">Limit Cycles</div>
+    <p>
+        A <strong>limit cycle</strong> is an isolated closed orbit. Unlike a center
+        (where every orbit is closed), a limit cycle is a single special orbit that
+        <em>attracts</em> (stable) or <em>repels</em> (unstable) nearby trajectories.
+        In polar coordinates, limit cycles appear as <strong>zeros of \( h(r) \)</strong>
+        where the sign of \( h \) changes. If \( h \) goes from + to &minus;, the
+        limit cycle is stable (trajectories converge to it from both sides).
+    </p>
+</div>
+
+<!-- ========== Test Your Understanding #2 ========== -->
+<div class="interactive-container question-section">
+    <div class="interactive-title">Test Your Understanding</div>
+
+    <p style="margin-bottom: var(--spacing-md); color: var(--text-secondary);">
+        Use the Radial Dynamics Analyzer to answer these questions.
+    </p>
+
+    <div class="tabs">
+        <div class="tab-buttons">
+            <button class="tab-button active">Question 4</button>
+            <button class="tab-button">Question 5</button>
+            <button class="tab-button">Question 6</button>
+        </div>
+
+        <div class="tab-content active">
+            <div class="question-container" data-type="mcq" data-answer="1">
+                <div class="question-text">
+                    Select \( \dot{r} = r(1 - r^2) \) and set \( r_0 = 0.3 \). What does
+                    \( r(t) \) converge to?
+                </div>
+                <div class="question-options">
+                    <label class="option">
+                        <input type="radio" name="pc-q4" value="0">
+                        <span>\( r \to 0 \) &mdash; spiral into the origin</span>
+                    </label>
+                    <label class="option">
+                        <input type="radio" name="pc-q4" value="1">
+                        <span>\( r \to 1 \) &mdash; spiral out to the limit cycle</span>
+                    </label>
+                    <label class="option">
+                        <input type="radio" name="pc-q4" value="2">
+                        <span>\( r \to \infty \) &mdash; escape to infinity</span>
+                    </label>
+                    <label class="option">
+                        <input type="radio" name="pc-q4" value="3">
+                        <span>\( r \) stays at 0.3 forever</span>
+                    </label>
+                </div>
+                <div class="question-actions">
+                    <button class="btn-verify">Verify</button>
+                </div>
+                <div class="question-explanation" style="display:none;">
+                    <strong>Explanation:</strong>
+                    For \( 0 < r < 1 \): \( 1 - r^2 > 0 \), so \( \dot{r} > 0 \). The radius
+                    grows. It approaches \( r = 1 \) where \( \dot{r} = 0 \). The trajectory
+                    spirals outward from the origin and settles onto the <strong>stable limit
+                    cycle</strong> at \( r = 1 \).
+                </div>
+            </div>
+        </div>
+
+        <div class="tab-content">
+            <div class="question-container" data-type="fill" data-answer="1[0.9,1.1]">
+                <div class="question-text">
+                    Now set \( r_0 = 2.5 \). The radius <em>decreases</em> because
+                    \( \dot{r} < 0 \) for \( r > 1 \). It converges to
+                    \( r = \) <input type="text" class="fill-blank" style="width: 50px">.
+                </div>
+                <div class="question-actions">
+                    <button class="btn-verify">Verify</button>
+                </div>
+                <div class="question-explanation" style="display:none;">
+                    <strong>Explanation:</strong>
+                    For \( r > 1 \): \( 1 - r^2 < 0 \), so \( \dot{r} = r(1 - r^2) < 0 \).
+                    The radius shrinks toward \( r = 1 \). The limit cycle attracts from
+                    <strong>both sides</strong>: inside (r < 1) and outside (r > 1). This
+                    bidirectional attraction is what makes it a <strong>stable</strong> limit cycle.
+                </div>
+            </div>
+        </div>
+
+        <div class="tab-content">
+            <div class="question-container" data-type="mcq" data-answer="2">
+                <div class="question-text">
+                    Select <strong>Two limit cycles</strong>. How many zeros does \( h(r) \)
+                    have for \( r > 0 \)?
+                </div>
+                <div class="question-options">
+                    <label class="option">
+                        <input type="radio" name="pc-q6" value="0">
+                        <span>One &mdash; a single limit cycle</span>
+                    </label>
+                    <label class="option">
+                        <input type="radio" name="pc-q6" value="1">
+                        <span>None &mdash; no closed orbits</span>
+                    </label>
+                    <label class="option">
+                        <input type="radio" name="pc-q6" value="2">
+                        <span>Two &mdash; at r = 1 and r = 2</span>
+                    </label>
+                    <label class="option">
+                        <input type="radio" name="pc-q6" value="3">
+                        <span>Infinitely many</span>
+                    </label>
+                </div>
+                <div class="question-actions">
+                    <button class="btn-verify">Verify</button>
+                </div>
+                <div class="question-explanation" style="display:none;">
+                    <strong>Explanation:</strong>
+                    \( h(r) = r(1-r^2)(r^2-4) \) has zeros at \( r = 0, 1, 2 \). For \( r > 0 \),
+                    there are <strong>two</strong> limit cycles: at \( r = 1 \) (where \( h \)
+                    goes from + to &minus;, so stable) and at \( r = 2 \) (where \( h \) goes
+                    from &minus; to +, so unstable). The unstable limit cycle acts as a
+                    &ldquo;watershed&rdquo; between trajectories attracted to r = 1 and those
+                    escaping to infinity.
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- ============================================================ -->
+<!-- EXPLORER 3: Center vs Spiral Resolver -->
+<!-- ============================================================ -->
+<div class="interactive-container" id="center-resolver">
+    <div class="interactive-title">Explorer: Resolving Center vs Spiral</div>
+
+    <p>
+        The capstone of Chapter 5: three systems that linearization calls
+        &ldquo;center,&rdquo; but polar analysis reveals their true nature.
+        Watch the phase portrait evolve as you adjust the nonlinear parameter,
+        and see how \( \dot{r} \) tells the definitive story.
+    </p>
+
+    <div class="dual-panel">
+        <div class="panel">
+            <div class="plot-container" id="pc-resolvePlot" style="height: 400px;"></div>
+        </div>
+        <div class="panel">
+            <div class="plot-container" id="pc-resolveRdotPlot" style="height: 400px;"></div>
+        </div>
+    </div>
+
+    <div id="pc-stats3" class="stats-bar"></div>
+
+    <div class="control-panel">
+        <div class="control-group">
+            <label class="control-label" for="pc-resolve-mu">&mu; (nonlinear strength):
+                <span id="pc-resolve-mu-value">0.00</span>
+            </label>
+            <input type="range" class="slider" id="pc-resolve-mu"
+                   min="-1" max="1" step="0.02" value="0">
+        </div>
+        <div class="control-group">
+            <button class="btn" onclick="pcResolveReset()">Reset</button>
+        </div>
+    </div>
+</div>
+
+<!-- ========== Test Your Understanding #3 ========== -->
+<div class="interactive-container question-section">
+    <div class="interactive-title">Test Your Understanding</div>
+
+    <p style="margin-bottom: var(--spacing-md); color: var(--text-secondary);">
+        Use the Center Resolver to answer these questions.
+    </p>
+
+    <div class="tabs">
+        <div class="tab-buttons">
+            <button class="tab-button active">Question 7</button>
+            <button class="tab-button">Question 8</button>
+            <button class="tab-button">Question 9</button>
+        </div>
+
+        <div class="tab-content active">
+            <div class="question-container" data-type="mcq" data-answer="0">
+                <div class="question-text">
+                    Set \( \mu = 0 \). The \( \dot{r} \) plot shows \( \dot{r} = 0 \) for all
+                    \( r \). What does this confirm?
+                </div>
+                <div class="question-options">
+                    <label class="option">
+                        <input type="radio" name="pc-q7" value="0">
+                        <span>A true center &mdash; every orbit is closed at its initial radius</span>
+                    </label>
+                    <label class="option">
+                        <input type="radio" name="pc-q7" value="1">
+                        <span>A stable spiral &mdash; trajectories eventually reach the origin</span>
+                    </label>
+                    <label class="option">
+                        <input type="radio" name="pc-q7" value="2">
+                        <span>A saddle &mdash; some directions grow, others decay</span>
+                    </label>
+                    <label class="option">
+                        <input type="radio" name="pc-q7" value="3">
+                        <span>The system has no dynamics</span>
+                    </label>
+                </div>
+                <div class="question-actions">
+                    <button class="btn-verify">Verify</button>
+                </div>
+                <div class="question-explanation" style="display:none;">
+                    <strong>Explanation:</strong>
+                    \( \dot{r} = 0 \) everywhere means the radius never changes. Every trajectory
+                    is a circle at its initial radius &mdash; confirming a <strong>true center</strong>.
+                    Linearization predicted this, and polar analysis confirms it. This is the one
+                    case where the center prediction is actually correct.
+                </div>
+            </div>
+        </div>
+
+        <div class="tab-content">
+            <div class="question-container" data-type="fill" data-answer="limit cycle">
+                <div class="question-text">
+                    Set \( \mu = 0.5 \). The \( \dot{r} \) plot shows \( \dot{r} = \mu r(1-r^2) \).
+                    There is a zero at \( r = 1 \) where \( \dot{r} \) changes sign from positive
+                    to negative. This is a stable
+                    <select class="fill-blank-select">
+                        <option value=""></option>
+                        <option value="fixed point">fixed point</option>
+                        <option value="limit cycle">limit cycle</option>
+                        <option value="center">center</option>
+                        <option value="saddle">saddle</option>
+                    </select>.
+                </div>
+                <div class="question-actions">
+                    <button class="btn-verify">Verify</button>
+                </div>
+                <div class="question-explanation" style="display:none;">
+                    <strong>Explanation:</strong>
+                    A zero of \( \dot{r} \) at \( r = 1 \) means there is a closed orbit at
+                    that radius. Since \( \dot{r} > 0 \) for \( r < 1 \) and \( \dot{r} < 0 \)
+                    for \( r > 1 \), trajectories converge to this orbit from both sides.
+                    This is a <strong>stable limit cycle</strong> &mdash; a feature completely
+                    invisible to linearization.
+                </div>
+            </div>
+        </div>
+
+        <div class="tab-content">
+            <div class="question-container" data-type="msq" data-answer="1,3">
+                <div class="question-text">
+                    Which statements about polar coordinate analysis are true? (Select all)
+                </div>
+                <div class="question-options">
+                    <label class="option">
+                        <input type="checkbox" value="0">
+                        <span>Polar coordinates work for any 2D system, not just symmetric ones</span>
+                    </label>
+                    <label class="option">
+                        <input type="checkbox" value="1">
+                        <span>For radially symmetric systems, the ṙ equation is a 1D system that can be analyzed independently</span>
+                    </label>
+                    <label class="option">
+                        <input type="checkbox" value="2">
+                        <span>Linearization always gives the same answer as polar analysis</span>
+                    </label>
+                    <label class="option">
+                        <input type="checkbox" value="3">
+                        <span>Limit cycles appear as stable fixed points of the radial equation ṙ = h(r)</span>
+                    </label>
+                </div>
+                <div class="question-actions">
+                    <button class="btn-verify">Verify</button>
+                </div>
+                <div class="question-explanation" style="display:none;">
+                    <strong>Explanation:</strong>
+                    <ul>
+                        <li><strong>Any system:</strong> ✗ You can always transform to polar, but the equations only <em>simplify</em> when there is radial symmetry. For general systems, the polar equations are as complicated as the Cartesian ones.</li>
+                        <li><strong>1D radial equation:</strong> ✓ When ṙ depends only on r (not θ), it decouples and becomes a standalone 1D problem.</li>
+                        <li><strong>Same as linearization:</strong> ✗ The whole point of this section: polar analysis reveals information that linearization misses (center vs spiral, limit cycles).</li>
+                        <li><strong>Limit cycles as radial FPs:</strong> ✓ A limit cycle at radius r₀ satisfies h(r₀) = 0 with h changing sign &mdash; exactly a fixed point of the 1D radial system.</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- ============================================================ -->
+<!-- PYTHON CODE EXAMPLES -->
+<!-- ============================================================ -->
+<h2>Python Code</h2>
+
+<div class="tabs">
+    <div class="tab-buttons">
+        <button class="tab-button active">Polar Analysis</button>
+        <button class="tab-button">Limit Cycle</button>
+        <button class="tab-button">Prompt</button>
+    </div>
+
+    <div class="tab-content active">
+        <div class="code-block-container">
+            <div class="code-header">
+                <span class="code-lang">Python</span>
+                <button class="copy-btn">Copy</button>
+            </div>
+            <pre><code class="language-python">
+import numpy as np
+import plotly.graph_objects as go
+from plotly.subplots import make_subplots
+
+def rk4(f, g, x0, y0, T, N):
+    h=T/N; X,Y=[x0],[y0]; x,y=x0,y0
+    for _ in range(N):
+        k1x,k1y=f(x,y),g(x,y)
+        k2x,k2y=f(x+h/2*k1x,y+h/2*k1y),g(x+h/2*k1x,y+h/2*k1y)
+        k3x,k3y=f(x+h/2*k2x,y+h/2*k2y),g(x+h/2*k2x,y+h/2*k2y)
+        k4x,k4y=f(x+h*k3x,y+h*k3y),g(x+h*k3x,y+h*k3y)
+        x+=h/6*(k1x+2*k2x+2*k3x+k4x);y+=h/6*(k1y+2*k2y+2*k3y+k4y)
+        if x*x+y*y>100: break
+        X.append(x); Y.append(y)
+    return np.array(X), np.array(Y)
+
+# Three systems with SAME linearization (center)
+eps_vals = [0, 0.1, -0.1]
+titles = ['ε=0 (True Center)', 'ε=0.1 (Unstable Spiral)', 'ε=−0.1 (Stable Spiral)']
+fig = make_subplots(1, 3, subplot_titles=titles)
+
+colors = ['#00f3ff','#ff006e','#ffbe0b','#00ff88']
+for col, eps in enumerate(eps_vals):
+    f = lambda x,y,e=eps: -y + e*x*(x**2+y**2)
+    g = lambda x,y,e=eps:  x + e*y*(x**2+y**2)
+    for k in range(4):
+        th = k*np.pi/2
+        X, Y = rk4(f, g, 0.8*np.cos(th), 0.8*np.sin(th), 20, 3000)
+        fig.add_trace(go.Scatter(x=X, y=Y, mode='lines',
+            line=dict(color=colors[k], width=1.5),
+            showlegend=False), row=1, col=col+1)
+
+for col in range(3):
+    fig.update_xaxes(range=[-3,3], zerolinecolor='#808080', row=1, col=col+1)
+    fig.update_yaxes(range=[-3,3], zerolinecolor='#808080', row=1, col=col+1)
+
+fig.update_layout(template='plotly_dark', height=400, width=1000)
+fig.show()
+            </code></pre>
+        </div>
+    </div>
+
+    <div class="tab-content">
+        <div class="code-block-container">
+            <div class="code-header">
+                <span class="code-lang">Python</span>
+                <button class="copy-btn">Copy</button>
+            </div>
+            <pre><code class="language-python">
+import numpy as np
+import plotly.graph_objects as go
+from plotly.subplots import make_subplots
+
+# Limit cycle system: ṙ = r(1-r²), θ̇ = 1
+f = lambda x,y: -y + x*(1-(x**2+y**2))
+g = lambda x,y:  x + y*(1-(x**2+y**2))
+
+def rk4(f, g, x0, y0, T, N):
+    h=T/N; X,Y=[x0],[y0]; x,y=x0,y0
+    for _ in range(N):
+        k1x,k1y=f(x,y),g(x,y)
+        k2x,k2y=f(x+h/2*k1x,y+h/2*k1y),g(x+h/2*k1x,y+h/2*k1y)
+        k3x,k3y=f(x+h/2*k2x,y+h/2*k2y),g(x+h/2*k2x,y+h/2*k2y)
+        k4x,k4y=f(x+h*k3x,y+h*k3y),g(x+h*k3x,y+h*k3y)
+        x+=h/6*(k1x+2*k2x+2*k3x+k4x);y+=h/6*(k1y+2*k2y+2*k3y+k4y)
+        X.append(x); Y.append(y)
+    return np.array(X), np.array(Y)
+
+fig = make_subplots(1, 2, subplot_titles=[
+    'Phase Portrait', 'Radial equation ṙ = r(1−r²)'])
+
+# Trajectories from inside and outside
+for r0, col in [(0.2,'#00f3ff'),(0.5,'#ffbe0b'),(1.5,'#ff006e'),(2.5,'#bb86fc')]:
+    X, Y = rk4(f, g, r0, 0, 25, 5000)
+    fig.add_trace(go.Scatter(x=X,y=Y,mode='lines',
+        line=dict(color=col,width=1.5),
+        name=f'r₀={r0}'), row=1, col=1)
+
+# Limit cycle circle
+th = np.linspace(0, 2*np.pi, 200)
+fig.add_trace(go.Scatter(x=np.cos(th),y=np.sin(th),mode='lines',
+    line=dict(color='white',width=2,dash='dash'),
+    name='Limit cycle r=1'), row=1, col=1)
+
+# ṙ vs r
+r = np.linspace(0, 2.5, 200)
+rdot = r*(1 - r**2)
+fig.add_trace(go.Scatter(x=r,y=rdot,mode='lines',
+    line=dict(color='#00f3ff',width=2.5),
+    name='ṙ = r(1−r²)'), row=1, col=2)
+fig.add_trace(go.Scatter(x=[0,2.5],y=[0,0],mode='lines',
+    line=dict(color='#808080',width=1,dash='dot'),
+    showlegend=False), row=1, col=2)
+fig.add_trace(go.Scatter(x=[1],y=[0],mode='markers',
+    marker=dict(color='white',size=12,line=dict(color='white',width=2)),
+    name='Stable LC'), row=1, col=2)
+
+fig.update_layout(template='plotly_dark', height=400, width=900)
+fig.update_xaxes(range=[-3,3],zerolinecolor='#808080',row=1,col=1)
+fig.update_yaxes(range=[-3,3],zerolinecolor='#808080',row=1,col=1)
+fig.update_xaxes(title='r',range=[0,2.5],zerolinecolor='#808080',row=1,col=2)
+fig.update_yaxes(title='ṙ',range=[-3,1],zerolinecolor='#808080',row=1,col=2)
+fig.show()
+            </code></pre>
+        </div>
+    </div>
+
+    <div class="tab-content">
+        <div class="code-block-container">
+            <div class="code-header">
+                <span class="code-lang">Prompt for AI</span>
+                <button class="copy-btn">Copy</button>
+            </div>
+            <pre><code class="language-text">Create a Python script using Plotly to demonstrate polar
+coordinate analysis of 2D dynamical systems.
+
+Requirements:
+- System: ẋ = -y + μx(1-(x²+y²)), ẏ = x + μy(1-(x²+y²))
+  In polar: ṙ = μr(1-r²), θ̇ = 1
+- Panel 1: Phase portrait with trajectories from r₀=0.2,0.5,1.5,2.5
+  Show limit cycle at r=1 as dashed white circle
+- Panel 2: Plot ṙ = μr(1-r²) vs r
+  Mark zeros (r=0 origin, r=1 limit cycle)
+  Show arrows indicating flow direction
+- Panel 3: r(t) time series for different initial radii
+  All converge to r=1 (the limit cycle)
+- Compare μ=0 (true center), μ=0.5 (limit cycle), μ=-0.5 (stable spiral)
+- Solve with RK4 (not scipy)
+- Use dark theme (plotly_dark) with gray (#808080) axes</code></pre>
+        </div>
+    </div>
+</div>
+
+<!-- ============================================================ -->
+<!-- NAVIGATION -->
+<!-- ============================================================ -->
+<div class="btn-group mt-xl">
+    <button class="btn btn-magenta" onclick="navigateToSection('64-linearization-limits')">&larr; Previous: When Linearization Fails</button>
+    <button class="btn btn-secondary" onclick="scrollToTop()">&uarr; Back to Top</button>
+    <button class="btn btn-secondary" onclick="navigateToSection('66-monte-carlo-intro')">Next: Why Use Randomness? &rarr;</button>
+</div>

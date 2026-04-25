@@ -1,0 +1,751 @@
+<!-- ============================================================
+     Section 5.6: Romeo & Juliet: Love in Phase Space
+     Source: NPTEL Lecture 8_2 (Linear Systems — Love Affairs)
+     Concept: Applying phase space classification to a playful
+              model of romantic dynamics
+     Time: 20-25 minutes
+     Prerequisites: Sections 5.1-5.5 (phase space, vector fields,
+                    fixed points, classification, trajectories)
+     ============================================================ -->
+
+<h1>Romeo &amp; Juliet: Love in Phase Space</h1>
+
+<p>
+    Can mathematics predict the course of true love? Steven Strogatz posed this
+    playful question by modeling Romeo and Juliet&rsquo;s feelings as a coupled
+    dynamical system. The punchline: the mathematics of love affairs is
+    <strong>identical</strong> to the physics of oscillators &mdash; and all the
+    phase space tools you&rsquo;ve learned (fixed points, eigenvalues, classification)
+    predict whether a relationship thrives, fades, or cycles endlessly.
+</p>
+
+<div class="info-box">
+    <div class="info-box-title">Learning Objectives</div>
+    <ul>
+        <li>Model a romantic relationship as a 2D dynamical system and interpret the phase portrait as a &ldquo;love story&rdquo;</li>
+        <li>Connect the personality parameters \(a, b, c, d\) to eigenvalues, trace, and determinant</li>
+        <li>Predict relationship fate (eternal cycling, decay, explosion, or saddle sensitivity) from the fixed-point classification</li>
+        <li>Explore how the balance between <strong>cautiousness</strong> and <strong>responsiveness</strong> determines whether love survives</li>
+    </ul>
+</div>
+
+<div class="equation-display">
+    <p><strong>The Love Affair Model:</strong></p>
+    $$ \dot{R} = aR + bJ, \qquad \dot{J} = cR + dJ $$
+    <p>
+        where \( R(t) \) = Romeo&rsquo;s feelings and \( J(t) \) = Juliet&rsquo;s feelings.
+        Positive means love, negative means hate, zero means indifference.
+    </p>
+    <p>
+        The parameters encode <strong>personality</strong>: \( a \) and \( d \) control
+        self-response (positive = self-reinforcing, negative = cautious), while
+        \( b \) and \( c \) control response to the other&rsquo;s feelings.
+    </p>
+</div>
+
+<hr>
+
+<!-- ============================================================ -->
+<!-- EXPLORER 1: The Love Story -->
+<!-- ============================================================ -->
+<div class="interactive-container" id="love-story">
+    <div class="interactive-title">Explorer: The Love Story</div>
+
+    <p>
+        Start with the simplest model: \( \dot{R} = J \), \( \dot{J} = -R \).
+        Romeo mirrors Juliet&rsquo;s feelings, but Juliet is contrarian &mdash; the more
+        Romeo loves her, the more she pulls away. Set initial feelings and watch the
+        eternal cycle unfold.
+    </p>
+
+    <div class="dual-panel">
+        <div class="panel">
+            <div class="plot-container" id="la-storyPlot" style="height: 400px;"></div>
+        </div>
+        <div class="panel">
+            <div class="plot-container" id="la-timePlot" style="height: 400px;"></div>
+        </div>
+    </div>
+
+    <div id="la-stats1" class="stats-bar"></div>
+
+    <div class="control-panel">
+        <div class="control-group">
+            <label class="control-label" for="la-r0-slider">R&#8320; (Romeo):
+                <span id="la-r0-value">2.0</span>
+            </label>
+            <input type="range" class="slider" id="la-r0-slider"
+                   min="-2.5" max="2.5" step="0.1" value="2.0">
+        </div>
+        <div class="control-group">
+            <label class="control-label" for="la-j0-slider">J&#8320; (Juliet):
+                <span id="la-j0-value">0.0</span>
+            </label>
+            <input type="range" class="slider" id="la-j0-slider"
+                   min="-2.5" max="2.5" step="0.1" value="0">
+        </div>
+        <div class="control-group">
+            <button class="btn" onclick="laStoryReset()">Reset</button>
+        </div>
+    </div>
+</div>
+
+<div class="info-box">
+    <div class="info-box-title">The Story Behind the Cycle</div>
+    <p>
+        Starting from \( R = 2, J = 0 \): Romeo loves Juliet, but she&rsquo;s indifferent.
+        His eagerness repels her (\( \dot{J} = -R < 0 \)), so she starts to hate him.
+        Her coldness kills his love (\( \dot{R} = J < 0 \)). Now both hate each other &mdash;
+        but her hate triggers a reversal (\( \dot{J} = -R > 0 \) since \( R < 0 \)).
+        She starts to love again, he follows, and the cycle repeats. Only one quarter
+        of the cycle is mutual love &mdash; a bittersweet prediction!
+    </p>
+</div>
+
+<!-- ========== Test Your Understanding #1 ========== -->
+<div class="interactive-container question-section">
+    <div class="interactive-title">Test Your Understanding</div>
+
+    <p style="margin-bottom: var(--spacing-md); color: var(--text-secondary);">
+        Use the Love Story explorer to answer these questions.
+    </p>
+
+    <div class="tabs">
+        <div class="tab-buttons">
+            <button class="tab-button active">Question 1</button>
+            <button class="tab-button">Question 2</button>
+            <button class="tab-button">Question 3</button>
+        </div>
+
+        <div class="tab-content active">
+            <div class="question-container" data-type="mcq" data-answer="1">
+                <div class="question-text">
+                    Start from \( R_0 = 2, J_0 = 0 \). What happens to Juliet&rsquo;s
+                    feelings <strong>first</strong>?
+                </div>
+                <div class="question-options">
+                    <label class="option">
+                        <input type="radio" name="la-q1" value="0">
+                        <span>They increase &mdash; she falls in love with Romeo</span>
+                    </label>
+                    <label class="option">
+                        <input type="radio" name="la-q1" value="1">
+                        <span>They decrease &mdash; his eagerness repels her</span>
+                    </label>
+                    <label class="option">
+                        <input type="radio" name="la-q1" value="2">
+                        <span>They stay at zero &mdash; she remains indifferent</span>
+                    </label>
+                    <label class="option">
+                        <input type="radio" name="la-q1" value="3">
+                        <span>They oscillate rapidly between love and hate</span>
+                    </label>
+                </div>
+                <div class="question-actions">
+                    <button class="btn-verify">Verify</button>
+                </div>
+                <div class="question-explanation" style="display:none;">
+                    <strong>Explanation:</strong>
+                    At \( t = 0 \): \( \dot{J} = -R = -2 < 0 \). Juliet&rsquo;s feelings
+                    <strong>decrease</strong> &mdash; Romeo&rsquo;s love pushes her toward hate.
+                    This is the &ldquo;contrarian Juliet&rdquo; dynamic: \( \dot{J} = -R \) means
+                    the more Romeo loves, the more Juliet pulls away.
+                </div>
+            </div>
+        </div>
+
+        <div class="tab-content">
+            <div class="question-container" data-type="fill" data-answer="simple harmonic oscillator">
+                <div class="question-text">
+                    The simple model \( \dot{R} = J,\; \dot{J} = -R \) is mathematically
+                    identical to a
+                    <select class="fill-blank-select">
+                        <option value=""></option>
+                        <option value="simple harmonic oscillator">simple harmonic oscillator</option>
+                        <option value="damped oscillator">damped oscillator</option>
+                        <option value="driven oscillator">driven oscillator</option>
+                        <option value="saddle system">saddle system</option>
+                    </select>.
+                </div>
+                <div class="question-actions">
+                    <button class="btn-verify">Verify</button>
+                </div>
+                <div class="question-explanation" style="display:none;">
+                    <strong>Explanation:</strong>
+                    The system \( \dot{R} = J,\; \dot{J} = -R \) is exactly
+                    \( \dot{x} = v,\; \dot{v} = -x \) &mdash; the
+                    <strong>simple harmonic oscillator</strong> with \( \omega = 1 \).
+                    The eigenvalues are \( \lambda = \pm i \) (pure imaginary), giving
+                    a center with period \( T = 2\pi \). Love is a harmonic oscillator!
+                </div>
+            </div>
+        </div>
+
+        <div class="tab-content">
+            <div class="question-container" data-type="mcq" data-answer="0">
+                <div class="question-text">
+                    What fraction of the cycle are Romeo and Juliet <strong>simultaneously
+                    in love</strong> (both \( R > 0 \) and \( J > 0 \))?
+                </div>
+                <div class="question-options">
+                    <label class="option">
+                        <input type="radio" name="la-q3" value="0">
+                        <span>One quarter &mdash; only in Quadrant I</span>
+                    </label>
+                    <label class="option">
+                        <input type="radio" name="la-q3" value="1">
+                        <span>One half &mdash; half the cycle</span>
+                    </label>
+                    <label class="option">
+                        <input type="radio" name="la-q3" value="2">
+                        <span>Always &mdash; they love each other the whole time</span>
+                    </label>
+                    <label class="option">
+                        <input type="radio" name="la-q3" value="3">
+                        <span>Never &mdash; they are always out of phase</span>
+                    </label>
+                </div>
+                <div class="question-actions">
+                    <button class="btn-verify">Verify</button>
+                </div>
+                <div class="question-explanation" style="display:none;">
+                    <strong>Explanation:</strong>
+                    The trajectory is a circle traversed at constant angular speed. It passes
+                    through all four quadrants equally, spending exactly <strong>one quarter</strong>
+                    of the period in Quadrant I (mutual love). This means 75% of the time, at
+                    least one of them is unhappy &mdash; a bittersweet mathematical prediction!
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- ============================================================ -->
+<!-- EXPLORER 2: Personality Parameters -->
+<!-- ============================================================ -->
+<div class="interactive-container" id="personality-params">
+    <div class="interactive-title">Explorer: Personality Parameters</div>
+
+    <p>
+        Different personalities create different dynamics. Adjust the four parameters
+        of the love matrix \( A = \begin{pmatrix} a & b \\ c & d \end{pmatrix} \) or
+        choose a preset to see how personality determines fate.
+    </p>
+
+    <div class="plot-container" id="la-paramPlot" style="height: 440px;"></div>
+
+    <div id="la-stats2" class="stats-bar"></div>
+
+    <div class="control-panel">
+        <div class="control-group">
+            <label class="control-label" for="la-preset-select">Preset:</label>
+            <select id="la-preset-select" class="control-select" onchange="laPresetChange()">
+                <option value="eternalCycle">Eternal Cycle</option>
+                <option value="loveFades">Love Fades</option>
+                <option value="loveGrows">Love Grows</option>
+                <option value="starCrossed">Star-Crossed</option>
+                <option value="spiralRomance">Spiral Romance</option>
+                <option value="custom">Custom</option>
+            </select>
+        </div>
+        <div class="control-group">
+            <label class="control-label" for="la-a-slider">a (Romeo self):
+                <span id="la-a-value">0.0</span>
+            </label>
+            <input type="range" class="slider" id="la-a-slider"
+                   min="-3" max="3" step="0.1" value="0">
+        </div>
+        <div class="control-group">
+            <label class="control-label" for="la-b-slider">b (Romeo &rarr; Juliet):
+                <span id="la-b-value">1.0</span>
+            </label>
+            <input type="range" class="slider" id="la-b-slider"
+                   min="-3" max="3" step="0.1" value="1">
+        </div>
+        <div class="control-group">
+            <label class="control-label" for="la-c-slider">c (Juliet &rarr; Romeo):
+                <span id="la-c-value">-1.0</span>
+            </label>
+            <input type="range" class="slider" id="la-c-slider"
+                   min="-3" max="3" step="0.1" value="-1">
+        </div>
+        <div class="control-group">
+            <label class="control-label" for="la-d-slider">d (Juliet self):
+                <span id="la-d-value">0.0</span>
+            </label>
+            <input type="range" class="slider" id="la-d-slider"
+                   min="-3" max="3" step="0.1" value="0">
+        </div>
+        <div class="control-group">
+            <button class="btn" onclick="laParamReset()">Reset</button>
+        </div>
+    </div>
+</div>
+
+<!-- ========== Test Your Understanding #2 ========== -->
+<div class="interactive-container question-section">
+    <div class="interactive-title">Test Your Understanding</div>
+
+    <p style="margin-bottom: var(--spacing-md); color: var(--text-secondary);">
+        Use the Personality Parameters explorer to answer these questions.
+    </p>
+
+    <div class="tabs">
+        <div class="tab-buttons">
+            <button class="tab-button active">Question 4</button>
+            <button class="tab-button">Question 5</button>
+            <button class="tab-button">Question 6</button>
+        </div>
+
+        <div class="tab-content active">
+            <div class="question-container" data-type="mcq" data-answer="1">
+                <div class="question-text">
+                    Select the <strong>Love Fades</strong> preset. What is the long-term
+                    fate of the relationship?
+                </div>
+                <div class="question-options">
+                    <label class="option">
+                        <input type="radio" name="la-q4" value="0">
+                        <span>They cycle between love and hate forever</span>
+                    </label>
+                    <label class="option">
+                        <input type="radio" name="la-q4" value="1">
+                        <span>Both feelings decay to zero &mdash; mutual indifference</span>
+                    </label>
+                    <label class="option">
+                        <input type="radio" name="la-q4" value="2">
+                        <span>One person loves, the other hates, forever</span>
+                    </label>
+                    <label class="option">
+                        <input type="radio" name="la-q4" value="3">
+                        <span>Both feelings grow without bound</span>
+                    </label>
+                </div>
+                <div class="question-actions">
+                    <button class="btn-verify">Verify</button>
+                </div>
+                <div class="question-explanation" style="display:none;">
+                    <strong>Explanation:</strong>
+                    &ldquo;Love Fades&rdquo; is a <strong>stable node</strong> (\( \tau = -4, \Delta = 3 \)).
+                    Both eigenvalues are negative, so all trajectories converge to the origin.
+                    Physically: cautiousness (\( a = d = -2 \)) overwhelms responsiveness
+                    (\( b = c = 1 \)), and the flame dies out.
+                </div>
+            </div>
+        </div>
+
+        <div class="tab-content">
+            <div class="question-container" data-type="fill" data-answer="starting point">
+                <div class="question-text">
+                    Select the <strong>Star-Crossed</strong> preset (a saddle). In a saddle,
+                    the long-term fate depends entirely on the
+                    <select class="fill-blank-select">
+                        <option value=""></option>
+                        <option value="starting point">starting point</option>
+                        <option value="time elapsed">time elapsed</option>
+                        <option value="system parameters">system parameters</option>
+                    </select>.
+                </div>
+                <div class="question-actions">
+                    <button class="btn-verify">Verify</button>
+                </div>
+                <div class="question-explanation" style="display:none;">
+                    <strong>Explanation:</strong>
+                    A saddle has one positive and one negative eigenvalue. Some initial conditions
+                    lead to growing mutual love (along the unstable manifold), while others lead to
+                    growing mutual hate. The <strong>starting point</strong> &mdash; the initial
+                    feelings &mdash; determines everything. Two couples with identical personalities
+                    but slightly different first impressions can have completely opposite fates.
+                </div>
+            </div>
+        </div>
+
+        <div class="tab-content">
+            <div class="question-container" data-type="msq" data-answer="0,2">
+                <div class="question-text">
+                    Which presets lead to relationships that eventually <strong>settle down</strong>
+                    (feelings stop changing)? Select all that apply.
+                </div>
+                <div class="question-options">
+                    <label class="option">
+                        <input type="checkbox" value="0">
+                        <span>Love Fades (stable node)</span>
+                    </label>
+                    <label class="option">
+                        <input type="checkbox" value="1">
+                        <span>Eternal Cycle (center)</span>
+                    </label>
+                    <label class="option">
+                        <input type="checkbox" value="2">
+                        <span>Spiral Romance (stable spiral)</span>
+                    </label>
+                    <label class="option">
+                        <input type="checkbox" value="3">
+                        <span>Love Grows (unstable node)</span>
+                    </label>
+                </div>
+                <div class="question-actions">
+                    <button class="btn-verify">Verify</button>
+                </div>
+                <div class="question-explanation" style="display:none;">
+                    <strong>Explanation:</strong>
+                    <ul>
+                        <li><strong>Love Fades (stable node):</strong> ✓ All eigenvalues negative &mdash; feelings decay to zero.</li>
+                        <li><strong>Eternal Cycle (center):</strong> ✗ Pure imaginary eigenvalues &mdash; feelings oscillate forever, never settling.</li>
+                        <li><strong>Spiral Romance (stable spiral):</strong> ✓ Negative real part &mdash; oscillating feelings gradually calm to indifference.</li>
+                        <li><strong>Love Grows (unstable node):</strong> ✗ Positive eigenvalues &mdash; feelings grow without bound!</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- ============================================================ -->
+<!-- EXPLORER 3: Cautiousness vs Responsiveness -->
+<!-- ============================================================ -->
+<div class="interactive-container" id="cautious-lovers">
+    <div class="interactive-title">Explorer: Cautiousness vs Responsiveness</div>
+
+    <p>
+        The symmetric &ldquo;cautious lovers&rdquo; model: both partners have the same
+        cautiousness \( \alpha \) and responsiveness \( \beta \).
+        The system \( \dot{R} = -\alpha R + \beta J,\; \dot{J} = \beta R - \alpha J \)
+        has eigenvalues \( \lambda_1 = \beta - \alpha \) and \( \lambda_2 = -(\alpha + \beta) \).
+        The critical question: does cautiousness or responsiveness win?
+    </p>
+
+    <div class="dual-panel">
+        <div class="panel">
+            <div class="plot-container" id="la-regimePlot" style="height: 400px;"></div>
+        </div>
+        <div class="panel">
+            <div class="plot-container" id="la-regimeMapPlot" style="height: 400px;"></div>
+        </div>
+    </div>
+
+    <div id="la-stats3" class="stats-bar"></div>
+
+    <div class="control-panel">
+        <div class="control-group">
+            <label class="control-label" for="la-caution-slider">Cautiousness &alpha;:
+                <span id="la-caution-value">1.5</span>
+            </label>
+            <input type="range" class="slider" id="la-caution-slider"
+                   min="0.1" max="3" step="0.1" value="1.5">
+        </div>
+        <div class="control-group">
+            <label class="control-label" for="la-response-slider">Responsiveness &beta;:
+                <span id="la-response-value">0.8</span>
+            </label>
+            <input type="range" class="slider" id="la-response-slider"
+                   min="0.1" max="3" step="0.1" value="0.8">
+        </div>
+        <div class="control-group">
+            <button class="btn" onclick="laRegimeReset()">Reset</button>
+        </div>
+    </div>
+</div>
+
+<div class="info-box">
+    <div class="info-box-title">The Eigenvectors Tell the Story</div>
+    <p>
+        The eigenvector for \( \lambda_1 = \beta - \alpha \) is \( (1, 1) \) &mdash; the
+        &ldquo;mutual feelings&rdquo; direction where both love or both hate equally.
+        The eigenvector for \( \lambda_2 = -(\alpha + \beta) \) is \( (1, -1) \) &mdash;
+        the &ldquo;opposite feelings&rdquo; direction. Since \( \lambda_2 < 0 \) always,
+        opposite feelings always decay. The entire fate hinges on \( \lambda_1 \):
+        if \( \beta > \alpha \), mutual feelings <strong>grow</strong> (saddle &mdash;
+        couples either fall deeply in love or sink into mutual hate);
+        if \( \beta < \alpha \), mutual feelings <strong>decay</strong> (stable node &mdash;
+        indifference wins).
+    </p>
+</div>
+
+<!-- ========== Test Your Understanding #3 ========== -->
+<div class="interactive-container question-section">
+    <div class="interactive-title">Test Your Understanding</div>
+
+    <p style="margin-bottom: var(--spacing-md); color: var(--text-secondary);">
+        Use the Cautiousness vs Responsiveness explorer to answer these questions.
+    </p>
+
+    <div class="tabs">
+        <div class="tab-buttons">
+            <button class="tab-button active">Question 7</button>
+            <button class="tab-button">Question 8</button>
+            <button class="tab-button">Question 9</button>
+        </div>
+
+        <div class="tab-content active">
+            <div class="question-container" data-type="mcq" data-answer="0">
+                <div class="question-text">
+                    Set cautiousness \( \alpha = 2 \) and responsiveness \( \beta = 1 \).
+                    What happens to all initial conditions?
+                </div>
+                <div class="question-options">
+                    <label class="option">
+                        <input type="radio" name="la-q7" value="0">
+                        <span>All feelings decay to zero &mdash; cautiousness wins</span>
+                    </label>
+                    <label class="option">
+                        <input type="radio" name="la-q7" value="1">
+                        <span>Feelings grow without bound</span>
+                    </label>
+                    <label class="option">
+                        <input type="radio" name="la-q7" value="2">
+                        <span>They cycle forever</span>
+                    </label>
+                    <label class="option">
+                        <input type="radio" name="la-q7" value="3">
+                        <span>Outcome depends on the starting point</span>
+                    </label>
+                </div>
+                <div class="question-actions">
+                    <button class="btn-verify">Verify</button>
+                </div>
+                <div class="question-explanation" style="display:none;">
+                    <strong>Explanation:</strong>
+                    With \( \alpha = 2, \beta = 1 \): \( \lambda_1 = 1 - 2 = -1 \) and
+                    \( \lambda_2 = -(2 + 1) = -3 \). Both eigenvalues are negative &mdash;
+                    <strong>stable node</strong>. Cautiousness overwhelms responsiveness, and
+                    both feelings decay to indifference regardless of starting point.
+                </div>
+            </div>
+        </div>
+
+        <div class="tab-content">
+            <div class="question-container" data-type="fill" data-answer="equals">
+                <div class="question-text">
+                    The critical transition between a stable node and a saddle occurs
+                    when cautiousness
+                    <select class="fill-blank-select">
+                        <option value=""></option>
+                        <option value="equals">equals</option>
+                        <option value="exceeds">exceeds</option>
+                        <option value="is less than">is less than</option>
+                    </select>
+                    responsiveness (\( \alpha = \beta \)).
+                </div>
+                <div class="question-actions">
+                    <button class="btn-verify">Verify</button>
+                </div>
+                <div class="question-explanation" style="display:none;">
+                    <strong>Explanation:</strong>
+                    When \( \alpha = \beta \), one eigenvalue \( \lambda_1 = \beta - \alpha = 0 \)
+                    becomes zero. This is the boundary: a <strong>degenerate</strong> case with a
+                    line of fixed points along \( R = J \). Below the diagonal (\( \beta < \alpha \))
+                    is a stable node; above (\( \beta > \alpha \)) is a saddle. The diagonal is
+                    the &ldquo;tipping point&rdquo; of the relationship.
+                </div>
+            </div>
+        </div>
+
+        <div class="tab-content">
+            <div class="question-container" data-type="mcq" data-answer="2">
+                <div class="question-text">
+                    In the saddle regime (\( \beta > \alpha \)), the <strong>unstable</strong>
+                    direction (growing eigenvalue) points along&hellip;
+                </div>
+                <div class="question-options">
+                    <label class="option">
+                        <input type="radio" name="la-q9" value="0">
+                        <span>The R-axis (Romeo&rsquo;s feelings only)</span>
+                    </label>
+                    <label class="option">
+                        <input type="radio" name="la-q9" value="1">
+                        <span>The \( R = -J \) line (opposite feelings)</span>
+                    </label>
+                    <label class="option">
+                        <input type="radio" name="la-q9" value="2">
+                        <span>The \( R = J \) line (mutual feelings)</span>
+                    </label>
+                    <label class="option">
+                        <input type="radio" name="la-q9" value="3">
+                        <span>A circle around the origin</span>
+                    </label>
+                </div>
+                <div class="question-actions">
+                    <button class="btn-verify">Verify</button>
+                </div>
+                <div class="question-explanation" style="display:none;">
+                    <strong>Explanation:</strong>
+                    The unstable eigenvalue \( \lambda_1 = \beta - \alpha > 0 \) has
+                    eigenvector \( (1, 1) \) &mdash; the line \( R = J \). Along this direction,
+                    <strong>mutual</strong> feelings grow: if both start loving, love amplifies;
+                    if both start hating, hate amplifies. The stable direction \( (1, -1) \)
+                    (opposite feelings) always decays. Responsiveness amplifies whatever
+                    sentiment the couple shares.
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- ============================================================ -->
+<!-- PYTHON CODE EXAMPLES -->
+<!-- ============================================================ -->
+<h2>Python Code</h2>
+
+<div class="tabs">
+    <div class="tab-buttons">
+        <button class="tab-button active">Love Story</button>
+        <button class="tab-button">Personality Scan</button>
+        <button class="tab-button">Prompt</button>
+    </div>
+
+    <div class="tab-content active">
+        <div class="code-block-container">
+            <div class="code-header">
+                <span class="code-lang">Python</span>
+                <button class="copy-btn">Copy</button>
+            </div>
+            <pre><code class="language-python">
+import numpy as np
+import plotly.graph_objects as go
+from plotly.subplots import make_subplots
+
+def rk4(f, x0, T, N):
+    """RK4 for dx/dt = f(x). x is a 2-vector."""
+    h = T / N
+    x = np.array(x0, dtype=float)
+    traj, times = [x.copy()], [0.0]
+    for i in range(N):
+        k1 = f(x); k2 = f(x + h/2*k1)
+        k3 = f(x + h/2*k2); k4 = f(x + h*k3)
+        x += h/6 * (k1 + 2*k2 + 2*k3 + k4)
+        traj.append(x.copy())
+        times.append((i+1)*h)
+    return np.array(traj), np.array(times)
+
+# Simple love model: R' = J, J' = -R
+love = lambda x: np.array([x[1], -x[0]])
+traj, t = rk4(love, [2, 0], 8, 2000)
+
+fig = make_subplots(rows=1, cols=2,
+    subplot_titles=['Phase Portrait', 'The Love Story'])
+
+fig.add_trace(go.Scatter(
+    x=traj[:,0], y=traj[:,1], mode='lines',
+    line=dict(color='#00f3ff', width=2),
+    showlegend=False), row=1, col=1)
+fig.add_trace(go.Scatter(
+    x=[2], y=[0], mode='markers',
+    marker=dict(color='#00f3ff', size=8,
+        line=dict(color='white', width=2)),
+    showlegend=False), row=1, col=1)
+
+fig.add_trace(go.Scatter(
+    x=t, y=traj[:,0], mode='lines',
+    line=dict(color='#00f3ff', width=2),
+    name='Romeo'), row=1, col=2)
+fig.add_trace(go.Scatter(
+    x=t, y=traj[:,1], mode='lines',
+    line=dict(color='#ff006e', width=2),
+    name='Juliet'), row=1, col=2)
+
+fig.update_layout(template='plotly_dark',
+    height=400, width=900)
+fig.update_xaxes(title='Romeo R', range=[-3,3],
+    zerolinecolor='#808080', row=1, col=1)
+fig.update_yaxes(title='Juliet J', range=[-3,3],
+    zerolinecolor='#808080', row=1, col=1)
+fig.update_xaxes(title='Time', zerolinecolor='#808080',
+    row=1, col=2)
+fig.update_yaxes(title='Feelings', zerolinecolor='#808080',
+    row=1, col=2)
+fig.show()
+            </code></pre>
+        </div>
+    </div>
+
+    <div class="tab-content">
+        <div class="code-block-container">
+            <div class="code-header">
+                <span class="code-lang">Python</span>
+                <button class="copy-btn">Copy</button>
+            </div>
+            <pre><code class="language-python">
+import numpy as np
+import plotly.graph_objects as go
+
+def rk4_linear(a, b, c, d, x0, T, N):
+    h = T / N
+    x = np.array(x0, dtype=float)
+    traj = [x.copy()]
+    for i in range(N):
+        def f(u): return np.array([a*u[0]+b*u[1], c*u[0]+d*u[1]])
+        k1 = f(x); k2 = f(x+h/2*k1)
+        k3 = f(x+h/2*k2); k4 = f(x+h*k3)
+        x += h/6*(k1+2*k2+2*k3+k4)
+        if np.linalg.norm(x) > 20: break
+        traj.append(x.copy())
+    return np.array(traj)
+
+presets = {
+    'Eternal Cycle': (0, 1, -1, 0),
+    'Love Fades': (-2, 1, 1, -2),
+    'Star-Crossed': (-1, 2, 2, -1),
+    'Spiral Romance': (-0.3, 1, -1, -0.3),
+}
+
+colors = ['#00f3ff', '#ff006e', '#ffbe0b', '#00ff88',
+          '#bb86fc', '#ff5722', '#76ff03', '#40c4ff']
+
+for name, (a, b, c, d) in presets.items():
+    fig = go.Figure()
+    for k in range(8):
+        th = k * np.pi / 4
+        traj = rk4_linear(a, b, c, d,
+            [1.5*np.cos(th), 1.5*np.sin(th)], 20, 2000)
+        fig.add_trace(go.Scatter(
+            x=traj[:,0], y=traj[:,1], mode='lines',
+            line=dict(color=colors[k], width=1.5),
+            showlegend=False))
+    tau, delta = a+d, a*d-b*c
+    fig.update_layout(
+        template='plotly_dark',
+        title=f'{name} (τ={tau:.1f}, Δ={delta:.1f})',
+        xaxis=dict(title='Romeo', range=[-3,3],
+                   zerolinecolor='#808080'),
+        yaxis=dict(title='Juliet', range=[-3,3],
+                   zerolinecolor='#808080'),
+        height=450, width=500)
+    fig.show()
+            </code></pre>
+        </div>
+    </div>
+
+    <div class="tab-content">
+        <div class="code-block-container">
+            <div class="code-header">
+                <span class="code-lang">Prompt for AI</span>
+                <button class="copy-btn">Copy</button>
+            </div>
+            <pre><code class="language-text">Create a Python script using Plotly to model a romantic
+relationship as a 2D linear ODE system.
+
+Requirements:
+- Model: R' = aR + bJ, J' = cR + dJ (Romeo and Juliet)
+- Solve with RK4 integrator (not scipy)
+- Show two panels: phase portrait (R vs J) and time series
+- Phase portrait: label quadrants as "Mutual Love", "Mutual
+  Hate", "R loves J hates", "J loves R hates"
+- Time series: R(t) in cyan, J(t) in magenta
+- Test with several presets:
+  (a,b,c,d) = (0,1,-1,0) center, (-2,1,1,-2) stable node,
+  (-1,2,2,-1) saddle, (-0.3,1,-1,-0.3) stable spiral
+- Use dark theme (plotly_dark) with gray (#808080) axes
+- Fixed axis ranges [-3, 3] for the phase portrait</code></pre>
+        </div>
+    </div>
+</div>
+
+<!-- ============================================================ -->
+<!-- NAVIGATION -->
+<!-- ============================================================ -->
+<div class="btn-group mt-xl">
+    <button class="btn btn-magenta" onclick="navigateToSection('55-trajectory-dynamics')">&larr; Previous: Trajectory Exploration</button>
+    <button class="btn btn-secondary" onclick="scrollToTop()">&uarr; Back to Top</button>
+    <button class="btn btn-secondary" onclick="navigateToSection('57-linear-systems-intro')">Next: Linear Systems &amp; Eigenvalues &rarr;</button>
+</div>

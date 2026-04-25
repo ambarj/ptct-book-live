@@ -1,0 +1,750 @@
+<!-- ============================================================
+     Section 5.9: Damped Harmonic Oscillator Revisited
+     Source: NPTEL Lecture 8_2 (Linear Systems, Part 3)
+     Concept: Mapping the damped oscillator into the τ-Δ plane —
+              three damping regimes correspond to three regions
+     Time: 20-25 minutes
+     Prerequisites: Sections 3.5-3.7 (damping), 5.7-5.8 (linear
+                    systems, eigenvalues, τ-Δ classification)
+     ============================================================ -->
+
+<h1>Damped Harmonic Oscillator Revisited</h1>
+
+<p>
+    In Chapter 3 you met the damped oscillator and learned that it has three
+    regimes: underdamped, critically damped, and overdamped. Now you have the
+    tools to see <em>why</em>. The oscillator is a 2D linear system, and its
+    three regimes map directly onto three regions of the &tau;-&Delta; plane.
+    Phase space makes the physics <strong>visible</strong>.
+</p>
+
+<div class="info-box">
+    <div class="info-box-title">Learning Objectives</div>
+    <ul>
+        <li>Write the damped oscillator \( m\ddot{x} + b\dot{x} + kx = 0 \) as a 2D linear system and identify its matrix</li>
+        <li>Compute \( \tau = -b/m \) and \( \Delta = k/m \), and locate the oscillator on the &tau;-&Delta; plane</li>
+        <li>Connect the three damping regimes (underdamped, critical, overdamped) to the node-spiral boundary \( \tau^2 = 4\Delta \)</li>
+        <li>Watch energy dissipation in phase space as trajectories spiral (or slide) toward the origin</li>
+    </ul>
+</div>
+
+<div class="equation-display">
+    <p><strong>The Oscillator as a Linear System:</strong></p>
+    $$ m\ddot{x} + b\dot{x} + kx = 0 \quad\Longrightarrow\quad
+    \begin{pmatrix} \dot{x} \\ \dot{v} \end{pmatrix} =
+    \begin{pmatrix} 0 & 1 \\ -k/m & -b/m \end{pmatrix}
+    \begin{pmatrix} x \\ v \end{pmatrix} $$
+    <p>
+        Trace: \( \tau = 0 + (-b/m) = -b/m \leq 0 \). &ensp;
+        Determinant: \( \Delta = (0)(-b/m) - (1)(-k/m) = k/m > 0 \).
+    </p>
+    <p>
+        Since \( \tau \leq 0 \) and \( \Delta > 0 \), the oscillator always lives in the
+        <strong>left half</strong> of the &tau;-&Delta; plane, above the &Delta; = 0 axis.
+        It can never be a saddle or unstable!
+    </p>
+</div>
+
+<hr>
+
+<!-- ============================================================ -->
+<!-- EXPLORER 1: Damping Regime Explorer -->
+<!-- ============================================================ -->
+<div class="interactive-container" id="damping-regime-explorer">
+    <div class="interactive-title">Explorer: Damping Regime Explorer</div>
+
+    <p>
+        Adjust the physical parameters &mdash; mass \( m \), spring constant \( k \),
+        and damping coefficient \( b \) &mdash; and watch the phase portrait and
+        &tau;-&Delta; location update simultaneously. The critical damping boundary
+        \( b^2 = 4mk \) is shown as a dashed line on the parameter display.
+    </p>
+
+    <div class="dual-panel">
+        <div class="panel">
+            <div class="plot-container" id="op-phasePlot" style="height: 400px;"></div>
+        </div>
+        <div class="panel">
+            <div class="plot-container" id="op-tdPlot" style="height: 400px;"></div>
+        </div>
+    </div>
+
+    <div id="op-stats1" class="stats-bar"></div>
+
+    <div class="control-panel">
+        <div class="control-group">
+            <label class="control-label" for="op-m-slider">Mass m:
+                <span id="op-m-value">1.0</span>
+            </label>
+            <input type="range" class="slider" id="op-m-slider"
+                   min="0.5" max="3" step="0.1" value="1">
+        </div>
+        <div class="control-group">
+            <label class="control-label" for="op-k-slider">Spring k:
+                <span id="op-k-value">4.0</span>
+            </label>
+            <input type="range" class="slider" id="op-k-slider"
+                   min="0.5" max="8" step="0.1" value="4">
+        </div>
+        <div class="control-group">
+            <label class="control-label" for="op-b-slider">Damping b:
+                <span id="op-b-value">1.0</span>
+            </label>
+            <input type="range" class="slider" id="op-b-slider"
+                   min="0" max="8" step="0.1" value="1">
+        </div>
+        <div class="control-group">
+            <button class="btn" onclick="opRegimeReset()">Reset</button>
+        </div>
+    </div>
+</div>
+
+<div class="info-box">
+    <div class="info-box-title">The Three Regimes on the τ-Δ Plane</div>
+    <p>
+        The oscillator sits at \( (\tau, \Delta) = (-b/m,\; k/m) \). Changing \( b \)
+        moves the point <strong>horizontally</strong> (more damping → more negative τ).
+        The parabola \( \tau^2 = 4\Delta \) is the boundary:
+    </p>
+    <ul>
+        <li><strong>Inside the parabola</strong> (\( b^2 < 4mk \)): <em>Underdamped</em> — stable spiral, oscillations that decay</li>
+        <li><strong>On the parabola</strong> (\( b^2 = 4mk \)): <em>Critically damped</em> — repeated eigenvalue, fastest non-oscillatory return</li>
+        <li><strong>Outside the parabola</strong> (\( b^2 > 4mk \)): <em>Overdamped</em> — stable node, sluggish exponential decay</li>
+    </ul>
+</div>
+
+<!-- ========== Test Your Understanding #1 ========== -->
+<div class="interactive-container question-section">
+    <div class="interactive-title">Test Your Understanding</div>
+
+    <p style="margin-bottom: var(--spacing-md); color: var(--text-secondary);">
+        Use the Damping Regime Explorer to answer these questions.
+    </p>
+
+    <div class="tabs">
+        <div class="tab-buttons">
+            <button class="tab-button active">Question 1</button>
+            <button class="tab-button">Question 2</button>
+            <button class="tab-button">Question 3</button>
+        </div>
+
+        <div class="tab-content active">
+            <div class="question-container" data-type="mcq" data-answer="2">
+                <div class="question-text">
+                    Set \( m = 1, k = 4, b = 0 \) (no damping). What type of fixed point
+                    do you see in the phase portrait?
+                </div>
+                <div class="question-options">
+                    <label class="option">
+                        <input type="radio" name="op-q1" value="0">
+                        <span>Stable spiral &mdash; decaying oscillations</span>
+                    </label>
+                    <label class="option">
+                        <input type="radio" name="op-q1" value="1">
+                        <span>Stable node &mdash; exponential decay</span>
+                    </label>
+                    <label class="option">
+                        <input type="radio" name="op-q1" value="2">
+                        <span>Center &mdash; closed elliptical orbits</span>
+                    </label>
+                    <label class="option">
+                        <input type="radio" name="op-q1" value="3">
+                        <span>Saddle &mdash; unstable equilibrium</span>
+                    </label>
+                </div>
+                <div class="question-actions">
+                    <button class="btn-verify">Verify</button>
+                </div>
+                <div class="question-explanation" style="display:none;">
+                    <strong>Explanation:</strong>
+                    With \( b = 0 \): \( \tau = 0, \Delta = k/m = 4 \). The point sits on the
+                    \( \tau = 0 \) axis inside the parabola &mdash; a <strong>center</strong>.
+                    The eigenvalues are \( \lambda = \pm 2i \) (pure imaginary). Trajectories are
+                    closed ellipses: the undamped simple harmonic oscillator conserves energy perfectly.
+                </div>
+            </div>
+        </div>
+
+        <div class="tab-content">
+            <div class="question-container" data-type="fill" data-answer="4[3.8,4.2]">
+                <div class="question-text">
+                    With \( m = 1 \) and \( k = 4 \), the critical damping value is
+                    \( b_{\text{crit}} = \sqrt{4mk} = \)
+                    <input type="text" class="fill-blank" style="width: 60px">.
+                    (Set b to this value and watch the portrait transition.)
+                </div>
+                <div class="question-actions">
+                    <button class="btn-verify">Verify</button>
+                </div>
+                <div class="question-explanation" style="display:none;">
+                    <strong>Explanation:</strong>
+                    \( b_{\text{crit}} = \sqrt{4mk} = \sqrt{4 \cdot 1 \cdot 4} = \sqrt{16} = 4 \).
+                    At \( b = 4 \), the discriminant \( \tau^2 - 4\Delta = 16/1 - 16/1 = 0 \).
+                    The eigenvalue is repeated: \( \lambda = -b/(2m) = -2 \). Try setting \( b = 4 \)
+                    and watch the portrait shift from spiral to degenerate node.
+                </div>
+            </div>
+        </div>
+
+        <div class="tab-content">
+            <div class="question-container" data-type="mcq" data-answer="0">
+                <div class="question-text">
+                    Now increase damping to \( b = 6 \) (overdamped). How does the phase
+                    portrait differ from the underdamped case?
+                </div>
+                <div class="question-options">
+                    <label class="option">
+                        <input type="radio" name="op-q3" value="0">
+                        <span>Trajectories approach the origin without oscillating &mdash; no spiraling</span>
+                    </label>
+                    <label class="option">
+                        <input type="radio" name="op-q3" value="1">
+                        <span>Trajectories spiral outward &mdash; the system is unstable</span>
+                    </label>
+                    <label class="option">
+                        <input type="radio" name="op-q3" value="2">
+                        <span>Trajectories form closed orbits like a center</span>
+                    </label>
+                    <label class="option">
+                        <input type="radio" name="op-q3" value="3">
+                        <span>There is no visible difference from underdamped</span>
+                    </label>
+                </div>
+                <div class="question-actions">
+                    <button class="btn-verify">Verify</button>
+                </div>
+                <div class="question-explanation" style="display:none;">
+                    <strong>Explanation:</strong>
+                    With \( b = 6 > b_{\text{crit}} = 4 \), the eigenvalues are both real and
+                    negative. The system is a <strong>stable node</strong>: trajectories approach
+                    the origin along eigenvector directions without oscillating. The system is
+                    &ldquo;too sluggish&rdquo; to oscillate &mdash; damping overwhelms the restoring force.
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- ============================================================ -->
+<!-- EXPLORER 2: Three Regimes Comparison -->
+<!-- ============================================================ -->
+<div class="interactive-container" id="three-regimes">
+    <div class="interactive-title">Explorer: Three Regimes Side by Side</div>
+
+    <p>
+        Compare the time response \( x(t) \) for all three regimes with the
+        <strong>same initial condition</strong>. Adjust \( k \) and \( m \) to
+        set the natural frequency, then see how each regime returns to equilibrium.
+        Critical damping is always the <strong>fastest non-oscillatory</strong> return.
+    </p>
+
+    <div class="dual-panel">
+        <div class="panel">
+            <div class="plot-container" id="op-comparePlot" style="height: 400px;"></div>
+        </div>
+        <div class="panel">
+            <div class="plot-container" id="op-comparePhasePlot" style="height: 400px;"></div>
+        </div>
+    </div>
+
+    <div id="op-stats2" class="stats-bar"></div>
+
+    <div class="control-panel">
+        <div class="control-group">
+            <label class="control-label" for="op-cmp-k-slider">Spring k:
+                <span id="op-cmp-k-value">4.0</span>
+            </label>
+            <input type="range" class="slider" id="op-cmp-k-slider"
+                   min="1" max="8" step="0.1" value="4">
+        </div>
+        <div class="control-group">
+            <label class="control-label" for="op-cmp-m-slider">Mass m:
+                <span id="op-cmp-m-value">1.0</span>
+            </label>
+            <input type="range" class="slider" id="op-cmp-m-slider"
+                   min="0.5" max="3" step="0.1" value="1">
+        </div>
+        <div class="control-group">
+            <button class="btn" onclick="opCompareReset()">Reset</button>
+        </div>
+    </div>
+</div>
+
+<div class="info-box">
+    <div class="info-box-title">Why Critical Damping is Special</div>
+    <p>
+        Critical damping (\( b^2 = 4mk \)) gives the <strong>fastest return to
+        equilibrium without oscillation</strong>. Underdamped systems oscillate
+        (wasting time overshooting), while overdamped systems creep back slowly
+        (too much friction). Critical damping is the sweet spot &mdash; the
+        parabola boundary in the &tau;-&Delta; plane. This is why door closers,
+        car suspensions, and galvanometers are designed to operate near critical damping.
+    </p>
+</div>
+
+<!-- ========== Test Your Understanding #2 ========== -->
+<div class="interactive-container question-section">
+    <div class="interactive-title">Test Your Understanding</div>
+
+    <p style="margin-bottom: var(--spacing-md); color: var(--text-secondary);">
+        Use the Three Regimes Comparison to answer these questions.
+    </p>
+
+    <div class="tabs">
+        <div class="tab-buttons">
+            <button class="tab-button active">Question 4</button>
+            <button class="tab-button">Question 5</button>
+            <button class="tab-button">Question 6</button>
+        </div>
+
+        <div class="tab-content active">
+            <div class="question-container" data-type="mcq" data-answer="1">
+                <div class="question-text">
+                    Looking at the time series, which regime reaches \( x = 0 \)
+                    <strong>first</strong> (without overshooting)?
+                </div>
+                <div class="question-options">
+                    <label class="option">
+                        <input type="radio" name="op-q4" value="0">
+                        <span>Underdamped &mdash; oscillations get it there fastest</span>
+                    </label>
+                    <label class="option">
+                        <input type="radio" name="op-q4" value="1">
+                        <span>Critically damped &mdash; fastest without overshoot</span>
+                    </label>
+                    <label class="option">
+                        <input type="radio" name="op-q4" value="2">
+                        <span>Overdamped &mdash; steady approach</span>
+                    </label>
+                    <label class="option">
+                        <input type="radio" name="op-q4" value="3">
+                        <span>All three are identical</span>
+                    </label>
+                </div>
+                <div class="question-actions">
+                    <button class="btn-verify">Verify</button>
+                </div>
+                <div class="question-explanation" style="display:none;">
+                    <strong>Explanation:</strong>
+                    The underdamped system crosses zero first, but then <em>overshoots</em> and
+                    oscillates. The overdamped system never overshoots but is sluggish.
+                    <strong>Critical damping</strong> is the fastest approach that doesn&rsquo;t
+                    cross zero &mdash; the optimal tradeoff. Compare the phase portraits:
+                    the critical case goes straight to the origin along a single eigenvector.
+                </div>
+            </div>
+        </div>
+
+        <div class="tab-content">
+            <div class="question-container" data-type="fill" data-answer="spiral|node">
+                <div class="question-text">
+                    In the phase portrait (right panel), the underdamped trajectory forms a
+                    <select class="fill-blank-select">
+                        <option value=""></option>
+                        <option value="spiral">spiral</option>
+                        <option value="node">node</option>
+                        <option value="center">center</option>
+                    </select>
+                    while the overdamped trajectory forms a
+                    <select class="fill-blank-select">
+                        <option value=""></option>
+                        <option value="spiral">spiral</option>
+                        <option value="node">node</option>
+                        <option value="center">center</option>
+                    </select>.
+                </div>
+                <div class="question-actions">
+                    <button class="btn-verify">Verify</button>
+                </div>
+                <div class="question-explanation" style="display:none;">
+                    <strong>Explanation:</strong>
+                    Underdamped: complex eigenvalues → <strong>spiral</strong> (winds inward).
+                    Overdamped: real eigenvalues → <strong>node</strong> (approaches along
+                    eigenvector lines). The critical case is on the boundary: a degenerate node.
+                </div>
+            </div>
+        </div>
+
+        <div class="tab-content">
+            <div class="question-container" data-type="msq" data-answer="0,2">
+                <div class="question-text">
+                    Which statements about the damped oscillator on the &tau;-&Delta; plane
+                    are true? (Select all that apply)
+                </div>
+                <div class="question-options">
+                    <label class="option">
+                        <input type="checkbox" value="0">
+                        <span>Increasing \( b \) moves the point leftward (more negative τ) while Δ stays fixed</span>
+                    </label>
+                    <label class="option">
+                        <input type="checkbox" value="1">
+                        <span>The oscillator can be in the saddle region if damping is large enough</span>
+                    </label>
+                    <label class="option">
+                        <input type="checkbox" value="2">
+                        <span>Increasing \( k \) moves the point upward (larger Δ), making underdamping more likely</span>
+                    </label>
+                    <label class="option">
+                        <input type="checkbox" value="3">
+                        <span>The undamped oscillator (\( b = 0 \)) is an unstable spiral</span>
+                    </label>
+                </div>
+                <div class="question-actions">
+                    <button class="btn-verify">Verify</button>
+                </div>
+                <div class="question-explanation" style="display:none;">
+                    <strong>Explanation:</strong>
+                    <ul>
+                        <li><strong>b moves left:</strong> ✓ τ = −b/m, so increasing b makes τ more negative. Δ = k/m is independent of b.</li>
+                        <li><strong>Saddle possible:</strong> ✗ Δ = k/m > 0 always (k, m > 0). The oscillator can never have Δ < 0, so saddles are impossible.</li>
+                        <li><strong>k moves up:</strong> ✓ Δ = k/m, so larger k → larger Δ → point moves above parabola → underdamped (for fixed b).</li>
+                        <li><strong>Undamped = unstable spiral:</strong> ✗ At b = 0: τ = 0, inside parabola → <strong>center</strong>, not an unstable spiral.</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- ============================================================ -->
+<!-- EXPLORER 3: Energy Dissipation -->
+<!-- ============================================================ -->
+<div class="interactive-container" id="energy-dissipation">
+    <div class="interactive-title">Explorer: Energy Dissipation in Phase Space</div>
+
+    <p>
+        The total energy \( E = \frac{1}{2}mv^2 + \frac{1}{2}kx^2 \) defines
+        ellipses in phase space. Without damping, the trajectory stays on one
+        ellipse forever. With damping, the trajectory <strong>crosses energy
+        contours</strong>, spiraling inward. Watch the energy drain in real time.
+    </p>
+
+    <div class="dual-panel">
+        <div class="panel">
+            <div class="plot-container" id="op-energyPhasePlot" style="height: 400px;"></div>
+        </div>
+        <div class="panel">
+            <div class="plot-container" id="op-energyTimePlot" style="height: 400px;"></div>
+        </div>
+    </div>
+
+    <div id="op-stats3" class="stats-bar"></div>
+
+    <div class="control-panel">
+        <div class="control-group">
+            <label class="control-label" for="op-en-b-slider">Damping b:
+                <span id="op-en-b-value">0.8</span>
+            </label>
+            <input type="range" class="slider" id="op-en-b-slider"
+                   min="0" max="5" step="0.1" value="0.8">
+        </div>
+        <div class="control-group">
+            <label class="control-label" for="op-en-x0-slider">x&#8320;:
+                <span id="op-en-x0-value">2.5</span>
+            </label>
+            <input type="range" class="slider" id="op-en-x0-slider"
+                   min="0.5" max="3" step="0.1" value="2.5">
+        </div>
+        <div class="control-group">
+            <button class="btn" onclick="opEnergyReset()">Reset</button>
+        </div>
+    </div>
+</div>
+
+<!-- ========== Test Your Understanding #3 ========== -->
+<div class="interactive-container question-section">
+    <div class="interactive-title">Test Your Understanding</div>
+
+    <p style="margin-bottom: var(--spacing-md); color: var(--text-secondary);">
+        Use the Energy Dissipation explorer to answer these questions.
+    </p>
+
+    <div class="tabs">
+        <div class="tab-buttons">
+            <button class="tab-button active">Question 7</button>
+            <button class="tab-button">Question 8</button>
+            <button class="tab-button">Question 9</button>
+        </div>
+
+        <div class="tab-content active">
+            <div class="question-container" data-type="mcq" data-answer="0">
+                <div class="question-text">
+                    Set \( b = 0 \) (no damping). What happens to the energy \( E(t) \)?
+                </div>
+                <div class="question-options">
+                    <label class="option">
+                        <input type="radio" name="op-q7" value="0">
+                        <span>It stays perfectly constant &mdash; the trajectory is a closed ellipse</span>
+                    </label>
+                    <label class="option">
+                        <input type="radio" name="op-q7" value="1">
+                        <span>It decays exponentially</span>
+                    </label>
+                    <label class="option">
+                        <input type="radio" name="op-q7" value="2">
+                        <span>It oscillates between zero and a maximum</span>
+                    </label>
+                    <label class="option">
+                        <input type="radio" name="op-q7" value="3">
+                        <span>It grows without bound</span>
+                    </label>
+                </div>
+                <div class="question-actions">
+                    <button class="btn-verify">Verify</button>
+                </div>
+                <div class="question-explanation" style="display:none;">
+                    <strong>Explanation:</strong>
+                    With no damping, energy is conserved: \( dE/dt = -bv^2 = 0 \). The trajectory
+                    is a closed ellipse in the \( (x, v) \) plane, sitting on a single energy
+                    contour forever. The energy time series is a flat line.
+                </div>
+            </div>
+        </div>
+
+        <div class="tab-content">
+            <div class="question-container" data-type="mcq" data-answer="2">
+                <div class="question-text">
+                    Set \( b = 0.8 \). In the phase portrait, the trajectory crosses energy
+                    contours. At what points does the trajectory cross contours
+                    <strong>most steeply</strong>?
+                </div>
+                <div class="question-options">
+                    <label class="option">
+                        <input type="radio" name="op-q8" value="0">
+                        <span>At the x-axis (where velocity is zero)</span>
+                    </label>
+                    <label class="option">
+                        <input type="radio" name="op-q8" value="1">
+                        <span>At the origin</span>
+                    </label>
+                    <label class="option">
+                        <input type="radio" name="op-q8" value="2">
+                        <span>At maximum velocity (v-axis) &mdash; where dissipation is greatest</span>
+                    </label>
+                    <label class="option">
+                        <input type="radio" name="op-q8" value="3">
+                        <span>Equally everywhere</span>
+                    </label>
+                </div>
+                <div class="question-actions">
+                    <button class="btn-verify">Verify</button>
+                </div>
+                <div class="question-explanation" style="display:none;">
+                    <strong>Explanation:</strong>
+                    The energy dissipation rate is \( dE/dt = -bv^2 \). Energy is lost fastest
+                    when \( |v| \) is largest &mdash; at the v-axis crossings (turning points of
+                    position). At the x-axis (\( v = 0 \)), no energy is being dissipated at that
+                    instant, so the trajectory is tangent to the energy contour there.
+                </div>
+            </div>
+        </div>
+
+        <div class="tab-content">
+            <div class="question-container" data-type="fill" data-answer="exponential">
+                <div class="question-text">
+                    The energy \( E(t) \) of the underdamped oscillator decays
+                    <select class="fill-blank-select">
+                        <option value=""></option>
+                        <option value="linearly">linearly</option>
+                        <option value="exponential">exponentially</option>
+                        <option value="quadratically">quadratically</option>
+                        <option value="instantly">instantly</option>
+                    </select>
+                    (on average), consistent with the amplitude decaying as \( e^{-\gamma t} \)
+                    where \( \gamma = b/(2m) \).
+                </div>
+                <div class="question-actions">
+                    <button class="btn-verify">Verify</button>
+                </div>
+                <div class="question-explanation" style="display:none;">
+                    <strong>Explanation:</strong>
+                    The amplitude decays as \( A(t) = A_0 e^{-\gamma t} \) where
+                    \( \gamma = b/(2m) \). Since energy \( E \propto A^2 \), we get
+                    \( E(t) \propto e^{-2\gamma t} \) &mdash; <strong>exponential</strong> decay.
+                    The energy curve in the right panel shows this: a smooth exponential envelope
+                    with small oscillations from the KE ↔ PE exchange within each cycle.
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- ============================================================ -->
+<!-- PYTHON CODE EXAMPLES -->
+<!-- ============================================================ -->
+<h2>Python Code</h2>
+
+<div class="tabs">
+    <div class="tab-buttons">
+        <button class="tab-button active">Damping Regimes</button>
+        <button class="tab-button">Energy Dissipation</button>
+        <button class="tab-button">Prompt</button>
+    </div>
+
+    <div class="tab-content active">
+        <div class="code-block-container">
+            <div class="code-header">
+                <span class="code-lang">Python</span>
+                <button class="copy-btn">Copy</button>
+            </div>
+            <pre><code class="language-python">
+import numpy as np
+import plotly.graph_objects as go
+from plotly.subplots import make_subplots
+
+def rk4(A, x0, T, N):
+    h = T / N; x = np.array(x0, float)
+    xs, ts = [x.copy()], [0.0]
+    for i in range(N):
+        f = lambda u: A @ u
+        k1=f(x); k2=f(x+h/2*k1); k3=f(x+h/2*k2); k4=f(x+h*k3)
+        x += h/6*(k1+2*k2+2*k3+k4)
+        xs.append(x.copy()); ts.append((i+1)*h)
+    return np.array(xs), np.array(ts)
+
+m, k = 1.0, 4.0
+b_crit = np.sqrt(4*m*k)  # = 4.0
+
+fig = make_subplots(1, 2, subplot_titles=[
+    'x(t) Time Series', 'Phase Portrait (x, v)'])
+
+cases = [
+    (0.5*b_crit, 'Underdamped', '#00f3ff'),
+    (b_crit,     'Critical',    '#ffbe0b'),
+    (1.5*b_crit, 'Overdamped',  '#ff006e'),
+]
+
+for b, label, color in cases:
+    A = np.array([[0, 1], [-k/m, -b/m]])
+    traj, t = rk4(A, [2.5, 0], 10, 2000)
+
+    fig.add_trace(go.Scatter(
+        x=t, y=traj[:,0], mode='lines',
+        line=dict(color=color, width=2), name=label),
+        row=1, col=1)
+    fig.add_trace(go.Scatter(
+        x=traj[:,0], y=traj[:,1], mode='lines',
+        line=dict(color=color, width=1.5),
+        showlegend=False), row=1, col=2)
+
+fig.update_layout(template='plotly_dark', height=400, width=900)
+fig.update_xaxes(title='Time', zerolinecolor='#808080', row=1, col=1)
+fig.update_yaxes(title='x(t)', range=[-3, 3],
+    zerolinecolor='#808080', row=1, col=1)
+fig.update_xaxes(title='x', range=[-3, 3],
+    zerolinecolor='#808080', row=1, col=2)
+fig.update_yaxes(title='v', range=[-6, 6],
+    zerolinecolor='#808080', scaleanchor='x2', row=1, col=2)
+fig.show()
+            </code></pre>
+        </div>
+    </div>
+
+    <div class="tab-content">
+        <div class="code-block-container">
+            <div class="code-header">
+                <span class="code-lang">Python</span>
+                <button class="copy-btn">Copy</button>
+            </div>
+            <pre><code class="language-python">
+import numpy as np
+import plotly.graph_objects as go
+from plotly.subplots import make_subplots
+
+def rk4(A, x0, T, N):
+    h = T / N; x = np.array(x0, float)
+    xs, ts = [x.copy()], [0.0]
+    for i in range(N):
+        f = lambda u: A @ u
+        k1=f(x); k2=f(x+h/2*k1); k3=f(x+h/2*k2); k4=f(x+h*k3)
+        x += h/6*(k1+2*k2+2*k3+k4)
+        xs.append(x.copy()); ts.append((i+1)*h)
+    return np.array(xs), np.array(ts)
+
+m, k, b = 1.0, 4.0, 0.8
+A = np.array([[0, 1], [-k/m, -b/m]])
+traj, t = rk4(A, [2.5, 0], 15, 3000)
+
+# Energy: E = 0.5*m*v² + 0.5*k*x²
+E = 0.5*m*traj[:,1]**2 + 0.5*k*traj[:,0]**2
+
+fig = make_subplots(1, 2, subplot_titles=[
+    'Phase Space + Energy Contours', 'Energy E(t)'])
+
+# Energy contours
+for E_val in [1, 3, 6, 10, 15]:
+    th = np.linspace(0, 2*np.pi, 200)
+    xe = np.sqrt(2*E_val/k) * np.cos(th)
+    ve = np.sqrt(2*E_val/m) * np.sin(th)
+    fig.add_trace(go.Scatter(
+        x=xe, y=ve, mode='lines',
+        line=dict(color='rgba(100,100,100,0.3)', width=1),
+        showlegend=False), row=1, col=1)
+
+# Trajectory
+fig.add_trace(go.Scatter(
+    x=traj[:,0], y=traj[:,1], mode='lines',
+    line=dict(color='#00f3ff', width=2), name='Trajectory'),
+    row=1, col=1)
+
+# Energy vs time
+fig.add_trace(go.Scatter(
+    x=t, y=E, mode='lines',
+    line=dict(color='#ffbe0b', width=2), name='E(t)'),
+    row=1, col=2)
+
+# Exponential envelope
+gamma = b / (2*m)
+E_env = E[0] * np.exp(-2*gamma*t)
+fig.add_trace(go.Scatter(
+    x=t, y=E_env, mode='lines',
+    line=dict(color='#ff006e', width=1.5, dash='dash'),
+    name='e^(-2γt)'), row=1, col=2)
+
+fig.update_layout(template='plotly_dark', height=400, width=900)
+fig.update_xaxes(title='x', range=[-3, 3],
+    zerolinecolor='#808080', row=1, col=1)
+fig.update_yaxes(title='v', range=[-6, 6],
+    zerolinecolor='#808080', row=1, col=1)
+fig.update_xaxes(title='Time', zerolinecolor='#808080', row=1, col=2)
+fig.update_yaxes(title='Energy', range=[0, 15],
+    zerolinecolor='#808080', row=1, col=2)
+fig.show()
+            </code></pre>
+        </div>
+    </div>
+
+    <div class="tab-content">
+        <div class="code-block-container">
+            <div class="code-header">
+                <span class="code-lang">Prompt for AI</span>
+                <button class="copy-btn">Copy</button>
+            </div>
+            <pre><code class="language-text">Create a Python script using Plotly to analyze the damped
+harmonic oscillator mẍ + bẋ + kx = 0 in phase space.
+
+Requirements:
+- Rewrite as 2D system: ẋ = v, v̇ = -(k/m)x - (b/m)v
+- Solve with RK4 (not scipy) for three damping values:
+  b = 0.5*b_crit (underdamped), b_crit, 1.5*b_crit (overdamped)
+  where b_crit = sqrt(4mk)
+- Panel 1: x(t) time series for all three (different colors)
+- Panel 2: (x,v) phase portrait for all three
+- Panel 3: Energy E(t) = 0.5*m*v² + 0.5*k*x² with exponential
+  envelope e^(-2γt) where γ = b/(2m)
+- Overlay energy contour ellipses on the phase portrait
+- Use m=1, k=4, IC = (2.5, 0)
+- Use dark theme (plotly_dark) with gray (#808080) axes
+- Fixed ranges: x [-3,3], v [-6,6], E [0,15]</code></pre>
+        </div>
+    </div>
+</div>
+
+<!-- ============================================================ -->
+<!-- NAVIGATION -->
+<!-- ============================================================ -->
+<div class="btn-group mt-xl">
+    <button class="btn btn-magenta" onclick="navigateToSection('58-tau-delta-plane')">&larr; Previous: The &tau;-&Delta; Classification</button>
+    <button class="btn btn-secondary" onclick="scrollToTop()">&uarr; Back to Top</button>
+    <button class="btn btn-secondary" onclick="navigateToSection('60-cautious-lovers')">Next: Cautious Lovers Model &rarr;</button>
+</div>

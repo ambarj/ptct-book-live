@@ -1,0 +1,783 @@
+<!-- ============================================================
+     Section 4.11: Improved Euler Method (RK2)
+     Source: NPTEL Module-8, Lecture4_2.nb, test_rk4.nb
+     Concept: Midpoint method — check slope at half-step for
+              second-order convergence O(h²)
+     Time: 15-20 minutes
+     Prerequisites: Euler method (4.4-4.5), error analysis (4.10)
+     ============================================================ -->
+
+<h1>Improved Euler Method (RK2)</h1>
+
+<p>
+    Euler's method uses the slope at the <strong>start</strong> of each interval to predict where to go next.
+    That's like driving with your eyes fixed on the road right in front of you — it works, but you drift.
+    What if you could peek ahead to see where the road is going?
+</p>
+
+<div class="info-box">
+    <div class="info-box-title">Learning Objectives</div>
+    <ul>
+        <li>Understand the core idea: evaluating the slope at the <em>midpoint</em> cancels the leading error term</li>
+        <li>Implement the RK2 (midpoint method) recipe and compare it to Euler</li>
+        <li>Verify second-order convergence \( O(h^2) \) — halving \( h \) reduces error by 4×</li>
+        <li>See how RK2 conserves energy far better than Euler for oscillatory systems</li>
+    </ul>
+</div>
+
+<p>
+    The <strong>Improved Euler Method</strong> (also called the <strong>Midpoint Method</strong> or <strong>RK2</strong>)
+    does exactly this:
+</p>
+
+<div class="equation-display">
+    <p><strong>The RK2 Recipe:</strong></p>
+    $$
+    \begin{aligned}
+    k_1 &= f(t_n,\, y_n) & &\text{(slope at start)} \\[4pt]
+    k_2 &= f\!\left(t_n + \tfrac{h}{2},\, y_n + \tfrac{h}{2}\,k_1\right) & &\text{(slope at midpoint)} \\[4pt]
+    y_{n+1} &= y_n + h\,k_2 & &\text{(step using midpoint slope)}
+    \end{aligned}
+    $$
+    <p>
+        Two evaluations of \( f \) per step instead of one, but the payoff is enormous:
+        the global error drops from \( O(h) \) to \( O(h^2) \).
+    </p>
+</div>
+
+<p>
+    Think of it as a <strong>scout-and-step</strong> strategy: use Euler to scout to the midpoint,
+    read the slope there, then go back and take the full step with the improved slope.
+</p>
+
+<div class="info-box">
+    <div class="info-box-title">Why the Midpoint?</div>
+    <p>
+        The Taylor expansion of the exact solution involves both \( f \) and \( f' \). By evaluating \( f \)
+        at the midpoint, the RK2 formula automatically captures the first correction term — no
+        derivatives needed! This is the magic of Runge-Kutta methods: they trade extra function
+        evaluations for higher-order accuracy without computing any derivatives of \( f \).
+    </p>
+</div>
+
+<!-- ============================================================ -->
+<!-- EXPLORER 1: Algorithm Race -->
+<!-- ============================================================ -->
+<div class="interactive-container" id="algorithm-race">
+    <div class="interactive-title">Explorer: Algorithm Race</div>
+
+    <p>
+        Solve the simple harmonic oscillator \( \ddot{x} = -x \) with both Euler and RK2 at the same step size.
+        Watch how RK2 stays faithful to the exact solution while Euler spirals away.
+    </p>
+
+    <div class="control-panel">
+        <div class="control-group">
+            <label class="control-label" for="impEuler-race-h-slider">Step size h:</label>
+            <input type="range" class="slider" id="impEuler-race-h-slider"
+                   min="0.01" max="0.50" step="0.01" value="0.15">
+            <span id="impEuler-race-h-value">0.15</span>
+        </div>
+        <div class="control-group">
+            <label class="control-label" for="impEuler-race-T-slider">Time T:</label>
+            <input type="range" class="slider" id="impEuler-race-T-slider"
+                   min="10" max="60" step="5" value="30">
+            <span id="impEuler-race-T-value">30</span>
+        </div>
+        <button class="btn btn-sm" onclick="impEulerRaceReset()">Reset</button>
+    </div>
+
+    <div class="stats-bar">
+        <div class="stat-item">
+            <span class="stat-label">Euler error</span>
+            <span class="stat-value" id="impEuler-race-eulerErr">—</span>
+        </div>
+        <div class="stat-item">
+            <span class="stat-label">RK2 error</span>
+            <span class="stat-value" id="impEuler-race-rk2Err">—</span>
+        </div>
+        <div class="stat-item">
+            <span class="stat-label">Improvement</span>
+            <span class="stat-value" id="impEuler-race-ratio">—</span>
+        </div>
+    </div>
+
+    <div class="dual-panel">
+        <div class="plot-container" id="impEuler-timePlot"></div>
+        <div class="plot-container" id="impEuler-phasePlot"></div>
+    </div>
+
+    <div class="info-box">
+        <div class="info-box-title">What to Try</div>
+        <ul>
+            <li>Start at h = 0.15, T = 30. Compare the cyan (Euler) and green (RK2) curves to the gray exact solution.</li>
+            <li>Increase T to 60 — Euler's amplitude grows wildly while RK2 stays tight.</li>
+            <li>In the phase portrait (right), Euler spirals outward; RK2 traces a near-perfect ellipse.</li>
+            <li>Try h = 0.05 — both improve, but RK2 improves <em>much</em> more.</li>
+        </ul>
+    </div>
+</div>
+
+<!-- Questions Group 1 -->
+<div class="interactive-container question-section">
+    <div class="interactive-title">Test Your Understanding</div>
+
+    <p style="margin-bottom: var(--spacing-md); color: var(--text-secondary);">
+        Use the Algorithm Race explorer to answer these questions.
+    </p>
+
+    <div class="tabs">
+        <div class="tab-buttons">
+            <button class="tab-button active">Question 1</button>
+            <button class="tab-button">Question 2</button>
+            <button class="tab-button">Question 3</button>
+        </div>
+
+        <div class="tab-content active">
+            <div class="question-container" data-type="mcq" data-answer="2">
+                <div class="question-text">
+                    In the phase portrait at h = 0.15, what does Euler's trajectory do compared to the exact circle?
+                </div>
+                <div class="question-options">
+                    <label class="option">
+                        <input type="radio" name="impEuler-q1" value="0">
+                        <span>It stays exactly on the circle</span>
+                    </label>
+                    <label class="option">
+                        <input type="radio" name="impEuler-q1" value="1">
+                        <span>It spirals inward (loses amplitude)</span>
+                    </label>
+                    <label class="option">
+                        <input type="radio" name="impEuler-q1" value="2">
+                        <span>It spirals outward (gains amplitude)</span>
+                    </label>
+                    <label class="option">
+                        <input type="radio" name="impEuler-q1" value="3">
+                        <span>It jumps to a larger circle immediately</span>
+                    </label>
+                </div>
+                <div class="question-actions">
+                    <button class="btn-verify">Verify</button>
+                </div>
+                <div class="question-explanation" style="display:none;">
+                    <strong>Explanation:</strong>
+                    Euler's method systematically adds energy to the harmonic oscillator — each step slightly
+                    overshoots, making the amplitude grow. In the phase portrait this appears as an outward
+                    spiral. This is Euler's most famous failure mode for oscillatory systems.
+                </div>
+            </div>
+        </div>
+
+        <div class="tab-content">
+            <div class="question-container" data-type="mcq" data-answer="1">
+                <div class="question-text">
+                    How many evaluations of \( f \) does RK2 require per step, compared to Euler's one?
+                </div>
+                <div class="question-options">
+                    <label class="option">
+                        <input type="radio" name="impEuler-q2" value="0">
+                        <span>1 (same as Euler)</span>
+                    </label>
+                    <label class="option">
+                        <input type="radio" name="impEuler-q2" value="1">
+                        <span>2 (\( k_1 \) and \( k_2 \))</span>
+                    </label>
+                    <label class="option">
+                        <input type="radio" name="impEuler-q2" value="2">
+                        <span>4 (like RK4)</span>
+                    </label>
+                </div>
+                <div class="question-actions">
+                    <button class="btn-verify">Verify</button>
+                </div>
+                <div class="question-explanation" style="display:none;">
+                    <strong>Explanation:</strong>
+                    RK2 evaluates \( f \) twice per step: once at the start (\( k_1 \)) and once at the
+                    midpoint (\( k_2 \)). This doubles the cost per step compared to Euler, but the
+                    error drops from \( O(h) \) to \( O(h^2) \) — a huge net win.
+                </div>
+            </div>
+        </div>
+
+        <div class="tab-content">
+            <div class="question-container" data-type="fill" data-answer="4[3.5,4.5]">
+                <div class="question-text">
+                    Set h = 0.10, T = 30 and note the improvement ratio. Then set h = 0.05, T = 30.
+                    The improvement ratio should be roughly similar, around
+                    <input type="text" class="fill-blank" placeholder="?">.
+                    This is because the error ratio scales as \( (h_{\text{Euler}}/h_{\text{RK2}})^{\text{order}} \),
+                    and for RK2, the extra order makes it consistently better.
+                </div>
+                <div class="question-actions">
+                    <button class="btn-verify">Verify</button>
+                </div>
+                <div class="question-explanation" style="display:none;">
+                    <strong>Explanation:</strong>
+                    The improvement ratio varies with h and T, but at the same step size, RK2 is typically
+                    around 3-5× better than Euler for this system. The key insight is not the exact ratio
+                    at one h, but that when you halve h, RK2's error drops by 4× while Euler's drops by only 2×.
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- ============================================================ -->
+<!-- EXPLORER 2: Convergence Rate -->
+<!-- ============================================================ -->
+<h2>Measuring the Improvement</h2>
+
+<p>
+    In Section 4.10 you learned to measure convergence order with log-log plots. Now let's see how
+    RK2 compares to Euler on the same plot. The slope tells the story:
+</p>
+
+<div class="equation-display">
+    <p><strong>Convergence Orders:</strong></p>
+    $$ \text{Euler: error} \propto h^1 \quad(\text{slope = 1}) \qquad \text{RK2: error} \propto h^2 \quad(\text{slope = 2}) $$
+    <p>This means halving \( h \) reduces Euler's error by 2× but RK2's error by 4×.</p>
+</div>
+
+<div class="interactive-container" id="convergence-rate">
+    <div class="interactive-title">Explorer: Convergence Rate Plotter</div>
+
+    <p>
+        Run both methods at 20+ step sizes and measure the error at a fixed time.
+        The log-log slopes confirm each method's convergence order.
+    </p>
+
+    <div class="control-panel">
+        <div class="control-group">
+            <label class="control-label" for="impEuler-conv-T-slider">Evaluation time T:</label>
+            <input type="range" class="slider" id="impEuler-conv-T-slider"
+                   min="1" max="10" step="1" value="5">
+            <span id="impEuler-conv-T-value">5</span>
+        </div>
+        <div class="control-group">
+            <label class="control-label" for="impEuler-conv-eq-select">Test system:</label>
+            <select class="control-select" id="impEuler-conv-eq-select">
+                <option value="sho">SHO: ẍ = −x</option>
+                <option value="decay">Decay: dy/dt = −y</option>
+                <option value="damped">Damped: ẍ + ẋ + 4x = 0</option>
+            </select>
+        </div>
+        <button class="btn btn-sm" onclick="impEulerConvReset()">Reset</button>
+    </div>
+
+    <div class="stats-bar">
+        <div class="stat-item">
+            <span class="stat-label">Euler slope</span>
+            <span class="stat-value" id="impEuler-conv-eulerSlope">—</span>
+        </div>
+        <div class="stat-item">
+            <span class="stat-label">RK2 slope</span>
+            <span class="stat-value" id="impEuler-conv-rk2Slope">—</span>
+        </div>
+        <div class="stat-item">
+            <span class="stat-label">At h=0.01</span>
+            <span class="stat-value" id="impEuler-conv-ratio">—</span>
+        </div>
+    </div>
+
+    <div class="dual-panel">
+        <div class="plot-container" id="impEuler-convPlot"></div>
+        <div class="plot-container" id="impEuler-halvingPlot"></div>
+    </div>
+
+    <div class="info-box">
+        <div class="info-box-title">Reading the Plots</div>
+        <ul>
+            <li><strong>Left:</strong> Log-log error vs h. Euler's line has slope ≈ 1; RK2's has slope ≈ 2. The gap widens at small h.</li>
+            <li><strong>Right:</strong> Error improvement ratio when halving h. Euler approaches 2×; RK2 approaches 4×.</li>
+            <li>Try different test systems — the convergence orders are universal, independent of the equation!</li>
+        </ul>
+    </div>
+</div>
+
+<!-- Questions Group 2 -->
+<div class="interactive-container question-section">
+    <div class="interactive-title">Test Your Understanding</div>
+
+    <p style="margin-bottom: var(--spacing-md); color: var(--text-secondary);">
+        Use the Convergence Rate Plotter to answer these questions.
+    </p>
+
+    <div class="tabs">
+        <div class="tab-buttons">
+            <button class="tab-button active">Question 4</button>
+            <button class="tab-button">Question 5</button>
+            <button class="tab-button">Question 6</button>
+        </div>
+
+        <div class="tab-content active">
+            <div class="question-container" data-type="fill" data-answer="2[1.8,2.2]">
+                <div class="question-text">
+                    Using the SHO system at T = 5, what is the measured slope of the RK2 convergence
+                    line (shown in the stats bar)?
+                    <input type="text" class="fill-blank" placeholder="slope ≈ ?">
+                </div>
+                <div class="question-actions">
+                    <button class="btn-verify">Verify</button>
+                </div>
+                <div class="question-explanation" style="display:none;">
+                    <strong>Explanation:</strong>
+                    The slope should be close to 2.0, confirming RK2 is a second-order method.
+                    The measured value may differ slightly from exactly 2 due to higher-order terms in the
+                    error expansion, but it should be within 1.8–2.2 for well-behaved problems.
+                </div>
+            </div>
+        </div>
+
+        <div class="tab-content">
+            <div class="question-container" data-type="msq" data-answer="1,3">
+                <div class="question-text">
+                    Which statements about the halving-h improvement bars are correct? (Select all that apply)
+                </div>
+                <div class="question-options">
+                    <label class="option">
+                        <input type="checkbox" value="0">
+                        <span>Euler's improvement factor is always exactly 2.0</span>
+                    </label>
+                    <label class="option">
+                        <input type="checkbox" value="1">
+                        <span>As h gets smaller, Euler's ratio approaches 2 and RK2's approaches 4</span>
+                    </label>
+                    <label class="option">
+                        <input type="checkbox" value="2">
+                        <span>The ratios depend on which equation you're solving</span>
+                    </label>
+                    <label class="option">
+                        <input type="checkbox" value="3">
+                        <span>The factor of 4 for RK2 comes from \( (h/2)^2 / h^2 = 1/4 \)</span>
+                    </label>
+                </div>
+                <div class="question-actions">
+                    <button class="btn-verify">Verify</button>
+                </div>
+                <div class="question-explanation" style="display:none;">
+                    <strong>Explanation:</strong>
+                    <ul>
+                        <li>✗ Not exactly 2.0 — that's the asymptotic limit. At finite h, higher-order terms contribute.</li>
+                        <li>✓ As h → 0, the leading-order term dominates and ratios converge to \( 2^p \).</li>
+                        <li>✗ The convergence order is a property of the <em>method</em>, not the equation. All smooth ODEs give the same slopes.</li>
+                        <li>✓ For \( O(h^2) \): error(h/2)/error(h) = (h/2)²/h² = 1/4, so error drops by a factor of 4.</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <div class="tab-content">
+            <div class="question-container" data-type="mcq" data-answer="1">
+                <div class="question-text">
+                    To achieve the same accuracy as RK2 with h = 0.1, Euler would need approximately:
+                </div>
+                <div class="question-options">
+                    <label class="option">
+                        <input type="radio" name="impEuler-q6" value="0">
+                        <span>h = 0.05 (half the step size)</span>
+                    </label>
+                    <label class="option">
+                        <input type="radio" name="impEuler-q6" value="1">
+                        <span>h = 0.01 or smaller (10× more steps)</span>
+                    </label>
+                    <label class="option">
+                        <input type="radio" name="impEuler-q6" value="2">
+                        <span>h = 0.001 (100× more steps)</span>
+                    </label>
+                </div>
+                <div class="question-actions">
+                    <button class="btn-verify">Verify</button>
+                </div>
+                <div class="question-explanation" style="display:none;">
+                    <strong>Explanation:</strong>
+                    RK2 error at h = 0.1: proportional to \( 0.1^2 = 0.01 \).
+                    Euler error at h: proportional to \( h \). To match: \( h \approx 0.01 \).
+                    That's 10× smaller step → 10× more steps. And each RK2 step only costs 2× Euler,
+                    so RK2 at h = 0.1 is about 5× cheaper than Euler at h = 0.01 for the same accuracy.
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- ============================================================ -->
+<!-- EXPLORER 3: Energy Conservation -->
+<!-- ============================================================ -->
+<h2>The Energy Test</h2>
+
+<p>
+    The harmonic oscillator conserves total energy \( E = \frac{1}{2}v^2 + \frac{1}{2}x^2 \).
+    A perfect numerical method would maintain \( E(t)/E(0) = 1 \) forever.
+    How do our methods stack up?
+</p>
+
+<div class="interactive-container" id="energy-conservation">
+    <div class="interactive-title">Explorer: Energy Conservation</div>
+
+    <p>
+        Track the energy ratio \( E(t)/E(0) \) for both methods over long times.
+        Euler injects fake energy; RK2 oscillates around the true value without systematic drift.
+    </p>
+
+    <div class="control-panel">
+        <div class="control-group">
+            <label class="control-label" for="impEuler-energy-h-slider">Step size h:</label>
+            <input type="range" class="slider" id="impEuler-energy-h-slider"
+                   min="0.01" max="0.30" step="0.01" value="0.10">
+            <span id="impEuler-energy-h-value">0.10</span>
+        </div>
+        <div class="control-group">
+            <label class="control-label" for="impEuler-energy-T-slider">Time T:</label>
+            <input type="range" class="slider" id="impEuler-energy-T-slider"
+                   min="10" max="100" step="10" value="50">
+            <span id="impEuler-energy-T-value">50</span>
+        </div>
+        <button class="btn btn-sm" onclick="impEulerEnergyReset()">Reset</button>
+    </div>
+
+    <div class="stats-bar">
+        <div class="stat-item">
+            <span class="stat-label">Euler E(T)/E(0)</span>
+            <span class="stat-value" id="impEuler-energy-eulerRatio">—</span>
+        </div>
+        <div class="stat-item">
+            <span class="stat-label">RK2 E(T)/E(0)</span>
+            <span class="stat-value" id="impEuler-energy-rk2Ratio">—</span>
+        </div>
+        <div class="stat-item">
+            <span class="stat-label">Euler drift</span>
+            <span class="stat-value" id="impEuler-energy-eulerDrift">—</span>
+        </div>
+        <div class="stat-item">
+            <span class="stat-label">RK2 drift</span>
+            <span class="stat-value" id="impEuler-energy-rk2Drift">—</span>
+        </div>
+    </div>
+
+    <div class="dual-panel">
+        <div class="plot-container" id="impEuler-energyPlot"></div>
+        <div class="plot-container" id="impEuler-trajPlot"></div>
+    </div>
+
+    <div class="info-box">
+        <div class="info-box-title">What to Try</div>
+        <ul>
+            <li>At h = 0.10, T = 50: Euler's energy ratio climbs above 1 (fake energy gain). RK2 stays near 1.</li>
+            <li>Push T to 100: Euler's energy explodes, RK2 oscillates but doesn't drift.</li>
+            <li>In the trajectory plot (right): Euler's orbit expands turn by turn; RK2 retraces itself.</li>
+            <li>Decrease h to 0.02 — both improve, but RK2 is already nearly perfect at h = 0.10.</li>
+        </ul>
+    </div>
+</div>
+
+<div class="warning-box">
+    <div class="warning-icon">⚠️</div>
+    <div class="warning-content">
+        <strong>RK2 isn't perfect either:</strong>
+        <p>
+            RK2 doesn't <em>exactly</em> conserve energy — it oscillates around the true value.
+            For truly long-time simulations (millions of orbits), you'd need <strong>symplectic integrators</strong>
+            that preserve the Hamiltonian structure. But for most practical work, RK2 (and especially RK4)
+            are excellent choices.
+        </p>
+    </div>
+</div>
+
+<!-- Questions Group 3 -->
+<div class="interactive-container question-section">
+    <div class="interactive-title">Test Your Understanding</div>
+
+    <p style="margin-bottom: var(--spacing-md); color: var(--text-secondary);">
+        Use the Energy Conservation explorer to answer these questions.
+    </p>
+
+    <div class="tabs">
+        <div class="tab-buttons">
+            <button class="tab-button active">Question 7</button>
+            <button class="tab-button">Question 8</button>
+            <button class="tab-button">Question 9</button>
+        </div>
+
+        <div class="tab-content active">
+            <div class="question-container" data-type="mcq" data-answer="0">
+                <div class="question-text">
+                    At h = 0.10, T = 50, Euler's energy ratio E(T)/E(0) is:
+                </div>
+                <div class="question-options">
+                    <label class="option">
+                        <input type="radio" name="impEuler-q7" value="0">
+                        <span>Significantly above 1 (energy is growing)</span>
+                    </label>
+                    <label class="option">
+                        <input type="radio" name="impEuler-q7" value="1">
+                        <span>Exactly 1 (energy is conserved)</span>
+                    </label>
+                    <label class="option">
+                        <input type="radio" name="impEuler-q7" value="2">
+                        <span>Significantly below 1 (energy is decreasing)</span>
+                    </label>
+                </div>
+                <div class="question-actions">
+                    <button class="btn-verify">Verify</button>
+                </div>
+                <div class="question-explanation" style="display:none;">
+                    <strong>Explanation:</strong>
+                    Euler's method systematically <em>adds</em> energy to the simple harmonic oscillator.
+                    Each step slightly overshoots the exact trajectory, increasing the amplitude. After many
+                    periods, E(T)/E(0) grows well above 1. This is Euler's fundamental problem with
+                    conservative systems — it doesn't conserve energy.
+                </div>
+            </div>
+        </div>
+
+        <div class="tab-content">
+            <div class="question-container" data-type="msq" data-answer="0,2">
+                <div class="question-text">
+                    Which statements about RK2's energy behavior are correct? (Select all that apply)
+                </div>
+                <div class="question-options">
+                    <label class="option">
+                        <input type="checkbox" value="0">
+                        <span>RK2's energy oscillates around 1 without systematic drift</span>
+                    </label>
+                    <label class="option">
+                        <input type="checkbox" value="1">
+                        <span>RK2 exactly conserves energy for all step sizes</span>
+                    </label>
+                    <label class="option">
+                        <input type="checkbox" value="2">
+                        <span>RK2's energy deviations shrink as h decreases</span>
+                    </label>
+                    <label class="option">
+                        <input type="checkbox" value="3">
+                        <span>RK2 always loses energy (damps the oscillator)</span>
+                    </label>
+                </div>
+                <div class="question-actions">
+                    <button class="btn-verify">Verify</button>
+                </div>
+                <div class="question-explanation" style="display:none;">
+                    <strong>Explanation:</strong>
+                    <ul>
+                        <li>✓ RK2 oscillates around E = 1 — no net energy gain or loss over many periods.</li>
+                        <li>✗ RK2 does NOT exactly conserve energy. Exact conservation requires symplectic methods.</li>
+                        <li>✓ As h shrinks, the oscillation amplitude shrinks too — proportional to \( h^2 \).</li>
+                        <li>✗ RK2 neither systematically gains nor loses energy — it oscillates symmetrically.</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <div class="tab-content">
+            <div class="question-container" data-type="mcq" data-answer="2">
+                <div class="question-text">
+                    RK2 costs 2× per step compared to Euler. Is it worth it?
+                </div>
+                <div class="question-options">
+                    <label class="option">
+                        <input type="radio" name="impEuler-q9" value="0">
+                        <span>No — you could just use Euler with half the step size for the same cost</span>
+                    </label>
+                    <label class="option">
+                        <input type="radio" name="impEuler-q9" value="1">
+                        <span>It depends entirely on the equation being solved</span>
+                    </label>
+                    <label class="option">
+                        <input type="radio" name="impEuler-q9" value="2">
+                        <span>Yes — Euler at h/2 only halves the error, but RK2 at h quarters it</span>
+                    </label>
+                </div>
+                <div class="question-actions">
+                    <button class="btn-verify">Verify</button>
+                </div>
+                <div class="question-explanation" style="display:none;">
+                    <strong>Explanation:</strong>
+                    Same total cost: Euler at h/2 = 2N steps × 1 eval = 2N evals. RK2 at h = N steps × 2 evals = 2N evals.
+                    Euler at h/2: error ∝ h/2 (halved). RK2 at h: error ∝ h² (much smaller for small h).
+                    For h = 0.1: Euler error ~ 0.05, RK2 error ~ 0.01. RK2 wins decisively.
+                    The higher convergence order always wins for smooth problems.
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- ============================================================ -->
+<!-- CODE EXAMPLES -->
+<!-- ============================================================ -->
+<h2>Python Code</h2>
+
+<div class="tabs">
+    <div class="tab-buttons">
+        <button class="tab-button active">RK2 Implementation</button>
+        <button class="tab-button">Convergence Comparison</button>
+        <button class="tab-button">Prompt</button>
+    </div>
+
+    <div class="tab-content active">
+        <div class="code-block-container">
+            <div class="code-header">
+                <span class="code-lang">Python</span>
+                <button class="copy-btn">Copy</button>
+            </div>
+            <pre><code class="language-python">
+import numpy as np
+import plotly.graph_objects as go
+from plotly.subplots import make_subplots
+
+def euler(f, y0, T, h):
+    """Euler method for systems: y' = f(t, y)."""
+    t = np.arange(0, T + h/2, h)
+    y = np.zeros((len(t), len(y0)))
+    y[0] = y0
+    for i in range(len(t) - 1):
+        y[i+1] = y[i] + h * np.array(f(t[i], y[i]))
+    return t, y
+
+def rk2(f, y0, T, h):
+    """RK2 (midpoint method) for systems: y' = f(t, y)."""
+    t = np.arange(0, T + h/2, h)
+    y = np.zeros((len(t), len(y0)))
+    y[0] = y0
+    for i in range(len(t) - 1):
+        k1 = np.array(f(t[i], y[i]))
+        k2 = np.array(f(t[i] + h/2, y[i] + h/2 * k1))
+        y[i+1] = y[i] + h * k2
+    return t, y
+
+# Simple harmonic oscillator: x'' = -x
+# System: dx/dt = v, dv/dt = -x
+f_sho = lambda t, y: [y[1], -y[0]]
+
+h = 0.15
+T = 30
+t_euler, y_euler = euler(f_sho, [1, 0], T, h)
+t_rk2, y_rk2 = rk2(f_sho, [1, 0], T, h)
+t_exact = np.linspace(0, T, 1000)
+x_exact = np.cos(t_exact)
+
+fig = make_subplots(rows=1, cols=2,
+    subplot_titles=['Position vs Time', 'Phase Portrait'])
+
+fig.add_trace(go.Scatter(x=t_exact, y=x_exact, name='Exact',
+    line=dict(color='#808080', dash='dash')), row=1, col=1)
+fig.add_trace(go.Scatter(x=t_euler, y=y_euler[:,0], name='Euler',
+    line=dict(color='#00f3ff')), row=1, col=1)
+fig.add_trace(go.Scatter(x=t_rk2, y=y_rk2[:,0], name='RK2',
+    line=dict(color='#00ff9f')), row=1, col=1)
+
+fig.add_trace(go.Scatter(x=y_euler[:,0], y=y_euler[:,1],
+    name='Euler', line=dict(color='#00f3ff'), showlegend=False),
+    row=1, col=2)
+fig.add_trace(go.Scatter(x=y_rk2[:,0], y=y_rk2[:,1],
+    name='RK2', line=dict(color='#00ff9f'), showlegend=False),
+    row=1, col=2)
+
+fig.update_layout(template='plotly_dark')
+fig.show()
+            </code></pre>
+        </div>
+    </div>
+
+    <div class="tab-content">
+        <div class="code-block-container">
+            <div class="code-header">
+                <span class="code-lang">Python</span>
+                <button class="copy-btn">Copy</button>
+            </div>
+            <pre><code class="language-python">
+import numpy as np
+import plotly.graph_objects as go
+
+def euler_scalar(f, y0, T, h):
+    t = np.arange(0, T + h/2, h)
+    y = np.zeros(len(t)); y[0] = y0
+    for i in range(len(t) - 1):
+        y[i+1] = y[i] + h * f(t[i], y[i])
+    return t, y
+
+def rk2_scalar(f, y0, T, h):
+    t = np.arange(0, T + h/2, h)
+    y = np.zeros(len(t)); y[0] = y0
+    for i in range(len(t) - 1):
+        k1 = f(t[i], y[i])
+        k2 = f(t[i] + h/2, y[i] + h/2 * k1)
+        y[i+1] = y[i] + h * k2
+    return t, y
+
+# Test: dy/dt = -y, exact: y = exp(-t)
+f = lambda t, y: -y
+T = 5.0
+
+h_values = np.logspace(-4, 0, 30)
+euler_errs, rk2_errs = [], []
+
+for h in h_values:
+    _, ye = euler_scalar(f, 1.0, T, h)
+    _, yr = rk2_scalar(f, 1.0, T, h)
+    exact = np.exp(-T)
+    euler_errs.append(abs(ye[-1] - exact))
+    rk2_errs.append(abs(yr[-1] - exact))
+
+fig = go.Figure()
+fig.add_trace(go.Scatter(x=h_values, y=euler_errs,
+    name='Euler O(h)', mode='markers+lines',
+    line=dict(color='#00f3ff')))
+fig.add_trace(go.Scatter(x=h_values, y=rk2_errs,
+    name='RK2 O(h²)', mode='markers+lines',
+    line=dict(color='#00ff9f')))
+
+# Reference lines
+fig.add_trace(go.Scatter(x=[1e-4, 1], y=[1e-4, 1],
+    name='slope=1', line=dict(color='#808080', dash='dot')))
+fig.add_trace(go.Scatter(x=[1e-4, 1], y=[1e-8, 1],
+    name='slope=2', line=dict(color='#ff00ff', dash='dot')))
+
+fig.update_layout(template='plotly_dark',
+    xaxis=dict(type='log', title='Step size h',
+               gridcolor='#2a2f4a', linecolor='#808080'),
+    yaxis=dict(type='log', title='|Error at t=T|',
+               gridcolor='#2a2f4a', linecolor='#808080'),
+    title='Euler vs RK2 Convergence')
+fig.show()
+            </code></pre>
+        </div>
+    </div>
+
+    <div class="tab-content">
+        <div class="code-block-container">
+            <div class="code-header">
+                <span class="code-lang">Prompt for AI</span>
+                <button class="copy-btn">Copy</button>
+            </div>
+            <pre><code class="language-text">Write a Python script comparing Euler and RK2 (midpoint method) for ODEs.
+
+1. Implement both methods as functions that accept f(t,y), y0, T, h
+2. Test on dy/dt = -y (exact: exp(-t)) and the SHO (x'' = -x, exact: cos(t))
+3. Create a log-log convergence plot: error vs h for both methods
+4. Add reference lines with slopes 1 (Euler) and 2 (RK2)
+5. Create a second plot showing E(t)/E(0) for the SHO over long times
+6. Show that Euler gains energy but RK2 oscillates around E=1
+7. Use plotly_dark theme, cyan for Euler, green for RK2, gray axes (#808080)</code></pre>
+        </div>
+
+        <div class="info-box" style="margin-top: var(--spacing-md);">
+            <div class="info-box-title">Pro Tips for Prompting</div>
+            <ul>
+                <li>Ask for both scalar and vector (system) implementations</li>
+                <li>Request log-log plots with reference slope lines for visual convergence verification</li>
+                <li>Specify long integration times (T > 50) to see energy drift clearly</li>
+                <li>Ask for a cost-benefit table comparing total function evaluations</li>
+            </ul>
+        </div>
+    </div>
+</div>
+
+<!-- ============================================================ -->
+<!-- NAVIGATION -->
+<!-- ============================================================ -->
+<div class="btn-group mt-xl">
+    <button class="btn btn-magenta" onclick="navigateToSection('43-practical-errors')">&larr; Previous: Error Analysis in Practice</button>
+    <button class="btn btn-secondary" onclick="scrollToTop()">&uarr; Back to Top</button>
+    <button class="btn btn-secondary" onclick="navigateToSection('45-rk4-method')">Next: Runge-Kutta 4th Order &rarr;</button>
+</div>

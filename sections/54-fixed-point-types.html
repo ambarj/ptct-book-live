@@ -1,0 +1,692 @@
+<!-- ============================================================
+     Section 5.4: The Big Three: Centers, Sources, Saddles
+     Source: NPTEL Lecture 8_1 (Linear Systems & Phase Space, Parts 4-5)
+     Concept: Classify fixed points by phase portrait shape —
+              centers, nodes, spirals, and saddles
+     Time: 15-20 minutes
+     Prerequisites: Sections 5.1-5.3 (phase space, vector fields, fixed points)
+     ============================================================ -->
+
+<h1>The Big Three: Centers, Sources, Saddles</h1>
+
+<p>
+    In Section 5.3 you learned to <em>find</em> fixed points. Now comes the deeper question:
+    <strong>what happens near them?</strong> Nearby trajectories can circle forever, spiral in,
+    spiral out, or split &mdash; and the behavior falls into just a few fundamental types.
+    Classify the fixed points, and you understand the entire phase portrait.
+</p>
+
+<div class="info-box">
+    <div class="info-box-title">Learning Objectives</div>
+    <ul>
+        <li>Recognize the six fundamental fixed-point types: center, stable/unstable node, stable/unstable spiral, and saddle</li>
+        <li>Connect each type to its eigenvalue signature: real vs complex, positive vs negative</li>
+        <li>Use the <strong>trace-determinant plane</strong> to classify any 2&times;2 linear system at a glance</li>
+        <li>Identify fixed-point types from phase portraits alone</li>
+    </ul>
+</div>
+
+<p>
+    For a linear system \( \dot{\mathbf{x}} = \mathbf{A}\mathbf{x} \), the eigenvalues of
+    \( \mathbf{A} \) completely determine the behavior near the origin. And those eigenvalues
+    depend on just two numbers: the <strong>trace</strong> \( \tau = a + d \) and the
+    <strong>determinant</strong> \( \Delta = ad - bc \).
+</p>
+
+<div class="equation-display">
+    <p><strong>Eigenvalues from trace and determinant:</strong></p>
+    $$ \lambda_{1,2} = \frac{\tau \pm \sqrt{\tau^2 - 4\Delta}}{2} $$
+    <p>Real eigenvalues when \( \tau^2 > 4\Delta \). Complex when \( \tau^2 < 4\Delta \).
+    The sign of \( \tau \) determines stability. The sign of \( \Delta \) separates saddles from everything else.</p>
+</div>
+
+<hr>
+
+<!-- ============================================================ -->
+<!-- EXPLORER 1: Type Gallery -->
+<!-- ============================================================ -->
+<div class="interactive-container" id="type-gallery">
+    <div class="interactive-title">Explorer: The Type Gallery</div>
+
+    <p>
+        Select a fixed-point type and examine its phase portrait. Watch how trajectories
+        behave near the origin &mdash; the shape reveals the type.
+    </p>
+
+    <div class="plot-container" id="ft-galleryPlot" style="height: 440px;"></div>
+
+    <div id="ft-stats1" class="stats-bar"></div>
+
+    <div class="control-panel">
+        <div class="control-group">
+            <label class="control-label" for="ft-type-select">Fixed-Point Type:</label>
+            <select id="ft-type-select" class="control-select">
+                <option value="center">Center</option>
+                <option value="stableNode">Stable Node (Sink)</option>
+                <option value="unstableNode">Unstable Node (Source)</option>
+                <option value="saddle">Saddle</option>
+                <option value="stableSpiral">Stable Spiral</option>
+                <option value="unstableSpiral">Unstable Spiral</option>
+            </select>
+        </div>
+        <div class="control-group">
+            <button class="btn" onclick="ftGalleryReset()">Reset</button>
+        </div>
+    </div>
+</div>
+
+<!-- ========== Test Your Understanding #1 ========== -->
+<div class="interactive-container question-section">
+    <div class="interactive-title">Test Your Understanding</div>
+
+    <p style="margin-bottom: var(--spacing-md); color: var(--text-secondary);">
+        Use the Type Gallery above to answer these questions.
+    </p>
+
+    <div class="tabs">
+        <div class="tab-buttons">
+            <button class="tab-button active">Question 1</button>
+            <button class="tab-button">Question 2</button>
+            <button class="tab-button">Question 3</button>
+        </div>
+
+        <div class="tab-content active">
+            <div class="question-container" data-type="mcq" data-answer="1">
+                <div class="question-text">
+                    Which fixed-point type has <em>closed orbits</em> &mdash; trajectories
+                    that return exactly to their starting point?
+                </div>
+                <div class="question-options">
+                    <label class="option">
+                        <input type="radio" name="ft-q1" value="0">
+                        <span>Stable spiral</span>
+                    </label>
+                    <label class="option">
+                        <input type="radio" name="ft-q1" value="1">
+                        <span>Center</span>
+                    </label>
+                    <label class="option">
+                        <input type="radio" name="ft-q1" value="2">
+                        <span>Stable node</span>
+                    </label>
+                    <label class="option">
+                        <input type="radio" name="ft-q1" value="3">
+                        <span>Saddle</span>
+                    </label>
+                </div>
+                <div class="question-actions">
+                    <button class="btn-verify">Verify</button>
+                </div>
+                <div class="question-explanation" style="display:none;">
+                    <strong>Explanation:</strong>
+                    A <strong>center</strong> has purely imaginary eigenvalues (\( \lambda = \pm i\omega \)),
+                    producing periodic, closed orbits. Spirals look similar but slowly converge
+                    or diverge &mdash; they never close. Select &ldquo;Center&rdquo; in the gallery to see the closed ellipses.
+                </div>
+            </div>
+        </div>
+
+        <div class="tab-content">
+            <div class="question-container" data-type="fill" data-answer="negative|positive">
+                <div class="question-text">
+                    A <strong>saddle</strong> has determinant \( \Delta \)
+                    <select class="fill-blank-select">
+                        <option value=""></option>
+                        <option value="positive">positive</option>
+                        <option value="negative">negative</option>
+                        <option value="zero">zero</option>
+                    </select>
+                    . An <strong>unstable node</strong> has trace \( \tau \)
+                    <select class="fill-blank-select">
+                        <option value=""></option>
+                        <option value="positive">positive</option>
+                        <option value="negative">negative</option>
+                        <option value="zero">zero</option>
+                    </select>
+                    .
+                </div>
+                <div class="question-actions">
+                    <button class="btn-verify">Verify</button>
+                </div>
+                <div class="question-explanation" style="display:none;">
+                    <strong>Explanation:</strong>
+                    A <strong>saddle</strong> has \( \Delta &lt; 0 \), giving one positive and one negative
+                    eigenvalue. An <strong>unstable node</strong> has \( \tau &gt; 0 \), so both
+                    eigenvalues have positive real parts. Check both in the Type Gallery &mdash;
+                    notice the &tau; and &Delta; values in the stats bar.
+                </div>
+            </div>
+        </div>
+
+        <div class="tab-content">
+            <div class="question-container" data-type="msq" data-answer="0,1">
+                <div class="question-text">
+                    Which fixed-point types are <strong>asymptotically stable</strong> &mdash; meaning
+                    <em>all</em> nearby trajectories converge to the fixed point? (Select all that apply)
+                </div>
+                <div class="question-options">
+                    <label class="option">
+                        <input type="checkbox" value="0">
+                        <span>Stable node</span>
+                    </label>
+                    <label class="option">
+                        <input type="checkbox" value="1">
+                        <span>Stable spiral</span>
+                    </label>
+                    <label class="option">
+                        <input type="checkbox" value="2">
+                        <span>Center</span>
+                    </label>
+                    <label class="option">
+                        <input type="checkbox" value="3">
+                        <span>Saddle</span>
+                    </label>
+                </div>
+                <div class="question-actions">
+                    <button class="btn-verify">Verify</button>
+                </div>
+                <div class="question-explanation" style="display:none;">
+                    <strong>Explanation:</strong>
+                    <ul>
+                        <li><strong>Stable node:</strong> ✓ Both eigenvalues real and negative &rarr; all trajectories converge</li>
+                        <li><strong>Stable spiral:</strong> ✓ Complex eigenvalues with negative real part &rarr; trajectories spiral in</li>
+                        <li><strong>Center:</strong> ✗ Purely imaginary eigenvalues &rarr; orbits circle forever but never reach the origin. This is <em>neutrally</em> stable, not <em>asymptotically</em> stable.</li>
+                        <li><strong>Saddle:</strong> ✗ One positive eigenvalue &rarr; trajectories diverge along the unstable manifold</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- ============================================================ -->
+<!-- EXPLORER 2: Trace-Determinant Plane -->
+<!-- ============================================================ -->
+<div class="interactive-container" id="td-plane">
+    <div class="interactive-title">Explorer: The Trace-Determinant Plane</div>
+
+    <p>
+        Every 2&times;2 linear system lives at a point \( (\tau, \Delta) \) in this plane.
+        Move the sliders to explore how the phase portrait changes as you cross
+        boundaries between regions. The dashed parabola \( \Delta = \tau^2/4 \)
+        separates nodes from spirals.
+    </p>
+
+    <div class="dual-panel">
+        <div class="panel">
+            <div class="plot-container" id="ft-tdPlot" style="height: 400px;"></div>
+        </div>
+        <div class="panel">
+            <div class="plot-container" id="ft-phasePlot" style="height: 400px;"></div>
+        </div>
+    </div>
+
+    <div id="ft-stats2" class="stats-bar"></div>
+
+    <div class="control-panel">
+        <div class="control-group">
+            <label class="control-label" for="ft-tau-slider">Trace &tau;:
+                <span id="ft-tau-value">0.0</span>
+            </label>
+            <input type="range" class="slider" id="ft-tau-slider"
+                   min="-4" max="4" step="0.1" value="0">
+        </div>
+        <div class="control-group">
+            <label class="control-label" for="ft-delta-slider">Determinant &Delta;:
+                <span id="ft-delta-value">1.0</span>
+            </label>
+            <input type="range" class="slider" id="ft-delta-slider"
+                   min="-3" max="6" step="0.1" value="1">
+        </div>
+        <div class="control-group">
+            <button class="btn" onclick="ftTDReset()">Reset</button>
+        </div>
+    </div>
+</div>
+
+<div class="info-box">
+    <div class="info-box-title">The Classification Map</div>
+    <p>
+        The trace-determinant plane is the <strong>complete classification</strong> for
+        linear systems. Every point \( (\tau, \Delta) \) maps to a unique type:
+    </p>
+    <ul>
+        <li>\( \Delta &lt; 0 \): <strong>Saddle</strong> (always unstable)</li>
+        <li>\( \Delta &gt; 0, \; \tau &lt; 0 \): <strong>Stable</strong> (node if \( \tau^2 &gt; 4\Delta \), spiral if \( \tau^2 &lt; 4\Delta \))</li>
+        <li>\( \Delta &gt; 0, \; \tau &gt; 0 \): <strong>Unstable</strong> (node or spiral)</li>
+        <li>\( \Delta &gt; 0, \; \tau = 0 \): <strong>Center</strong> (neutrally stable)</li>
+    </ul>
+</div>
+
+<!-- ========== Test Your Understanding #2 ========== -->
+<div class="interactive-container question-section">
+    <div class="interactive-title">Test Your Understanding</div>
+
+    <p style="margin-bottom: var(--spacing-md); color: var(--text-secondary);">
+        Use the Trace-Determinant explorer to answer these questions.
+    </p>
+
+    <div class="tabs">
+        <div class="tab-buttons">
+            <button class="tab-button active">Question 4</button>
+            <button class="tab-button">Question 5</button>
+            <button class="tab-button">Question 6</button>
+        </div>
+
+        <div class="tab-content active">
+            <div class="question-container" data-type="mcq" data-answer="2">
+                <div class="question-text">
+                    In the &tau;-&Delta; plane, the dashed parabola \( \Delta = \tau^2/4 \) separates&hellip;
+                </div>
+                <div class="question-options">
+                    <label class="option">
+                        <input type="radio" name="ft-q4" value="0">
+                        <span>Stable from unstable systems</span>
+                    </label>
+                    <label class="option">
+                        <input type="radio" name="ft-q4" value="1">
+                        <span>Saddles from everything else</span>
+                    </label>
+                    <label class="option">
+                        <input type="radio" name="ft-q4" value="2">
+                        <span>Nodes from spirals (real vs complex eigenvalues)</span>
+                    </label>
+                    <label class="option">
+                        <input type="radio" name="ft-q4" value="3">
+                        <span>Centers from spirals</span>
+                    </label>
+                </div>
+                <div class="question-actions">
+                    <button class="btn-verify">Verify</button>
+                </div>
+                <div class="question-explanation" style="display:none;">
+                    <strong>Explanation:</strong>
+                    On the parabola, \( \tau^2 - 4\Delta = 0 \) &mdash; the discriminant vanishes.
+                    Above it (\( \Delta &gt; \tau^2/4 \)), eigenvalues are complex &rarr; <em>spirals</em>.
+                    Below it (\( \Delta &lt; \tau^2/4 \)), eigenvalues are real &rarr; <em>nodes</em> (or saddles if \( \Delta &lt; 0 \)).
+                    Move the sliders to cross the parabola and watch the portrait morph.
+                </div>
+            </div>
+        </div>
+
+        <div class="tab-content">
+            <div class="question-container" data-type="fill" data-answer="stable spiral">
+                <div class="question-text">
+                    Set \( \tau = -1 \) and \( \Delta = 4 \) in the explorer. The discriminant is
+                    \( \tau^2 - 4\Delta = 1 - 16 = -15 &lt; 0 \) (complex eigenvalues) and \( \tau &lt; 0 \)
+                    (negative real part). This system is a
+                    <input type="text" class="fill-blank" placeholder="type name">.
+                </div>
+                <div class="question-actions">
+                    <button class="btn-verify">Verify</button>
+                </div>
+                <div class="question-explanation" style="display:none;">
+                    <strong>Explanation:</strong>
+                    Complex eigenvalues (discriminant &lt; 0) means spiraling motion. Negative trace (\( \tau &lt; 0 \))
+                    means the real part is negative &rarr; trajectories spiral <em>inward</em>. This is a
+                    <strong>stable spiral</strong>. Try it in the explorer to see the portrait.
+                </div>
+            </div>
+        </div>
+
+        <div class="tab-content">
+            <div class="question-container" data-type="mcq" data-answer="1">
+                <div class="question-text">
+                    Starting at a <em>center</em> (\( \tau = 0, \Delta &gt; 0 \)), you slowly
+                    decrease \( \tau \) to negative values. What happens to the phase portrait?
+                </div>
+                <div class="question-options">
+                    <label class="option">
+                        <input type="radio" name="ft-q6" value="0">
+                        <span>Closed orbits become saddle trajectories</span>
+                    </label>
+                    <label class="option">
+                        <input type="radio" name="ft-q6" value="1">
+                        <span>Closed orbits become inward spirals (stable spiral)</span>
+                    </label>
+                    <label class="option">
+                        <input type="radio" name="ft-q6" value="2">
+                        <span>Closed orbits become outward spirals (unstable spiral)</span>
+                    </label>
+                    <label class="option">
+                        <input type="radio" name="ft-q6" value="3">
+                        <span>Nothing changes &mdash; centers are robust</span>
+                    </label>
+                </div>
+                <div class="question-actions">
+                    <button class="btn-verify">Verify</button>
+                </div>
+                <div class="question-explanation" style="display:none;">
+                    <strong>Explanation:</strong>
+                    Centers are <strong>structurally unstable</strong>: any tiny negative &tau; turns
+                    the purely imaginary eigenvalues into complex eigenvalues with negative real parts,
+                    converting closed orbits into inward spirals. Try it &mdash; set &Delta; = 2,
+                    start at &tau; = 0, then nudge &tau; to &minus;0.1. The portrait changes immediately.
+                    This is why perfect centers are rare in nature &mdash; any damping breaks them.
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- ============================================================ -->
+<!-- EXPLORER 3: Classification Challenge -->
+<!-- ============================================================ -->
+<div class="interactive-container" id="classify-challenge">
+    <div class="interactive-title">Explorer: Classification Challenge</div>
+
+    <p>
+        A mystery linear system generates the phase portrait below. Identify the
+        fixed-point type from the trajectories alone. Click <strong>New Challenge</strong>
+        to begin, then choose your answer.
+    </p>
+
+    <div class="plot-container" id="ft-challengePlot" style="height: 420px;"></div>
+
+    <div id="ft-challengeResult" style="text-align: center; min-height: 2rem; margin: 0.5rem 0; font-size: 1.05rem;"></div>
+
+    <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 0.5rem; max-width: 500px; margin: 0 auto;">
+        <button class="btn" onclick="ftCheckAnswer('center')">Center</button>
+        <button class="btn" onclick="ftCheckAnswer('stableNode')">Stable Node</button>
+        <button class="btn" onclick="ftCheckAnswer('unstableNode')">Unstable Node</button>
+        <button class="btn" onclick="ftCheckAnswer('saddle')">Saddle</button>
+        <button class="btn" onclick="ftCheckAnswer('stableSpiral')">Stable Spiral</button>
+        <button class="btn" onclick="ftCheckAnswer('unstableSpiral')">Unstable Spiral</button>
+    </div>
+
+    <div id="ft-score" style="text-align: center; margin-top: 0.5rem; color: var(--text-secondary); font-size: 0.9rem;">
+        Click <strong>New Challenge</strong> to start
+    </div>
+
+    <div class="control-panel">
+        <div class="control-group">
+            <button class="btn" onclick="ftNewChallenge()">New Challenge</button>
+        </div>
+    </div>
+</div>
+
+<!-- ========== Test Your Understanding #3 ========== -->
+<div class="interactive-container question-section">
+    <div class="interactive-title">Test Your Understanding</div>
+
+    <p style="margin-bottom: var(--spacing-md); color: var(--text-secondary);">
+        Think about what you&rsquo;ve learned from classifying phase portraits.
+    </p>
+
+    <div class="tabs">
+        <div class="tab-buttons">
+            <button class="tab-button active">Question 7</button>
+            <button class="tab-button">Question 8</button>
+            <button class="tab-button">Question 9</button>
+        </div>
+
+        <div class="tab-content active">
+            <div class="question-container" data-type="mcq" data-answer="2">
+                <div class="question-text">
+                    You see trajectories approaching the origin but along <em>curved</em> paths
+                    that wrap around it. What type is this?
+                </div>
+                <div class="question-options">
+                    <label class="option">
+                        <input type="radio" name="ft-q7" value="0">
+                        <span>Stable node</span>
+                    </label>
+                    <label class="option">
+                        <input type="radio" name="ft-q7" value="1">
+                        <span>Center</span>
+                    </label>
+                    <label class="option">
+                        <input type="radio" name="ft-q7" value="2">
+                        <span>Stable spiral</span>
+                    </label>
+                    <label class="option">
+                        <input type="radio" name="ft-q7" value="3">
+                        <span>Saddle</span>
+                    </label>
+                </div>
+                <div class="question-actions">
+                    <button class="btn-verify">Verify</button>
+                </div>
+                <div class="question-explanation" style="display:none;">
+                    <strong>Explanation:</strong>
+                    Curved paths that wrap <em>and converge</em> &rarr; <strong>stable spiral</strong>.
+                    A center also wraps but never converges. A stable node converges but along
+                    <em>straight</em> lines (eigenvector directions). The key distinction:
+                    spirals have complex eigenvalues (oscillatory), nodes have real eigenvalues (monotonic).
+                </div>
+            </div>
+        </div>
+
+        <div class="tab-content">
+            <div class="question-container" data-type="fill" data-answer="real">
+                <div class="question-text">
+                    A system where trajectories approach the origin along <strong>straight lines</strong>
+                    (not curves) has eigenvalues that are
+                    <select class="fill-blank-select">
+                        <option value=""></option>
+                        <option value="real">real</option>
+                        <option value="complex">complex</option>
+                        <option value="imaginary">purely imaginary</option>
+                    </select>
+                    .
+                </div>
+                <div class="question-actions">
+                    <button class="btn-verify">Verify</button>
+                </div>
+                <div class="question-explanation" style="display:none;">
+                    <strong>Explanation:</strong>
+                    Real eigenvalues produce straight-line trajectories along eigenvectors. This is
+                    because the general solution is \( \mathbf{x}(t) = c_1 e^{\lambda_1 t} \mathbf{v}_1
+                    + c_2 e^{\lambda_2 t} \mathbf{v}_2 \). When started on an eigenvector, the motion
+                    stays on that line. Complex eigenvalues add rotation, producing curves.
+                </div>
+            </div>
+        </div>
+
+        <div class="tab-content">
+            <div class="question-container" data-type="msq" data-answer="1,2,3">
+                <div class="question-text">
+                    Which of these fixed-point types are <strong>structurally stable</strong> &mdash;
+                    meaning a small perturbation of the matrix does NOT change the type?
+                    (Select all that apply)
+                </div>
+                <div class="question-options">
+                    <label class="option">
+                        <input type="checkbox" value="0">
+                        <span>Center</span>
+                    </label>
+                    <label class="option">
+                        <input type="checkbox" value="1">
+                        <span>Stable spiral</span>
+                    </label>
+                    <label class="option">
+                        <input type="checkbox" value="2">
+                        <span>Unstable node</span>
+                    </label>
+                    <label class="option">
+                        <input type="checkbox" value="3">
+                        <span>Saddle</span>
+                    </label>
+                </div>
+                <div class="question-actions">
+                    <button class="btn-verify">Verify</button>
+                </div>
+                <div class="question-explanation" style="display:none;">
+                    <strong>Explanation:</strong>
+                    <ul>
+                        <li><strong>Center:</strong> ✗ Lives on the &tau; = 0 boundary. Any perturbation pushes &tau; positive or negative, converting it to a spiral. Centers are <em>structurally unstable</em>.</li>
+                        <li><strong>Stable spiral:</strong> ✓ Lives in the interior of a region. Small changes to &tau; and &Delta; keep it a stable spiral.</li>
+                        <li><strong>Unstable node:</strong> ✓ Also in a region interior &mdash; robust to perturbations.</li>
+                        <li><strong>Saddle:</strong> ✓ The entire half-plane \( \Delta &lt; 0 \) is saddle territory &mdash; very robust.</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- ============================================================ -->
+<!-- PYTHON CODE EXAMPLES -->
+<!-- ============================================================ -->
+<h2>Python Code</h2>
+
+<div class="tabs">
+    <div class="tab-buttons">
+        <button class="tab-button active">Phase Portraits</button>
+        <button class="tab-button">&tau;-&Delta; Plane</button>
+        <button class="tab-button">Prompt</button>
+    </div>
+
+    <div class="tab-content active">
+        <div class="code-block-container">
+            <div class="code-header">
+                <span class="code-lang">Python</span>
+                <button class="copy-btn">Copy</button>
+            </div>
+            <pre><code class="language-python">
+import numpy as np
+import plotly.graph_objects as go
+from plotly.subplots import make_subplots
+
+def solve_rk4(A, x0, T, N):
+    """RK4 solver for dx/dt = A @ x."""
+    h = T / N
+    x = np.array(x0, dtype=float)
+    traj = [x.copy()]
+    for _ in range(N):
+        k1 = A @ x
+        k2 = A @ (x + h/2 * k1)
+        k3 = A @ (x + h/2 * k2)
+        k4 = A @ (x + h * k3)
+        x += h/6 * (k1 + 2*k2 + 2*k3 + k4)
+        traj.append(x.copy())
+        if np.linalg.norm(x) > 20:
+            break
+    return np.array(traj)
+
+# Six canonical types
+types = {
+    'Center':          np.array([[0, 1], [-4, 0]]),
+    'Stable Node':     np.array([[-1, 0], [0, -3]]),
+    'Unstable Node':   np.array([[1, 0], [0, 3]]),
+    'Saddle':          np.array([[2, 0], [0, -1]]),
+    'Stable Spiral':   np.array([[-0.2, 1], [-1, -0.2]]),
+    'Unstable Spiral': np.array([[0.2, 1], [-1, 0.2]]),
+}
+
+fig = make_subplots(rows=2, cols=3,
+                    subplot_titles=list(types.keys()))
+
+for idx, (name, A) in enumerate(types.items()):
+    row, col = idx // 3 + 1, idx % 3 + 1
+    T = 20 if 'Node' in name or 'Saddle' in name else 30
+    for theta in np.linspace(0, 2*np.pi, 10, endpoint=False):
+        x0 = [1.5 * np.cos(theta), 1.5 * np.sin(theta)]
+        traj = solve_rk4(A, x0, T, 2000)
+        fig.add_trace(go.Scatter(
+            x=traj[:, 0], y=traj[:, 1],
+            mode='lines', line=dict(width=1),
+            showlegend=False
+        ), row=row, col=col)
+
+fig.update_xaxes(range=[-3, 3], zeroline=True,
+                 zerolinecolor='#808080')
+fig.update_yaxes(range=[-3, 3], zeroline=True,
+                 zerolinecolor='#808080')
+fig.update_layout(template='plotly_dark',
+                  height=700, width=900)
+fig.show()
+            </code></pre>
+        </div>
+    </div>
+
+    <div class="tab-content">
+        <div class="code-block-container">
+            <div class="code-header">
+                <span class="code-lang">Python</span>
+                <button class="copy-btn">Copy</button>
+            </div>
+            <pre><code class="language-python">
+import numpy as np
+import plotly.graph_objects as go
+
+# Build the trace-determinant classification diagram
+tau = np.linspace(-4, 4, 400)
+delta = np.linspace(-3, 6, 400)
+T, D = np.meshgrid(tau, delta)
+
+# Classify each point: 0=Saddle, 1=StableNode, 2=UnstableNode,
+#                       3=StableSpiral, 4=UnstableSpiral
+Z = np.zeros_like(T)
+Z[D < 0] = 0                                    # Saddle
+Z[(D >= 0) & (T**2 >= 4*D) & (T < 0)] = 1      # Stable Node
+Z[(D >= 0) & (T**2 >= 4*D) & (T >= 0)] = 2     # Unstable Node
+Z[(D >= 0) & (T**2 < 4*D) & (T < 0)] = 3       # Stable Spiral
+Z[(D >= 0) & (T**2 < 4*D) & (T >= 0)] = 4      # Unstable Spiral
+
+colors = ['#ff006e', '#00ff88', '#ff5722',
+          '#40c4ff', '#ffbe0b']
+names = ['Saddle', 'Stable Node', 'Unstable Node',
+         'Stable Spiral', 'Unstable Spiral']
+
+fig = go.Figure()
+fig.add_trace(go.Heatmap(
+    z=Z, x=tau, y=delta, opacity=0.3,
+    colorscale=[[i/4, c] for i, c in enumerate(colors)
+                for _ in range(2)],
+    showscale=False, zmin=-0.5, zmax=4.5
+))
+
+# Parabola boundary
+t_par = np.linspace(-4, 4, 200)
+fig.add_trace(go.Scatter(
+    x=t_par, y=t_par**2/4, mode='lines',
+    line=dict(color='white', width=2, dash='dash'),
+    name='Δ = τ²/4'
+))
+
+fig.update_layout(
+    template='plotly_dark',
+    xaxis=dict(title='Trace τ', range=[-4, 4],
+               zerolinecolor='#808080'),
+    yaxis=dict(title='Determinant Δ', range=[-3, 6],
+               zerolinecolor='#808080'),
+    height=550, width=600
+)
+fig.show()
+            </code></pre>
+        </div>
+    </div>
+
+    <div class="tab-content">
+        <div class="code-block-container">
+            <div class="code-header">
+                <span class="code-lang">Prompt for AI</span>
+                <button class="copy-btn">Copy</button>
+            </div>
+            <pre><code class="language-text">Create a Python script using Plotly that generates phase portraits
+for all six types of 2D linear fixed points:
+center, stable node, unstable node, saddle, stable spiral,
+and unstable spiral.
+
+Requirements:
+- Use RK4 to integrate dx/dt = A*x for each 2x2 matrix A
+- Launch 10 trajectories from a circle of radius 1.5
+- Show all six in a 2x3 subplot grid
+- Use dark theme (plotly_dark) with gray (#808080) axes
+- Fixed axis ranges: [-3, 3] on both axes
+- Title each subplot with the type name
+- Include a separate plot showing the trace-determinant
+  classification plane with colored regions</code></pre>
+        </div>
+    </div>
+</div>
+
+<!-- ============================================================ -->
+<!-- NAVIGATION -->
+<!-- ============================================================ -->
+<div class="btn-group mt-xl">
+    <button class="btn btn-magenta" onclick="navigateToSection('53-fixed-points')">&larr; Previous: Finding Fixed Points</button>
+    <button class="btn btn-secondary" onclick="scrollToTop()">&uarr; Back to Top</button>
+    <button class="btn btn-secondary" onclick="navigateToSection('55-trajectory-dynamics')">Next: Trajectory Exploration &rarr;</button>
+</div>

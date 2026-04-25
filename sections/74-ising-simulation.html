@@ -1,0 +1,680 @@
+<!-- ============================================================
+     Section 6.9: Ising Model Simulation & Results
+     Source: NPTEL Lecture 8_9 (Part 3)
+     Concept: Running production Metropolis simulations, computing
+              thermal averages, comparing with exact results,
+              understanding equilibration and autocorrelation
+     Time: 20-25 minutes
+     Prerequisites: Sections 6.7-6.8 (Ising model, Metropolis)
+     ============================================================ -->
+
+<h1>Ising Model Simulation &amp; Results</h1>
+
+<p>
+    You have the algorithm. Now let&rsquo;s use it. This section runs
+    <strong>production-quality</strong> Metropolis simulations of the 1D Ising
+    model, computes thermal averages, and compares with the exact analytical
+    solution. You&rsquo;ll also learn two practical skills every MC practitioner
+    needs: detecting <strong>equilibration</strong> and measuring
+    <strong>autocorrelation</strong>.
+</p>
+
+<div class="info-box">
+    <div class="info-box-title">Learning Objectives</div>
+    <ul>
+        <li>Run long Metropolis simulations and compute thermal averages \( \langle E \rangle \) and \( \langle |M| \rangle \) after discarding burn-in</li>
+        <li>Compare MC results with the exact 1D Ising solution \( \langle E \rangle / NJ = -\tanh(J/k_BT) \)</li>
+        <li>Determine the <strong>burn-in period</strong>: how many steps before measurements are valid</li>
+        <li>Understand <strong>autocorrelation</strong>: consecutive MC samples are correlated, reducing effective sample size</li>
+    </ul>
+</div>
+
+<div class="equation-display">
+    <p><strong>Exact 1D Ising Solution:</strong></p>
+    $$ \frac{\langle E \rangle}{NJ} = -\tanh\!\left(\frac{J}{k_BT}\right) $$
+    <p>
+        This exact result (derivable via transfer matrix) serves as a benchmark.
+        If your MC simulation reproduces this curve, the algorithm is working correctly.
+    </p>
+</div>
+
+<hr>
+
+<!-- ============================================================ -->
+<!-- EXPLORER 1: Full Simulation -->
+<!-- ============================================================ -->
+<div class="interactive-container" id="full-simulation">
+    <div class="interactive-title">Explorer: Production Simulation</div>
+
+    <p>
+        Run a long Metropolis simulation at a chosen temperature. The energy and
+        magnetization time series show equilibration followed by steady-state
+        fluctuations. Thermal averages are computed from the post-burn-in data.
+    </p>
+
+    <div class="dual-panel">
+        <div class="panel">
+            <div class="plot-container" id="is-energyPlot" style="height: 400px;"></div>
+        </div>
+        <div class="panel">
+            <div class="plot-container" id="is-magPlot" style="height: 400px;"></div>
+        </div>
+    </div>
+
+    <div id="is-stats1" class="stats-bar"></div>
+
+    <div class="control-panel">
+        <div class="control-group">
+            <label class="control-label" for="is-T-slider">Temperature T/J:
+                <span id="is-T-value">1.0</span>
+            </label>
+            <input type="range" class="slider" id="is-T-slider"
+                   min="0.2" max="5" step="0.1" value="1">
+        </div>
+        <div class="control-group">
+            <label class="control-label" for="is-N-select">Chain length:</label>
+            <select id="is-N-select" class="control-select">
+                <option value="30">N = 30</option>
+                <option value="50" selected>N = 50</option>
+                <option value="100">N = 100</option>
+            </select>
+        </div>
+        <div class="control-group">
+            <label class="control-label" for="is-steps-select">Total steps:</label>
+            <select id="is-steps-select" class="control-select">
+                <option value="5000">5,000</option>
+                <option value="10000" selected>10,000</option>
+                <option value="20000">20,000</option>
+            </select>
+        </div>
+        <div class="control-group">
+            <button class="btn" onclick="isSimRun()">Run Simulation</button>
+        </div>
+    </div>
+</div>
+
+<!-- ========== Test Your Understanding #1 ========== -->
+<div class="interactive-container question-section">
+    <div class="interactive-title">Test Your Understanding</div>
+
+    <p style="margin-bottom: var(--spacing-md); color: var(--text-secondary);">
+        Use the Production Simulation to answer these questions.
+    </p>
+
+    <div class="tabs">
+        <div class="tab-buttons">
+            <button class="tab-button active">Question 1</button>
+            <button class="tab-button">Question 2</button>
+            <button class="tab-button">Question 3</button>
+        </div>
+
+        <div class="tab-content active">
+            <div class="question-container" data-type="mcq" data-answer="2">
+                <div class="question-text">
+                    Run at T/J = 0.5 with N = 50. After equilibration, the magnetization
+                    \( |M|/N \) fluctuates near&hellip;
+                </div>
+                <div class="question-options">
+                    <label class="option">
+                        <input type="radio" name="is-q1" value="0">
+                        <span>0 (completely disordered)</span>
+                    </label>
+                    <label class="option">
+                        <input type="radio" name="is-q1" value="1">
+                        <span>0.5 (half-ordered)</span>
+                    </label>
+                    <label class="option">
+                        <input type="radio" name="is-q1" value="2">
+                        <span>Close to 1 (highly ordered &mdash; most spins aligned)</span>
+                    </label>
+                    <label class="option">
+                        <input type="radio" name="is-q1" value="3">
+                        <span>&minus;1 (all spins down)</span>
+                    </label>
+                </div>
+                <div class="question-actions">
+                    <button class="btn-verify">Verify</button>
+                </div>
+                <div class="question-explanation" style="display:none;">
+                    <strong>Explanation:</strong>
+                    At low T, the system strongly prefers the ordered (aligned) state. The
+                    magnetization \( |M|/N \) stays close to 1: nearly all spins point the
+                    same way. Occasional fluctuations briefly reduce it, but it quickly returns.
+                </div>
+            </div>
+        </div>
+
+        <div class="tab-content">
+            <div class="question-container" data-type="fill" data-answer="0[0,0.3]">
+                <div class="question-text">
+                    Now run at T/J = 5.0. The equilibrium magnetization \( \langle|M|\rangle/N \)
+                    is approximately <input type="text" class="fill-blank" style="width: 50px">.
+                    (Read from the time series)
+                </div>
+                <div class="question-actions">
+                    <button class="btn-verify">Verify</button>
+                </div>
+                <div class="question-explanation" style="display:none;">
+                    <strong>Explanation:</strong>
+                    At high T, spins are disordered &mdash; roughly equal numbers point up and
+                    down. The magnetization fluctuates near zero (with \( |M|/N \sim 1/\sqrt{N} \)
+                    from random fluctuations). For N = 50, expect \( |M|/N \approx 0.1\text{--}0.2 \).
+                </div>
+            </div>
+        </div>
+
+        <div class="tab-content">
+            <div class="question-container" data-type="mcq" data-answer="1">
+                <div class="question-text">
+                    Compare the MC \( \langle E \rangle / N \) with the exact value shown in
+                    the stats bar. How well do they agree?
+                </div>
+                <div class="question-options">
+                    <label class="option">
+                        <input type="radio" name="is-q3" value="0">
+                        <span>They disagree significantly &mdash; MC is wrong</span>
+                    </label>
+                    <label class="option">
+                        <input type="radio" name="is-q3" value="1">
+                        <span>They agree to 2&ndash;3 digits &mdash; MC validates the exact result</span>
+                    </label>
+                    <label class="option">
+                        <input type="radio" name="is-q3" value="2">
+                        <span>They agree perfectly (identical to 10 digits)</span>
+                    </label>
+                    <label class="option">
+                        <input type="radio" name="is-q3" value="3">
+                        <span>Cannot be compared</span>
+                    </label>
+                </div>
+                <div class="question-actions">
+                    <button class="btn-verify">Verify</button>
+                </div>
+                <div class="question-explanation" style="display:none;">
+                    <strong>Explanation:</strong>
+                    MC gives statistical estimates with error \( \sim 1/\sqrt{N_{\text{samples}}} \).
+                    With 10,000 steps (minus burn-in), expect 2&ndash;3 digits of agreement. This
+                    is the <strong>validation</strong> step: the MC result matches the known
+                    analytical answer, confirming the algorithm works.
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- ============================================================ -->
+<!-- EXPLORER 2: MC vs Exact -->
+<!-- ============================================================ -->
+<div class="interactive-container" id="mc-vs-exact">
+    <div class="interactive-title">Explorer: MC vs Exact Solution</div>
+
+    <p>
+        Sweep through temperatures and compare \( \langle E \rangle / N \) and
+        \( \langle |M| \rangle / N \) from Metropolis MC with the exact analytical
+        curves. The agreement validates the entire Metropolis framework.
+    </p>
+
+    <div class="dual-panel">
+        <div class="panel">
+            <div class="plot-container" id="is-sweepEPlot" style="height: 400px;"></div>
+        </div>
+        <div class="panel">
+            <div class="plot-container" id="is-sweepMPlot" style="height: 400px;"></div>
+        </div>
+    </div>
+
+    <div id="is-stats2" class="stats-bar"></div>
+
+    <div class="control-panel">
+        <div class="control-group">
+            <label class="control-label" for="is-sweep-N-select">Chain length:</label>
+            <select id="is-sweep-N-select" class="control-select">
+                <option value="30">N = 30</option>
+                <option value="50" selected>N = 50</option>
+                <option value="100">N = 100</option>
+            </select>
+        </div>
+        <div class="control-group">
+            <label class="control-label" for="is-sweep-steps-select">Steps per T:</label>
+            <select id="is-sweep-steps-select" class="control-select">
+                <option value="5000">5,000</option>
+                <option value="10000" selected>10,000</option>
+                <option value="20000">20,000</option>
+            </select>
+        </div>
+        <div class="control-group">
+            <button class="btn" onclick="isSweepRun()">Run Sweep</button>
+        </div>
+    </div>
+</div>
+
+<!-- ========== Test Your Understanding #2 ========== -->
+<div class="interactive-container question-section">
+    <div class="interactive-title">Test Your Understanding</div>
+
+    <p style="margin-bottom: var(--spacing-md); color: var(--text-secondary);">
+        Use the MC vs Exact explorer to answer these questions.
+    </p>
+
+    <div class="tabs">
+        <div class="tab-buttons">
+            <button class="tab-button active">Question 4</button>
+            <button class="tab-button">Question 5</button>
+            <button class="tab-button">Question 6</button>
+        </div>
+
+        <div class="tab-content active">
+            <div class="question-container" data-type="mcq" data-answer="0">
+                <div class="question-text">
+                    Run the sweep with 10,000 steps per T. At which temperatures does
+                    the MC estimate have the <strong>largest</strong> scatter (error)?
+                </div>
+                <div class="question-options">
+                    <label class="option">
+                        <input type="radio" name="is-q4" value="0">
+                        <span>Low T &mdash; the system gets stuck, reducing effective samples</span>
+                    </label>
+                    <label class="option">
+                        <input type="radio" name="is-q4" value="1">
+                        <span>High T &mdash; disorder creates more noise</span>
+                    </label>
+                    <label class="option">
+                        <input type="radio" name="is-q4" value="2">
+                        <span>All temperatures have equal error</span>
+                    </label>
+                    <label class="option">
+                        <input type="radio" name="is-q4" value="3">
+                        <span>Only at T = 0</span>
+                    </label>
+                </div>
+                <div class="question-actions">
+                    <button class="btn-verify">Verify</button>
+                </div>
+                <div class="question-explanation" style="display:none;">
+                    <strong>Explanation:</strong>
+                    At low T, the acceptance rate drops and consecutive configurations are
+                    highly correlated (the chain barely moves). This means fewer
+                    <em>independent</em> samples, resulting in larger statistical error. The
+                    autocorrelation time (Explorer 3) quantifies this effect.
+                </div>
+            </div>
+        </div>
+
+        <div class="tab-content">
+            <div class="question-container" data-type="fill" data-answer="-1[-1.05,-0.95]">
+                <div class="question-text">
+                    The exact energy per spin at T &rarr; 0 is
+                    \( \langle E \rangle / NJ \to \)
+                    <input type="text" class="fill-blank" style="width: 50px">.
+                </div>
+                <div class="question-actions">
+                    <button class="btn-verify">Verify</button>
+                </div>
+                <div class="question-explanation" style="display:none;">
+                    <strong>Explanation:</strong>
+                    \( -\tanh(J/k_BT) \to -\tanh(\infty) = -1 \). At T = 0, all spins align:
+                    \( E = -(N-1)J \), so \( E/NJ = -(N-1)/N \to -1 \) for large N.
+                </div>
+            </div>
+        </div>
+
+        <div class="tab-content">
+            <div class="question-container" data-type="msq" data-answer="0,2">
+                <div class="question-text">
+                    Which observations from the sweep are correct? (Select all)
+                </div>
+                <div class="question-options">
+                    <label class="option">
+                        <input type="checkbox" value="0">
+                        <span>MC points closely follow the exact &minus;tanh(1/T) curve for energy</span>
+                    </label>
+                    <label class="option">
+                        <input type="checkbox" value="1">
+                        <span>Magnetization has a sharp phase transition at a critical T</span>
+                    </label>
+                    <label class="option">
+                        <input type="checkbox" value="2">
+                        <span>Magnetization drops smoothly from 1 to ~0 as T increases (no sharp transition in 1D)</span>
+                    </label>
+                    <label class="option">
+                        <input type="checkbox" value="3">
+                        <span>More MC steps per T always gives worse results</span>
+                    </label>
+                </div>
+                <div class="question-actions">
+                    <button class="btn-verify">Verify</button>
+                </div>
+                <div class="question-explanation" style="display:none;">
+                    <strong>Explanation:</strong>
+                    <ul>
+                        <li><strong>Follows exact curve:</strong> ✓ This validates the Metropolis algorithm.</li>
+                        <li><strong>Sharp phase transition:</strong> ✗ The 1D Ising model has <em>no</em> phase transition at finite T. Only the 2D model (Onsager) has a critical temperature.</li>
+                        <li><strong>Smooth crossover:</strong> ✓ Magnetization smoothly decreases &mdash; a crossover, not a transition. This is a fundamental result of 1D statistical mechanics.</li>
+                        <li><strong>More steps = worse:</strong> ✗ More steps always reduces statistical error.</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- ============================================================ -->
+<!-- EXPLORER 3: Equilibration & Autocorrelation -->
+<!-- ============================================================ -->
+<div class="interactive-container" id="autocorrelation-explorer">
+    <div class="interactive-title">Explorer: Equilibration &amp; Autocorrelation</div>
+
+    <p>
+        Two practical diagnostics every MC practitioner needs. <strong>Left:</strong>
+        the burn-in detector shows when the energy has equilibrated.
+        <strong>Right:</strong> the autocorrelation function \( C(k) \) shows how
+        many steps separate <em>independent</em> samples. At low T, autocorrelation
+        is long (samples are correlated); at high T, it&rsquo;s short.
+    </p>
+
+    <div class="dual-panel">
+        <div class="panel">
+            <div class="plot-container" id="is-burninPlot" style="height: 400px;"></div>
+        </div>
+        <div class="panel">
+            <div class="plot-container" id="is-autocorrPlot" style="height: 400px;"></div>
+        </div>
+    </div>
+
+    <div id="is-stats3" class="stats-bar"></div>
+
+    <div class="control-panel">
+        <div class="control-group">
+            <label class="control-label" for="is-ac-T-slider">Temperature T/J:
+                <span id="is-ac-T-value">1.0</span>
+            </label>
+            <input type="range" class="slider" id="is-ac-T-slider"
+                   min="0.3" max="5" step="0.1" value="1">
+        </div>
+        <div class="control-group">
+            <button class="btn" onclick="isAutoRun()">Run Analysis</button>
+        </div>
+    </div>
+</div>
+
+<div class="info-box">
+    <div class="info-box-title">Effective Sample Size</div>
+    <p>
+        If the autocorrelation time is \( \tau_{\text{auto}} \) steps, then out of
+        \( N_{\text{steps}} \) total MC steps, only \( N_{\text{eff}} \approx N_{\text{steps}} / (2\tau_{\text{auto}}) \)
+        are independent. The true statistical error is \( \sigma / \sqrt{N_{\text{eff}}} \),
+        not \( \sigma / \sqrt{N_{\text{steps}}} \). Ignoring autocorrelation
+        <strong>underestimates</strong> your error bars!
+    </p>
+</div>
+
+<!-- ========== Test Your Understanding #3 ========== -->
+<div class="interactive-container question-section">
+    <div class="interactive-title">Test Your Understanding</div>
+
+    <p style="margin-bottom: var(--spacing-md); color: var(--text-secondary);">
+        Use the Autocorrelation explorer to answer these questions.
+    </p>
+
+    <div class="tabs">
+        <div class="tab-buttons">
+            <button class="tab-button active">Question 7</button>
+            <button class="tab-button">Question 8</button>
+            <button class="tab-button">Question 9</button>
+        </div>
+
+        <div class="tab-content active">
+            <div class="question-container" data-type="mcq" data-answer="1">
+                <div class="question-text">
+                    Run at T/J = 0.5. The autocorrelation function \( C(k) \) decays
+                    slowly. What does this mean practically?
+                </div>
+                <div class="question-options">
+                    <label class="option">
+                        <input type="radio" name="is-q7" value="0">
+                        <span>The simulation has converged perfectly</span>
+                    </label>
+                    <label class="option">
+                        <input type="radio" name="is-q7" value="1">
+                        <span>Consecutive samples are highly correlated &mdash; you need many more steps for reliable averages</span>
+                    </label>
+                    <label class="option">
+                        <input type="radio" name="is-q7" value="2">
+                        <span>The algorithm has a bug</span>
+                    </label>
+                    <label class="option">
+                        <input type="radio" name="is-q7" value="3">
+                        <span>The temperature is too high</span>
+                    </label>
+                </div>
+                <div class="question-actions">
+                    <button class="btn-verify">Verify</button>
+                </div>
+                <div class="question-explanation" style="display:none;">
+                    <strong>Explanation:</strong>
+                    Slow decay of \( C(k) \) means the chain moves sluggishly through
+                    configuration space. Sample \( n \) is very similar to sample \( n+1 \).
+                    To get <em>independent</em> measurements, you must skip many steps between
+                    samples. This is the <strong>critical slowing down</strong> at low T.
+                </div>
+            </div>
+        </div>
+
+        <div class="tab-content">
+            <div class="question-container" data-type="mcq" data-answer="0">
+                <div class="question-text">
+                    Now run at T/J = 3.0. How does the autocorrelation compare?
+                </div>
+                <div class="question-options">
+                    <label class="option">
+                        <input type="radio" name="is-q8" value="0">
+                        <span>\( C(k) \) drops to zero in just a few steps &mdash; samples are nearly independent</span>
+                    </label>
+                    <label class="option">
+                        <input type="radio" name="is-q8" value="1">
+                        <span>\( C(k) \) is identical to the low-T case</span>
+                    </label>
+                    <label class="option">
+                        <input type="radio" name="is-q8" value="2">
+                        <span>\( C(k) \) never decays &mdash; samples are permanently correlated</span>
+                    </label>
+                    <label class="option">
+                        <input type="radio" name="is-q8" value="3">
+                        <span>\( C(k) \) oscillates</span>
+                    </label>
+                </div>
+                <div class="question-actions">
+                    <button class="btn-verify">Verify</button>
+                </div>
+                <div class="question-explanation" style="display:none;">
+                    <strong>Explanation:</strong>
+                    At high T, the acceptance rate is high and the chain moves freely. Each step
+                    significantly changes the configuration, so \( C(k) \) drops to zero within
+                    a few steps. Nearly every sample is independent &mdash; ideal for MC.
+                </div>
+            </div>
+        </div>
+
+        <div class="tab-content">
+            <div class="question-container" data-type="fill" data-answer="underestimate">
+                <div class="question-text">
+                    If you ignore autocorrelation and compute error bars as
+                    \( \sigma / \sqrt{N_{\text{steps}}} \), you will
+                    <select class="fill-blank-select">
+                        <option value=""></option>
+                        <option value="overestimate">overestimate</option>
+                        <option value="underestimate">underestimate</option>
+                        <option value="correctly estimate">correctly estimate</option>
+                    </select>
+                    the true error.
+                </div>
+                <div class="question-actions">
+                    <button class="btn-verify">Verify</button>
+                </div>
+                <div class="question-explanation" style="display:none;">
+                    <strong>Explanation:</strong>
+                    Using \( N_{\text{steps}} \) instead of \( N_{\text{eff}} \) in the denominator
+                    makes the error bar too small &mdash; you <strong>underestimate</strong> the
+                    true uncertainty. The correct formula uses
+                    \( N_{\text{eff}} = N_{\text{steps}} / (2\tau_{\text{auto}}) \), which gives
+                    a larger (more honest) error bar.
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- ============================================================ -->
+<!-- PYTHON CODE EXAMPLES -->
+<!-- ============================================================ -->
+<h2>Python Code</h2>
+
+<div class="tabs">
+    <div class="tab-buttons">
+        <button class="tab-button active">Full Simulation</button>
+        <button class="tab-button">Autocorrelation</button>
+        <button class="tab-button">Prompt</button>
+    </div>
+
+    <div class="tab-content active">
+        <div class="code-block-container">
+            <div class="code-header">
+                <span class="code-lang">Python</span>
+                <button class="copy-btn">Copy</button>
+            </div>
+            <pre><code class="language-python">
+import numpy as np
+import plotly.graph_objects as go
+from plotly.subplots import make_subplots
+
+def metropolis_1d(N, T, n_steps):
+    spins = np.random.choice([-1, 1], N)
+    E = -np.sum(spins[:-1] * spins[1:])
+    energies, mags = [], []
+    for _ in range(n_steps):
+        i = np.random.randint(N)
+        dE = 0
+        if i > 0:   dE += 2 * spins[i] * spins[i-1]
+        if i < N-1: dE += 2 * spins[i] * spins[i+1]
+        if dE <= 0 or np.random.random() < np.exp(-dE/T):
+            spins[i] *= -1
+            E += dE
+        energies.append(E)
+        mags.append(np.abs(np.sum(spins)) / N)
+    return np.array(energies), np.array(mags)
+
+# Temperature sweep
+N = 50
+Ts = np.linspace(0.3, 5, 25)
+mc_E, mc_M = [], []
+for T in Ts:
+    E, M = metropolis_1d(N, T, 10000)
+    mc_E.append(np.mean(E[2000:]) / N)
+    mc_M.append(np.mean(M[2000:]))
+
+fig = make_subplots(1, 2, subplot_titles=['⟨E⟩/N', '⟨|M|⟩/N'])
+fig.add_trace(go.Scatter(x=Ts, y=mc_E, mode='markers',
+    marker=dict(color='#00f3ff', size=8), name='MC'), row=1, col=1)
+fig.add_trace(go.Scatter(x=Ts, y=-np.tanh(1/Ts), mode='lines',
+    line=dict(color='white', dash='dash'), name='Exact'), row=1, col=1)
+fig.add_trace(go.Scatter(x=Ts, y=mc_M, mode='markers',
+    marker=dict(color='#ff006e', size=8), name='MC'), row=1, col=2)
+
+fig.update_layout(template='plotly_dark', height=400, width=900)
+for col in [1,2]:
+    fig.update_xaxes(title='T/J', zerolinecolor='#808080', row=1, col=col)
+fig.update_yaxes(title='⟨E⟩/NJ', range=[-1.1,0.1],
+    zerolinecolor='#808080', row=1, col=1)
+fig.update_yaxes(title='⟨|M|⟩/N', range=[0,1.05],
+    zerolinecolor='#808080', row=1, col=2)
+fig.show()
+            </code></pre>
+        </div>
+    </div>
+
+    <div class="tab-content">
+        <div class="code-block-container">
+            <div class="code-header">
+                <span class="code-lang">Python</span>
+                <button class="copy-btn">Copy</button>
+            </div>
+            <pre><code class="language-python">
+import numpy as np
+import plotly.graph_objects as go
+
+def autocorrelation(data, max_lag=200):
+    """Compute normalized autocorrelation function."""
+    n = len(data)
+    mean = np.mean(data)
+    var = np.var(data)
+    if var < 1e-10: return np.zeros(max_lag)
+    C = np.zeros(max_lag)
+    for k in range(max_lag):
+        C[k] = np.mean((data[:n-k] - mean) * (data[k:] - mean)) / var
+    return C
+
+N, n_steps = 50, 20000
+fig = go.Figure()
+colors = ['#00f3ff', '#ffbe0b', '#ff006e']
+
+for T, color in zip([0.5, 1.0, 3.0], colors):
+    E, _ = metropolis_1d(N, T, n_steps)
+    C = autocorrelation(E[2000:], 300)  # skip burn-in
+    fig.add_trace(go.Scatter(
+        y=C, mode='lines', line=dict(color=color, width=2),
+        name=f'T/J = {T}'))
+
+fig.add_trace(go.Scatter(
+    x=[0, 300], y=[0, 0], mode='lines',
+    line=dict(color='#808080', dash='dot'), showlegend=False))
+
+fig.update_layout(template='plotly_dark',
+    xaxis=dict(title='Lag k (MC steps)', zerolinecolor='#808080'),
+    yaxis=dict(title='C(k)', range=[-0.2, 1.05],
+        zerolinecolor='#808080'),
+    height=400, width=550)
+fig.show()
+            </code></pre>
+        </div>
+    </div>
+
+    <div class="tab-content">
+        <div class="code-block-container">
+            <div class="code-header">
+                <span class="code-lang">Prompt for AI</span>
+                <button class="copy-btn">Copy</button>
+            </div>
+            <pre><code class="language-text">Create a Python script using Plotly for production Ising model
+Metropolis simulation with diagnostics.
+
+Requirements:
+- 1D Ising model with Metropolis MC
+- Part 1: Temperature sweep (T = 0.3 to 5, 25 points)
+  Panel 1: ⟨E⟩/N — MC markers vs exact −tanh(1/T) dashed
+  Panel 2: ⟨|M|⟩/N — MC markers
+  Use N=50, 10000 steps, 2000 burn-in per T
+
+- Part 2: Autocorrelation analysis
+  Run at T = 0.5, 1.0, 3.0 (low, medium, high)
+  Compute C(k) = normalized autocorrelation of E time series
+  Plot C(k) vs lag k for all three temperatures
+  Show that low T has long autocorrelation (slow mixing)
+
+- Part 3: Effective sample size
+  Estimate τ_auto (where C(k) first crosses 0 or 1/e)
+  Compute N_eff = N_steps / (2 * τ_auto)
+  Print comparison of naive vs corrected error bars
+
+- Use dark theme (plotly_dark) with gray (#808080) axes</code></pre>
+        </div>
+    </div>
+</div>
+
+<!-- ============================================================ -->
+<!-- NAVIGATION -->
+<!-- ============================================================ -->
+<div class="btn-group mt-xl">
+    <button class="btn btn-magenta" onclick="navigateToSection('73-metropolis-algorithm')">&larr; Previous: The Metropolis Algorithm</button>
+    <button class="btn btn-secondary" onclick="scrollToTop()">&uarr; Back to Top</button>
+    <button class="btn btn-secondary" onclick="navigateToSection('75-mc-applications')">Next: MC in Science &rarr;</button>
+</div>

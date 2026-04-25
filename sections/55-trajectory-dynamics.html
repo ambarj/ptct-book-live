@@ -1,0 +1,708 @@
+<!-- ============================================================
+     Section 5.5: Trajectory Exploration
+     Source: NPTEL Lecture 8_1 (Linear Systems & Phase Space, Part 6)
+     Concept: Trajectories as fundamental objects — uniqueness,
+              basins of attraction, long-term fate, cloud evolution
+     Time: 15-20 minutes
+     Prerequisites: Sections 5.1-5.4 (phase space, vector fields,
+                    fixed points, classification)
+     ============================================================ -->
+
+<h1>Trajectory Exploration</h1>
+
+<p>
+    You can now classify fixed points and read phase portraits. But there&rsquo;s a deeper
+    structure at work: <strong>trajectories</strong> themselves obey powerful rules. Every
+    initial condition launches exactly one trajectory. Different trajectories never cross.
+    And the plane partitions into <strong>basins of attraction</strong> &mdash; regions of
+    initial conditions that share the same long-term fate.
+</p>
+
+<div class="info-box">
+    <div class="info-box-title">Learning Objectives</div>
+    <ul>
+        <li>Launch trajectories from different initial conditions and observe how the starting point determines the entire future</li>
+        <li>Understand the <strong>uniqueness theorem</strong>: two distinct trajectories can never occupy the same point</li>
+        <li>Map <strong>basins of attraction</strong> &mdash; regions of initial conditions that share the same long-term fate</li>
+        <li>Watch how a cloud of nearby initial conditions deforms over time, revealing stretching and compression</li>
+    </ul>
+</div>
+
+<div class="info-box">
+    <div class="info-box-title">The Uniqueness Theorem</div>
+    <p>
+        If \( f \) and \( g \) are smooth, then through every point \( (x_0, y_0) \) there passes
+        <strong>exactly one</strong> trajectory. Two different trajectories can never intersect,
+        merge, or cross. This seemingly simple fact has profound consequences: it means the
+        phase portrait is a collection of non-intersecting curves that fill the entire plane.
+    </p>
+</div>
+
+<hr>
+
+<!-- ============================================================ -->
+<!-- EXPLORER 1: Trajectory Launcher -->
+<!-- ============================================================ -->
+<div class="interactive-container" id="trajectory-launcher">
+    <div class="interactive-title">Explorer: Trajectory Launcher</div>
+
+    <p>
+        Choose a system and set an initial condition with the sliders.
+        Click <strong>Launch</strong> to fire a trajectory &mdash; each new launch
+        adds to the portrait so you can compare different starting points.
+    </p>
+
+    <div class="dual-panel">
+        <div class="panel">
+            <div class="plot-container" id="td-phasePlot" style="height: 400px;"></div>
+        </div>
+        <div class="panel">
+            <div class="plot-container" id="td-timePlot" style="height: 400px;"></div>
+        </div>
+    </div>
+
+    <div id="td-stats1" class="stats-bar"></div>
+
+    <div class="control-panel">
+        <div class="control-group">
+            <label class="control-label" for="td-system1">System:</label>
+            <select id="td-system1" class="control-select">
+                <option value="center">Center (SHO)</option>
+                <option value="stableSpiral">Stable Spiral</option>
+                <option value="saddle">Saddle</option>
+                <option value="predatorPrey">Predator-Prey</option>
+            </select>
+        </div>
+        <div class="control-group">
+            <label class="control-label" for="td-x0-slider">x&#8320;:
+                <span id="td-x0-value">1.5</span>
+            </label>
+            <input type="range" class="slider" id="td-x0-slider"
+                   min="-2.5" max="2.5" step="0.1" value="1.5">
+        </div>
+        <div class="control-group">
+            <label class="control-label" for="td-y0-slider">y&#8320;:
+                <span id="td-y0-value">0.0</span>
+            </label>
+            <input type="range" class="slider" id="td-y0-slider"
+                   min="-2.5" max="2.5" step="0.1" value="0">
+        </div>
+        <div class="control-group">
+            <button class="btn" onclick="tdLaunch()">Launch</button>
+            <button class="btn" onclick="tdClear()">Clear All</button>
+        </div>
+    </div>
+</div>
+
+<!-- ========== Test Your Understanding #1 ========== -->
+<div class="interactive-container question-section">
+    <div class="interactive-title">Test Your Understanding</div>
+
+    <p style="margin-bottom: var(--spacing-md); color: var(--text-secondary);">
+        Use the Trajectory Launcher to answer these questions.
+    </p>
+
+    <div class="tabs">
+        <div class="tab-buttons">
+            <button class="tab-button active">Question 1</button>
+            <button class="tab-button">Question 2</button>
+            <button class="tab-button">Question 3</button>
+        </div>
+
+        <div class="tab-content active">
+            <div class="question-container" data-type="mcq" data-answer="0">
+                <div class="question-text">
+                    In the <strong>Center (SHO)</strong> system, launch several trajectories from
+                    different distances from the origin. How do the orbits differ?
+                </div>
+                <div class="question-options">
+                    <label class="option">
+                        <input type="radio" name="td-q1" value="0">
+                        <span>They form closed orbits of different sizes but the same period</span>
+                    </label>
+                    <label class="option">
+                        <input type="radio" name="td-q1" value="1">
+                        <span>They form closed orbits with different periods</span>
+                    </label>
+                    <label class="option">
+                        <input type="radio" name="td-q1" value="2">
+                        <span>All orbits are identical regardless of starting point</span>
+                    </label>
+                    <label class="option">
+                        <input type="radio" name="td-q1" value="3">
+                        <span>Larger orbits spiral inward over time</span>
+                    </label>
+                </div>
+                <div class="question-actions">
+                    <button class="btn-verify">Verify</button>
+                </div>
+                <div class="question-explanation" style="display:none;">
+                    <strong>Explanation:</strong>
+                    For the simple harmonic oscillator (\( \dot{x} = y,\; \dot{y} = -x \)), the
+                    eigenvalues are \( \pm i \) so the period is \( 2\pi \) regardless of amplitude.
+                    Larger initial conditions give larger orbits, but the oscillation frequency is the
+                    same. Check the time series &mdash; all trajectories complete one cycle in the same time.
+                </div>
+            </div>
+        </div>
+
+        <div class="tab-content">
+            <div class="question-container" data-type="fill" data-answer="approach">
+                <div class="question-text">
+                    Switch to the <strong>Saddle</strong> system. Launch from (0, 2) &mdash; exactly
+                    on the y-axis. The trajectory will
+                    <select class="fill-blank-select">
+                        <option value=""></option>
+                        <option value="approach">approach the origin</option>
+                        <option value="escape">escape to infinity</option>
+                        <option value="orbit">orbit the origin</option>
+                    </select>
+                    because the y-axis is the saddle&rsquo;s <strong>stable manifold</strong>.
+                </div>
+                <div class="question-actions">
+                    <button class="btn-verify">Verify</button>
+                </div>
+                <div class="question-explanation" style="display:none;">
+                    <strong>Explanation:</strong>
+                    For the saddle \( \dot{x} = 2x,\; \dot{y} = -y \), the y-axis (\( x = 0 \)) is an
+                    invariant line where \( \dot{x} = 0 \). Along it, \( y(t) = y_0 e^{-t} \to 0 \).
+                    The y-axis is the <strong>stable manifold</strong>. Now try launching from (0.01, 2)
+                    &mdash; that tiny x-offset causes the trajectory to veer off and escape along the x-axis
+                    (the unstable manifold). Saddles are exquisitely sensitive!
+                </div>
+            </div>
+        </div>
+
+        <div class="tab-content">
+            <div class="question-container" data-type="mcq" data-answer="2">
+                <div class="question-text">
+                    Switch to <strong>Predator-Prey</strong>. Launch from (2, 1), then from (3, 3).
+                    Both trajectories&hellip;
+                </div>
+                <div class="question-options">
+                    <label class="option">
+                        <input type="radio" name="td-q3" value="0">
+                        <span>Spiral into the fixed point (1, 2)</span>
+                    </label>
+                    <label class="option">
+                        <input type="radio" name="td-q3" value="1">
+                        <span>Escape to infinity</span>
+                    </label>
+                    <label class="option">
+                        <input type="radio" name="td-q3" value="2">
+                        <span>Form closed orbits around (1, 2) with different sizes</span>
+                    </label>
+                    <label class="option">
+                        <input type="radio" name="td-q3" value="3">
+                        <span>Converge to the same orbit regardless of starting point</span>
+                    </label>
+                </div>
+                <div class="question-actions">
+                    <button class="btn-verify">Verify</button>
+                </div>
+                <div class="question-explanation" style="display:none;">
+                    <strong>Explanation:</strong>
+                    The Lotka-Volterra predator-prey system has a center at (1, 2). All trajectories
+                    in the positive quadrant form closed orbits &mdash; prey and predator populations
+                    oscillate forever. Different starting points give different orbit sizes (amplitudes)
+                    but all orbits enclose the fixed point. This is a nonlinear center.
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- ============================================================ -->
+<!-- EXPLORER 2: Basin of Attraction Mapper -->
+<!-- ============================================================ -->
+<div class="interactive-container" id="basin-mapper">
+    <div class="interactive-title">Explorer: Basin of Attraction Mapper</div>
+
+    <p>
+        When a system has <strong>multiple attractors</strong>, the plane splits into
+        <strong>basins of attraction</strong> &mdash; regions colored by which attractor
+        each initial condition eventually reaches. The boundary between basins passes
+        through saddle points.
+    </p>
+
+    <div class="plot-container" id="td-basinPlot" style="height: 440px;"></div>
+
+    <div id="td-stats2" class="stats-bar"></div>
+
+    <div class="control-panel">
+        <div class="control-group">
+            <label class="control-label" for="td-basin-system">System:</label>
+            <select id="td-basin-system" class="control-select">
+                <option value="competition">Competing Species</option>
+                <option value="doubleWell">Damped Double-Well</option>
+            </select>
+        </div>
+        <div class="control-group">
+            <button class="btn" onclick="tdBasinReset()">Reset</button>
+        </div>
+    </div>
+</div>
+
+<div class="info-box">
+    <div class="info-box-title">Basins and Separatrices</div>
+    <p>
+        The boundary between basins is called a <strong>separatrix</strong>. It typically
+        consists of the <strong>stable manifold</strong> of a saddle point &mdash; the set of
+        initial conditions that approach the saddle as \( t \to \infty \). Points on one side
+        of the separatrix go to one attractor; points on the other side go to the other. The
+        saddle point itself sits on the boundary, attracting along one direction and repelling
+        along the other.
+    </p>
+</div>
+
+<!-- ========== Test Your Understanding #2 ========== -->
+<div class="interactive-container question-section">
+    <div class="interactive-title">Test Your Understanding</div>
+
+    <p style="margin-bottom: var(--spacing-md); color: var(--text-secondary);">
+        Examine the basin maps to answer these questions.
+    </p>
+
+    <div class="tabs">
+        <div class="tab-buttons">
+            <button class="tab-button active">Question 4</button>
+            <button class="tab-button">Question 5</button>
+            <button class="tab-button">Question 6</button>
+        </div>
+
+        <div class="tab-content active">
+            <div class="question-container" data-type="mcq" data-answer="1">
+                <div class="question-text">
+                    In the <strong>Competing Species</strong> basin map, the boundary between
+                    the two colored regions passes through&hellip;
+                </div>
+                <div class="question-options">
+                    <label class="option">
+                        <input type="radio" name="td-q4" value="0">
+                        <span>The origin (0, 0)</span>
+                    </label>
+                    <label class="option">
+                        <input type="radio" name="td-q4" value="1">
+                        <span>The saddle point at (1, 1)</span>
+                    </label>
+                    <label class="option">
+                        <input type="radio" name="td-q4" value="2">
+                        <span>Both stable nodes equally</span>
+                    </label>
+                    <label class="option">
+                        <input type="radio" name="td-q4" value="3">
+                        <span>There is no clear boundary</span>
+                    </label>
+                </div>
+                <div class="question-actions">
+                    <button class="btn-verify">Verify</button>
+                </div>
+                <div class="question-explanation" style="display:none;">
+                    <strong>Explanation:</strong>
+                    The saddle at (1, 1) has a stable manifold that serves as the basin boundary
+                    (separatrix). Points above-left go to (0, 2), points below-right go to (3, 0).
+                    The saddle organizes the global dynamics by acting as a &ldquo;watershed&rdquo;
+                    between the two attractors.
+                </div>
+            </div>
+        </div>
+
+        <div class="tab-content">
+            <div class="question-container" data-type="fill" data-answer="stable">
+                <div class="question-text">
+                    The basin boundary (separatrix) consists of the
+                    <select class="fill-blank-select">
+                        <option value=""></option>
+                        <option value="stable">stable</option>
+                        <option value="unstable">unstable</option>
+                    </select>
+                    manifold of the saddle point.
+                </div>
+                <div class="question-actions">
+                    <button class="btn-verify">Verify</button>
+                </div>
+                <div class="question-explanation" style="display:none;">
+                    <strong>Explanation:</strong>
+                    The <strong>stable manifold</strong> of a saddle is the set of points that
+                    approach the saddle as \( t \to \infty \). These trajectories sit right on the
+                    boundary &mdash; they don&rsquo;t go to either attractor (they approach the saddle
+                    instead). Points on either side of this manifold diverge toward different attractors.
+                </div>
+            </div>
+        </div>
+
+        <div class="tab-content">
+            <div class="question-container" data-type="msq" data-answer="0,2">
+                <div class="question-text">
+                    Which statements about basins of attraction are true? (Select all that apply)
+                </div>
+                <div class="question-options">
+                    <label class="option">
+                        <input type="checkbox" value="0">
+                        <span>Every initial condition belongs to some basin (basins tile the plane)</span>
+                    </label>
+                    <label class="option">
+                        <input type="checkbox" value="1">
+                        <span>Basins of different attractors always have equal area</span>
+                    </label>
+                    <label class="option">
+                        <input type="checkbox" value="2">
+                        <span>Basin boundaries typically pass through saddle points</span>
+                    </label>
+                    <label class="option">
+                        <input type="checkbox" value="3">
+                        <span>Basin boundaries are always straight lines</span>
+                    </label>
+                </div>
+                <div class="question-actions">
+                    <button class="btn-verify">Verify</button>
+                </div>
+                <div class="question-explanation" style="display:none;">
+                    <strong>Explanation:</strong>
+                    <ul>
+                        <li><strong>Basins tile the plane:</strong> ✓ Every IC leads somewhere &mdash; no gaps.</li>
+                        <li><strong>Equal area:</strong> ✗ Look at the competing species map &mdash; one basin is clearly larger. Basins can be very asymmetric.</li>
+                        <li><strong>Through saddle points:</strong> ✓ The separatrix is the stable manifold of the saddle.</li>
+                        <li><strong>Straight lines:</strong> ✗ The double-well system has a curved basin boundary. Only special (linear) systems have straight separatrices.</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- ============================================================ -->
+<!-- EXPLORER 3: Cloud Evolution -->
+<!-- ============================================================ -->
+<div class="interactive-container" id="cloud-evolution">
+    <div class="interactive-title">Explorer: The No-Crossing Principle</div>
+
+    <p>
+        Drop a cloud of nearby initial conditions and watch them evolve.
+        The blob stretches and deforms &mdash; but trajectories <strong>never cross</strong>.
+        Near a saddle, the stretching is dramatic: the cloud elongates into a thin filament
+        along the unstable direction.
+    </p>
+
+    <div class="plot-container" id="td-cloudPlot" style="height: 440px;"></div>
+
+    <div id="td-stats3" class="stats-bar"></div>
+
+    <div class="control-panel">
+        <div class="control-group">
+            <label class="control-label" for="td-cloud-system">System:</label>
+            <select id="td-cloud-system" class="control-select">
+                <option value="center">Center (SHO)</option>
+                <option value="stableSpiral">Stable Spiral</option>
+                <option value="saddle">Saddle</option>
+            </select>
+        </div>
+        <div class="control-group">
+            <label class="control-label" for="td-cloud-time">Time:
+                <span id="td-cloud-time-value">0.0</span>
+            </label>
+            <input type="range" class="slider" id="td-cloud-time"
+                   min="0" max="500" step="1" value="0">
+        </div>
+        <div class="control-group">
+            <button class="btn" onclick="tdDropCloud()">Drop Cloud</button>
+            <button class="btn" onclick="tdCloudReset()">Reset</button>
+        </div>
+    </div>
+</div>
+
+<!-- ========== Test Your Understanding #3 ========== -->
+<div class="interactive-container question-section">
+    <div class="interactive-title">Test Your Understanding</div>
+
+    <p style="margin-bottom: var(--spacing-md); color: var(--text-secondary);">
+        Use the Cloud explorer to answer these questions.
+    </p>
+
+    <div class="tabs">
+        <div class="tab-buttons">
+            <button class="tab-button active">Question 7</button>
+            <button class="tab-button">Question 8</button>
+            <button class="tab-button">Question 9</button>
+        </div>
+
+        <div class="tab-content active">
+            <div class="question-container" data-type="mcq" data-answer="1">
+                <div class="question-text">
+                    Drop a cloud near the origin in the <strong>Saddle</strong> system and drag
+                    the time slider forward. The cloud&hellip;
+                </div>
+                <div class="question-options">
+                    <label class="option">
+                        <input type="radio" name="td-q7" value="0">
+                        <span>Contracts to a point</span>
+                    </label>
+                    <label class="option">
+                        <input type="radio" name="td-q7" value="1">
+                        <span>Stretches along x and compresses along y into a thin filament</span>
+                    </label>
+                    <label class="option">
+                        <input type="radio" name="td-q7" value="2">
+                        <span>Rotates as a rigid body</span>
+                    </label>
+                    <label class="option">
+                        <input type="radio" name="td-q7" value="3">
+                        <span>Expands uniformly in all directions</span>
+                    </label>
+                </div>
+                <div class="question-actions">
+                    <button class="btn-verify">Verify</button>
+                </div>
+                <div class="question-explanation" style="display:none;">
+                    <strong>Explanation:</strong>
+                    The saddle has eigenvalues \( \lambda_1 = 2 \) (unstable, along x) and
+                    \( \lambda_2 = -1 \) (stable, along y). The cloud stretches exponentially
+                    along x and compresses along y. The result is a thin filament aligned with the
+                    unstable manifold. This is the geometric signature of a saddle &mdash; simultaneous
+                    stretching and compression.
+                </div>
+            </div>
+        </div>
+
+        <div class="tab-content">
+            <div class="question-container" data-type="fill" data-answer="never">
+                <div class="question-text">
+                    The uniqueness theorem guarantees that two distinct trajectories can
+                    <select class="fill-blank-select">
+                        <option value=""></option>
+                        <option value="sometimes">sometimes cross</option>
+                        <option value="never">never cross</option>
+                        <option value="always">always cross eventually</option>
+                    </select>
+                    in an autonomous system.
+                </div>
+                <div class="question-actions">
+                    <button class="btn-verify">Verify</button>
+                </div>
+                <div class="question-explanation" style="display:none;">
+                    <strong>Explanation:</strong>
+                    If two trajectories crossed at a point \( P \), then \( P \) would be
+                    an initial condition with two different futures &mdash; violating uniqueness.
+                    Therefore trajectories can <strong>never cross</strong>. Watch the cloud: no
+                    matter how much it stretches, the points maintain their relative ordering.
+                </div>
+            </div>
+        </div>
+
+        <div class="tab-content">
+            <div class="question-container" data-type="mcq" data-answer="2">
+                <div class="question-text">
+                    In the <strong>Center</strong> system, drop a cloud and advance time.
+                    What happens to the cloud shape?
+                </div>
+                <div class="question-options">
+                    <label class="option">
+                        <input type="radio" name="td-q9" value="0">
+                        <span>It contracts to a point</span>
+                    </label>
+                    <label class="option">
+                        <input type="radio" name="td-q9" value="1">
+                        <span>It stretches into a filament</span>
+                    </label>
+                    <label class="option">
+                        <input type="radio" name="td-q9" value="2">
+                        <span>It rotates and shears but returns to its original shape periodically</span>
+                    </label>
+                    <label class="option">
+                        <input type="radio" name="td-q9" value="3">
+                        <span>It immediately disappears</span>
+                    </label>
+                </div>
+                <div class="question-actions">
+                    <button class="btn-verify">Verify</button>
+                </div>
+                <div class="question-explanation" style="display:none;">
+                    <strong>Explanation:</strong>
+                    In a center, all trajectories are periodic with the same period \( T = 2\pi \).
+                    The cloud rotates around the origin and shears slightly (since different radii
+                    have the same angular speed but different linear speeds), but after one full
+                    period \( T = 2\pi \) every point returns to its start. The cloud shape is periodic.
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- ============================================================ -->
+<!-- PYTHON CODE EXAMPLES -->
+<!-- ============================================================ -->
+<h2>Python Code</h2>
+
+<div class="tabs">
+    <div class="tab-buttons">
+        <button class="tab-button active">Trajectory Launcher</button>
+        <button class="tab-button">Basin Mapper</button>
+        <button class="tab-button">Prompt</button>
+    </div>
+
+    <div class="tab-content active">
+        <div class="code-block-container">
+            <div class="code-header">
+                <span class="code-lang">Python</span>
+                <button class="copy-btn">Copy</button>
+            </div>
+            <pre><code class="language-python">
+import numpy as np
+import plotly.graph_objects as go
+
+def rk4_solve(f, x0, T, N):
+    """RK4 for dx/dt = f(x). x is a 2-vector."""
+    h = T / N
+    x = np.array(x0, dtype=float)
+    traj = [x.copy()]
+    for _ in range(N):
+        k1 = f(x)
+        k2 = f(x + h/2 * k1)
+        k3 = f(x + h/2 * k2)
+        k4 = f(x + h * k3)
+        x += h/6 * (k1 + 2*k2 + 2*k3 + k4)
+        if np.linalg.norm(x) > 20: break
+        traj.append(x.copy())
+    return np.array(traj)
+
+# Predator-prey system
+def lotka_volterra(x):
+    return np.array([x[0]*(2 - x[1]),
+                     x[1]*(-1 + x[0])])
+
+fig = go.Figure()
+colors = ['#00f3ff', '#ff006e', '#ffbe0b', '#00ff88',
+          '#bb86fc', '#ff5722', '#76ff03', '#40c4ff']
+
+# Launch from several initial conditions
+ics = [(2, 1), (3, 3), (0.5, 0.5), (1, 4),
+       (3, 1), (0.3, 3), (2, 0.5), (1.5, 3.5)]
+
+for i, ic in enumerate(ics):
+    traj = rk4_solve(lotka_volterra, ic, 15, 2000)
+    fig.add_trace(go.Scatter(
+        x=traj[:, 0], y=traj[:, 1], mode='lines',
+        line=dict(color=colors[i % len(colors)], width=1.5),
+        name=f'IC = {ic}'))
+
+# Fixed point
+fig.add_trace(go.Scatter(
+    x=[1], y=[2], mode='markers',
+    marker=dict(color='#ffbe0b', size=10,
+                line=dict(color='white', width=2)),
+    name='Fixed point'))
+
+fig.update_layout(
+    template='plotly_dark',
+    xaxis=dict(title='Prey', range=[0, 4.5],
+               zerolinecolor='#808080'),
+    yaxis=dict(title='Predator', range=[0, 4.5],
+               zerolinecolor='#808080'),
+    height=550, width=600)
+fig.show()
+            </code></pre>
+        </div>
+    </div>
+
+    <div class="tab-content">
+        <div class="code-block-container">
+            <div class="code-header">
+                <span class="code-lang">Python</span>
+                <button class="copy-btn">Copy</button>
+            </div>
+            <pre><code class="language-python">
+import numpy as np
+import plotly.graph_objects as go
+
+def competition(x):
+    """Competing species: x'=x(3-x-2y), y'=y(2-x-y)"""
+    return np.array([x[0]*(3 - x[0] - 2*x[1]),
+                     x[1]*(2 - x[0] - x[1])])
+
+def rk4_endpoint(f, x0, T, N):
+    """RK4 — return only final point."""
+    h = T / N
+    x = np.array(x0, dtype=float)
+    for _ in range(N):
+        k1 = f(x); k2 = f(x + h/2*k1)
+        k3 = f(x + h/2*k2); k4 = f(x + h*k3)
+        x += h/6 * (k1 + 2*k2 + 2*k3 + k4)
+    return x
+
+# Compute basin map on a grid
+nx, ny = 80, 60
+xs = np.linspace(0.01, 3.99, nx)
+ys = np.linspace(0.01, 2.99, ny)
+basin = np.zeros((ny, nx))
+
+attractors = [np.array([3, 0]), np.array([0, 2])]
+
+for j, y0 in enumerate(ys):
+    for i, x0 in enumerate(xs):
+        endpoint = rk4_endpoint(competition, [x0, y0], 30, 500)
+        dists = [np.linalg.norm(endpoint - a)
+                 for a in attractors]
+        basin[j, i] = np.argmin(dists)
+
+fig = go.Figure()
+fig.add_trace(go.Heatmap(
+    z=basin, x=xs, y=ys, opacity=0.6,
+    colorscale=[[0, '#00f3ff'], [1, '#ff006e']],
+    showscale=False))
+
+# Fixed points
+fps = [(3, 0, 'Stable'), (0, 2, 'Stable'),
+       (1, 1, 'Saddle'), (0, 0, 'Unstable')]
+for x, y, label in fps:
+    fig.add_trace(go.Scatter(
+        x=[x], y=[y], mode='markers+text',
+        marker=dict(color='#ffbe0b', size=10,
+                    line=dict(color='white', width=2)),
+        text=[label], textposition='top center',
+        textfont=dict(color='white', size=10),
+        showlegend=False))
+
+fig.update_layout(
+    template='plotly_dark',
+    xaxis=dict(title='Species 1', range=[0, 4],
+               zerolinecolor='#808080'),
+    yaxis=dict(title='Species 2', range=[0, 3],
+               zerolinecolor='#808080'),
+    height=500, width=600)
+fig.show()
+            </code></pre>
+        </div>
+    </div>
+
+    <div class="tab-content">
+        <div class="code-block-container">
+            <div class="code-header">
+                <span class="code-lang">Prompt for AI</span>
+                <button class="copy-btn">Copy</button>
+            </div>
+            <pre><code class="language-text">Create a Python script using Plotly to visualize basins of
+attraction for a 2D dynamical system with multiple attractors.
+
+Requirements:
+- Use the competing species model: x'=x(3-x-2y), y'=y(2-x-y)
+- Compute trajectories from an 80x60 grid of initial conditions
+  using RK4 (integrate to T=30)
+- Color each grid point by which attractor it approaches:
+  (3,0) in cyan and (0,2) in magenta
+- Show fixed points as yellow markers with labels
+- Use dark theme (plotly_dark) with gray (#808080) axes
+- Also create a second figure showing a "cloud" of 40 initial
+  conditions near a saddle point, evolved forward in time,
+  to demonstrate trajectory non-crossing</code></pre>
+        </div>
+    </div>
+</div>
+
+<!-- ============================================================ -->
+<!-- NAVIGATION -->
+<!-- ============================================================ -->
+<div class="btn-group mt-xl">
+    <button class="btn btn-magenta" onclick="navigateToSection('54-fixed-point-types')">&larr; Previous: The Big Three</button>
+    <button class="btn btn-secondary" onclick="scrollToTop()">&uarr; Back to Top</button>
+    <button class="btn btn-secondary" onclick="navigateToSection('56-love-affairs')">Next: Romeo &amp; Juliet &rarr;</button>
+</div>

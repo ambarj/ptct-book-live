@@ -1,0 +1,763 @@
+<!-- ============================================================
+     Section 4.15: Non-dimensionalization
+     Source: NPTEL Lecture 6 (Escaping the Earth)
+     Concept: Scaling variables to eliminate parameters,
+              universal dimensionless equations, scale translation
+     Time: 15-20 minutes
+     Prerequisites: Section 4.14 (escape velocity physics)
+     ============================================================ -->
+
+<h1>Non-dimensionalization</h1>
+
+<p>
+    In Section 4.14, we derived the escape ODE: \( \ddot{x} = -gR^2/x^2 \). This equation has
+    two parameters (\( g \) and \( R \)) that depend on which planet you're on. Can we make them
+    disappear? The trick is to measure everything in <em>natural units</em> for the problem.
+</p>
+
+<div class="info-box">
+    <div class="info-box-title">Learning Objectives</div>
+    <ul>
+        <li>Choose natural scales (length \( R \), time \( \sqrt{R/g} \)) to non-dimensionalize the escape ODE</li>
+        <li>See that the dimensionless equation \( \ddot{X} = -1/X^2 \) has <em>no free parameters</em></li>
+        <li>Discover that \( V_0 = \sqrt{2} \) is the universal escape threshold for any planet</li>
+        <li>Translate between dimensionless results and physical units for any celestial body</li>
+    </ul>
+</div>
+
+<div class="equation-display">
+    <p><strong>The scaling substitution:</strong></p>
+    $$ x = R\,X, \qquad t = \sqrt{\frac{R}{g}}\,T $$
+    <p>where \( X \) is distance in units of the planet's radius, and \( T \) is time
+    in units of the natural time scale \( \tau = \sqrt{R/g} \).</p>
+</div>
+
+<p>
+    Substituting into the ODE:
+</p>
+
+<div class="equation-display">
+    $$ \frac{R}{\tau^2}\,\ddot{X} = -\frac{gR^2}{R^2 X^2}
+    \quad\Longrightarrow\quad
+    \frac{R}{R/g}\,\ddot{X} = -\frac{g}{X^2}
+    \quad\Longrightarrow\quad
+    \boxed{\ddot{X} = -\frac{1}{X^2}} $$
+</div>
+
+<div class="info-box">
+    <div class="info-box-title">The Key Insight</div>
+    <p>
+        The dimensionless equation \( \ddot{X} = -1/X^2 \) contains <strong>no parameters at all</strong>.
+        The solution depends only on the initial conditions: \( X(0) = 1 \) (start at the surface)
+        and \( \dot{X}(0) = V_0 \) (dimensionless launch speed). Every planet in the universe
+        obeys the same equation — the physics is universal.
+    </p>
+</div>
+
+<p>
+    The dimensionless launch speed is:
+</p>
+
+<div class="equation-display">
+    $$ V_0 = \frac{v_0}{\sqrt{gR}} $$
+    <p>The energy integral becomes \( \tfrac{1}{2}V^2 - 1/X = \tfrac{1}{2}V_0^2 - 1 = E \).
+    Escape requires \( E \geq 0 \), giving the universal threshold
+    \( V_0 \geq \sqrt{2} \approx 1.414 \).</p>
+</div>
+
+<!-- ============================================================ -->
+<!-- EXPLORER 1: The Scaling Collapse -->
+<!-- ============================================================ -->
+<div class="interactive-container" id="scaling-collapse">
+    <div class="interactive-title">Explorer: The Scaling Collapse</div>
+
+    <p>
+        Three planets, same \( v_0/v_{\text{esc}} \) ratio. In dimensional units (left), the curves
+        look completely different. In dimensionless units (right), they <strong>perfectly overlap</strong>.
+    </p>
+
+    <div class="control-panel">
+        <div class="control-group">
+            <label class="control-label" for="nd-ratio-slider">v₀ / v_esc ratio:</label>
+            <input type="range" class="slider" id="nd-ratio-slider"
+                   min="0.3" max="1.5" step="0.01" value="0.80">
+            <span id="nd-ratio-value">0.80</span>
+        </div>
+        <button class="btn btn-sm" onclick="ndCollapseReset()">Reset</button>
+    </div>
+
+    <div class="stats-bar">
+        <div class="stat-item">
+            <span class="stat-label">Earth v₀</span>
+            <span class="stat-value" id="nd-v0earth">9.0 km/s</span>
+        </div>
+        <div class="stat-item">
+            <span class="stat-label">Moon v₀</span>
+            <span class="stat-value" id="nd-v0moon">1.9 km/s</span>
+        </div>
+        <div class="stat-item">
+            <span class="stat-label">Mars v₀</span>
+            <span class="stat-value" id="nd-v0mars">4.0 km/s</span>
+        </div>
+        <div class="stat-item">
+            <span class="stat-label">Dimensionless V₀</span>
+            <span class="stat-value" id="nd-V0">1.13</span>
+        </div>
+    </div>
+
+    <div class="dual-panel">
+        <div class="plot-container" id="nd-dimPlot"></div>
+        <div class="plot-container" id="nd-ndimPlot"></div>
+    </div>
+
+    <div class="info-box">
+        <div class="info-box-title">What to Try</div>
+        <ul>
+            <li>At ratio = 0.8: the left plot shows three different curves (different g, R). The right plot shows they're <em>the same curve</em>.</li>
+            <li>Slide to ratio = 1.0 (escape speed): all curves just touch zero at the right edge — the universal threshold.</li>
+            <li>Push past 1.0: all curves stay positive — unbound trajectories, all identical in dimensionless units.</li>
+            <li>The collapse proves that one dimensionless simulation answers the escape question for <em>every planet</em>.</li>
+        </ul>
+    </div>
+</div>
+
+<!-- Questions Group 1 -->
+<div class="interactive-container question-section">
+    <div class="interactive-title">Test Your Understanding</div>
+
+    <p style="margin-bottom: var(--spacing-md); color: var(--text-secondary);">
+        Use the Scaling Collapse explorer to answer these questions.
+    </p>
+
+    <div class="tabs">
+        <div class="tab-buttons">
+            <button class="tab-button active">Question 1</button>
+            <button class="tab-button">Question 2</button>
+            <button class="tab-button">Question 3</button>
+        </div>
+
+        <div class="tab-content active">
+            <div class="question-container" data-type="mcq" data-answer="2">
+                <div class="question-text">
+                    Why do the dimensional \( v^2(x) \) curves look different for Earth, Moon, and Mars?
+                </div>
+                <div class="question-options">
+                    <label class="option">
+                        <input type="radio" name="nd-q1" value="0">
+                        <span>The physics is different on each planet</span>
+                    </label>
+                    <label class="option">
+                        <input type="radio" name="nd-q1" value="1">
+                        <span>The ODE has a different form for each planet</span>
+                    </label>
+                    <label class="option">
+                        <input type="radio" name="nd-q1" value="2">
+                        <span>They use different natural scales (different \( g \) and \( R \)), but the underlying physics is the same</span>
+                    </label>
+                </div>
+                <div class="question-actions">
+                    <button class="btn-verify">Verify</button>
+                </div>
+                <div class="question-explanation" style="display:none;">
+                    <strong>Explanation:</strong>
+                    The ODE \( \ddot{x} = -gR^2/x^2 \) has the same form everywhere — it's Newton's
+                    gravity. The curves look different because \( g \) and \( R \) set different
+                    scales for velocity and distance. Non-dimensionalization removes these scales,
+                    revealing the universal structure underneath.
+                </div>
+            </div>
+        </div>
+
+        <div class="tab-content">
+            <div class="question-container" data-type="fill" data-answer="1.41[1.40,1.42]">
+                <div class="question-text">
+                    In dimensionless units, the escape threshold is \( V_0 = \sqrt{2} \approx \)
+                    <input type="text" class="fill-blank" placeholder="?">
+                    (Slide the ratio to 1.0 and read the dimensionless \( V_0 \).)
+                </div>
+                <div class="question-actions">
+                    <button class="btn-verify">Verify</button>
+                </div>
+                <div class="question-explanation" style="display:none;">
+                    <strong>Explanation:</strong>
+                    At ratio = 1.0, \( v_0 = v_{\text{esc}} = \sqrt{2gR} \). The dimensionless
+                    speed is \( V_0 = v_0/\sqrt{gR} = \sqrt{2gR}/\sqrt{gR} = \sqrt{2} \approx 1.414 \).
+                    This single number is the escape threshold for <em>any</em> planet.
+                </div>
+            </div>
+        </div>
+
+        <div class="tab-content">
+            <div class="question-container" data-type="mcq" data-answer="1">
+                <div class="question-text">
+                    How many free parameters appear in the dimensionless ODE \( \ddot{X} = -1/X^2 \)?
+                </div>
+                <div class="question-options">
+                    <label class="option">
+                        <input type="radio" name="nd-q3" value="0">
+                        <span>Two (\( g \) and \( R \))</span>
+                    </label>
+                    <label class="option">
+                        <input type="radio" name="nd-q3" value="1">
+                        <span>Zero — all parameters have been absorbed into the scales</span>
+                    </label>
+                    <label class="option">
+                        <input type="radio" name="nd-q3" value="2">
+                        <span>One (the dimensionless launch speed \( V_0 \))</span>
+                    </label>
+                </div>
+                <div class="question-actions">
+                    <button class="btn-verify">Verify</button>
+                </div>
+                <div class="question-explanation" style="display:none;">
+                    <strong>Explanation:</strong>
+                    The ODE itself has <em>zero</em> parameters. The initial condition \( V_0 \) is
+                    not a parameter of the equation — it's a boundary condition. The equation
+                    \( \ddot{X} = -1/X^2 \) is completely universal. This is the power of
+                    non-dimensionalization: it separates the universal dynamics from the
+                    problem-specific scales.
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- ============================================================ -->
+<!-- THE UNIVERSAL EQUATION -->
+<!-- ============================================================ -->
+<h2>The Universal Phase Portrait</h2>
+
+<p>
+    The dimensionless energy integral gives us velocity as a function of position:
+</p>
+
+<div class="equation-display">
+    $$ V^2 = V_0^2 - 2\left(1 - \frac{1}{X}\right) = V_0^2 - 2 + \frac{2}{X} $$
+    <p>The total energy (per unit mass, dimensionless) is \( E = \tfrac{1}{2}V_0^2 - 1 \).</p>
+</div>
+
+<p>
+    Three regimes emerge:
+</p>
+
+<ul>
+    <li>\( V_0 &lt; \sqrt{2} \) → \( E &lt; 0 \) → <strong>Bound</strong>: the projectile turns around at \( X_{\max} = 1/(1 - V_0^2/2) \)</li>
+    <li>\( V_0 = \sqrt{2} \) → \( E = 0 \) → <strong>Critical</strong>: barely escapes, \( V \to 0 \) as \( X \to \infty \)</li>
+    <li>\( V_0 &gt; \sqrt{2} \) → \( E &gt; 0 \) → <strong>Unbound</strong>: escapes with speed \( V_\infty = \sqrt{V_0^2 - 2} \)</li>
+</ul>
+
+<!-- ============================================================ -->
+<!-- EXPLORER 2: Universal Phase Portrait -->
+<!-- ============================================================ -->
+<div class="interactive-container" id="universal-portrait">
+    <div class="interactive-title">Explorer: Universal Phase Portrait</div>
+
+    <p>
+        Sweep the dimensionless launch speed \( V_0 \) to see the three regimes.
+        The dashed yellow curve is the critical case \( V_0 = \sqrt{2} \).
+    </p>
+
+    <div class="control-panel">
+        <div class="control-group">
+            <label class="control-label" for="nd-V0-slider">V₀ (dimensionless):</label>
+            <input type="range" class="slider" id="nd-V0-slider"
+                   min="0.5" max="2.5" step="0.01" value="1.00">
+            <span id="nd-V0-value">1.00</span>
+        </div>
+        <button class="btn btn-sm" onclick="ndUniversalReset()">Reset</button>
+    </div>
+
+    <div class="stats-bar">
+        <div class="stat-item">
+            <span class="stat-label">V₀</span>
+            <span class="stat-value" id="nd-V0val">1.00</span>
+        </div>
+        <div class="stat-item">
+            <span class="stat-label">Energy E</span>
+            <span class="stat-value" id="nd-Eval">-0.50</span>
+        </div>
+        <div class="stat-item">
+            <span class="stat-label">Classification</span>
+            <span class="stat-value" id="nd-class2">Bound</span>
+        </div>
+        <div class="stat-item">
+            <span class="stat-label">X_max or V_∞</span>
+            <span class="stat-value" id="nd-xmax">2.00</span>
+        </div>
+    </div>
+
+    <div class="dual-panel">
+        <div class="plot-container" id="nd-vxPlot"></div>
+        <div class="plot-container" id="nd-ePlot"></div>
+    </div>
+
+    <div class="info-box">
+        <div class="info-box-title">What to Try</div>
+        <ul>
+            <li>At V₀ = 1.0 (bound): the velocity hits zero at X = 2. The projectile can only reach twice the planet's radius.</li>
+            <li>Slide to V₀ = √2 ≈ 1.41: the curve just touches zero at the far right — critical escape.</li>
+            <li>At V₀ = 2.0 (unbound): the curve levels off at V_∞ = √(4 - 2) ≈ 1.41 — it keeps that speed forever.</li>
+            <li>Right plot: the horizontal energy line crossing the potential well shows whether escape is possible.</li>
+        </ul>
+    </div>
+</div>
+
+<!-- Questions Group 2 -->
+<div class="interactive-container question-section">
+    <div class="interactive-title">Test Your Understanding</div>
+
+    <p style="margin-bottom: var(--spacing-md); color: var(--text-secondary);">
+        Use the Universal Phase Portrait to answer these questions.
+    </p>
+
+    <div class="tabs">
+        <div class="tab-buttons">
+            <button class="tab-button active">Question 4</button>
+            <button class="tab-button">Question 5</button>
+            <button class="tab-button">Question 6</button>
+        </div>
+
+        <div class="tab-content active">
+            <div class="question-container" data-type="fill" data-answer="2.0[1.9,2.1]">
+                <div class="question-text">
+                    With \( V_0 = 1.0 \), the projectile reaches a maximum distance of
+                    \( X_{\max} = \) <input type="text" class="fill-blank" placeholder="?"> (in planet radii).
+                </div>
+                <div class="question-actions">
+                    <button class="btn-verify">Verify</button>
+                </div>
+                <div class="question-explanation" style="display:none;">
+                    <strong>Explanation:</strong>
+                    Setting \( V = 0 \): \( 0 = V_0^2 - 2 + 2/X_{\max} \), so
+                    \( X_{\max} = 2/(2 - V_0^2) = 2/(2 - 1) = 2 \). The projectile reaches
+                    twice the planet's radius — one radius above the surface.
+                </div>
+            </div>
+        </div>
+
+        <div class="tab-content">
+            <div class="question-container" data-type="mcq" data-answer="2">
+                <div class="question-text">
+                    For the critical trajectory (\( V_0 = \sqrt{2} \)), the exact analytical solution is
+                    \( X(T) = (1 + \tfrac{3}{2}\sqrt{2}\,T)^{2/3} \). What does this tell us about the
+                    projectile's speed at large times?
+                </div>
+                <div class="question-options">
+                    <label class="option">
+                        <input type="radio" name="nd-q5" value="0">
+                        <span>It approaches a constant speed</span>
+                    </label>
+                    <label class="option">
+                        <input type="radio" name="nd-q5" value="1">
+                        <span>It speeds up without bound</span>
+                    </label>
+                    <label class="option">
+                        <input type="radio" name="nd-q5" value="2">
+                        <span>It slows to zero: \( \dot{X} \propto T^{-1/3} \to 0 \)</span>
+                    </label>
+                </div>
+                <div class="question-actions">
+                    <button class="btn-verify">Verify</button>
+                </div>
+                <div class="question-explanation" style="display:none;">
+                    <strong>Explanation:</strong>
+                    \( \dot{X} = \tfrac{d}{dT}(1 + \tfrac{3}{2}\sqrt{2}\,T)^{2/3}
+                    = \sqrt{2}\,(1 + \tfrac{3}{2}\sqrt{2}\,T)^{-1/3} \to 0 \) as \( T \to \infty \).
+                    The critical trajectory just barely escapes — it keeps going forever but gets slower
+                    and slower. It never quite stops, but its speed approaches zero. This is the
+                    boundary between bound and unbound.
+                </div>
+            </div>
+        </div>
+
+        <div class="tab-content">
+            <div class="question-container" data-type="msq" data-answer="1,3">
+                <div class="question-text">
+                    Which statements about the dimensionless energy \( E = \tfrac{1}{2}V_0^2 - 1 \) are correct? (Select all)
+                </div>
+                <div class="question-options">
+                    <label class="option">
+                        <input type="checkbox" value="0">
+                        <span>E depends on which planet you're on</span>
+                    </label>
+                    <label class="option">
+                        <input type="checkbox" value="1">
+                        <span>E = 0 is the dividing line between bound and unbound orbits</span>
+                    </label>
+                    <label class="option">
+                        <input type="checkbox" value="2">
+                        <span>Negative energy means the projectile has no kinetic energy</span>
+                    </label>
+                    <label class="option">
+                        <input type="checkbox" value="3">
+                        <span>For an unbound trajectory, \( V_\infty = \sqrt{2E} \)</span>
+                    </label>
+                </div>
+                <div class="question-actions">
+                    <button class="btn-verify">Verify</button>
+                </div>
+                <div class="question-explanation" style="display:none;">
+                    <strong>Explanation:</strong>
+                    <ul>
+                        <li>E is dimensionless — it doesn't depend on g or R (those were absorbed into the scales).</li>
+                        <li>✓ E = 0 → V₀ = √2: the critical threshold. E &lt; 0 is bound, E &gt; 0 is unbound.</li>
+                        <li>Negative total energy means PE dominates, not that KE = 0. The projectile still moves; it just can't escape.</li>
+                        <li>✓ As X → ∞, V² → V₀² − 2 = 2E, so V_∞ = √(2E).</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- ============================================================ -->
+<!-- SCALE TRANSLATION -->
+<!-- ============================================================ -->
+<h2>Translating Back to Physical Units</h2>
+
+<p>
+    The power of non-dimensionalization is that you solve the problem <em>once</em> in
+    dimensionless units, then translate the answer to any planet by plugging in that
+    planet's scales:
+</p>
+
+<div class="equation-display">
+    <p><strong>The translation dictionary:</strong></p>
+    $$ v_0 = V_0 \sqrt{gR}, \qquad
+       t_{\text{phys}} = T\sqrt{\frac{R}{g}}, \qquad
+       x_{\text{phys}} = X \cdot R $$
+</div>
+
+<p>
+    For example, \( V_0 = \sqrt{2} \) (escape) translates to:
+</p>
+<ul>
+    <li>Earth: \( v_0 = \sqrt{2} \times \sqrt{9.8 \times 6.37 \times 10^6} \approx 11.2 \) km/s</li>
+    <li>Moon: \( v_0 = \sqrt{2} \times \sqrt{1.62 \times 1.74 \times 10^6} \approx 2.4 \) km/s</li>
+    <li>Jupiter: \( v_0 = \sqrt{2} \times \sqrt{24.79 \times 7.15 \times 10^7} \approx 59.5 \) km/s</li>
+</ul>
+
+<!-- ============================================================ -->
+<!-- EXPLORER 3: Scale Translator -->
+<!-- ============================================================ -->
+<div class="interactive-container" id="scale-translator">
+    <div class="interactive-title">Explorer: Scale Translator</div>
+
+    <p>
+        Set a dimensionless launch speed \( V_0 \), then see what physical velocity,
+        time scale, and distance this corresponds to for each planet.
+    </p>
+
+    <div class="control-panel">
+        <div class="control-group">
+            <label class="control-label" for="nd-body-select2">Highlight body:</label>
+            <select class="control-select" id="nd-body-select2">
+                <option value="earth">Earth</option>
+                <option value="moon">Moon</option>
+                <option value="mars">Mars</option>
+                <option value="jupiter">Jupiter</option>
+            </select>
+        </div>
+        <div class="control-group">
+            <label class="control-label" for="nd-V0dim-slider">V₀ (dimensionless):</label>
+            <input type="range" class="slider" id="nd-V0dim-slider"
+                   min="0.5" max="2.5" step="0.01" value="1.41">
+            <span id="nd-V0dim-value">1.41</span>
+        </div>
+        <button class="btn btn-sm" onclick="ndScaleReset()">Reset</button>
+    </div>
+
+    <div class="stats-bar">
+        <div class="stat-item">
+            <span class="stat-label">Physical v₀</span>
+            <span class="stat-value" id="nd-physV0">11.2 km/s</span>
+        </div>
+        <div class="stat-item">
+            <span class="stat-label">Time scale τ</span>
+            <span class="stat-value" id="nd-tscale">806 s</span>
+        </div>
+        <div class="stat-item">
+            <span class="stat-label">Length scale R</span>
+            <span class="stat-value" id="nd-lscale">6370 km</span>
+        </div>
+    </div>
+
+    <div class="dual-panel">
+        <div class="plot-container" id="nd-scaleBarPlot"></div>
+        <div class="plot-container" id="nd-scalePlot"></div>
+    </div>
+
+    <div class="info-box">
+        <div class="info-box-title">What to Try</div>
+        <ul>
+            <li>At V₀ = √2 ≈ 1.41 (escape): Earth needs 11.2 km/s, Moon only 2.4 km/s, Jupiter needs 59.5 km/s.</li>
+            <li>The time scale τ = √(R/g) sets how "fast" the problem unfolds: ~806 s for Earth, ~1036 s for Moon.</li>
+            <li>Try V₀ = 1.0: each planet has a different physical speed, but the <em>same dimensionless trajectory</em>.</li>
+            <li>Right plot: the three scale factors show why Jupiter's problem is so different in physical units.</li>
+        </ul>
+    </div>
+</div>
+
+<!-- Questions Group 3 -->
+<div class="interactive-container question-section">
+    <div class="interactive-title">Test Your Understanding</div>
+
+    <p style="margin-bottom: var(--spacing-md); color: var(--text-secondary);">
+        Use the Scale Translator to answer these questions.
+    </p>
+
+    <div class="tabs">
+        <div class="tab-buttons">
+            <button class="tab-button active">Question 7</button>
+            <button class="tab-button">Question 8</button>
+            <button class="tab-button">Question 9</button>
+        </div>
+
+        <div class="tab-content active">
+            <div class="question-container" data-type="fill" data-answer="59.5[58.0,61.0]">
+                <div class="question-text">
+                    Jupiter's escape velocity is approximately
+                    <input type="text" class="fill-blank" placeholder="?"> km/s.
+                    (Set V₀ = √2 and select Jupiter.)
+                </div>
+                <div class="question-actions">
+                    <button class="btn-verify">Verify</button>
+                </div>
+                <div class="question-explanation" style="display:none;">
+                    <strong>Explanation:</strong>
+                    \( v_{\text{esc}} = \sqrt{2gR} = \sqrt{2 \times 24.79 \times 7.15 \times 10^7}
+                    \approx 59{,}500 \) m/s ≈ 59.5 km/s. Jupiter's enormous mass and radius make
+                    escape extremely difficult — about 5× harder than Earth.
+                </div>
+            </div>
+        </div>
+
+        <div class="tab-content">
+            <div class="question-container" data-type="mcq" data-answer="1">
+                <div class="question-text">
+                    The natural time scale \( \tau = \sqrt{R/g} \) for Earth is about 806 seconds (~13 minutes).
+                    What does this time scale physically represent?
+                </div>
+                <div class="question-options">
+                    <label class="option">
+                        <input type="radio" name="nd-q8" value="0">
+                        <span>The time to reach escape velocity</span>
+                    </label>
+                    <label class="option">
+                        <input type="radio" name="nd-q8" value="1">
+                        <span>The characteristic time for free-fall from the surface (related to orbital period)</span>
+                    </label>
+                    <label class="option">
+                        <input type="radio" name="nd-q8" value="2">
+                        <span>The time for light to cross the planet's radius</span>
+                    </label>
+                </div>
+                <div class="question-actions">
+                    <button class="btn-verify">Verify</button>
+                </div>
+                <div class="question-explanation" style="display:none;">
+                    <strong>Explanation:</strong>
+                    \( \tau = \sqrt{R/g} \approx \sqrt{6.37 \times 10^6 / 9.8} \approx 806 \) s.
+                    This is the time scale for gravitational dynamics near the surface — roughly
+                    the time to fall a distance \( R \) under gravity \( g \). It's related to
+                    the orbital period at the surface: \( T_{\text{orbit}} = 2\pi\tau \approx 84 \) min,
+                    which matches the ~90-minute low Earth orbit period.
+                </div>
+            </div>
+        </div>
+
+        <div class="tab-content">
+            <div class="question-container" data-type="msq" data-answer="0,2">
+                <div class="question-text">
+                    Which are valid advantages of non-dimensionalization? (Select all)
+                </div>
+                <div class="question-options">
+                    <label class="option">
+                        <input type="checkbox" value="0">
+                        <span>Solve once, apply to any planet — just plug in different scales</span>
+                    </label>
+                    <label class="option">
+                        <input type="checkbox" value="1">
+                        <span>It makes the ODE easier to solve analytically</span>
+                    </label>
+                    <label class="option">
+                        <input type="checkbox" value="2">
+                        <span>Fewer parameters means fewer numerical experiments needed</span>
+                    </label>
+                    <label class="option">
+                        <input type="checkbox" value="3">
+                        <span>It eliminates the need for initial conditions</span>
+                    </label>
+                </div>
+                <div class="question-actions">
+                    <button class="btn-verify">Verify</button>
+                </div>
+                <div class="question-explanation" style="display:none;">
+                    <strong>Explanation:</strong>
+                    <ul>
+                        <li>✓ Universality: one dimensionless solution covers every planet.</li>
+                        <li>The ODE \( \ddot{X} = -1/X^2 \) is no easier to solve analytically than the original — non-dimensionalization simplifies the <em>parameter space</em>, not the math.</li>
+                        <li>✓ With zero parameters in the ODE, you only need to scan the initial condition \( V_0 \). No need to separately vary g and R.</li>
+                        <li>Initial conditions still exist (\( X(0) = 1 \), \( \dot{X}(0) = V_0 \)). Non-dimensionalization reduces parameters, not boundary conditions.</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- ============================================================ -->
+<!-- CODE EXAMPLES -->
+<!-- ============================================================ -->
+<h2>Python Code</h2>
+
+<div class="tabs">
+    <div class="tab-buttons">
+        <button class="tab-button active">Non-dimensionalization</button>
+        <button class="tab-button">Scale Translation</button>
+        <button class="tab-button">Prompt</button>
+    </div>
+
+    <div class="tab-content active">
+        <div class="code-block-container">
+            <div class="code-header">
+                <span class="code-lang">Python</span>
+                <button class="copy-btn">Copy</button>
+            </div>
+            <pre><code class="language-python">
+import numpy as np
+import plotly.graph_objects as go
+from plotly.subplots import make_subplots
+
+# Planetary data: (g, R)
+planets = {
+    'Earth':   (9.80, 6.37e6),
+    'Moon':    (1.62, 1.74e6),
+    'Mars':    (3.72, 3.39e6),
+}
+
+ratio = 0.8  # v0/v_esc
+fig = make_subplots(rows=1, cols=2,
+    subplot_titles=['Dimensional v²(x)', 'Dimensionless V²(X)'])
+
+colors = ['#00f3ff', '#808080', '#ff6b6b']
+
+for i, (name, (g, R)) in enumerate(planets.items()):
+    v_esc = np.sqrt(2 * g * R)
+    v0 = ratio * v_esc
+
+    # Dimensional
+    x = np.linspace(R, 15 * R, 500)
+    v2 = v0**2 - 2 * g * R * (1 - R / x)
+    fig.add_trace(go.Scatter(x=x/1e6, y=v2/1e6,
+        name=name, line=dict(color=colors[i], width=2)), row=1, col=1)
+
+    # Dimensionless (all collapse!)
+    X = np.linspace(1, 15, 500)
+    V0 = v0 / np.sqrt(g * R)  # = ratio * sqrt(2)
+    V2 = V0**2 - 2 * (1 - 1/X)
+    fig.add_trace(go.Scatter(x=X, y=V2,
+        name=name, line=dict(color=colors[i], width=2),
+        showlegend=False), row=1, col=2)
+
+fig.update_layout(template='plotly_dark')
+fig.update_xaxes(title='x (Mm)', linecolor='#808080', row=1, col=1)
+fig.update_xaxes(title='X (planet radii)', linecolor='#808080', row=1, col=2)
+fig.update_yaxes(title='v² (km/s)²', linecolor='#808080', row=1, col=1)
+fig.update_yaxes(title='V² (dimensionless)', linecolor='#808080', row=1, col=2)
+fig.show()
+
+print(f"Dimensionless V0 = {ratio * np.sqrt(2):.3f}")
+print(f"Escape threshold: V0 = sqrt(2) = {np.sqrt(2):.3f}")
+            </code></pre>
+        </div>
+    </div>
+
+    <div class="tab-content">
+        <div class="code-block-container">
+            <div class="code-header">
+                <span class="code-lang">Python</span>
+                <button class="copy-btn">Copy</button>
+            </div>
+            <pre><code class="language-python">
+import numpy as np
+
+# Dimensionless result: escape requires V0 >= sqrt(2)
+V0_escape = np.sqrt(2)
+
+planets = {
+    'Earth':   (9.80,  6.37e6),
+    'Moon':    (1.62,  1.74e6),
+    'Mars':    (3.72,  3.39e6),
+    'Jupiter': (24.79, 7.15e7),
+}
+
+print("Scale Translation: V0 = sqrt(2) -> physical escape velocity")
+print(f"{'Planet':10s} {'g (m/s²)':>10s} {'R (km)':>10s} {'tau (s)':>10s} "
+      f"{'v_esc (km/s)':>12s}")
+print("-" * 58)
+
+for name, (g, R) in planets.items():
+    tau = np.sqrt(R / g)                    # time scale
+    v_phys = V0_escape * np.sqrt(g * R)     # physical velocity
+    print(f"{name:10s} {g:10.2f} {R/1e3:10.0f} {tau:10.1f} {v_phys/1e3:12.1f}")
+
+# The beauty: ONE dimensionless number (sqrt(2)) gives
+# the escape velocity for EVERY planet!
+            </code></pre>
+        </div>
+    </div>
+
+    <div class="tab-content">
+        <div class="code-block-container">
+            <div class="code-header">
+                <span class="code-lang">Prompt for AI</span>
+                <button class="copy-btn">Copy</button>
+            </div>
+            <pre><code class="language-text">Non-dimensionalize the escape velocity ODE x'' = -gR²/x² using:
+- Length scale: R (planet radius)
+- Time scale: tau = sqrt(R/g)
+
+1. Show the substitution step-by-step: x = R*X, t = tau*T
+2. Derive the dimensionless ODE: X'' = -1/X²
+3. Plot V²(X) = V0² - 2 + 2/X for several V0 values
+4. Highlight V0 = sqrt(2) as the universal escape threshold
+5. Create a side-by-side plot: dimensional (different per planet)
+   vs dimensionless (all collapse onto same curve)
+6. Print a table translating V0 = sqrt(2) to physical units
+   for Earth, Moon, Mars, Jupiter
+
+Use plotly_dark theme, gray axes (#808080), neon colors.</code></pre>
+        </div>
+
+        <div class="info-box" style="margin-top: var(--spacing-md);">
+            <div class="info-box-title">Pro Tips for Prompting</div>
+            <ul>
+                <li>Ask the AI to derive the scales from dimensional analysis (not just state them)</li>
+                <li>Request a "collapse plot" showing dimensional curves becoming identical after scaling</li>
+                <li>Ask for the analytical solution at V₀ = √2: X(T) = (1 + 3√2T/2)^(2/3)</li>
+                <li>Have it verify by back-substituting into the original ODE</li>
+            </ul>
+        </div>
+    </div>
+</div>
+
+<div class="info-box">
+    <div class="info-box-title">What's Next?</div>
+    <p>
+        Now we have a clean, parameter-free ODE: \( \ddot{X} = -1/X^2 \). Energy conservation
+        tells us <em>whether</em> escape happens (\( V_0 \geq \sqrt{2} \)), but not <em>how</em>
+        the trajectory unfolds in time — questions like "how long to reach the Moon?" need
+        \( X(T) \). In Section 4.16, we'll unleash RK4 on this dimensionless system to compute
+        full trajectories and compare with the analytical solution at the critical speed.
+    </p>
+</div>
+
+<!-- ============================================================ -->
+<!-- NAVIGATION -->
+<!-- ============================================================ -->
+<div class="btn-group mt-xl">
+    <button class="btn btn-magenta" onclick="navigateToSection('47-escape-velocity-physics')">&larr; Previous: Escape Velocity: The Physics</button>
+    <button class="btn btn-secondary" onclick="scrollToTop()">&uarr; Back to Top</button>
+    <button class="btn btn-secondary" onclick="navigateToSection('49-escape-rk4')">Next: RK4 for Escape Velocity &rarr;</button>
+</div>

@@ -1,0 +1,738 @@
+<!-- ============================================================
+     Section 5.13: Stability from Linearization
+     Source: NPTEL Lecture 8_3 (Linearization, Part 3)
+     Concept: The complete linearization pipeline for nonlinear
+              systems — when to trust the prediction (hyperbolic
+              fixed points) and when to be cautious
+     Time: 20-25 minutes
+     Prerequisites: Sections 5.7-5.8 (eigenvalues, τ-Δ),
+                    5.11-5.12 (linearization, Jacobian)
+     ============================================================ -->
+
+<h1>Stability from Linearization</h1>
+
+<p>
+    You now have all the tools: find fixed points, compute the Jacobian, extract
+    eigenvalues, classify on the &tau;-&Delta; plane. This section puts the
+    <strong>full pipeline</strong> together and addresses the critical question:
+    when can you <em>trust</em> the linearized prediction? The answer involves
+    a key concept &mdash; <strong>hyperbolic fixed points</strong>.
+</p>
+
+<div class="info-box">
+    <div class="info-box-title">Learning Objectives</div>
+    <ul>
+        <li>Execute the complete linearization pipeline: system &rarr; fixed points &rarr; Jacobian &rarr; eigenvalues &rarr; classification</li>
+        <li>Understand <strong>hyperbolic fixed points</strong>: no eigenvalue has zero real part &rarr; linearization is trustworthy</li>
+        <li>Identify <strong>non-hyperbolic</strong> cases (centers, zero eigenvalues) where nonlinear terms can change the qualitative behavior</li>
+        <li>Apply linearization to classify multiple fixed points of a single system and build the global phase portrait</li>
+    </ul>
+</div>
+
+<div class="equation-display">
+    <p><strong>The Complete Pipeline:</strong></p>
+    $$ \dot{\mathbf{x}} = \mathbf{F}(\mathbf{x}) \;\xrightarrow{1}\; \mathbf{F}(\mathbf{x}_0) = 0
+    \;\xrightarrow{2}\; J = D\mathbf{F}\big|_{\mathbf{x}_0}
+    \;\xrightarrow{3}\; \lambda_{1,2}
+    \;\xrightarrow{4}\; \text{Classification} $$
+    <p>
+        <strong>Trust rule:</strong> If all eigenvalues have nonzero real part
+        (\( \text{Re}(\lambda) \neq 0 \)), the fixed point is <strong>hyperbolic</strong>
+        and linearization gives the correct qualitative behavior.
+    </p>
+</div>
+
+<hr>
+
+<!-- ============================================================ -->
+<!-- EXPLORER 1: Full Stability Pipeline -->
+<!-- ============================================================ -->
+<div class="interactive-container" id="stability-pipeline">
+    <div class="interactive-title">Explorer: The Stability Pipeline</div>
+
+    <p>
+        Choose a nonlinear system and a fixed point. The explorer walks through
+        each step of the pipeline and shows the nonlinear phase portrait alongside
+        the linearized prediction. When they agree, the classification is
+        <strong>trustworthy</strong>.
+    </p>
+
+    <div class="dual-panel">
+        <div class="panel">
+            <div class="plot-container" id="sp-nonlinearPlot" style="height: 400px;"></div>
+        </div>
+        <div class="panel">
+            <div class="plot-container" id="sp-linearPlot" style="height: 400px;"></div>
+        </div>
+    </div>
+
+    <div id="sp-stats1" class="stats-bar"></div>
+
+    <div class="control-panel">
+        <div class="control-group">
+            <label class="control-label" for="sp-system-select">System:</label>
+            <select id="sp-system-select" class="control-select">
+                <option value="lotkaVolterra">Lotka-Volterra</option>
+                <option value="competition">Competing Species</option>
+                <option value="pendulum">Damped Pendulum</option>
+                <option value="glycolysis">Glycolysis Model</option>
+            </select>
+        </div>
+        <div class="control-group">
+            <label class="control-label" for="sp-fp-select">Fixed point:</label>
+            <select id="sp-fp-select" class="control-select">
+                <option value="0">(0, 0)</option>
+            </select>
+        </div>
+        <div class="control-group">
+            <button class="btn" onclick="spPipelineReset()">Reset</button>
+        </div>
+    </div>
+</div>
+
+<div class="info-box">
+    <div class="info-box-title">Hyperbolic = Trustworthy</div>
+    <p>
+        A fixed point is <strong>hyperbolic</strong> if no eigenvalue of the Jacobian
+        lies on the imaginary axis (i.e., \( \text{Re}(\lambda_i) \neq 0 \) for all \( i \)).
+        The <strong>Hartman-Grobman theorem</strong> guarantees that near a hyperbolic
+        fixed point, the nonlinear system is <em>topologically equivalent</em> to its
+        linearization. Saddles, stable nodes, unstable nodes, and spirals are all
+        hyperbolic &mdash; they&rsquo;re robust. Centers (\( \text{Re}(\lambda) = 0 \))
+        are <strong>not</strong> hyperbolic and can be destroyed by tiny nonlinear perturbations.
+    </p>
+</div>
+
+<!-- ========== Test Your Understanding #1 ========== -->
+<div class="interactive-container question-section">
+    <div class="interactive-title">Test Your Understanding</div>
+
+    <p style="margin-bottom: var(--spacing-md); color: var(--text-secondary);">
+        Use the Stability Pipeline explorer to answer these questions.
+    </p>
+
+    <div class="tabs">
+        <div class="tab-buttons">
+            <button class="tab-button active">Question 1</button>
+            <button class="tab-button">Question 2</button>
+            <button class="tab-button">Question 3</button>
+        </div>
+
+        <div class="tab-content active">
+            <div class="question-container" data-type="mcq" data-answer="0">
+                <div class="question-text">
+                    Select <strong>Damped Pendulum</strong> at the origin (0, 0). The linearization
+                    predicts a stable spiral. Is this prediction trustworthy?
+                </div>
+                <div class="question-options">
+                    <label class="option">
+                        <input type="radio" name="sp-q1" value="0">
+                        <span>Yes &mdash; the eigenvalues have nonzero real part (hyperbolic)</span>
+                    </label>
+                    <label class="option">
+                        <input type="radio" name="sp-q1" value="1">
+                        <span>No &mdash; the eigenvalues are pure imaginary</span>
+                    </label>
+                    <label class="option">
+                        <input type="radio" name="sp-q1" value="2">
+                        <span>No &mdash; the system is nonlinear</span>
+                    </label>
+                    <label class="option">
+                        <input type="radio" name="sp-q1" value="3">
+                        <span>Cannot be determined</span>
+                    </label>
+                </div>
+                <div class="question-actions">
+                    <button class="btn-verify">Verify</button>
+                </div>
+                <div class="question-explanation" style="display:none;">
+                    <strong>Explanation:</strong>
+                    The damped pendulum at (0, 0) has eigenvalues with
+                    \( \text{Re}(\lambda) = -\gamma/2 < 0 \) &mdash; nonzero real part.
+                    The fixed point is <strong>hyperbolic</strong>, so the Hartman-Grobman
+                    theorem guarantees the linearized prediction (stable spiral) is correct.
+                    Compare the two panels &mdash; both show inward spirals.
+                </div>
+            </div>
+        </div>
+
+        <div class="tab-content">
+            <div class="question-container" data-type="mcq" data-answer="2">
+                <div class="question-text">
+                    Now select <strong>Lotka-Volterra</strong> at the coexistence point.
+                    The linearization predicts a center. Is this trustworthy?
+                </div>
+                <div class="question-options">
+                    <label class="option">
+                        <input type="radio" name="sp-q2" value="0">
+                        <span>Yes &mdash; centers are always robust</span>
+                    </label>
+                    <label class="option">
+                        <input type="radio" name="sp-q2" value="1">
+                        <span>Yes &mdash; the eigenvalues are real</span>
+                    </label>
+                    <label class="option">
+                        <input type="radio" name="sp-q2" value="2">
+                        <span>Caution &mdash; eigenvalues are pure imaginary (non-hyperbolic)</span>
+                    </label>
+                    <label class="option">
+                        <input type="radio" name="sp-q2" value="3">
+                        <span>No &mdash; the system has no fixed points</span>
+                    </label>
+                </div>
+                <div class="question-actions">
+                    <button class="btn-verify">Verify</button>
+                </div>
+                <div class="question-explanation" style="display:none;">
+                    <strong>Explanation:</strong>
+                    At the coexistence point, \( \tau = 0 \), so eigenvalues are
+                    \( \lambda = \pm i\omega \) (pure imaginary). This is
+                    <strong>non-hyperbolic</strong>. Linearization predicts a center, but
+                    nonlinear terms could turn it into a spiral. For standard Lotka-Volterra,
+                    the nonlinear system also has closed orbits &mdash; but this is a special
+                    case, not guaranteed by linearization.
+                </div>
+            </div>
+        </div>
+
+        <div class="tab-content">
+            <div class="question-container" data-type="fill" data-answer="hyperbolic">
+                <div class="question-text">
+                    A fixed point where all eigenvalues have nonzero real part is called
+                    <select class="fill-blank-select">
+                        <option value=""></option>
+                        <option value="hyperbolic">hyperbolic</option>
+                        <option value="elliptic">elliptic</option>
+                        <option value="parabolic">parabolic</option>
+                        <option value="degenerate">degenerate</option>
+                    </select>.
+                    At such points, linearization is guaranteed to give the correct
+                    qualitative behavior.
+                </div>
+                <div class="question-actions">
+                    <button class="btn-verify">Verify</button>
+                </div>
+                <div class="question-explanation" style="display:none;">
+                    <strong>Explanation:</strong>
+                    <strong>Hyperbolic</strong> fixed points have \( \text{Re}(\lambda_i) \neq 0 \)
+                    for all eigenvalues. The Hartman-Grobman theorem says the nonlinear flow
+                    near a hyperbolic FP is topologically equivalent to the linear flow.
+                    Nodes, spirals, and saddles are hyperbolic. Centers are not.
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- ============================================================ -->
+<!-- EXPLORER 2: Trust Boundary -->
+<!-- ============================================================ -->
+<div class="interactive-container" id="trust-boundary">
+    <div class="interactive-title">Explorer: When to Trust Linearization</div>
+
+    <p>
+        The &tau;-&Delta; plane has a <strong>trust boundary</strong>: the \( \tau = 0 \)
+        axis (where centers live). Move a system across this boundary by adding
+        damping, and watch linearization go from unreliable to reliable. The
+        &ldquo;safe zones&rdquo; are everywhere except the axes.
+    </p>
+
+    <div class="dual-panel">
+        <div class="panel">
+            <div class="plot-container" id="sp-trustMapPlot" style="height: 400px;"></div>
+        </div>
+        <div class="panel">
+            <div class="plot-container" id="sp-trustPortraitPlot" style="height: 400px;"></div>
+        </div>
+    </div>
+
+    <div id="sp-stats2" class="stats-bar"></div>
+
+    <div class="control-panel">
+        <div class="control-group">
+            <label class="control-label" for="sp-trust-tau">&tau;:
+                <span id="sp-trust-tau-value">0.0</span>
+            </label>
+            <input type="range" class="slider" id="sp-trust-tau"
+                   min="-4" max="4" step="0.1" value="0">
+        </div>
+        <div class="control-group">
+            <label class="control-label" for="sp-trust-delta">&Delta;:
+                <span id="sp-trust-delta-value">2.0</span>
+            </label>
+            <input type="range" class="slider" id="sp-trust-delta"
+                   min="-2" max="5" step="0.1" value="2">
+        </div>
+        <div class="control-group">
+            <button class="btn" onclick="spTrustReset()">Reset</button>
+        </div>
+    </div>
+</div>
+
+<!-- ========== Test Your Understanding #2 ========== -->
+<div class="interactive-container question-section">
+    <div class="interactive-title">Test Your Understanding</div>
+
+    <p style="margin-bottom: var(--spacing-md); color: var(--text-secondary);">
+        Use the Trust Boundary explorer to answer these questions.
+    </p>
+
+    <div class="tabs">
+        <div class="tab-buttons">
+            <button class="tab-button active">Question 4</button>
+            <button class="tab-button">Question 5</button>
+            <button class="tab-button">Question 6</button>
+        </div>
+
+        <div class="tab-content active">
+            <div class="question-container" data-type="msq" data-answer="0,1,3">
+                <div class="question-text">
+                    Which fixed-point types are <strong>hyperbolic</strong> (trustworthy
+                    linearization)? (Select all that apply)
+                </div>
+                <div class="question-options">
+                    <label class="option">
+                        <input type="checkbox" value="0">
+                        <span>Stable node</span>
+                    </label>
+                    <label class="option">
+                        <input type="checkbox" value="1">
+                        <span>Saddle</span>
+                    </label>
+                    <label class="option">
+                        <input type="checkbox" value="2">
+                        <span>Center</span>
+                    </label>
+                    <label class="option">
+                        <input type="checkbox" value="3">
+                        <span>Unstable spiral</span>
+                    </label>
+                </div>
+                <div class="question-actions">
+                    <button class="btn-verify">Verify</button>
+                </div>
+                <div class="question-explanation" style="display:none;">
+                    <strong>Explanation:</strong>
+                    <ul>
+                        <li><strong>Stable node:</strong> ✓ Both eigenvalues have Re &lt; 0. Hyperbolic.</li>
+                        <li><strong>Saddle:</strong> ✓ Eigenvalues are real with opposite signs. Both Re &ne; 0. Hyperbolic.</li>
+                        <li><strong>Center:</strong> ✗ Eigenvalues are pure imaginary: Re = 0. <strong>Not hyperbolic</strong>.</li>
+                        <li><strong>Unstable spiral:</strong> ✓ Complex eigenvalues with Re &gt; 0. Hyperbolic.</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <div class="tab-content">
+            <div class="question-container" data-type="mcq" data-answer="1">
+                <div class="question-text">
+                    Set \( \tau = 0, \Delta = 2 \) (a center). Now slowly increase \( \tau \)
+                    to &minus;0.5. What happens?
+                </div>
+                <div class="question-options">
+                    <label class="option">
+                        <input type="radio" name="sp-q5" value="0">
+                        <span>Nothing changes &mdash; still a center</span>
+                    </label>
+                    <label class="option">
+                        <input type="radio" name="sp-q5" value="1">
+                        <span>Closed orbits break into an inward spiral &mdash; now a stable spiral (hyperbolic)</span>
+                    </label>
+                    <label class="option">
+                        <input type="radio" name="sp-q5" value="2">
+                        <span>The fixed point becomes a saddle</span>
+                    </label>
+                    <label class="option">
+                        <input type="radio" name="sp-q5" value="3">
+                        <span>The fixed point disappears</span>
+                    </label>
+                </div>
+                <div class="question-actions">
+                    <button class="btn-verify">Verify</button>
+                </div>
+                <div class="question-explanation" style="display:none;">
+                    <strong>Explanation:</strong>
+                    Adding any negative \( \tau \) (damping) moves the point off the \( \tau = 0 \)
+                    axis into the <strong>stable spiral</strong> region. The closed orbits break
+                    into decaying spirals. Now Re(&lambda;) &lt; 0, the FP is hyperbolic, and
+                    linearization is trustworthy. This is why centers are fragile: the tiniest
+                    perturbation converts them to spirals.
+                </div>
+            </div>
+        </div>
+
+        <div class="tab-content">
+            <div class="question-container" data-type="mcq" data-answer="0">
+                <div class="question-text">
+                    Set \( \tau = -2, \Delta = -1 \) (a saddle). Is this prediction reliable
+                    for the nonlinear system?
+                </div>
+                <div class="question-options">
+                    <label class="option">
+                        <input type="radio" name="sp-q6" value="0">
+                        <span>Yes &mdash; saddles are always hyperbolic and robust</span>
+                    </label>
+                    <label class="option">
+                        <input type="radio" name="sp-q6" value="1">
+                        <span>No &mdash; saddles are non-hyperbolic</span>
+                    </label>
+                    <label class="option">
+                        <input type="radio" name="sp-q6" value="2">
+                        <span>Only if the nonlinear terms are small</span>
+                    </label>
+                    <label class="option">
+                        <input type="radio" name="sp-q6" value="3">
+                        <span>Only for symmetric matrices</span>
+                    </label>
+                </div>
+                <div class="question-actions">
+                    <button class="btn-verify">Verify</button>
+                </div>
+                <div class="question-explanation" style="display:none;">
+                    <strong>Explanation:</strong>
+                    Saddles have one positive and one negative real eigenvalue &mdash; both
+                    Re(&lambda;) &ne; 0. This makes them <strong>hyperbolic</strong>. The
+                    Hartman-Grobman theorem guarantees the nonlinear system near the FP has
+                    the same saddle structure. Saddles are among the most robust predictions
+                    of linearization.
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- ============================================================ -->
+<!-- EXPLORER 3: Example Gallery -->
+<!-- ============================================================ -->
+<div class="interactive-container" id="example-gallery">
+    <div class="interactive-title">Explorer: Linearization in Action</div>
+
+    <p>
+        A gallery of classic physical systems with all fixed points classified by
+        linearization. Each system shows the full phase portrait with every FP
+        labeled. The color indicates trustworthiness:
+        <span style="color: #00ff88;">green</span> = hyperbolic (reliable),
+        <span style="color: #ffbe0b;">yellow</span> = non-hyperbolic (caution).
+    </p>
+
+    <div class="plot-container" id="sp-galleryPlot" style="height: 440px;"></div>
+
+    <div id="sp-stats3" class="stats-bar"></div>
+
+    <div class="control-panel">
+        <div class="control-group">
+            <label class="control-label" for="sp-gallery-select">System:</label>
+            <select id="sp-gallery-select" class="control-select">
+                <option value="pendulum">Damped Pendulum</option>
+                <option value="lotkaVolterra">Lotka-Volterra Predator-Prey</option>
+                <option value="competition">Competitive Exclusion</option>
+                <option value="saddleNode">Saddle-Node Example</option>
+            </select>
+        </div>
+        <div class="control-group">
+            <button class="btn" onclick="spGalleryReset()">Reset</button>
+        </div>
+    </div>
+</div>
+
+<!-- ========== Test Your Understanding #3 ========== -->
+<div class="interactive-container question-section">
+    <div class="interactive-title">Test Your Understanding</div>
+
+    <p style="margin-bottom: var(--spacing-md); color: var(--text-secondary);">
+        Use the Example Gallery to answer these questions.
+    </p>
+
+    <div class="tabs">
+        <div class="tab-buttons">
+            <button class="tab-button active">Question 7</button>
+            <button class="tab-button">Question 8</button>
+            <button class="tab-button">Question 9</button>
+        </div>
+
+        <div class="tab-content active">
+            <div class="question-container" data-type="mcq" data-answer="2">
+                <div class="question-text">
+                    Select <strong>Damped Pendulum</strong>. How many distinct fixed-point
+                    <em>types</em> appear?
+                </div>
+                <div class="question-options">
+                    <label class="option">
+                        <input type="radio" name="sp-q7" value="0">
+                        <span>One &mdash; all fixed points are the same type</span>
+                    </label>
+                    <label class="option">
+                        <input type="radio" name="sp-q7" value="1">
+                        <span>Three &mdash; stable spiral, unstable spiral, saddle</span>
+                    </label>
+                    <label class="option">
+                        <input type="radio" name="sp-q7" value="2">
+                        <span>Two &mdash; stable spirals (at &theta; = 0, &plusmn;2&pi;,&hellip;) and saddles (at &theta; = &plusmn;&pi;,&hellip;)</span>
+                    </label>
+                    <label class="option">
+                        <input type="radio" name="sp-q7" value="3">
+                        <span>Four &mdash; one of each type</span>
+                    </label>
+                </div>
+                <div class="question-actions">
+                    <button class="btn-verify">Verify</button>
+                </div>
+                <div class="question-explanation" style="display:none;">
+                    <strong>Explanation:</strong>
+                    The damped pendulum has two types that alternate:
+                    <strong>stable spirals</strong> at &theta; = 0, &plusmn;2&pi;,&hellip;
+                    (hanging down &mdash; the natural rest position) and <strong>saddles</strong>
+                    at &theta; = &plusmn;&pi;,&hellip; (inverted &mdash; unstable balance).
+                    Both types are hyperbolic, so linearization is reliable for all of them.
+                </div>
+            </div>
+        </div>
+
+        <div class="tab-content">
+            <div class="question-container" data-type="fill" data-answer="center|saddle">
+                <div class="question-text">
+                    Select <strong>Lotka-Volterra</strong>. At the coexistence point,
+                    linearization predicts a
+                    <select class="fill-blank-select">
+                        <option value=""></option>
+                        <option value="center">center</option>
+                        <option value="stable spiral">stable spiral</option>
+                        <option value="saddle">saddle</option>
+                        <option value="stable node">stable node</option>
+                    </select>
+                    (non-hyperbolic &mdash; caution!). At the origin, it predicts a
+                    <select class="fill-blank-select">
+                        <option value=""></option>
+                        <option value="center">center</option>
+                        <option value="stable spiral">stable spiral</option>
+                        <option value="saddle">saddle</option>
+                        <option value="stable node">stable node</option>
+                    </select>
+                    (hyperbolic &mdash; trustworthy).
+                </div>
+                <div class="question-actions">
+                    <button class="btn-verify">Verify</button>
+                </div>
+                <div class="question-explanation" style="display:none;">
+                    <strong>Explanation:</strong>
+                    Coexistence (1, 2): &tau; = 0, pure imaginary eigenvalues &rarr;
+                    <strong>center</strong> (non-hyperbolic, shown in yellow).
+                    Origin (0, 0): eigenvalues are &lambda; = 2, &minus;1 (real, opposite signs)
+                    &rarr; <strong>saddle</strong> (hyperbolic, shown in green).
+                </div>
+            </div>
+        </div>
+
+        <div class="tab-content">
+            <div class="question-container" data-type="msq" data-answer="1,2,3">
+                <div class="question-text">
+                    When is linearization <strong>reliable</strong>? (Select all that apply)
+                </div>
+                <div class="question-options">
+                    <label class="option">
+                        <input type="checkbox" value="0">
+                        <span>When the Jacobian predicts a center (&tau; = 0)</span>
+                    </label>
+                    <label class="option">
+                        <input type="checkbox" value="1">
+                        <span>When the Jacobian predicts a stable spiral (&tau; &lt; 0, complex eigenvalues)</span>
+                    </label>
+                    <label class="option">
+                        <input type="checkbox" value="2">
+                        <span>When the Jacobian predicts a saddle (&Delta; &lt; 0)</span>
+                    </label>
+                    <label class="option">
+                        <input type="checkbox" value="3">
+                        <span>When the Jacobian predicts a stable node (real &lambda;, both negative)</span>
+                    </label>
+                </div>
+                <div class="question-actions">
+                    <button class="btn-verify">Verify</button>
+                </div>
+                <div class="question-explanation" style="display:none;">
+                    <strong>Explanation:</strong>
+                    <ul>
+                        <li><strong>Center:</strong> ✗ Re(&lambda;) = 0 &rarr; non-hyperbolic. Nonlinear terms can make it a spiral.</li>
+                        <li><strong>Stable spiral:</strong> ✓ Re(&lambda;) &lt; 0 &rarr; hyperbolic. Reliable.</li>
+                        <li><strong>Saddle:</strong> ✓ Eigenvalues are real with opposite signs. Hyperbolic. Reliable.</li>
+                        <li><strong>Stable node:</strong> ✓ Both eigenvalues real and negative. Hyperbolic. Reliable.</li>
+                    </ul>
+                    <p>The only unreliable case is when eigenvalues hit the imaginary axis: centers and zero-eigenvalue cases.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- ============================================================ -->
+<!-- PYTHON CODE EXAMPLES -->
+<!-- ============================================================ -->
+<h2>Python Code</h2>
+
+<div class="tabs">
+    <div class="tab-buttons">
+        <button class="tab-button active">Full Pipeline</button>
+        <button class="tab-button">Trust Checker</button>
+        <button class="tab-button">Prompt</button>
+    </div>
+
+    <div class="tab-content active">
+        <div class="code-block-container">
+            <div class="code-header">
+                <span class="code-lang">Python</span>
+                <button class="copy-btn">Copy</button>
+            </div>
+            <pre><code class="language-python">
+import numpy as np
+import plotly.graph_objects as go
+
+def rk4(f, g, x0, y0, T, N):
+    h=T/N; X,Y=[x0],[y0]; x,y=x0,y0
+    for _ in range(N):
+        k1x,k1y=f(x,y),g(x,y)
+        k2x,k2y=f(x+h/2*k1x,y+h/2*k1y),g(x+h/2*k1x,y+h/2*k1y)
+        k3x,k3y=f(x+h/2*k2x,y+h/2*k2y),g(x+h/2*k2x,y+h/2*k2y)
+        k4x,k4y=f(x+h*k3x,y+h*k3y),g(x+h*k3x,y+h*k3y)
+        x+=h/6*(k1x+2*k2x+2*k3x+k4x)
+        y+=h/6*(k1y+2*k2y+2*k3y+k4y)
+        if abs(x)>20 or abs(y)>20: break
+        X.append(x); Y.append(y)
+    return np.array(X), np.array(Y)
+
+def analyze_fp(name, J, x0, y0):
+    tau = np.trace(J)
+    delta = np.linalg.det(J)
+    evals = np.linalg.eigvals(J)
+    hyp = all(abs(e.real) > 1e-6 for e in evals)
+    if delta < 0: fp_type = 'Saddle'
+    elif abs(tau*tau - 4*delta) < 0.1:
+        fp_type = 'Star Node'
+    elif tau*tau < 4*delta:
+        fp_type = 'Center' if abs(tau)<0.05 else \
+                  ('Stable Spiral' if tau<0 else 'Unstable Spiral')
+    else:
+        fp_type = 'Stable Node' if tau<0 else 'Unstable Node'
+    print(f'{name} at ({x0},{y0}):')
+    print(f'  J = {J.tolist()}')
+    print(f'  τ={tau:.2f}, Δ={delta:.2f}, λ={evals}')
+    print(f'  Type: {fp_type}')
+    print(f'  Hyperbolic: {"YES ✓" if hyp else "NO ✗ (caution!)"}')
+    return fp_type, hyp
+
+# Damped pendulum: θ̈ + 0.3θ̇ + sin(θ) = 0
+f = lambda x,y: y
+g = lambda x,y: -np.sin(x) - 0.3*y
+
+fps = [(0, 0, 'Hanging down'),
+       (np.pi, 0, 'Inverted')]
+
+for x0, y0, name in fps:
+    J = np.array([[0, 1],
+                  [-np.cos(x0), -0.3]])
+    analyze_fp(name, J, x0, y0)
+
+# Phase portrait
+fig = go.Figure()
+colors = ['#00f3ff','#ff006e','#ffbe0b','#00ff88',
+          '#bb86fc','#ff5722','#76ff03','#40c4ff']
+for k in range(8):
+    th = k*np.pi/4
+    X, Y = rk4(f, g, 1.5*np.cos(th), 3*np.sin(th), 20, 3000)
+    fig.add_trace(go.Scatter(x=X, y=Y, mode='lines',
+        line=dict(color=colors[k], width=1.5),
+        showlegend=False))
+
+fig.update_layout(template='plotly_dark',
+    xaxis=dict(title='θ', range=[-4,4],
+        zerolinecolor='#808080'),
+    yaxis=dict(title='ω', range=[-3,3],
+        zerolinecolor='#808080'),
+    height=500, width=600)
+fig.show()
+            </code></pre>
+        </div>
+    </div>
+
+    <div class="tab-content">
+        <div class="code-block-container">
+            <div class="code-header">
+                <span class="code-lang">Python</span>
+                <button class="copy-btn">Copy</button>
+            </div>
+            <pre><code class="language-python">
+import numpy as np
+
+def is_hyperbolic(J):
+    """Check if all eigenvalues have nonzero real part."""
+    evals = np.linalg.eigvals(J)
+    return all(abs(e.real) > 1e-6 for e in evals)
+
+def trust_report(name, J):
+    evals = np.linalg.eigvals(J)
+    tau = np.trace(J)
+    delta = np.linalg.det(J)
+    hyp = is_hyperbolic(J)
+    print(f'\n=== {name} ===')
+    print(f'  λ = {evals}')
+    print(f'  τ = {tau:.3f}, Δ = {delta:.3f}')
+    if hyp:
+        print(f'  ✓ HYPERBOLIC — linearization RELIABLE')
+        print(f'    Reason: all Re(λ) ≠ 0')
+    else:
+        print(f'  ✗ NON-HYPERBOLIC — linearization UNRELIABLE')
+        for e in evals:
+            if abs(e.real) < 1e-6:
+                print(f'    Offender: λ = {e} has Re ≈ 0')
+
+# Test cases
+trust_report('Stable spiral',
+    np.array([[-0.5, 1], [-1, -0.5]]))
+
+trust_report('Center (caution!)',
+    np.array([[0, 1], [-1, 0]]))
+
+trust_report('Saddle',
+    np.array([[1, 1], [0, -2]]))
+
+trust_report('Zero eigenvalue (caution!)',
+    np.array([[0, 1], [0, -1]]))
+            </code></pre>
+        </div>
+    </div>
+
+    <div class="tab-content">
+        <div class="code-block-container">
+            <div class="code-header">
+                <span class="code-lang">Prompt for AI</span>
+                <button class="copy-btn">Copy</button>
+            </div>
+            <pre><code class="language-text">Create a Python script that performs complete linearization
+stability analysis of a 2D nonlinear system.
+
+Requirements:
+- Input: system equations f(x,y), g(x,y) + list of fixed points
+- For each fixed point:
+  1. Compute Jacobian J (analytically or numerically)
+  2. Find eigenvalues
+  3. Compute τ, Δ
+  4. Classify (node/spiral/saddle/center)
+  5. Check if HYPERBOLIC (Re(λ) ≠ 0 for all λ)
+  6. Print trust assessment (reliable / caution)
+- Plot phase portrait with all FPs marked:
+  Green filled = hyperbolic (reliable)
+  Yellow open = non-hyperbolic (caution)
+- Test with: damped pendulum, Lotka-Volterra, competing species
+- Use RK4 for trajectories (not scipy)
+- Use dark theme (plotly_dark) with gray (#808080) axes</code></pre>
+        </div>
+    </div>
+</div>
+
+<!-- ============================================================ -->
+<!-- NAVIGATION -->
+<!-- ============================================================ -->
+<div class="btn-group mt-xl">
+    <button class="btn btn-magenta" onclick="navigateToSection('62-jacobian-matrix')">&larr; Previous: Jacobian Matrix</button>
+    <button class="btn btn-secondary" onclick="scrollToTop()">&uarr; Back to Top</button>
+    <button class="btn btn-secondary" onclick="navigateToSection('64-linearization-limits')">Next: When Linearization Fails &rarr;</button>
+</div>

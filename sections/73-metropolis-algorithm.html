@@ -1,0 +1,676 @@
+<!-- ============================================================
+     Section 6.8: The Metropolis Algorithm
+     Source: NPTEL Lecture 8_9 (Part 2), MCIsing.nb
+     Concept: Markov chain Monte Carlo — the Metropolis algorithm
+              for sampling Boltzmann-weighted configurations
+     Time: 20-25 minutes
+     Prerequisites: Section 6.7 (Ising model, Boltzmann weights)
+     ============================================================ -->
+
+<h1>The Metropolis Algorithm</h1>
+
+<p>
+    The previous section showed that brute-force enumeration fails for large systems.
+    The <strong>Metropolis algorithm</strong> solves this brilliantly: instead of
+    sampling all configurations, it performs a <em>random walk</em> through
+    configuration space that automatically spends more time in low-energy states.
+    The result: thermal averages from a manageable number of samples, even when
+    \( 2^N \) is astronomically large.
+</p>
+
+<div class="info-box">
+    <div class="info-box-title">Learning Objectives</div>
+    <ul>
+        <li>Understand the Metropolis algorithm: propose a change, accept or reject based on energy difference</li>
+        <li>Implement the accept/reject rule: always accept \( \Delta E < 0 \); accept \( \Delta E > 0 \) with probability \( e^{-\Delta E/k_BT} \)</li>
+        <li>Watch a Metropolis simulation <strong>equilibrate</strong> and understand when to start measuring</li>
+        <li>See how temperature controls the <strong>acceptance rate</strong> and the equilibrium properties</li>
+    </ul>
+</div>
+
+<div class="equation-display">
+    <p><strong>The Metropolis Rule:</strong></p>
+    $$ P(\text{accept}) = \begin{cases} 1 & \text{if } \Delta E \leq 0 \\ e^{-\Delta E / k_BT} & \text{if } \Delta E > 0 \end{cases} $$
+    <p>
+        Propose flipping one spin. If it lowers the energy, always accept.
+        If it raises the energy by \( \Delta E \), accept with probability
+        \( e^{-\Delta E / k_BT} \). At low T, uphill moves are rare
+        (system freezes into order). At high T, most moves are accepted (disorder).
+    </p>
+</div>
+
+<hr>
+
+<!-- ============================================================ -->
+<!-- EXPLORER 1: Step-by-Step Metropolis -->
+<!-- ============================================================ -->
+<div class="interactive-container" id="step-by-step-metropolis">
+    <div class="interactive-title">Explorer: Step-by-Step Metropolis</div>
+
+    <p>
+        Watch each Metropolis step in slow motion. A random spin is proposed for
+        flipping (highlighted). The energy change \( \Delta E \) is computed. The
+        accept/reject decision is shown. Click <strong>Step</strong> to advance
+        one move at a time, or <strong>Run 100</strong> for a burst.
+    </p>
+
+    <div class="plot-container" id="mt-spinPlot" style="height: 180px;"></div>
+
+    <div id="mt-stats1" class="stats-bar"></div>
+
+    <div class="control-panel">
+        <div class="control-group">
+            <label class="control-label" for="mt-N-slider">Chain length N:
+                <span id="mt-N-value">16</span>
+            </label>
+            <input type="range" class="slider" id="mt-N-slider"
+                   min="8" max="30" step="1" value="16">
+        </div>
+        <div class="control-group">
+            <label class="control-label" for="mt-T-slider">Temperature T/J:
+                <span id="mt-T-value">1.0</span>
+            </label>
+            <input type="range" class="slider" id="mt-T-slider"
+                   min="0.1" max="5" step="0.1" value="1">
+        </div>
+        <div class="control-group">
+            <button class="btn" onclick="mtStep()">Step</button>
+            <button class="btn" onclick="mtRun100()">Run 100</button>
+            <button class="btn" onclick="mtReset()">Reset</button>
+        </div>
+    </div>
+</div>
+
+<div class="info-box">
+    <div class="info-box-title">Why It Works: Detailed Balance</div>
+    <p>
+        The Metropolis rule satisfies <strong>detailed balance</strong>: the rate
+        of transitions from configuration A to B equals the rate from B to A
+        (weighted by their Boltzmann probabilities). This guarantees that after
+        enough steps, the random walk samples configurations with the correct
+        thermal probabilities &mdash; without ever computing the partition function Z.
+    </p>
+</div>
+
+<!-- ========== Test Your Understanding #1 ========== -->
+<div class="interactive-container question-section">
+    <div class="interactive-title">Test Your Understanding</div>
+
+    <p style="margin-bottom: var(--spacing-md); color: var(--text-secondary);">
+        Use the Step-by-Step Metropolis explorer to answer these questions.
+    </p>
+
+    <div class="tabs">
+        <div class="tab-buttons">
+            <button class="tab-button active">Question 1</button>
+            <button class="tab-button">Question 2</button>
+            <button class="tab-button">Question 3</button>
+        </div>
+
+        <div class="tab-content active">
+            <div class="question-container" data-type="mcq" data-answer="0">
+                <div class="question-text">
+                    Set T/J = 0.5 (cold). Step through 20 moves. What fraction of
+                    proposed flips are accepted?
+                </div>
+                <div class="question-options">
+                    <label class="option">
+                        <input type="radio" name="mt-q1" value="0">
+                        <span>Low (&lt; 50%) &mdash; most uphill moves are rejected at low T</span>
+                    </label>
+                    <label class="option">
+                        <input type="radio" name="mt-q1" value="1">
+                        <span>High (&gt; 80%) &mdash; low T means everything is accepted</span>
+                    </label>
+                    <label class="option">
+                        <input type="radio" name="mt-q1" value="2">
+                        <span>Exactly 50% always</span>
+                    </label>
+                    <label class="option">
+                        <input type="radio" name="mt-q1" value="3">
+                        <span>100% &mdash; all moves are accepted</span>
+                    </label>
+                </div>
+                <div class="question-actions">
+                    <button class="btn-verify">Verify</button>
+                </div>
+                <div class="question-explanation" style="display:none;">
+                    <strong>Explanation:</strong>
+                    At low T, \( e^{-\Delta E / k_BT} \) is very small for \( \Delta E > 0 \).
+                    So uphill moves (energy-increasing flips) are almost never accepted. Only
+                    downhill moves pass, making the acceptance rate low. The chain gets
+                    &ldquo;stuck&rdquo; in ordered configurations.
+                </div>
+            </div>
+        </div>
+
+        <div class="tab-content">
+            <div class="question-container" data-type="fill" data-answer="always">
+                <div class="question-text">
+                    When a proposed flip <em>lowers</em> the energy (\( \Delta E < 0 \)),
+                    it is
+                    <select class="fill-blank-select">
+                        <option value=""></option>
+                        <option value="always">always accepted</option>
+                        <option value="sometimes">sometimes accepted</option>
+                        <option value="never">never accepted</option>
+                        <option value="accepted with probability 0.5">accepted with probability 0.5</option>
+                    </select>.
+                </div>
+                <div class="question-actions">
+                    <button class="btn-verify">Verify</button>
+                </div>
+                <div class="question-explanation" style="display:none;">
+                    <strong>Explanation:</strong>
+                    The Metropolis rule: if \( \Delta E \leq 0 \), accept with probability 1
+                    &mdash; <strong>always</strong>. The system always moves downhill in energy.
+                    The randomness only comes from the occasional acceptance of uphill moves.
+                </div>
+            </div>
+        </div>
+
+        <div class="tab-content">
+            <div class="question-container" data-type="mcq" data-answer="1">
+                <div class="question-text">
+                    Set T/J = 5.0 (hot) and step through 20 moves. Now what is the
+                    acceptance rate?
+                </div>
+                <div class="question-options">
+                    <label class="option">
+                        <input type="radio" name="mt-q3" value="0">
+                        <span>Still low &mdash; temperature doesn&rsquo;t affect acceptance</span>
+                    </label>
+                    <label class="option">
+                        <input type="radio" name="mt-q3" value="1">
+                        <span>High (&gt; 80%) &mdash; at high T, even uphill moves are usually accepted</span>
+                    </label>
+                    <label class="option">
+                        <input type="radio" name="mt-q3" value="2">
+                        <span>Exactly 0% &mdash; nothing moves at high T</span>
+                    </label>
+                    <label class="option">
+                        <input type="radio" name="mt-q3" value="3">
+                        <span>50% regardless of T</span>
+                    </label>
+                </div>
+                <div class="question-actions">
+                    <button class="btn-verify">Verify</button>
+                </div>
+                <div class="question-explanation" style="display:none;">
+                    <strong>Explanation:</strong>
+                    At high T, \( e^{-\Delta E / k_BT} \approx 1 \) even for \( \Delta E > 0 \).
+                    Almost every proposed flip is accepted. The chain bounces freely through
+                    configuration space, sampling disordered (high-energy) states. This gives
+                    high acceptance rate but less ordered configurations.
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- ============================================================ -->
+<!-- EXPLORER 2: Equilibration Watcher -->
+<!-- ============================================================ -->
+<div class="interactive-container" id="equilibration-watcher">
+    <div class="interactive-title">Explorer: Watching Equilibration</div>
+
+    <p>
+        Run a full Metropolis simulation starting from a random configuration.
+        The energy time series shows the system <strong>equilibrating</strong>:
+        initially bouncing wildly, then settling into steady fluctuations around
+        the thermal average. Measurements should only start <em>after</em>
+        equilibration.
+    </p>
+
+    <div class="dual-panel">
+        <div class="panel">
+            <div class="plot-container" id="mt-energyPlot" style="height: 400px;"></div>
+        </div>
+        <div class="panel">
+            <div class="plot-container" id="mt-magPlot" style="height: 400px;"></div>
+        </div>
+    </div>
+
+    <div id="mt-stats2" class="stats-bar"></div>
+
+    <div class="control-panel">
+        <div class="control-group">
+            <label class="control-label" for="mt-eq-T-slider">Temperature T/J:
+                <span id="mt-eq-T-value">1.0</span>
+            </label>
+            <input type="range" class="slider" id="mt-eq-T-slider"
+                   min="0.2" max="5" step="0.1" value="1">
+        </div>
+        <div class="control-group">
+            <label class="control-label" for="mt-eq-N-select">Chain length:</label>
+            <select id="mt-eq-N-select" class="control-select">
+                <option value="20">N = 20</option>
+                <option value="50" selected>N = 50</option>
+                <option value="100">N = 100</option>
+            </select>
+        </div>
+        <div class="control-group">
+            <button class="btn" onclick="mtEquilRun()">Run 5000 Steps</button>
+            <button class="btn" onclick="mtEquilReset()">Reset</button>
+        </div>
+    </div>
+</div>
+
+<!-- ========== Test Your Understanding #2 ========== -->
+<div class="interactive-container question-section">
+    <div class="interactive-title">Test Your Understanding</div>
+
+    <p style="margin-bottom: var(--spacing-md); color: var(--text-secondary);">
+        Use the Equilibration Watcher to answer these questions.
+    </p>
+
+    <div class="tabs">
+        <div class="tab-buttons">
+            <button class="tab-button active">Question 4</button>
+            <button class="tab-button">Question 5</button>
+            <button class="tab-button">Question 6</button>
+        </div>
+
+        <div class="tab-content active">
+            <div class="question-container" data-type="mcq" data-answer="2">
+                <div class="question-text">
+                    Run at T/J = 0.5 with N = 50. The energy time series initially drops
+                    steeply, then fluctuates around a low value. When should you start
+                    computing thermal averages?
+                </div>
+                <div class="question-options">
+                    <label class="option">
+                        <input type="radio" name="mt-q4" value="0">
+                        <span>From the very first step</span>
+                    </label>
+                    <label class="option">
+                        <input type="radio" name="mt-q4" value="1">
+                        <span>Only at the last step</span>
+                    </label>
+                    <label class="option">
+                        <input type="radio" name="mt-q4" value="2">
+                        <span>After the initial transient &mdash; once the energy has settled into steady fluctuations</span>
+                    </label>
+                    <label class="option">
+                        <input type="radio" name="mt-q4" value="3">
+                        <span>It doesn&rsquo;t matter when you start</span>
+                    </label>
+                </div>
+                <div class="question-actions">
+                    <button class="btn-verify">Verify</button>
+                </div>
+                <div class="question-explanation" style="display:none;">
+                    <strong>Explanation:</strong>
+                    The initial period where the energy drops steeply is the
+                    <strong>burn-in</strong> (or thermalization) phase. The chain hasn&rsquo;t
+                    reached equilibrium yet. Measurements during burn-in are biased. Start
+                    averaging only <em>after</em> the energy has equilibrated into steady
+                    fluctuations &mdash; typically after a few hundred to a few thousand steps.
+                </div>
+            </div>
+        </div>
+
+        <div class="tab-content">
+            <div class="question-container" data-type="mcq" data-answer="0">
+                <div class="question-text">
+                    Run at T/J = 0.3 vs T/J = 3.0. How does the equilibrium energy differ?
+                </div>
+                <div class="question-options">
+                    <label class="option">
+                        <input type="radio" name="mt-q5" value="0">
+                        <span>Low T: energy close to ground state (\( -(N-1)J \)). High T: energy near zero.</span>
+                    </label>
+                    <label class="option">
+                        <input type="radio" name="mt-q5" value="1">
+                        <span>Both temperatures give the same average energy</span>
+                    </label>
+                    <label class="option">
+                        <input type="radio" name="mt-q5" value="2">
+                        <span>Low T gives higher energy than high T</span>
+                    </label>
+                    <label class="option">
+                        <input type="radio" name="mt-q5" value="3">
+                        <span>The energy doesn&rsquo;t equilibrate at low T</span>
+                    </label>
+                </div>
+                <div class="question-actions">
+                    <button class="btn-verify">Verify</button>
+                </div>
+                <div class="question-explanation" style="display:none;">
+                    <strong>Explanation:</strong>
+                    At <strong>low T</strong>, the system freezes into near-ground-state order.
+                    \( \langle E \rangle \approx -(N-1)J \). At <strong>high T</strong>, the
+                    system is disordered; roughly half the pairs are aligned, so
+                    \( \langle E \rangle \approx 0 \). Temperature continuously interpolates
+                    between these limits.
+                </div>
+            </div>
+        </div>
+
+        <div class="tab-content">
+            <div class="question-container" data-type="msq" data-answer="1,3">
+                <div class="question-text">
+                    Which statements about Metropolis equilibration are true? (Select all)
+                </div>
+                <div class="question-options">
+                    <label class="option">
+                        <input type="checkbox" value="0">
+                        <span>Equilibration happens instantly at any temperature</span>
+                    </label>
+                    <label class="option">
+                        <input type="checkbox" value="1">
+                        <span>Low temperature requires more steps to equilibrate (system gets stuck)</span>
+                    </label>
+                    <label class="option">
+                        <input type="checkbox" value="2">
+                        <span>The equilibrium energy fluctuations have zero variance</span>
+                    </label>
+                    <label class="option">
+                        <input type="checkbox" value="3">
+                        <span>After equilibration, the energy fluctuates around the thermal average &langle;E&rangle;</span>
+                    </label>
+                </div>
+                <div class="question-actions">
+                    <button class="btn-verify">Verify</button>
+                </div>
+                <div class="question-explanation" style="display:none;">
+                    <strong>Explanation:</strong>
+                    <ul>
+                        <li><strong>Instant equilibration:</strong> ✗ Especially at low T, the chain takes many steps to find low-energy configurations.</li>
+                        <li><strong>Low T slower:</strong> ✓ Low acceptance rate means the chain moves slowly through configuration space.</li>
+                        <li><strong>Zero variance:</strong> ✗ Even at equilibrium, E fluctuates. The variance is a physical quantity (related to heat capacity).</li>
+                        <li><strong>Fluctuates around ⟨E⟩:</strong> ✓ This is the definition of thermal equilibrium — the time average equals the ensemble average.</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- ============================================================ -->
+<!-- EXPLORER 3: Temperature Sweep -->
+<!-- ============================================================ -->
+<div class="interactive-container" id="temperature-sweep">
+    <div class="interactive-title">Explorer: Temperature Sweep</div>
+
+    <p>
+        Run Metropolis at many temperatures and plot \( \langle E \rangle / N \)
+        (energy per spin) and the acceptance rate as functions of T. Compare the
+        MC results with the exact analytical solution for the 1D Ising model.
+    </p>
+
+    <div class="dual-panel">
+        <div class="panel">
+            <div class="plot-container" id="mt-sweepEPlot" style="height: 400px;"></div>
+        </div>
+        <div class="panel">
+            <div class="plot-container" id="mt-sweepAccPlot" style="height: 400px;"></div>
+        </div>
+    </div>
+
+    <div id="mt-stats3" class="stats-bar"></div>
+
+    <div class="control-panel">
+        <div class="control-group">
+            <label class="control-label" for="mt-sweep-N-select">Chain length:</label>
+            <select id="mt-sweep-N-select" class="control-select">
+                <option value="20">N = 20</option>
+                <option value="50" selected>N = 50</option>
+            </select>
+        </div>
+        <div class="control-group">
+            <label class="control-label" for="mt-sweep-steps-select">Steps per T:</label>
+            <select id="mt-sweep-steps-select" class="control-select">
+                <option value="2000">2,000</option>
+                <option value="5000" selected>5,000</option>
+                <option value="10000">10,000</option>
+            </select>
+        </div>
+        <div class="control-group">
+            <button class="btn" onclick="mtSweepRun()">Run Sweep</button>
+        </div>
+    </div>
+</div>
+
+<!-- ========== Test Your Understanding #3 ========== -->
+<div class="interactive-container question-section">
+    <div class="interactive-title">Test Your Understanding</div>
+
+    <p style="margin-bottom: var(--spacing-md); color: var(--text-secondary);">
+        Use the Temperature Sweep explorer to answer these questions.
+    </p>
+
+    <div class="tabs">
+        <div class="tab-buttons">
+            <button class="tab-button active">Question 7</button>
+            <button class="tab-button">Question 8</button>
+            <button class="tab-button">Question 9</button>
+        </div>
+
+        <div class="tab-content active">
+            <div class="question-container" data-type="mcq" data-answer="0">
+                <div class="question-text">
+                    Run the sweep. How well do the MC results match the exact solution?
+                </div>
+                <div class="question-options">
+                    <label class="option">
+                        <input type="radio" name="mt-q7" value="0">
+                        <span>Very well &mdash; MC points lie close to the exact curve</span>
+                    </label>
+                    <label class="option">
+                        <input type="radio" name="mt-q7" value="1">
+                        <span>Poorly &mdash; MC is systematically wrong</span>
+                    </label>
+                    <label class="option">
+                        <input type="radio" name="mt-q7" value="2">
+                        <span>Only at high temperature</span>
+                    </label>
+                    <label class="option">
+                        <input type="radio" name="mt-q7" value="3">
+                        <span>MC gives random scatter with no pattern</span>
+                    </label>
+                </div>
+                <div class="question-actions">
+                    <button class="btn-verify">Verify</button>
+                </div>
+                <div class="question-explanation" style="display:none;">
+                    <strong>Explanation:</strong>
+                    The MC points match the exact curve <strong>very well</strong>, with small
+                    statistical fluctuations. This validates the Metropolis algorithm: it correctly
+                    samples the Boltzmann distribution and gives accurate thermal averages. The
+                    agreement improves with more steps per temperature.
+                </div>
+            </div>
+        </div>
+
+        <div class="tab-content">
+            <div class="question-container" data-type="fill" data-answer="-1[-1.1,-0.9]">
+                <div class="question-text">
+                    The exact 1D Ising result for energy per spin at T &rarr; 0 is
+                    \( \langle E \rangle / N \to \)
+                    <input type="text" class="fill-blank" style="width: 60px"> \( J \).
+                    (All pairs aligned: \( -(N-1)/N \approx -1 \) for large N)
+                </div>
+                <div class="question-actions">
+                    <button class="btn-verify">Verify</button>
+                </div>
+                <div class="question-explanation" style="display:none;">
+                    <strong>Explanation:</strong>
+                    At T = 0, only the ground state contributes: \( E = -(N-1)J \). Per spin:
+                    \( E/N = -(N-1)/N \approx -1 \) for large N. The exact formula is
+                    \( \langle E \rangle / NJ = -\tanh(J/k_BT) \), which goes to &minus;1
+                    as T &rarr; 0.
+                </div>
+            </div>
+        </div>
+
+        <div class="tab-content">
+            <div class="question-container" data-type="mcq" data-answer="2">
+                <div class="question-text">
+                    Look at the acceptance rate plot. How does it vary with temperature?
+                </div>
+                <div class="question-options">
+                    <label class="option">
+                        <input type="radio" name="mt-q9" value="0">
+                        <span>Constant at 50% for all T</span>
+                    </label>
+                    <label class="option">
+                        <input type="radio" name="mt-q9" value="1">
+                        <span>Decreases with T (fewer moves at high T)</span>
+                    </label>
+                    <label class="option">
+                        <input type="radio" name="mt-q9" value="2">
+                        <span>Increases with T (more moves accepted at high T)</span>
+                    </label>
+                    <label class="option">
+                        <input type="radio" name="mt-q9" value="3">
+                        <span>Zero at all temperatures</span>
+                    </label>
+                </div>
+                <div class="question-actions">
+                    <button class="btn-verify">Verify</button>
+                </div>
+                <div class="question-explanation" style="display:none;">
+                    <strong>Explanation:</strong>
+                    At high T, \( e^{-\Delta E / k_BT} \approx 1 \), so almost all moves
+                    are accepted (acceptance rate &rarr; 100%). At low T, uphill moves are
+                    rejected, so acceptance rate drops (often to 10&ndash;30%). The acceptance
+                    rate <strong>increases monotonically</strong> with temperature.
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- ============================================================ -->
+<!-- PYTHON CODE EXAMPLES -->
+<!-- ============================================================ -->
+<h2>Python Code</h2>
+
+<div class="tabs">
+    <div class="tab-buttons">
+        <button class="tab-button active">Metropolis Algorithm</button>
+        <button class="tab-button">Temperature Sweep</button>
+        <button class="tab-button">Prompt</button>
+    </div>
+
+    <div class="tab-content active">
+        <div class="code-block-container">
+            <div class="code-header">
+                <span class="code-lang">Python</span>
+                <button class="copy-btn">Copy</button>
+            </div>
+            <pre><code class="language-python">
+import numpy as np
+
+def metropolis_ising_1d(N, T, n_steps, J=1):
+    """Metropolis MC for 1D Ising model."""
+    spins = np.random.choice([-1, 1], N)
+    E = -J * np.sum(spins[:-1] * spins[1:])
+
+    energies = [E]
+    accepted = 0
+
+    for step in range(n_steps):
+        # Propose: flip random spin
+        i = np.random.randint(N)
+
+        # Compute ΔE (only neighbors matter)
+        dE = 0
+        if i > 0:   dE += 2 * J * spins[i] * spins[i-1]
+        if i < N-1: dE += 2 * J * spins[i] * spins[i+1]
+
+        # Accept/reject
+        if dE <= 0 or np.random.random() < np.exp(-dE / T):
+            spins[i] *= -1
+            E += dE
+            accepted += 1
+
+        energies.append(E)
+
+    return energies, accepted / n_steps, spins
+
+# Run
+N, T, n_steps = 50, 1.0, 5000
+energies, acc_rate, final_spins = metropolis_ising_1d(N, T, n_steps)
+
+# Thermal average (skip burn-in)
+burn_in = 1000
+avg_E = np.mean(energies[burn_in:])
+print(f'⟨E⟩/N = {avg_E/N:.3f} J')
+print(f'Acceptance rate: {acc_rate:.1%}')
+print(f'Exact: ⟨E⟩/N = {-np.tanh(1/T):.3f} J')
+            </code></pre>
+        </div>
+    </div>
+
+    <div class="tab-content">
+        <div class="code-block-container">
+            <div class="code-header">
+                <span class="code-lang">Python</span>
+                <button class="copy-btn">Copy</button>
+            </div>
+            <pre><code class="language-python">
+import numpy as np
+import plotly.graph_objects as go
+
+N, n_steps = 50, 5000
+Ts = np.linspace(0.2, 5, 25)
+mc_E, mc_acc, exact_E = [], [], []
+
+for T in Ts:
+    energies, acc, _ = metropolis_ising_1d(N, T, n_steps)
+    mc_E.append(np.mean(energies[1000:]) / N)
+    mc_acc.append(acc)
+    exact_E.append(-np.tanh(1/T))
+
+fig = go.Figure()
+fig.add_trace(go.Scatter(x=Ts, y=mc_E, mode='markers',
+    marker=dict(color='#00f3ff', size=8),
+    name='MC ⟨E⟩/N'))
+fig.add_trace(go.Scatter(x=Ts, y=exact_E, mode='lines',
+    line=dict(color='white', width=2, dash='dash'),
+    name='Exact: −tanh(J/T)'))
+
+fig.update_layout(template='plotly_dark',
+    xaxis=dict(title='T/J', zerolinecolor='#808080'),
+    yaxis=dict(title='⟨E⟩/NJ', range=[-1.1, 0.1],
+        zerolinecolor='#808080'),
+    height=450, width=600)
+fig.show()
+            </code></pre>
+        </div>
+    </div>
+
+    <div class="tab-content">
+        <div class="code-block-container">
+            <div class="code-header">
+                <span class="code-lang">Prompt for AI</span>
+                <button class="copy-btn">Copy</button>
+            </div>
+            <pre><code class="language-text">Create a Python script using Plotly to implement the Metropolis
+algorithm for the 1D Ising model.
+
+Requirements:
+- Implement Metropolis MC: propose spin flip, accept/reject
+  based on ΔE and temperature T
+- Panel 1: Energy time series E(step) for N=50 at T/J = 0.5, 1, 3
+  Show equilibration (burn-in) region shaded
+- Panel 2: Temperature sweep — ⟨E⟩/N vs T/J
+  MC points (markers) vs exact −tanh(J/T) (dashed line)
+- Panel 3: Acceptance rate vs T/J
+- Use 5000 steps per temperature, 1000 burn-in
+- Use dark theme (plotly_dark) with gray (#808080) axes
+- Compare MC thermal averages with exact results</code></pre>
+        </div>
+    </div>
+</div>
+
+<!-- ============================================================ -->
+<!-- NAVIGATION -->
+<!-- ============================================================ -->
+<div class="btn-group mt-xl">
+    <button class="btn btn-magenta" onclick="navigateToSection('72-ising-model-intro')">&larr; Previous: Ising Model Introduction</button>
+    <button class="btn btn-secondary" onclick="scrollToTop()">&uarr; Back to Top</button>
+    <button class="btn btn-secondary" onclick="navigateToSection('74-ising-simulation')">Next: Ising Simulation &amp; Results &rarr;</button>
+</div>

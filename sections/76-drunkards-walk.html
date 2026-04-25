@@ -1,0 +1,642 @@
+<!-- ============================================================
+     Section 7.1: The Drunkard's Walk — One Dimension
+     Source: NPTEL Lecture 9 (Random Walks, Part 1)
+     Concept: Basic 1D random walk mechanics — coin flip steps,
+              individual trajectories, bias and drift
+     Time: 20-25 minutes
+     Prerequisites: Basic probability (Chapter 2), for loops
+                    (Chapter 4)
+     ============================================================ -->
+
+<h1>The Drunkard&rsquo;s Walk</h1>
+
+<p>
+    A drunkard stands at a lamppost. Each second, they take one step &mdash;
+    equally likely left or right. Where will they be after 100 steps? After 1,000?
+    No one can predict a single trajectory, but <strong>statistics</strong> can
+    predict the ensemble. This simple model &mdash; the <strong>random walk</strong>
+    &mdash; is the foundation of diffusion, Brownian motion, stock prices, and
+    polymer physics.
+</p>
+
+<div class="info-box">
+    <div class="info-box-title">Learning Objectives</div>
+    <ul>
+        <li>Simulate a 1D random walk: at each step, move +1 (right) or &minus;1 (left) with probability \( p \) and \( q = 1 - p \)</li>
+        <li>Observe that individual trajectories are <strong>unpredictable</strong>, but ensembles have clear statistical patterns</li>
+        <li>Understand the <strong>unbiased walk</strong> (\( p = q = 1/2 \)): zero mean displacement, growing spread</li>
+        <li>See how <strong>bias</strong> (\( p \neq 1/2 \)) creates a drift in the average position</li>
+    </ul>
+</div>
+
+<div class="equation-display">
+    <p><strong>The 1D Random Walk:</strong></p>
+    $$ x_N = \sum_{i=1}^{N} s_i, \qquad s_i = \begin{cases} +1 & \text{with probability } p \\ -1 & \text{with probability } q = 1-p \end{cases} $$
+    <p>
+        After \( N \) steps, the position is the sum of \( N \) independent random
+        steps. For the unbiased walk (\( p = 1/2 \)), the expected position is zero,
+        but the typical distance from the origin grows as \( \sqrt{N} \).
+    </p>
+</div>
+
+<hr>
+
+<!-- ============================================================ -->
+<!-- EXPLORER 1: Single Walker -->
+<!-- ============================================================ -->
+<div class="interactive-container" id="single-walker">
+    <div class="interactive-title">Explorer: A Single Drunkard</div>
+
+    <p>
+        Watch one walker take random steps. Click <strong>Step</strong> to advance
+        one step at a time, or <strong>Walk 100</strong> for a burst. The trajectory
+        plot shows position vs step number. Notice how erratic and unpredictable
+        each individual walk is.
+    </p>
+
+    <div class="dual-panel">
+        <div class="panel">
+            <div class="plot-container" id="dw-numberLine" style="height: 200px;"></div>
+            <div class="plot-container" id="dw-trajPlot" style="height: 250px;"></div>
+        </div>
+        <div class="panel">
+            <div class="plot-container" id="dw-histPlot" style="height: 460px;"></div>
+        </div>
+    </div>
+
+    <div id="dw-stats1" class="stats-bar"></div>
+
+    <div class="control-panel">
+        <div class="control-group">
+            <button class="btn" onclick="dwStep()">Step</button>
+            <button class="btn" onclick="dwWalk100()">Walk 100</button>
+            <button class="btn" onclick="dwNewWalk()">New Walk</button>
+            <button class="btn" onclick="dwReset()">Reset</button>
+        </div>
+    </div>
+</div>
+
+<!-- ========== Test Your Understanding #1 ========== -->
+<div class="interactive-container question-section">
+    <div class="interactive-title">Test Your Understanding</div>
+
+    <p style="margin-bottom: var(--spacing-md); color: var(--text-secondary);">
+        Use the Single Walker to answer these questions.
+    </p>
+
+    <div class="tabs">
+        <div class="tab-buttons">
+            <button class="tab-button active">Question 1</button>
+            <button class="tab-button">Question 2</button>
+            <button class="tab-button">Question 3</button>
+        </div>
+
+        <div class="tab-content active">
+            <div class="question-container" data-type="mcq" data-answer="2">
+                <div class="question-text">
+                    Walk 100 steps, then click <strong>New Walk</strong> and walk 100 again.
+                    Are the two trajectories the same?
+                </div>
+                <div class="question-options">
+                    <label class="option">
+                        <input type="radio" name="dw-q1" value="0">
+                        <span>Yes &mdash; same number of steps gives the same path</span>
+                    </label>
+                    <label class="option">
+                        <input type="radio" name="dw-q1" value="1">
+                        <span>Yes &mdash; they always end at the same position</span>
+                    </label>
+                    <label class="option">
+                        <input type="radio" name="dw-q1" value="2">
+                        <span>No &mdash; each walk is different because the steps are random</span>
+                    </label>
+                    <label class="option">
+                        <input type="radio" name="dw-q1" value="3">
+                        <span>No &mdash; but they always end at zero</span>
+                    </label>
+                </div>
+                <div class="question-actions">
+                    <button class="btn-verify">Verify</button>
+                </div>
+                <div class="question-explanation" style="display:none;">
+                    <strong>Explanation:</strong>
+                    Each walk uses independent random coin flips, so the trajectory is
+                    <strong>completely different</strong> each time. This is the fundamental
+                    unpredictability of random walks. The final position varies wildly between
+                    walks &mdash; but the <em>statistics</em> (mean, variance) are predictable.
+                </div>
+            </div>
+        </div>
+
+        <div class="tab-content">
+            <div class="question-container" data-type="mcq" data-answer="1">
+                <div class="question-text">
+                    Take several walks of 100 steps each. The histogram (right panel) shows
+                    where walks end up. Where is the histogram centered?
+                </div>
+                <div class="question-options">
+                    <label class="option">
+                        <input type="radio" name="dw-q2" value="0">
+                        <span>At +100 (always moves right)</span>
+                    </label>
+                    <label class="option">
+                        <input type="radio" name="dw-q2" value="1">
+                        <span>Near 0 (unbiased &mdash; equally likely left and right)</span>
+                    </label>
+                    <label class="option">
+                        <input type="radio" name="dw-q2" value="2">
+                        <span>At &minus;100 (always moves left)</span>
+                    </label>
+                    <label class="option">
+                        <input type="radio" name="dw-q2" value="3">
+                        <span>At a random position each time</span>
+                    </label>
+                </div>
+                <div class="question-actions">
+                    <button class="btn-verify">Verify</button>
+                </div>
+                <div class="question-explanation" style="display:none;">
+                    <strong>Explanation:</strong>
+                    For the unbiased walk (\( p = 1/2 \)), right and left steps are equally
+                    likely. On average, they cancel out: \( \langle x_N \rangle = 0 \). The
+                    histogram is centered at zero, but has a <strong>spread</strong> of about
+                    \( \pm\sqrt{N} = \pm 10 \) for 100 steps.
+                </div>
+            </div>
+        </div>
+
+        <div class="tab-content">
+            <div class="question-container" data-type="fill" data-answer="10[8,12]">
+                <div class="question-text">
+                    After 100 unbiased steps, the typical distance from the origin is
+                    about \( \sqrt{N} = \sqrt{100} = \)
+                    <input type="text" class="fill-blank" style="width: 50px">.
+                    (Check the spread of the histogram)
+                </div>
+                <div class="question-actions">
+                    <button class="btn-verify">Verify</button>
+                </div>
+                <div class="question-explanation" style="display:none;">
+                    <strong>Explanation:</strong>
+                    The root-mean-square displacement is \( \sqrt{\langle x^2 \rangle} = \sqrt{N} = 10 \).
+                    Most walks end within about &plusmn;10 of the origin after 100 steps. Not
+                    &plusmn;100 (the walker doesn&rsquo;t keep going in one direction) and not 0
+                    (they don&rsquo;t return exactly). The \( \sqrt{N} \) law is universal.
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- ============================================================ -->
+<!-- EXPLORER 2: Many Walkers -->
+<!-- ============================================================ -->
+<div class="interactive-container" id="many-walkers">
+    <div class="interactive-title">Explorer: A Crowd of Drunkards</div>
+
+    <p>
+        Launch many walkers from the origin simultaneously. Watch the crowd
+        <strong>spread out</strong> over time. The left panel shows all trajectories;
+        the right shows the distribution of positions at the final step.
+    </p>
+
+    <div class="dual-panel">
+        <div class="panel">
+            <div class="plot-container" id="dw-manyTrajPlot" style="height: 400px;"></div>
+        </div>
+        <div class="panel">
+            <div class="plot-container" id="dw-manyHistPlot" style="height: 400px;"></div>
+        </div>
+    </div>
+
+    <div id="dw-stats2" class="stats-bar"></div>
+
+    <div class="control-panel">
+        <div class="control-group">
+            <label class="control-label" for="dw-nwalkers-slider">Walkers:
+                <span id="dw-nwalkers-value">50</span>
+            </label>
+            <input type="range" class="slider" id="dw-nwalkers-slider"
+                   min="10" max="200" step="10" value="50">
+        </div>
+        <div class="control-group">
+            <label class="control-label" for="dw-nsteps-slider">Steps:
+                <span id="dw-nsteps-value">200</span>
+            </label>
+            <input type="range" class="slider" id="dw-nsteps-slider"
+                   min="50" max="1000" step="50" value="200">
+        </div>
+        <div class="control-group">
+            <button class="btn" onclick="dwManyRun()">Launch</button>
+        </div>
+    </div>
+</div>
+
+<!-- ========== Test Your Understanding #2 ========== -->
+<div class="interactive-container question-section">
+    <div class="interactive-title">Test Your Understanding</div>
+
+    <p style="margin-bottom: var(--spacing-md); color: var(--text-secondary);">
+        Use the Many Walkers explorer to answer these questions.
+    </p>
+
+    <div class="tabs">
+        <div class="tab-buttons">
+            <button class="tab-button active">Question 4</button>
+            <button class="tab-button">Question 5</button>
+            <button class="tab-button">Question 6</button>
+        </div>
+
+        <div class="tab-content active">
+            <div class="question-container" data-type="mcq" data-answer="0">
+                <div class="question-text">
+                    Launch 200 walkers for 200 steps. The envelope of trajectories forms
+                    a shape. What shape is it?
+                </div>
+                <div class="question-options">
+                    <label class="option">
+                        <input type="radio" name="dw-q4" value="0">
+                        <span>A widening funnel (\( \propto \sqrt{N} \)) &mdash; the diffusion cone</span>
+                    </label>
+                    <label class="option">
+                        <input type="radio" name="dw-q4" value="1">
+                        <span>A rectangle &mdash; constant width</span>
+                    </label>
+                    <label class="option">
+                        <input type="radio" name="dw-q4" value="2">
+                        <span>A narrowing cone &mdash; walkers converge</span>
+                    </label>
+                    <label class="option">
+                        <input type="radio" name="dw-q4" value="3">
+                        <span>A straight line &mdash; all walkers go the same way</span>
+                    </label>
+                </div>
+                <div class="question-actions">
+                    <button class="btn-verify">Verify</button>
+                </div>
+                <div class="question-explanation" style="display:none;">
+                    <strong>Explanation:</strong>
+                    The spread grows as \( \sqrt{N} \), forming a <strong>widening funnel</strong>
+                    (diffusion cone). This is the visual signature of diffusion: the cloud of
+                    walkers expands, but slowly &mdash; as the square root of time, not linearly.
+                </div>
+            </div>
+        </div>
+
+        <div class="tab-content">
+            <div class="question-container" data-type="mcq" data-answer="2">
+                <div class="question-text">
+                    Look at the histogram of final positions. What distribution does it resemble?
+                </div>
+                <div class="question-options">
+                    <label class="option">
+                        <input type="radio" name="dw-q5" value="0">
+                        <span>Uniform (flat)</span>
+                    </label>
+                    <label class="option">
+                        <input type="radio" name="dw-q5" value="1">
+                        <span>Exponential (one-sided peak)</span>
+                    </label>
+                    <label class="option">
+                        <input type="radio" name="dw-q5" value="2">
+                        <span>Gaussian (bell curve centered at 0)</span>
+                    </label>
+                    <label class="option">
+                        <input type="radio" name="dw-q5" value="3">
+                        <span>Bimodal (two peaks)</span>
+                    </label>
+                </div>
+                <div class="question-actions">
+                    <button class="btn-verify">Verify</button>
+                </div>
+                <div class="question-explanation" style="display:none;">
+                    <strong>Explanation:</strong>
+                    By the <strong>central limit theorem</strong>, the sum of many independent
+                    random steps converges to a Gaussian (normal) distribution. The mean is 0
+                    (unbiased) and the standard deviation is \( \sqrt{N} \). This is the
+                    mathematical foundation of diffusion.
+                </div>
+            </div>
+        </div>
+
+        <div class="tab-content">
+            <div class="question-container" data-type="msq" data-answer="0,3">
+                <div class="question-text">
+                    Which statements about the unbiased random walk are true? (Select all)
+                </div>
+                <div class="question-options">
+                    <label class="option">
+                        <input type="checkbox" value="0">
+                        <span>The mean displacement is zero: \( \langle x_N \rangle = 0 \)</span>
+                    </label>
+                    <label class="option">
+                        <input type="checkbox" value="1">
+                        <span>The walker always returns to the origin</span>
+                    </label>
+                    <label class="option">
+                        <input type="checkbox" value="2">
+                        <span>The RMS displacement is proportional to N (linear in steps)</span>
+                    </label>
+                    <label class="option">
+                        <input type="checkbox" value="3">
+                        <span>The RMS displacement is proportional to \( \sqrt{N} \)</span>
+                    </label>
+                </div>
+                <div class="question-actions">
+                    <button class="btn-verify">Verify</button>
+                </div>
+                <div class="question-explanation" style="display:none;">
+                    <strong>Explanation:</strong>
+                    <ul>
+                        <li><strong>Mean = 0:</strong> ✓ Unbiased walk has zero expected displacement.</li>
+                        <li><strong>Always returns:</strong> ✗ In 1D, a random walk <em>eventually</em> returns (P&oacute;lya&rsquo;s recurrence), but not at every step. Individual walks wander far.</li>
+                        <li><strong>RMS ∝ N:</strong> ✗ RMS grows as √N, not N. Linear growth would mean ballistic motion.</li>
+                        <li><strong>RMS ∝ √N:</strong> ✓ This is the diffusion law: \( \sqrt{\langle x^2 \rangle} = \sqrt{N} \).</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- ============================================================ -->
+<!-- EXPLORER 3: Biased Walk -->
+<!-- ============================================================ -->
+<div class="interactive-container" id="biased-walk">
+    <div class="interactive-title">Explorer: The Biased Drunkard</div>
+
+    <p>
+        What if the street is on a slope? If right steps are more likely (\( p > 1/2 \)),
+        the walker <strong>drifts</strong>. The mean position shifts linearly with
+        time: \( \langle x_N \rangle = N(2p - 1) \). But fluctuations still grow
+        as \( \sqrt{N} \), riding on top of the drift.
+    </p>
+
+    <div class="dual-panel">
+        <div class="panel">
+            <div class="plot-container" id="dw-biasPlot" style="height: 400px;"></div>
+        </div>
+        <div class="panel">
+            <div class="plot-container" id="dw-biasHistPlot" style="height: 400px;"></div>
+        </div>
+    </div>
+
+    <div id="dw-stats3" class="stats-bar"></div>
+
+    <div class="control-panel">
+        <div class="control-group">
+            <label class="control-label" for="dw-p-slider">Probability p (step right):
+                <span id="dw-p-value">0.50</span>
+            </label>
+            <input type="range" class="slider" id="dw-p-slider"
+                   min="0.3" max="0.7" step="0.01" value="0.5">
+        </div>
+        <div class="control-group">
+            <label class="control-label" for="dw-bias-steps-slider">Steps:
+                <span id="dw-bias-steps-value">300</span>
+            </label>
+            <input type="range" class="slider" id="dw-bias-steps-slider"
+                   min="50" max="500" step="50" value="300">
+        </div>
+        <div class="control-group">
+            <button class="btn" onclick="dwBiasRun()">Run 30 Walkers</button>
+        </div>
+    </div>
+</div>
+
+<!-- ========== Test Your Understanding #3 ========== -->
+<div class="interactive-container question-section">
+    <div class="interactive-title">Test Your Understanding</div>
+
+    <p style="margin-bottom: var(--spacing-md); color: var(--text-secondary);">
+        Use the Biased Walk explorer to answer these questions.
+    </p>
+
+    <div class="tabs">
+        <div class="tab-buttons">
+            <button class="tab-button active">Question 7</button>
+            <button class="tab-button">Question 8</button>
+            <button class="tab-button">Question 9</button>
+        </div>
+
+        <div class="tab-content active">
+            <div class="question-container" data-type="mcq" data-answer="1">
+                <div class="question-text">
+                    Set p = 0.55 (slight rightward bias). After 300 steps, where is the
+                    cloud of walkers centered?
+                </div>
+                <div class="question-options">
+                    <label class="option">
+                        <input type="radio" name="dw-q7" value="0">
+                        <span>At zero &mdash; bias doesn&rsquo;t matter</span>
+                    </label>
+                    <label class="option">
+                        <input type="radio" name="dw-q7" value="1">
+                        <span>At \( 300 \times (2 \times 0.55 - 1) = 30 \) &mdash; linear drift</span>
+                    </label>
+                    <label class="option">
+                        <input type="radio" name="dw-q7" value="2">
+                        <span>At +300 &mdash; all steps go right</span>
+                    </label>
+                    <label class="option">
+                        <input type="radio" name="dw-q7" value="3">
+                        <span>At a random position</span>
+                    </label>
+                </div>
+                <div class="question-actions">
+                    <button class="btn-verify">Verify</button>
+                </div>
+                <div class="question-explanation" style="display:none;">
+                    <strong>Explanation:</strong>
+                    The mean displacement is \( \langle x_N \rangle = N(2p - 1) = 300 \times 0.1 = 30 \).
+                    The walker drifts rightward at a rate of \( 2p - 1 = 0.1 \) per step. The
+                    cloud is centered at +30, with a spread of \( \pm\sqrt{300} \approx \pm 17 \).
+                </div>
+            </div>
+        </div>
+
+        <div class="tab-content">
+            <div class="question-container" data-type="fill" data-answer="0">
+                <div class="question-text">
+                    For an <strong>unbiased</strong> walk, the drift per step is
+                    \( 2p - 1 = 2(0.5) - 1 = \)
+                    <input type="text" class="fill-blank" style="width: 50px">.
+                </div>
+                <div class="question-actions">
+                    <button class="btn-verify">Verify</button>
+                </div>
+                <div class="question-explanation" style="display:none;">
+                    <strong>Explanation:</strong>
+                    \( 2p - 1 = 2(0.5) - 1 = 0 \). Zero drift &mdash; no net movement on
+                    average. The walker&rsquo;s expected position stays at the origin. The
+                    spread grows, but the center doesn&rsquo;t move.
+                </div>
+            </div>
+        </div>
+
+        <div class="tab-content">
+            <div class="question-container" data-type="mcq" data-answer="0">
+                <div class="question-text">
+                    Set p = 0.65 (strong bias). After 300 steps, the drift dominates the
+                    fluctuations. What does the trajectory look like?
+                </div>
+                <div class="question-options">
+                    <label class="option">
+                        <input type="radio" name="dw-q9" value="0">
+                        <span>Nearly straight lines going up-right, with small wiggles &mdash; drift overwhelms noise</span>
+                    </label>
+                    <label class="option">
+                        <input type="radio" name="dw-q9" value="1">
+                        <span>Random zig-zags with no trend</span>
+                    </label>
+                    <label class="option">
+                        <input type="radio" name="dw-q9" value="2">
+                        <span>All walkers at exactly the same position</span>
+                    </label>
+                    <label class="option">
+                        <input type="radio" name="dw-q9" value="3">
+                        <span>Walkers moving leftward</span>
+                    </label>
+                </div>
+                <div class="question-actions">
+                    <button class="btn-verify">Verify</button>
+                </div>
+                <div class="question-explanation" style="display:none;">
+                    <strong>Explanation:</strong>
+                    With strong bias, drift \( = N(2p-1) = 300 \times 0.3 = 90 \) dominates
+                    fluctuations \( \sqrt{N} \approx 17 \). The signal-to-noise ratio is
+                    90/17 &asymp; 5. Trajectories look like noisy straight lines &mdash; the
+                    drift is clearly visible above the random wiggles.
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- ============================================================ -->
+<!-- PYTHON CODE -->
+<!-- ============================================================ -->
+<h2>Python Code</h2>
+
+<div class="tabs">
+    <div class="tab-buttons">
+        <button class="tab-button active">Single Walk</button>
+        <button class="tab-button">Many Walkers</button>
+        <button class="tab-button">Prompt</button>
+    </div>
+
+    <div class="tab-content active">
+        <div class="code-block-container">
+            <div class="code-header">
+                <span class="code-lang">Python</span>
+                <button class="copy-btn">Copy</button>
+            </div>
+            <pre><code class="language-python">
+import numpy as np
+import plotly.graph_objects as go
+
+# Single random walk
+N = 500
+steps = np.random.choice([-1, 1], N)
+position = np.cumsum(steps)
+
+fig = go.Figure()
+fig.add_trace(go.Scatter(
+    y=position, mode='lines',
+    line=dict(color='#00f3ff', width=1.5),
+    name='Walker trajectory'))
+fig.add_trace(go.Scatter(
+    x=[0, N], y=[0, 0], mode='lines',
+    line=dict(color='#808080', width=1, dash='dot'),
+    showlegend=False))
+
+fig.update_layout(
+    template='plotly_dark',
+    xaxis=dict(title='Step number', zerolinecolor='#808080'),
+    yaxis=dict(title='Position x', zerolinecolor='#808080'),
+    height=400, width=600)
+fig.show()
+print(f'Final position: {position[-1]}')
+print(f'Expected RMS: √{N} = {np.sqrt(N):.1f}')
+            </code></pre>
+        </div>
+    </div>
+
+    <div class="tab-content">
+        <div class="code-block-container">
+            <div class="code-header">
+                <span class="code-lang">Python</span>
+                <button class="copy-btn">Copy</button>
+            </div>
+            <pre><code class="language-python">
+import numpy as np
+import plotly.graph_objects as go
+from plotly.subplots import make_subplots
+
+n_walkers, N = 200, 500
+positions = np.cumsum(np.random.choice([-1, 1], (n_walkers, N)), axis=1)
+
+fig = make_subplots(1, 2, subplot_titles=['Trajectories', 'Final positions'])
+
+colors = ['#00f3ff','#ff006e','#ffbe0b','#00ff88','#bb86fc']
+for w in range(min(n_walkers, 20)):
+    fig.add_trace(go.Scatter(
+        y=positions[w], mode='lines',
+        line=dict(color=colors[w % 5], width=0.8, opacity=0.5),
+        showlegend=False), row=1, col=1)
+
+# ±√N envelope
+fig.add_trace(go.Scatter(
+    x=list(range(N)), y=[np.sqrt(n) for n in range(N)],
+    mode='lines', line=dict(color='white', width=2, dash='dash'),
+    name='±√N'), row=1, col=1)
+fig.add_trace(go.Scatter(
+    x=list(range(N)), y=[-np.sqrt(n) for n in range(N)],
+    mode='lines', line=dict(color='white', width=2, dash='dash'),
+    showlegend=False), row=1, col=1)
+
+# Histogram
+fig.add_trace(go.Histogram(
+    x=positions[:, -1], nbinsx=30,
+    marker_color='#00f3ff', opacity=0.7), row=1, col=2)
+
+fig.update_layout(template='plotly_dark', height=400, width=900)
+fig.update_xaxes(title='Step', zerolinecolor='#808080', row=1, col=1)
+fig.update_yaxes(title='Position', zerolinecolor='#808080', row=1, col=1)
+fig.update_xaxes(title='Final position', zerolinecolor='#808080', row=1, col=2)
+fig.show()
+            </code></pre>
+        </div>
+    </div>
+
+    <div class="tab-content">
+        <div class="code-block-container">
+            <div class="code-header">
+                <span class="code-lang">Prompt for AI</span>
+                <button class="copy-btn">Copy</button>
+            </div>
+            <pre><code class="language-text">Create a Python script using Plotly to simulate 1D random walks.
+
+Requirements:
+- Part 1: Single walk of N=500 steps, plot position vs step
+- Part 2: 200 walkers, N=500 steps each
+  Panel 1: Show 20 trajectory curves with ±√N envelope (dashed)
+  Panel 2: Histogram of final positions with Gaussian overlay
+- Part 3: Biased walk with p=0.55 (slight rightward drift)
+  Show 30 biased walks, overlay drift line N*(2p-1)
+  Compare spread with unbiased case
+
+- Use dark theme (plotly_dark) with gray (#808080) axes
+- Use numpy for random steps: np.random.choice([-1,1], N)</code></pre>
+        </div>
+    </div>
+</div>
+
+<!-- ============================================================ -->
+<!-- NAVIGATION -->
+<!-- ============================================================ -->
+<div class="btn-group mt-xl">
+    <button class="btn btn-magenta" onclick="navigateToSection('75-mc-applications')">&larr; Previous: MC in Science</button>
+    <button class="btn btn-secondary" onclick="scrollToTop()">&uarr; Back to Top</button>
+    <button class="btn btn-secondary" onclick="navigateToSection('77-walk-statistics')">Next: Statistics of Random Walks &rarr;</button>
+</div>

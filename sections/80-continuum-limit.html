@@ -1,0 +1,641 @@
+<!-- ============================================================
+     Section 7.5: From Discrete to Continuous
+     Source: NPTEL Lecture 10_2 (Part 1)
+     Concept: Taking the continuum limit of the random walk to
+              derive the diffusion equation ∂P/∂t = D ∂²P/∂x²
+     Time: 20-25 minutes
+     Prerequisites: Sections 7.1-7.3 (random walk, statistics,
+                    binomial), calculus (Taylor series, PDEs)
+     ============================================================ -->
+
+<h1>From Discrete to Continuous</h1>
+
+<p>
+    This is the climax of Chapter 7: a discrete random walk with step size \( a \)
+    and time step \( \tau \) becomes, in the limit \( a \to 0 \) and \( \tau \to 0 \),
+    a <strong>partial differential equation</strong> &mdash; the <strong>diffusion
+    equation</strong>. Individual random steps, too small to see, collectively produce
+    the smooth spreading of heat, ink in water, and perfume through a room. Microscopic
+    randomness creates macroscopic law.
+</p>
+
+<div class="info-box">
+    <div class="info-box-title">Learning Objectives</div>
+    <ul>
+        <li>Understand the continuum limit: step size \( a \to 0 \), time step \( \tau \to 0 \), with \( D = a^2/(2\tau) \) held fixed</li>
+        <li>See how the discrete master equation becomes the <strong>diffusion PDE</strong>: \( \partial P/\partial t = D\,\partial^2 P/\partial x^2 \)</li>
+        <li>Connect the diffusion constant \( D \) to microscopic parameters: \( D = a^2/(2\tau) \)</li>
+        <li>Watch the discrete binomial distribution converge to the continuous Gaussian solution</li>
+    </ul>
+</div>
+
+<div class="equation-display">
+    <p><strong>The Continuum Limit:</strong></p>
+    $$ \underbrace{P(x, t+\tau)}_{\text{future}} = \tfrac{1}{2}\underbrace{P(x-a, t)}_{\text{left neighbor}} + \tfrac{1}{2}\underbrace{P(x+a, t)}_{\text{right neighbor}} $$
+    <p>Taylor-expand both sides to second order. Cancel and collect:</p>
+    $$ \frac{\partial P}{\partial t} = \frac{a^2}{2\tau}\frac{\partial^2 P}{\partial x^2} = D\frac{\partial^2 P}{\partial x^2} $$
+    <p>
+        The <strong>diffusion equation</strong>. The diffusion constant
+        \( D = a^2/(2\tau) \) connects microscopic (step size, step time) to
+        macroscopic (spreading rate).
+    </p>
+</div>
+
+<hr>
+
+<!-- ============================================================ -->
+<!-- EXPLORER 1: Discrete to Continuous -->
+<!-- ============================================================ -->
+<div class="interactive-container" id="discrete-to-continuous">
+    <div class="interactive-title">Explorer: Watching the Limit</div>
+
+    <p>
+        Start with a small random walk (large steps, few of them) and progressively
+        refine: smaller steps, more of them, same total time. The binomial distribution
+        converges to the smooth Gaussian &mdash; the diffusion equation&rsquo;s solution.
+    </p>
+
+    <div class="plot-container" id="cl-convergePlot" style="height: 420px;"></div>
+
+    <div id="cl-stats1" class="stats-bar"></div>
+
+    <div class="control-panel">
+        <div class="control-group">
+            <label class="control-label" for="cl-refine-slider">Refinement level:
+                <span id="cl-refine-value">1</span>
+            </label>
+            <input type="range" class="slider" id="cl-refine-slider"
+                   min="1" max="6" step="1" value="1">
+        </div>
+        <div class="control-group">
+            <label class="control-label" for="cl-T-slider">Total time T:
+                <span id="cl-T-value">1.0</span>
+            </label>
+            <input type="range" class="slider" id="cl-T-slider"
+                   min="0.5" max="3" step="0.25" value="1">
+        </div>
+        <div class="control-group">
+            <button class="btn" onclick="clConvergeReset()">Reset</button>
+        </div>
+    </div>
+</div>
+
+<div class="info-box">
+    <div class="info-box-title">The Key Trick: Hold D Fixed</div>
+    <p>
+        As \( a \to 0 \) and \( \tau \to 0 \), the ratio \( D = a^2/(2\tau) \) must
+        stay <strong>finite</strong>. If you shrink \( a \) by half, you must shrink
+        \( \tau \) by a factor of 4 (since \( \tau \propto a^2 \)). This means more
+        steps in the same time. The limiting distribution is the Gaussian
+        \( P(x,t) = \frac{1}{\sqrt{4\pi Dt}} e^{-x^2/(4Dt)} \).
+    </p>
+</div>
+
+<!-- ========== Test Your Understanding #1 ========== -->
+<div class="interactive-container question-section">
+    <div class="interactive-title">Test Your Understanding</div>
+
+    <p style="margin-bottom: var(--spacing-md); color: var(--text-secondary);">
+        Use the Watching the Limit explorer to answer these questions.
+    </p>
+
+    <div class="tabs">
+        <div class="tab-buttons">
+            <button class="tab-button active">Question 1</button>
+            <button class="tab-button">Question 2</button>
+            <button class="tab-button">Question 3</button>
+        </div>
+
+        <div class="tab-content active">
+            <div class="question-container" data-type="mcq" data-answer="1">
+                <div class="question-text">
+                    Move the refinement slider from 1 to 6. What happens to the binomial
+                    distribution?
+                </div>
+                <div class="question-options">
+                    <label class="option">
+                        <input type="radio" name="cl-q1" value="0">
+                        <span>It becomes wider and flatter</span>
+                    </label>
+                    <label class="option">
+                        <input type="radio" name="cl-q1" value="1">
+                        <span>It becomes smoother, approaching the Gaussian curve exactly</span>
+                    </label>
+                    <label class="option">
+                        <input type="radio" name="cl-q1" value="2">
+                        <span>It stays the same &mdash; refinement has no effect</span>
+                    </label>
+                    <label class="option">
+                        <input type="radio" name="cl-q1" value="3">
+                        <span>It becomes a delta function</span>
+                    </label>
+                </div>
+                <div class="question-actions">
+                    <button class="btn-verify">Verify</button>
+                </div>
+                <div class="question-explanation" style="display:none;">
+                    <strong>Explanation:</strong>
+                    As the step size shrinks and the number of steps increases (with D fixed),
+                    the discrete binomial bars fill in and converge to the <strong>smooth Gaussian
+                    curve</strong>. The width stays the same (same D and T), but the discrete
+                    jumps disappear. This is the continuum limit in action.
+                </div>
+            </div>
+        </div>
+
+        <div class="tab-content">
+            <div class="question-container" data-type="fill" data-answer="gaussian|normal">
+                <div class="question-text">
+                    In the continuum limit, the binomial distribution becomes a
+                    <select class="fill-blank-select">
+                        <option value=""></option>
+                        <option value="uniform">uniform</option>
+                        <option value="gaussian">Gaussian (normal)</option>
+                        <option value="exponential">exponential</option>
+                        <option value="poisson">Poisson</option>
+                    </select>
+                    distribution.
+                </div>
+                <div class="question-actions">
+                    <button class="btn-verify">Verify</button>
+                </div>
+                <div class="question-explanation" style="display:none;">
+                    <strong>Explanation:</strong>
+                    The CLT guarantees convergence to a <strong>Gaussian</strong>. The specific
+                    Gaussian is \( P(x,t) = \frac{1}{\sqrt{4\pi Dt}} e^{-x^2/(4Dt)} \) &mdash;
+                    the fundamental solution of the diffusion equation.
+                </div>
+            </div>
+        </div>
+
+        <div class="tab-content">
+            <div class="question-container" data-type="mcq" data-answer="2">
+                <div class="question-text">
+                    Does the <strong>width</strong> of the distribution change as you refine?
+                </div>
+                <div class="question-options">
+                    <label class="option">
+                        <input type="radio" name="cl-q3" value="0">
+                        <span>Yes &mdash; it gets wider with more refinement</span>
+                    </label>
+                    <label class="option">
+                        <input type="radio" name="cl-q3" value="1">
+                        <span>Yes &mdash; it gets narrower</span>
+                    </label>
+                    <label class="option">
+                        <input type="radio" name="cl-q3" value="2">
+                        <span>No &mdash; the width stays the same because D and T are fixed (σ = √(2DT))</span>
+                    </label>
+                    <label class="option">
+                        <input type="radio" name="cl-q3" value="3">
+                        <span>The width oscillates</span>
+                    </label>
+                </div>
+                <div class="question-actions">
+                    <button class="btn-verify">Verify</button>
+                </div>
+                <div class="question-explanation" style="display:none;">
+                    <strong>Explanation:</strong>
+                    The width is \( \sigma = \sqrt{2DT} \), which depends on D and T only &mdash;
+                    not on the step size a or step time &tau; individually. Since we hold D and T
+                    fixed during refinement, the width is <strong>unchanged</strong>. Only the
+                    smoothness improves.
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- ============================================================ -->
+<!-- EXPLORER 2: Continuum Limit Parameters -->
+<!-- ============================================================ -->
+<div class="interactive-container" id="continuum-parameters">
+    <div class="interactive-title">Explorer: The Continuum Limit Parameters</div>
+
+    <p>
+        Adjust the microscopic parameters \( a \) (step size) and \( \tau \) (step time)
+        independently. The diffusion constant \( D = a^2/(2\tau) \) updates automatically.
+        Watch how different microscopic choices give the <strong>same macroscopic
+        diffusion</strong> as long as D is the same.
+    </p>
+
+    <div class="dual-panel">
+        <div class="panel">
+            <div class="plot-container" id="cl-paramPlot" style="height: 400px;"></div>
+        </div>
+        <div class="panel">
+            <div class="plot-container" id="cl-gaussPlot" style="height: 400px;"></div>
+        </div>
+    </div>
+
+    <div id="cl-stats2" class="stats-bar"></div>
+
+    <div class="control-panel">
+        <div class="control-group">
+            <label class="control-label" for="cl-a-slider">Step size a:
+                <span id="cl-a-value">0.50</span>
+            </label>
+            <input type="range" class="slider" id="cl-a-slider"
+                   min="0.1" max="1" step="0.05" value="0.5">
+        </div>
+        <div class="control-group">
+            <label class="control-label" for="cl-tau-slider">Time step &tau;:
+                <span id="cl-tau-value">0.125</span>
+            </label>
+            <input type="range" class="slider" id="cl-tau-slider"
+                   min="0.01" max="0.5" step="0.005" value="0.125">
+        </div>
+        <div class="control-group">
+            <button class="btn" onclick="clParamReset()">Reset</button>
+        </div>
+    </div>
+</div>
+
+<!-- ========== Test Your Understanding #2 ========== -->
+<div class="interactive-container question-section">
+    <div class="interactive-title">Test Your Understanding</div>
+
+    <p style="margin-bottom: var(--spacing-md); color: var(--text-secondary);">
+        Use the Parameters explorer to answer these questions.
+    </p>
+
+    <div class="tabs">
+        <div class="tab-buttons">
+            <button class="tab-button active">Question 4</button>
+            <button class="tab-button">Question 5</button>
+            <button class="tab-button">Question 6</button>
+        </div>
+
+        <div class="tab-content active">
+            <div class="question-container" data-type="fill" data-answer="1[0.9,1.1]">
+                <div class="question-text">
+                    With a = 0.5 and &tau; = 0.125, the diffusion constant is
+                    \( D = a^2/(2\tau) = 0.25/0.25 = \)
+                    <input type="text" class="fill-blank" style="width: 50px">.
+                </div>
+                <div class="question-actions">
+                    <button class="btn-verify">Verify</button>
+                </div>
+                <div class="question-explanation" style="display:none;">
+                    <strong>Explanation:</strong>
+                    \( D = a^2/(2\tau) = 0.25 / 0.25 = 1 \). This means the width of the
+                    Gaussian at time T is \( \sigma = \sqrt{2DT} = \sqrt{2T} \).
+                </div>
+            </div>
+        </div>
+
+        <div class="tab-content">
+            <div class="question-container" data-type="mcq" data-answer="0">
+                <div class="question-text">
+                    Set a = 0.2 and adjust &tau; to keep D = 1. What &tau; do you need?
+                </div>
+                <div class="question-options">
+                    <label class="option">
+                        <input type="radio" name="cl-q5" value="0">
+                        <span>&tau; = a&sup2;/(2D) = 0.04/2 = 0.02</span>
+                    </label>
+                    <label class="option">
+                        <input type="radio" name="cl-q5" value="1">
+                        <span>&tau; = 0.1</span>
+                    </label>
+                    <label class="option">
+                        <input type="radio" name="cl-q5" value="2">
+                        <span>&tau; = 0.5</span>
+                    </label>
+                    <label class="option">
+                        <input type="radio" name="cl-q5" value="3">
+                        <span>&tau; = a = 0.2</span>
+                    </label>
+                </div>
+                <div class="question-actions">
+                    <button class="btn-verify">Verify</button>
+                </div>
+                <div class="question-explanation" style="display:none;">
+                    <strong>Explanation:</strong>
+                    \( D = a^2/(2\tau) \Rightarrow \tau = a^2/(2D) = 0.04/2 = 0.02 \).
+                    Halving the step size requires quartering the time step (&tau; &propto; a&sup2;).
+                    This is why the limit requires \( \tau \to 0 \) faster than \( a \to 0 \).
+                </div>
+            </div>
+        </div>
+
+        <div class="tab-content">
+            <div class="question-container" data-type="msq" data-answer="0,2">
+                <div class="question-text">
+                    Which statements about the continuum limit are true? (Select all)
+                </div>
+                <div class="question-options">
+                    <label class="option">
+                        <input type="checkbox" value="0">
+                        <span>Different microscopic (a, &tau;) pairs can give the same D and thus the same macroscopic behavior</span>
+                    </label>
+                    <label class="option">
+                        <input type="checkbox" value="1">
+                        <span>The continuum limit requires a &rarr; 0 with &tau; held fixed</span>
+                    </label>
+                    <label class="option">
+                        <input type="checkbox" value="2">
+                        <span>&tau; must shrink as a&sup2;: if you halve a, you must quarter &tau;</span>
+                    </label>
+                    <label class="option">
+                        <input type="checkbox" value="3">
+                        <span>D depends on the total number of steps N</span>
+                    </label>
+                </div>
+                <div class="question-actions">
+                    <button class="btn-verify">Verify</button>
+                </div>
+                <div class="question-explanation" style="display:none;">
+                    <strong>Explanation:</strong>
+                    <ul>
+                        <li><strong>Same D, same behavior:</strong> ✓ D is the only macroscopic parameter. Microscopic details don&rsquo;t matter as long as D is the same.</li>
+                        <li><strong>&tau; fixed:</strong> ✗ Both a and &tau; must go to zero, with their ratio a&sup2;/(2&tau;) = D held constant.</li>
+                        <li><strong>&tau; ∝ a&sup2;:</strong> ✓ From D = a&sup2;/(2&tau;), we get &tau; = a&sup2;/(2D). So &tau; scales as a&sup2;.</li>
+                        <li><strong>D depends on N:</strong> ✗ D = a&sup2;/(2&tau;) depends only on step size and step time, not the number of steps.</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- ============================================================ -->
+<!-- EXPLORER 3: Diffusion Constant Calculator -->
+<!-- ============================================================ -->
+<div class="interactive-container" id="diffusion-calculator">
+    <div class="interactive-title">Explorer: What Determines D?</div>
+
+    <p>
+        The diffusion constant D has units of length&sup2;/time and connects microscopic
+        to macroscopic. Choose a physical system and see how its microscopic parameters
+        determine D, which then predicts how fast things spread.
+    </p>
+
+    <div class="dual-panel">
+        <div class="panel">
+            <div class="plot-container" id="cl-spreadPlot" style="height: 400px;"></div>
+        </div>
+        <div class="panel">
+            <div class="plot-container" id="cl-dBarPlot" style="height: 400px;"></div>
+        </div>
+    </div>
+
+    <div id="cl-stats3" class="stats-bar"></div>
+
+    <div class="control-panel">
+        <div class="control-group">
+            <label class="control-label" for="cl-D-slider">Diffusion constant D:
+                <span id="cl-D-value">1.0</span>
+            </label>
+            <input type="range" class="slider" id="cl-D-slider"
+                   min="0.1" max="5" step="0.1" value="1">
+        </div>
+        <div class="control-group">
+            <button class="btn" onclick="clDiffReset()">Reset</button>
+        </div>
+    </div>
+</div>
+
+<!-- ========== Test Your Understanding #3 ========== -->
+<div class="interactive-container question-section">
+    <div class="interactive-title">Test Your Understanding</div>
+
+    <p style="margin-bottom: var(--spacing-md); color: var(--text-secondary);">
+        Use the Diffusion Constant explorer to answer these questions.
+    </p>
+
+    <div class="tabs">
+        <div class="tab-buttons">
+            <button class="tab-button active">Question 7</button>
+            <button class="tab-button">Question 8</button>
+            <button class="tab-button">Question 9</button>
+        </div>
+
+        <div class="tab-content active">
+            <div class="question-container" data-type="mcq" data-answer="1">
+                <div class="question-text">
+                    Double D from 1 to 2. How does the Gaussian width at time T = 1 change?
+                </div>
+                <div class="question-options">
+                    <label class="option">
+                        <input type="radio" name="cl-q7" value="0">
+                        <span>Doubles (σ &propto; D)</span>
+                    </label>
+                    <label class="option">
+                        <input type="radio" name="cl-q7" value="1">
+                        <span>Increases by &radic;2 (σ = &radic;(2DT) &propto; &radic;D)</span>
+                    </label>
+                    <label class="option">
+                        <input type="radio" name="cl-q7" value="2">
+                        <span>Stays the same</span>
+                    </label>
+                    <label class="option">
+                        <input type="radio" name="cl-q7" value="3">
+                        <span>Quadruples</span>
+                    </label>
+                </div>
+                <div class="question-actions">
+                    <button class="btn-verify">Verify</button>
+                </div>
+                <div class="question-explanation" style="display:none;">
+                    <strong>Explanation:</strong>
+                    \( \sigma = \sqrt{2DT} \). Doubling D gives \( \sigma' = \sqrt{2 \cdot 2D \cdot T} = \sqrt{2}\,\sigma \).
+                    The width increases by a factor of \( \sqrt{2} \approx 1.41 \), not 2.
+                </div>
+            </div>
+        </div>
+
+        <div class="tab-content">
+            <div class="question-container" data-type="fill" data-answer="diffusion">
+                <div class="question-text">
+                    The PDE \( \partial P/\partial t = D\,\partial^2 P/\partial x^2 \) is called the
+                    <select class="fill-blank-select">
+                        <option value=""></option>
+                        <option value="wave">wave equation</option>
+                        <option value="diffusion">diffusion equation</option>
+                        <option value="laplace">Laplace equation</option>
+                        <option value="schrodinger">Schr&ouml;dinger equation</option>
+                    </select>.
+                </div>
+                <div class="question-actions">
+                    <button class="btn-verify">Verify</button>
+                </div>
+                <div class="question-explanation" style="display:none;">
+                    <strong>Explanation:</strong>
+                    \( \partial P/\partial t = D\,\partial^2 P/\partial x^2 \) is the
+                    <strong>diffusion equation</strong> (also called the heat equation in
+                    thermodynamics). It describes how a probability distribution (or temperature,
+                    or concentration) spreads over time due to random motion.
+                </div>
+            </div>
+        </div>
+
+        <div class="tab-content">
+            <div class="question-container" data-type="mcq" data-answer="0">
+                <div class="question-text">
+                    What is the deepest insight of this section?
+                </div>
+                <div class="question-options">
+                    <label class="option">
+                        <input type="radio" name="cl-q9" value="0">
+                        <span>Microscopic random steps, individually unpredictable, collectively obey a smooth deterministic PDE</span>
+                    </label>
+                    <label class="option">
+                        <input type="radio" name="cl-q9" value="1">
+                        <span>Random walks are always Gaussian</span>
+                    </label>
+                    <label class="option">
+                        <input type="radio" name="cl-q9" value="2">
+                        <span>The diffusion equation can only be solved numerically</span>
+                    </label>
+                    <label class="option">
+                        <input type="radio" name="cl-q9" value="3">
+                        <span>Macroscopic behavior depends on all microscopic details</span>
+                    </label>
+                </div>
+                <div class="question-actions">
+                    <button class="btn-verify">Verify</button>
+                </div>
+                <div class="question-explanation" style="display:none;">
+                    <strong>Explanation:</strong>
+                    The miracle: <strong>randomness at the microscale produces law at the
+                    macroscale</strong>. Individual steps are unpredictable, but the ensemble
+                    obeys a clean PDE. This is the bridge between statistical mechanics and
+                    continuum physics &mdash; the reason thermodynamics works despite atoms
+                    being chaotic.
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- ============================================================ -->
+<!-- PYTHON CODE -->
+<!-- ============================================================ -->
+<h2>Python Code</h2>
+
+<div class="tabs">
+    <div class="tab-buttons">
+        <button class="tab-button active">Continuum Limit</button>
+        <button class="tab-button">Diffusion Solution</button>
+        <button class="tab-button">Prompt</button>
+    </div>
+
+    <div class="tab-content active">
+        <div class="code-block-container">
+            <div class="code-header">
+                <span class="code-lang">Python</span>
+                <button class="copy-btn">Copy</button>
+            </div>
+            <pre><code class="language-python">
+import numpy as np
+import plotly.graph_objects as go
+from math import comb
+
+D, T = 1.0, 1.0  # Diffusion constant and total time
+x_cont = np.linspace(-5, 5, 500)
+gauss = np.exp(-x_cont**2 / (4*D*T)) / np.sqrt(4*np.pi*D*T)
+
+fig = go.Figure()
+
+# Discrete walks at different refinements
+for level, color in zip([1, 2, 4, 16], ['#ff006e', '#ffbe0b', '#00ff88', '#00f3ff']):
+    a = 1.0 / level          # step size
+    tau = a**2 / (2*D)       # time step
+    N = int(T / tau)          # number of steps
+
+    # Binomial distribution
+    m_vals = np.arange(-N, N+1, 2)
+    n_R = (m_vals + N) // 2
+    probs = np.array([comb(N, int(nR)) * 0.5**N for nR in n_R])
+    x_vals = m_vals * a       # physical position
+
+    fig.add_trace(go.Bar(x=x_vals, y=probs / (2*a),  # density
+        marker_color=color, opacity=0.5, width=1.8*a,
+        name=f'a={a:.2f}, N={N}'))
+
+# Gaussian limit
+fig.add_trace(go.Scatter(x=x_cont, y=gauss, mode='lines',
+    line=dict(color='white', width=3, dash='dash'),
+    name='Gaussian limit'))
+
+fig.update_layout(template='plotly_dark',
+    xaxis=dict(title='Position x', range=[-5, 5],
+        zerolinecolor='#808080'),
+    yaxis=dict(title='P(x, T)', zerolinecolor='#808080'),
+    barmode='overlay', height=450, width=650)
+fig.show()
+            </code></pre>
+        </div>
+    </div>
+
+    <div class="tab-content">
+        <div class="code-block-container">
+            <div class="code-header">
+                <span class="code-lang">Python</span>
+                <button class="copy-btn">Copy</button>
+            </div>
+            <pre><code class="language-python">
+import numpy as np
+import plotly.graph_objects as go
+
+D = 1.0
+x = np.linspace(-6, 6, 500)
+
+fig = go.Figure()
+times = [0.1, 0.5, 1.0, 2.0, 5.0]
+colors = ['#ff006e', '#ffbe0b', '#00f3ff', '#00ff88', '#bb86fc']
+
+for t, color in zip(times, colors):
+    P = np.exp(-x**2 / (4*D*t)) / np.sqrt(4*np.pi*D*t)
+    fig.add_trace(go.Scatter(x=x, y=P, mode='lines',
+        line=dict(color=color, width=2),
+        name=f't = {t}'))
+
+fig.update_layout(template='plotly_dark',
+    xaxis=dict(title='x', range=[-6, 6], zerolinecolor='#808080'),
+    yaxis=dict(title='P(x, t)', range=[0, 1.5], zerolinecolor='#808080'),
+    height=450, width=600)
+fig.show()
+            </code></pre>
+        </div>
+    </div>
+
+    <div class="tab-content">
+        <div class="code-block-container">
+            <div class="code-header">
+                <span class="code-lang">Prompt for AI</span>
+                <button class="copy-btn">Copy</button>
+            </div>
+            <pre><code class="language-text">Create a Python script using Plotly to demonstrate the continuum
+limit of random walks.
+
+Requirements:
+- Part 1: Convergence to Gaussian
+  For D=1, T=1, show binomial distributions at refinement levels
+  a = 1, 0.5, 0.25, 0.0625 (with τ = a²/(2D))
+  Overlay as bar charts with decreasing opacity
+  Show Gaussian limit P(x,t) = exp(-x²/(4Dt))/√(4πDt) as dashed
+
+- Part 2: Diffusion equation solutions
+  Plot Gaussian P(x,t) for t = 0.1, 0.5, 1, 2, 5
+  Show peak decreasing as 1/√t, width growing as √t
+  All on same axes
+
+- Part 3: D dependence
+  Fix t=1, show Gaussians for D = 0.5, 1, 2, 5
+  Wider D → wider Gaussian (σ = √(2Dt))
+
+- Use dark theme (plotly_dark) with gray (#808080) axes</code></pre>
+        </div>
+    </div>
+</div>
+
+<!-- ============================================================ -->
+<!-- NAVIGATION -->
+<!-- ============================================================ -->
+<div class="btn-group mt-xl">
+    <button class="btn btn-magenta" onclick="navigateToSection('79-biased-walks')">&larr; Previous: Biased Walks &amp; Drift</button>
+    <button class="btn btn-secondary" onclick="scrollToTop()">&uarr; Back to Top</button>
+    <button class="btn btn-secondary" onclick="navigateToSection('81-diffusion-equation')">Next: The Diffusion Equation &rarr;</button>
+</div>

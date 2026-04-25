@@ -1,0 +1,446 @@
+<!-- ============================================================
+     Section 7.9: Stirling's Approximation & the Gaussian Limit
+     Source: NPTEL Lecture 10_1
+     Concept: Stirling's formula makes binomial → Gaussian rigorous;
+              ln(N!) ≈ N ln N − N + ½ ln(2πN)
+     Time: 20-25 minutes
+     Prerequisites: Sections 7.1-7.8 (walks, binomial, continuum,
+                    diffusion, simulations)
+     ============================================================ -->
+
+<h1>Stirling's Approximation &amp; the Gaussian Limit</h1>
+
+<p>
+    In Chapter 7 we <em>asserted</em> that the binomial distribution becomes a
+    Gaussian for large \( N \). Now we <strong>prove</strong> it. The key
+    ingredient is <strong>Stirling's approximation</strong> — a formula for
+    \( N! \) that turns the unwieldy factorials in the binomial coefficient
+    into a smooth, tractable expression. Apply it, expand around the peak, and
+    the Gaussian emerges naturally.
+</p>
+
+<div class="info-box">
+    <div class="info-box-title">Learning Objectives</div>
+    <ul>
+        <li>State Stirling's approximation: \( \ln N! \approx N\ln N - N + \tfrac{1}{2}\ln(2\pi N) \)</li>
+        <li>Understand <em>why</em> it works: the sum \( \sum \ln k \) is well approximated by the integral \( \int \ln x\,dx \)</li>
+        <li>Apply Stirling to the binomial coefficient to derive the Gaussian limit</li>
+        <li>Quantify how the approximation error shrinks with \( N \)</li>
+    </ul>
+</div>
+
+<div class="equation-display">
+    <p><strong>Stirling's Approximation:</strong></p>
+    $$ \ln N! \approx N\ln N - N + \tfrac{1}{2}\ln(2\pi N) $$
+    <p>
+        Equivalently: \( N! \approx \sqrt{2\pi N}\,(N/e)^N \). The relative
+        error is \( \sim 1/(12N) \) — already less than 1% for \( N = 10 \).
+    </p>
+</div>
+
+<hr>
+
+<!-- ============================================================ -->
+<!-- EXPLORER 1: Stirling Checker -->
+<!-- ============================================================ -->
+<div class="interactive-container" id="stirling-checker">
+    <div class="interactive-title">Explorer: How Good is Stirling?</div>
+
+    <p>
+        Compare the exact \( \ln N! = \sum_{k=1}^{N} \ln k \) (a sum) with
+        Stirling's approximation (a smooth formula). The left panel shows
+        both curves; the right panel shows the relative error. Even at
+        modest \( N \), the approximation is remarkably accurate.
+    </p>
+
+    <div class="dual-panel">
+        <div class="panel"><div class="plot-container" id="sg-factPlot" style="height: 400px;"></div></div>
+        <div class="panel"><div class="plot-container" id="sg-errPlot" style="height: 400px;"></div></div>
+    </div>
+    <div id="sg-stats1" class="stats-bar"></div>
+
+    <div class="control-panel">
+        <div class="control-group">
+            <label class="control-label" for="sg-nmax-slider">N max:
+                <span id="sg-nmax-value">50</span>
+            </label>
+            <input type="range" class="slider" id="sg-nmax-slider"
+                   min="5" max="200" step="5" value="50">
+        </div>
+        <div class="control-group">
+            <button class="btn" onclick="sgFactReset()">Reset</button>
+        </div>
+    </div>
+</div>
+
+<div class="info-box">
+    <div class="info-box-title">Why Does Stirling Work?</div>
+    <p>
+        \( \ln N! = \ln 1 + \ln 2 + \cdots + \ln N = \sum_{k=1}^{N} \ln k \).
+        This sum is the area of \( N \) rectangles of width 1. The integral
+        \( \int_1^N \ln x\,dx = N\ln N - N + 1 \) is the smooth area under the
+        same curve. The difference — the <strong>Euler–Maclaurin correction</strong>
+        — gives the \( \tfrac{1}{2}\ln(2\pi N) \) term. Bigger \( N \) means
+        more rectangles, so the rectangle-sum hugs the integral more tightly.
+    </p>
+</div>
+
+<!-- ========== Test Your Understanding #1 ========== -->
+<div class="interactive-container question-section">
+    <div class="interactive-title">Test Your Understanding</div>
+    <p style="margin-bottom: var(--spacing-md); color: var(--text-secondary);">Use the Stirling Checker explorer.</p>
+    <div class="tabs">
+        <div class="tab-buttons">
+            <button class="tab-button active">Question 1</button>
+            <button class="tab-button">Question 2</button>
+            <button class="tab-button">Question 3</button>
+        </div>
+        <div class="tab-content active">
+            <div class="question-container" data-type="fill" data-answer="0.8[0.5,1.2]">
+                <div class="question-text">From the error plot, the relative error at \( N = 10 \) is approximately <input type="text" class="fill-blank" style="width: 60px">% (read the right panel).</div>
+                <div class="question-actions"><button class="btn-verify">Verify</button></div>
+                <div class="question-explanation" style="display:none;"><strong>Explanation:</strong> The leading correction to Stirling is \( 1/(12N) \). At \( N = 10 \): \( 1/120 \approx 0.83\% \). By \( N = 50 \) the error is only \( \sim 0.17\% \). Stirling converges fast.</div>
+            </div>
+        </div>
+        <div class="tab-content">
+            <div class="question-container" data-type="mcq" data-answer="0">
+                <div class="question-text">Stirling's approximation works because&hellip;</div>
+                <div class="question-options">
+                    <label class="option"><input type="radio" name="sg-q2" value="0"><span>\( \sum \ln k \) is well approximated by \( \int \ln x\,dx \) for large \( N \)</span></label>
+                    <label class="option"><input type="radio" name="sg-q2" value="1"><span>Factorials grow slowly</span></label>
+                    <label class="option"><input type="radio" name="sg-q2" value="2"><span>It is an exact identity</span></label>
+                    <label class="option"><input type="radio" name="sg-q2" value="3"><span>It only works for prime numbers</span></label>
+                </div>
+                <div class="question-actions"><button class="btn-verify">Verify</button></div>
+                <div class="question-explanation" style="display:none;"><strong>Explanation:</strong> \( \ln N! = \sum_{k=1}^N \ln k \) is a Riemann-sum approximation to \( \int_1^N \ln x\,dx \). As \( N \to \infty \), the sum and integral converge. Stirling is <em>not</em> exact — it is an asymptotic approximation that gets better with increasing \( N \).</div>
+            </div>
+        </div>
+        <div class="tab-content">
+            <div class="question-container" data-type="mcq" data-answer="2">
+                <div class="question-text">The relative error of Stirling scales as&hellip;</div>
+                <div class="question-options">
+                    <label class="option"><input type="radio" name="sg-q3" value="0"><span>Constant — it never improves</span></label>
+                    <label class="option"><input type="radio" name="sg-q3" value="1"><span>\( 1/\sqrt{N} \) — slow improvement</span></label>
+                    <label class="option"><input type="radio" name="sg-q3" value="2"><span>\( 1/N \) — each doubling of \( N \) halves the error</span></label>
+                    <label class="option"><input type="radio" name="sg-q3" value="3"><span>\( 1/N^2 \) — extremely fast</span></label>
+                </div>
+                <div class="question-actions"><button class="btn-verify">Verify</button></div>
+                <div class="question-explanation" style="display:none;"><strong>Explanation:</strong> The leading correction is \( 1/(12N) \), so the relative error is \( O(1/N) \). Doubling \( N \) halves the error. Try reading the error at \( N = 20 \) vs \( N = 40 \) in the explorer — you should see roughly a factor of 2.</div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- ============================================================ -->
+<!-- EXPLORER 2: Binomial → Gaussian Morpher -->
+<!-- ============================================================ -->
+<div class="interactive-container" id="binomial-gaussian-morpher">
+    <div class="interactive-title">Explorer: Binomial → Gaussian as N Grows</div>
+
+    <p>
+        Here is the payoff: apply Stirling to the binomial \( P(m) = \binom{N}{(m+N)/2}\,2^{-N} \),
+        expand \( \ln P \) around the peak at \( m = 0 \), keep terms to second order, and out
+        pops the Gaussian \( (2\pi N)^{-1/2}\exp(-m^2/(2N)) \). Watch it happen: as \( N \)
+        increases, the exact binomial dots converge onto the smooth Gaussian curve.
+    </p>
+
+    <div class="plot-container" id="sg-morphPlot" style="height: 440px;"></div>
+    <div id="sg-stats2" class="stats-bar"></div>
+
+    <div class="control-panel">
+        <div class="control-group">
+            <label class="control-label" for="sg-morph-n-slider">Steps N:
+                <span id="sg-morph-n-value">10</span>
+            </label>
+            <input type="range" class="slider" id="sg-morph-n-slider"
+                   min="4" max="200" step="2" value="10">
+        </div>
+        <div class="control-group">
+            <button class="btn" onclick="sgMorphReset()">Reset</button>
+        </div>
+    </div>
+</div>
+
+<div class="equation-display">
+    <p><strong>The Derivation in One Line:</strong></p>
+    $$ \ln P(m) = \ln\!\binom{N}{\frac{m+N}{2}} - N\ln 2 \;\;\xrightarrow{\text{Stirling}}\;\; -\tfrac{1}{2}\ln(2\pi N) - \frac{m^2}{2N} + O(m^4/N^3) $$
+    <p>
+        Exponentiating: \( P(m) \approx (2\pi N)^{-1/2}\exp(-m^2/(2N)) \). This
+        is the <strong>Gaussian with variance \( N \)</strong> — exactly what we
+        assumed in earlier sections.
+    </p>
+</div>
+
+<!-- ========== Test Your Understanding #2 ========== -->
+<div class="interactive-container question-section">
+    <div class="interactive-title">Test Your Understanding</div>
+    <p style="margin-bottom: var(--spacing-md); color: var(--text-secondary);">Use the Binomial → Gaussian explorer.</p>
+    <div class="tabs">
+        <div class="tab-buttons">
+            <button class="tab-button active">Question 4</button>
+            <button class="tab-button">Question 5</button>
+            <button class="tab-button">Question 6</button>
+        </div>
+        <div class="tab-content active">
+            <div class="question-container" data-type="mcq" data-answer="1">
+                <div class="question-text">At \( N = 4 \), the binomial and Gaussian look quite different. At \( N = 100 \), they&hellip;</div>
+                <div class="question-options">
+                    <label class="option"><input type="radio" name="sg-q4" value="0"><span>Still look very different</span></label>
+                    <label class="option"><input type="radio" name="sg-q4" value="1"><span>Are nearly indistinguishable — the Gaussian is an excellent approximation</span></label>
+                    <label class="option"><input type="radio" name="sg-q4" value="2"><span>The Gaussian is narrower than the binomial</span></label>
+                    <label class="option"><input type="radio" name="sg-q4" value="3"><span>Only agree at the peak, not the tails</span></label>
+                </div>
+                <div class="question-actions"><button class="btn-verify">Verify</button></div>
+                <div class="question-explanation" style="display:none;"><strong>Explanation:</strong> By \( N = 100 \) the binomial dots fall precisely on the Gaussian curve. The Stirling expansion is accurate to \( O(m^4/N^3) \), so the tails (where \( |m| \sim \sqrt{N} \)) are also well captured. The central limit theorem guarantees this convergence.</div>
+            </div>
+        </div>
+        <div class="tab-content">
+            <div class="question-container" data-type="fill" data-answer="0.04[0.035,0.045]">
+                <div class="question-text">At \( N = 100 \), the peak of the Gaussian is \( (2\pi \times 100)^{-1/2} \approx \) <input type="text" class="fill-blank" style="width: 60px">. Verify this matches the binomial peak in the explorer.</div>
+                <div class="question-actions"><button class="btn-verify">Verify</button></div>
+                <div class="question-explanation" style="display:none;"><strong>Explanation:</strong> \( (2\pi \times 100)^{-1/2} = (200\pi)^{-1/2} = 1/\sqrt{628.3} \approx 0.0399 \). The exact binomial peak \( P(0) = \binom{100}{50}/2^{100} \approx 0.0796 \) — but remember \( P(m) \) is defined on even integers spaced by 2, so as a <em>density</em> (dividing by bin width 2) it is \( \approx 0.0398 \), matching the Gaussian.</div>
+            </div>
+        </div>
+        <div class="tab-content">
+            <div class="question-container" data-type="msq" data-answer="0,2,3">
+                <div class="question-text">Which are consequences of the binomial → Gaussian limit? (Select all)</div>
+                <div class="question-options">
+                    <label class="option"><input type="checkbox" value="0"><span>The diffusion equation's Gaussian solution is justified from first principles</span></label>
+                    <label class="option"><input type="checkbox" value="1"><span>Random walks produce uniform distributions for large \( N \)</span></label>
+                    <label class="option"><input type="checkbox" value="2"><span>The central limit theorem: sums of many random variables → Gaussian</span></label>
+                    <label class="option"><input type="checkbox" value="3"><span>The width \( \sigma = \sqrt{N} \) is exact, not an approximation</span></label>
+                </div>
+                <div class="question-actions"><button class="btn-verify">Verify</button></div>
+                <div class="question-explanation" style="display:none;"><strong>Explanation:</strong><ul><li><strong>Diffusion justified:</strong> ✓ We started with discrete walks, derived the continuum Gaussian — this closes the logical loop.</li><li><strong>Uniform:</strong> ✗ The CLT gives a Gaussian, not a uniform distribution.</li><li><strong>CLT:</strong> ✓ Each step is an independent random variable; their sum converges to a Gaussian. This is one of the most important results in all of probability.</li><li><strong>σ = √N exact:</strong> ✓ The variance \( \langle m^2 \rangle = N \) is exact for ±1 steps with p = 1/2, regardless of N. Only the <em>shape</em> is approximate for small N.</li></ul></div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- ============================================================ -->
+<!-- EXPLORER 3: Tail Accuracy / KL Divergence -->
+<!-- ============================================================ -->
+<div class="interactive-container" id="approximation-quality">
+    <div class="interactive-title">Explorer: Approximation Quality vs N</div>
+
+    <p>
+        How fast does the binomial approach the Gaussian? We measure the maximum
+        absolute difference \( \max_m |P_{\text{binom}}(m) - P_{\text{Gauss}}(m)| \)
+        and watch it shrink with \( N \). The left panel shows the two distributions
+        at the current \( N \); the right shows how the max error falls with \( N \)
+        on log-log axes.
+    </p>
+
+    <div class="dual-panel">
+        <div class="panel"><div class="plot-container" id="sg-qualPlot" style="height: 400px;"></div></div>
+        <div class="panel"><div class="plot-container" id="sg-scalePlot" style="height: 400px;"></div></div>
+    </div>
+    <div id="sg-stats3" class="stats-bar"></div>
+
+    <div class="control-panel">
+        <div class="control-group">
+            <label class="control-label" for="sg-qual-n-slider">N:
+                <span id="sg-qual-n-value">20</span>
+            </label>
+            <input type="range" class="slider" id="sg-qual-n-slider"
+                   min="4" max="200" step="2" value="20">
+        </div>
+        <div class="control-group">
+            <button class="btn" onclick="sgQualReset()">Reset</button>
+        </div>
+    </div>
+</div>
+
+<!-- ========== Test Your Understanding #3 ========== -->
+<div class="interactive-container question-section">
+    <div class="interactive-title">Test Your Understanding</div>
+    <p style="margin-bottom: var(--spacing-md); color: var(--text-secondary);">Use the Approximation Quality explorer.</p>
+    <div class="tabs">
+        <div class="tab-buttons">
+            <button class="tab-button active">Question 7</button>
+            <button class="tab-button">Question 8</button>
+            <button class="tab-button">Question 9</button>
+        </div>
+        <div class="tab-content active">
+            <div class="question-container" data-type="mcq" data-answer="1">
+                <div class="question-text">On the log-log error plot, the max error falls approximately as&hellip;</div>
+                <div class="question-options">
+                    <label class="option"><input type="radio" name="sg-q7" value="0"><span>\( 1/\sqrt{N} \)</span></label>
+                    <label class="option"><input type="radio" name="sg-q7" value="1"><span>\( 1/N \) — the Stirling correction rate</span></label>
+                    <label class="option"><input type="radio" name="sg-q7" value="2"><span>\( 1/N^2 \)</span></label>
+                    <label class="option"><input type="radio" name="sg-q7" value="3"><span>Constant — it does not improve</span></label>
+                </div>
+                <div class="question-actions"><button class="btn-verify">Verify</button></div>
+                <div class="question-explanation" style="display:none;"><strong>Explanation:</strong> The Gaussian approximation to the binomial has corrections of order \( 1/N \). The log-log slope is about \( -1 \). Doubling \( N \) halves the error — same rate as Stirling itself, because that is where the error originates.</div>
+            </div>
+        </div>
+        <div class="tab-content">
+            <div class="question-container" data-type="mcq" data-answer="2">
+                <div class="question-text">Where is the Gaussian approximation <em>worst</em>?</div>
+                <div class="question-options">
+                    <label class="option"><input type="radio" name="sg-q8" value="0"><span>At the peak \( m = 0 \) — the peak height is wrong</span></label>
+                    <label class="option"><input type="radio" name="sg-q8" value="1"><span>Everywhere equally</span></label>
+                    <label class="option"><input type="radio" name="sg-q8" value="2"><span>In the far tails — the Gaussian overestimates the probability there</span></label>
+                    <label class="option"><input type="radio" name="sg-q8" value="3"><span>At \( m = \pm 1 \)</span></label>
+                </div>
+                <div class="question-actions"><button class="btn-verify">Verify</button></div>
+                <div class="question-explanation" style="display:none;"><strong>Explanation:</strong> The Stirling expansion keeps terms to \( m^2/N \). The dropped \( m^4/N^3 \) terms matter when \( |m| \gg \sqrt{N} \) — the far tails. The Gaussian predicts non-zero probability at \( |m| > N \), which the binomial forbids. For most applications this difference is negligible, but rare-event estimates need care.</div>
+            </div>
+        </div>
+        <div class="tab-content">
+            <div class="question-container" data-type="mcq" data-answer="3">
+                <div class="question-text">What minimum \( N \) gives a max error below 1% of the peak?</div>
+                <div class="question-options">
+                    <label class="option"><input type="radio" name="sg-q9" value="0"><span>N = 4 — Stirling is always good enough</span></label>
+                    <label class="option"><input type="radio" name="sg-q9" value="1"><span>N = 10</span></label>
+                    <label class="option"><input type="radio" name="sg-q9" value="2"><span>N = 1000</span></label>
+                    <label class="option"><input type="radio" name="sg-q9" value="3"><span>Around N = 20–30 — use the slider to check</span></label>
+                </div>
+                <div class="question-actions"><button class="btn-verify">Verify</button></div>
+                <div class="question-explanation" style="display:none;"><strong>Explanation:</strong> Use the explorer: slide \( N \) up from 4 and watch the max error. It drops below 1% of the peak around \( N \approx 20\text{–}30 \). This is the practical rule of thumb: the Gaussian approximation is reliable for \( N \gtrsim 30 \), consistent with the usual "large \( N \)" threshold in statistics.</div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- ============================================================ -->
+<!-- KEY INSIGHT -->
+<!-- ============================================================ -->
+<div class="info-box">
+    <div class="info-box-title">The Big Picture</div>
+    <p>
+        We have now closed the loop that spans the entire chapter:
+        <strong>discrete random walk → binomial distribution → (Stirling) →
+        Gaussian → diffusion equation</strong>. Every step is rigorous: the
+        random walk gives an exact binomial, Stirling turns it into a Gaussian,
+        and taking the continuum limit yields the diffusion PDE. The Gaussian
+        is not an assumption — it is a <em>theorem</em>.
+    </p>
+</div>
+
+<!-- ============================================================ -->
+<!-- PYTHON CODE -->
+<!-- ============================================================ -->
+<h2>Python Code</h2>
+<div class="tabs">
+    <div class="tab-buttons">
+        <button class="tab-button active">Stirling Check</button>
+        <button class="tab-button">Binomial vs Gaussian</button>
+        <button class="tab-button">Convergence</button>
+        <button class="tab-button">Prompt</button>
+    </div>
+    <div class="tab-content active">
+        <div class="code-block-container"><div class="code-header"><span class="code-lang">Python</span><button class="copy-btn">Copy</button></div>
+            <pre><code class="language-python">
+import numpy as np
+import plotly.graph_objects as go
+from scipy.special import gammaln
+
+N = np.arange(1, 201)
+exact = gammaln(N + 1)  # ln(N!) via log-gamma
+stirling = N*np.log(N) - N + 0.5*np.log(2*np.pi*N)
+stirling[0] = 0  # fix N=1
+
+rel_err = np.abs(exact - stirling) / np.maximum(exact, 1e-15) * 100
+
+fig = go.Figure()
+fig.add_trace(go.Scatter(x=N, y=exact, mode='lines',
+    line=dict(color='#00f3ff', width=2), name='exact ln(N!)'))
+fig.add_trace(go.Scatter(x=N, y=stirling, mode='lines',
+    line=dict(color='#ff006e', width=2, dash='dash'), name='Stirling'))
+fig.update_layout(template='plotly_dark',
+    xaxis=dict(title='N', zerolinecolor='#808080'),
+    yaxis=dict(title='ln(N!)', zerolinecolor='#808080'),
+    height=400)
+fig.show()
+
+print(f"Relative error at N=10: {rel_err[9]:.3f}%")
+print(f"Relative error at N=50: {rel_err[49]:.4f}%")
+            </code></pre>
+        </div>
+    </div>
+    <div class="tab-content">
+        <div class="code-block-container"><div class="code-header"><span class="code-lang">Python</span><button class="copy-btn">Copy</button></div>
+            <pre><code class="language-python">
+import numpy as np
+import plotly.graph_objects as go
+from scipy.special import comb
+
+for N in [10, 50, 200]:
+    m = np.arange(-N, N+1, 2)
+    k = (m + N) // 2
+    binom = np.array([comb(N, ki, exact=True) * 2**(-N) / 2 for ki in k])
+    gauss = np.exp(-m**2 / (2*N)) / np.sqrt(2*np.pi*N)
+
+    fig = go.Figure()
+    fig.add_trace(go.Scatter(x=m, y=binom, mode='markers',
+        marker=dict(color='#ffbe0b', size=5), name='binomial'))
+    fig.add_trace(go.Scatter(x=m, y=gauss, mode='lines',
+        line=dict(color='#ff006e', width=2), name='Gaussian'))
+    fig.update_layout(template='plotly_dark',
+        title=dict(text=f'N = {N}', font=dict(color='#aaa')),
+        xaxis=dict(title='m', zerolinecolor='#808080'),
+        yaxis=dict(title='P(m)', zerolinecolor='#808080'),
+        height=350)
+    fig.show()
+            </code></pre>
+        </div>
+    </div>
+    <div class="tab-content">
+        <div class="code-block-container"><div class="code-header"><span class="code-lang">Python</span><button class="copy-btn">Copy</button></div>
+            <pre><code class="language-python">
+import numpy as np
+import plotly.graph_objects as go
+from scipy.special import comb
+
+Ns = np.arange(4, 202, 2)
+max_errs = []
+for N in Ns:
+    m = np.arange(-N, N+1, 2)
+    k = (m + N) // 2
+    binom = np.array([comb(N, ki, exact=True) * 2**(-N) / 2 for ki in k])
+    gauss = np.exp(-m**2 / (2*N)) / np.sqrt(2*np.pi*N)
+    max_errs.append(np.max(np.abs(binom - gauss)))
+
+fig = go.Figure()
+fig.add_trace(go.Scatter(x=Ns, y=max_errs, mode='markers+lines',
+    marker=dict(color='#00f3ff', size=6), name='max |error|'))
+fig.add_trace(go.Scatter(x=Ns, y=max_errs[0]*(Ns[0]/Ns),
+    mode='lines', line=dict(color='#ff006e', dash='dash'),
+    name='1/N reference'))
+fig.update_layout(template='plotly_dark',
+    xaxis=dict(title='N', type='log', zerolinecolor='#808080'),
+    yaxis=dict(title='max |P_binom − P_Gauss|', type='log',
+               zerolinecolor='#808080'),
+    height=400)
+fig.show()
+            </code></pre>
+        </div>
+    </div>
+    <div class="tab-content">
+        <div class="code-block-container"><div class="code-header"><span class="code-lang">Prompt for AI</span><button class="copy-btn">Copy</button></div>
+            <pre><code class="language-text">Create a Python script using numpy, scipy, and Plotly to explore Stirling's
+approximation and the binomial-to-Gaussian transition.
+
+Requirements:
+- Part 1: Stirling accuracy. Plot exact ln(N!) (use scipy gammaln) and
+  Stirling's approximation N*ln(N) - N + 0.5*ln(2πN) for N = 1..200.
+  Second panel: relative error (%), show it scales as 1/(12N).
+- Part 2: Binomial → Gaussian. For N = 10, 50, 200, plot exact binomial
+  P(m) = C(N,(m+N)/2) / 2^N / 2 as dots, overlay Gaussian
+  exp(-m²/(2N)) / √(2πN) as line. Show convergence.
+- Part 3: Max error vs N on log-log axes. Compute max |P_binom - P_Gauss|
+  for N = 4, 6, ..., 200. Overlay 1/N reference line (slope −1).
+- Use dark theme, gray axes (#808080), neon colors.</code></pre>
+        </div>
+    </div>
+</div>
+
+<!-- ============================================================ -->
+<!-- NAVIGATION -->
+<!-- ============================================================ -->
+<div class="btn-group mt-xl">
+    <button class="btn btn-magenta" onclick="navigateToSection('83-walk-simulations')">&larr; Previous: Numerical Walk Simulations</button>
+    <button class="btn btn-secondary" onclick="scrollToTop()">&uarr; Back to Top</button>
+    <button class="btn btn-secondary" onclick="navigateToSection('85-diffusion-applications')">Next: Diffusion in the Real World &rarr;</button>
+</div>

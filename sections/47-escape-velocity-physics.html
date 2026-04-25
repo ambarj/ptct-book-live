@@ -1,0 +1,753 @@
+<!-- ============================================================
+     Section 4.14: Escape Velocity — The Physics
+     Source: NPTEL Lecture 6 (Escaping the Earth)
+     Concept: Inverse-square gravity, energy conservation,
+              escape velocity derivation, trajectory classification
+     Time: 15-20 minutes
+     Prerequisites: Newton's gravitation, energy conservation (physics)
+     ============================================================ -->
+
+<h1>Escape Velocity: The Physics</h1>
+
+<p>
+    Near the ground, we treat gravity as constant: \( F = -mg \). But what if you launch a
+    projectile <em>really</em> high — hundreds or thousands of kilometers? Gravity weakens as
+    you move away from Earth. The constant-\( g \) model breaks down, and we need Newton's
+    law of gravitation.
+</p>
+
+<div class="info-box">
+    <div class="info-box-title">Learning Objectives</div>
+    <ul>
+        <li>See why constant \( g \) fails for high-altitude projectiles and derive the inverse-square ODE</li>
+        <li>Use energy conservation to find the escape velocity \( v_0 = \sqrt{2gR} \approx 11.2 \) km/s</li>
+        <li>Classify trajectories: bound (returns), critical (barely escapes), and unbound (escapes with speed to spare)</li>
+        <li>Understand why we need numerical methods: energy gives \( v(x) \) but not \( x(t) \)</li>
+    </ul>
+</div>
+
+<div class="equation-display">
+    <p><strong>Newton's Law of Gravitation:</strong></p>
+    $$ m\ddot{x} = -\frac{GMm}{x^2} $$
+    <p>where \( x \) is the distance from Earth's center, \( M \) is Earth's mass,
+    and \( G \) is the gravitational constant.</p>
+</div>
+
+<p>
+    Since \( g = GM/R^2 \) at Earth's surface (radius \( R \)), we can eliminate \( G \) and \( M \):
+</p>
+
+<div class="equation-display">
+    <p><strong>The equation of motion:</strong></p>
+    $$ \ddot{x} = -\frac{gR^2}{x^2} $$
+    <p>This is the ODE we'll eventually solve numerically (in Section 4.16). But first, let's
+    extract as much physics as we can analytically.</p>
+</div>
+
+<!-- ============================================================ -->
+<!-- EXPLORER 1: Gravity Field Explorer -->
+<!-- ============================================================ -->
+<div class="interactive-container" id="gravity-field">
+    <div class="interactive-title">Explorer: How Gravity Weakens</div>
+
+    <p>
+        Compare constant gravity (\( g = 9.8 \) m/s²) with the true inverse-square law.
+        Drag the altitude slider to see how dramatically gravity weakens with distance.
+    </p>
+
+    <div class="control-panel">
+        <div class="control-group">
+            <label class="control-label" for="esc-alt-slider">Altitude (Earth radii):</label>
+            <input type="range" class="slider" id="esc-alt-slider"
+                   min="0" max="10" step="0.1" value="0">
+            <span id="esc-alt-value">0</span>
+        </div>
+        <button class="btn btn-sm" onclick="escGravReset()">Reset</button>
+    </div>
+
+    <div class="stats-bar">
+        <div class="stat-item">
+            <span class="stat-label">Distance from center</span>
+            <span class="stat-value" id="esc-dist">1.00 R</span>
+        </div>
+        <div class="stat-item">
+            <span class="stat-label">True g</span>
+            <span class="stat-value" id="esc-trueG">9.80 m/s²</span>
+        </div>
+        <div class="stat-item">
+            <span class="stat-label">Fraction of surface g</span>
+            <span class="stat-value" id="esc-frac">100%</span>
+        </div>
+    </div>
+
+    <div class="dual-panel">
+        <div class="plot-container" id="esc-gravPlot"></div>
+        <div class="plot-container" id="esc-potPlot"></div>
+    </div>
+
+    <div class="info-box">
+        <div class="info-box-title">What to Try</div>
+        <ul>
+            <li>At 1 R altitude (x = 2R from center): gravity is only 25% of surface value.</li>
+            <li>At 5 R altitude: gravity is just 2.8% — nearly weightless, yet still bound.</li>
+            <li>Left plot: the red dot shows your position on the gravity curve. The dashed line is constant \( g \).</li>
+            <li>Right plot: the gravitational potential well. You need to "climb out" of this well to escape.</li>
+        </ul>
+    </div>
+</div>
+
+<!-- Questions Group 1 -->
+<div class="interactive-container question-section">
+    <div class="interactive-title">Test Your Understanding</div>
+
+    <p style="margin-bottom: var(--spacing-md); color: var(--text-secondary);">
+        Use the Gravity Field explorer to answer these questions.
+    </p>
+
+    <div class="tabs">
+        <div class="tab-buttons">
+            <button class="tab-button active">Question 1</button>
+            <button class="tab-button">Question 2</button>
+            <button class="tab-button">Question 3</button>
+        </div>
+
+        <div class="tab-content active">
+            <div class="question-container" data-type="fill" data-answer="25[22,28]">
+                <div class="question-text">
+                    At an altitude of 1 Earth radius (x = 2R from center), the gravitational
+                    acceleration is approximately what percentage of the surface value?
+                    <input type="text" class="fill-blank" placeholder="?"> %
+                </div>
+                <div class="question-actions">
+                    <button class="btn-verify">Verify</button>
+                </div>
+                <div class="question-explanation" style="display:none;">
+                    <strong>Explanation:</strong>
+                    At distance \( x = 2R \): \( g(x) = g_0 R^2/x^2 = g_0/4 = 25\% \).
+                    Even at just one Earth radius above the surface (~6,370 km), gravity has dropped
+                    to a quarter of its surface value. This is why constant \( g \) fails for
+                    high-altitude problems.
+                </div>
+            </div>
+        </div>
+
+        <div class="tab-content">
+            <div class="question-container" data-type="mcq" data-answer="1">
+                <div class="question-text">
+                    The gravitational potential energy (per unit mass) at distance \( x \) from Earth's center is:
+                </div>
+                <div class="question-options">
+                    <label class="option">
+                        <input type="radio" name="esc-q2" value="0">
+                        <span>\( U = -mgx \) (constant gravity)</span>
+                    </label>
+                    <label class="option">
+                        <input type="radio" name="esc-q2" value="1">
+                        <span>\( U = -gR^2/x \) (inverse-square)</span>
+                    </label>
+                    <label class="option">
+                        <input type="radio" name="esc-q2" value="2">
+                        <span>\( U = gR^2/x^2 \) (inverse-cube)</span>
+                    </label>
+                </div>
+                <div class="question-actions">
+                    <button class="btn-verify">Verify</button>
+                </div>
+                <div class="question-explanation" style="display:none;">
+                    <strong>Explanation:</strong>
+                    The force is \( F = -gR^2/x^2 \). Integrating:
+                    \( U = -\int F\,dx = -gR^2/x \) (choosing \( U \to 0 \) as \( x \to \infty \)).
+                    The potential is a well that approaches zero from below — you need to add energy
+                    to climb out of it.
+                </div>
+            </div>
+        </div>
+
+        <div class="tab-content">
+            <div class="question-container" data-type="mcq" data-answer="2">
+                <div class="question-text">
+                    Why does the constant-gravity model give the wrong answer for escape velocity?
+                </div>
+                <div class="question-options">
+                    <label class="option">
+                        <input type="radio" name="esc-q3" value="0">
+                        <span>It predicts a projectile can reach infinite height with any speed</span>
+                    </label>
+                    <label class="option">
+                        <input type="radio" name="esc-q3" value="1">
+                        <span>It predicts gravity gets stronger at high altitudes</span>
+                    </label>
+                    <label class="option">
+                        <input type="radio" name="esc-q3" value="2">
+                        <span>It requires infinite energy to reach infinite height (no escape possible)</span>
+                    </label>
+                </div>
+                <div class="question-actions">
+                    <button class="btn-verify">Verify</button>
+                </div>
+                <div class="question-explanation" style="display:none;">
+                    <strong>Explanation:</strong>
+                    With constant \( g \), the potential is \( U = mgh \) — it grows linearly without bound.
+                    To reach infinity would require infinite kinetic energy, so no finite launch speed
+                    would suffice. But with inverse-square gravity, the potential \( U = -gR^2/x \)
+                    asymptotes to zero. The well has a <em>finite</em> depth, so a finite speed can
+                    climb out. That's why escape is possible.
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- ============================================================ -->
+<!-- THE ENERGY APPROACH -->
+<!-- ============================================================ -->
+<h2>The Energy Approach</h2>
+
+<p>
+    Here's a beautiful trick from classical mechanics. Define \( v = dx/dt \). By the chain rule:
+</p>
+
+<div class="equation-display">
+    $$ \ddot{x} = \frac{dv}{dt} = \frac{dv}{dx}\cdot\frac{dx}{dt} = v\frac{dv}{dx} $$
+    <p>Our ODE becomes \( v\,dv/dx = -gR^2/x^2 \), which is <strong>separable</strong>.</p>
+</div>
+
+<p>
+    Integrating both sides:
+</p>
+
+<div class="equation-display">
+    $$ \frac{1}{2}v^2 = \frac{gR^2}{x} + C $$
+    <p>This is <strong>energy conservation</strong>: \( \tfrac{1}{2}v^2 \) is kinetic energy per unit mass,
+    and \( -gR^2/x \) is gravitational potential energy per unit mass.</p>
+</div>
+
+<p>
+    Launching from the surface (\( x = R \)) with speed \( v_0 \) gives \( C = \tfrac{1}{2}v_0^2 - gR \), so:
+</p>
+
+<div class="equation-display">
+    <p><strong>Velocity as a function of position:</strong></p>
+    $$ v^2 = v_0^2 - 2gR\left(1 - \frac{R}{x}\right) $$
+    <p>The projectile turns around when \( v^2 = 0 \). To <em>never</em> turn around
+    (escape to infinity), we need \( v^2 \geq 0 \) as \( x \to \infty \):</p>
+    $$ v_0^2 \geq 2gR \qquad \Longrightarrow \qquad v_{\text{escape}} = \sqrt{2gR} $$
+</div>
+
+<div class="info-box">
+    <div class="info-box-title">The Number</div>
+    <p>
+        For Earth: \( g = 9.8 \) m/s², \( R = 6.37 \times 10^6 \) m.
+        \( v_{\text{escape}} = \sqrt{2 \times 9.8 \times 6.37 \times 10^6} \approx 11{,}180 \) m/s
+        \( \approx \mathbf{11.2} \) <strong>km/s</strong> — about 33 times the speed of sound.
+    </p>
+</div>
+
+<!-- ============================================================ -->
+<!-- EXPLORER 2: Trajectory Classifier -->
+<!-- ============================================================ -->
+<div class="interactive-container" id="trajectory-classifier">
+    <div class="interactive-title">Explorer: Trajectory Classifier</div>
+
+    <p>
+        Adjust the launch speed \( v_0 \) and see the three types of trajectory: bound (returns),
+        critical (barely escapes), and unbound (escapes with speed to spare).
+    </p>
+
+    <div class="control-panel">
+        <div class="control-group">
+            <label class="control-label" for="esc-v0-slider">Launch speed v₀ (km/s):</label>
+            <input type="range" class="slider" id="esc-v0-slider"
+                   min="1" max="20" step="0.1" value="8.0">
+            <span id="esc-v0-value">8.0</span>
+        </div>
+        <button class="btn btn-sm" onclick="escTrajReset()">Reset</button>
+    </div>
+
+    <div class="stats-bar">
+        <div class="stat-item">
+            <span class="stat-label">v₀ / v_esc</span>
+            <span class="stat-value" id="esc-vratio">0.71</span>
+        </div>
+        <div class="stat-item">
+            <span class="stat-label">Total energy</span>
+            <span class="stat-value" id="esc-energy">—</span>
+        </div>
+        <div class="stat-item">
+            <span class="stat-label">Classification</span>
+            <span class="stat-value" id="esc-class">Bound</span>
+        </div>
+        <div class="stat-item">
+            <span class="stat-label">Max height</span>
+            <span class="stat-value" id="esc-maxH">—</span>
+        </div>
+    </div>
+
+    <div class="dual-panel">
+        <div class="plot-container" id="esc-vxPlot"></div>
+        <div class="plot-container" id="esc-energyPlot"></div>
+    </div>
+
+    <div class="info-box">
+        <div class="info-box-title">What to Try</div>
+        <ul>
+            <li>At v₀ = 8 km/s (below escape): the v² curve hits zero — the projectile turns around. Read the max height.</li>
+            <li>Slide to v₀ = 11.2 km/s (escape velocity): v² → 0 as x → ∞. The curve just touches the x-axis at infinity.</li>
+            <li>Push to v₀ = 15 km/s (above escape): v² stays positive forever — the projectile has speed to spare.</li>
+            <li>Right plot: KE (blue) + PE (red) = total E (yellow). Bound: E &lt; 0. Critical: E = 0. Unbound: E &gt; 0.</li>
+        </ul>
+    </div>
+</div>
+
+<!-- Questions Group 2 -->
+<div class="interactive-container question-section">
+    <div class="interactive-title">Test Your Understanding</div>
+
+    <p style="margin-bottom: var(--spacing-md); color: var(--text-secondary);">
+        Use the Trajectory Classifier to answer these questions.
+    </p>
+
+    <div class="tabs">
+        <div class="tab-buttons">
+            <button class="tab-button active">Question 4</button>
+            <button class="tab-button">Question 5</button>
+            <button class="tab-button">Question 6</button>
+        </div>
+
+        <div class="tab-content active">
+            <div class="question-container" data-type="fill" data-answer="11.2[11.0,11.4]">
+                <div class="question-text">
+                    Earth's escape velocity is approximately
+                    <input type="text" class="fill-blank" placeholder="?"> km/s.
+                    (Slide v₀ until the classification changes from "Bound" to "Critical".)
+                </div>
+                <div class="question-actions">
+                    <button class="btn-verify">Verify</button>
+                </div>
+                <div class="question-explanation" style="display:none;">
+                    <strong>Explanation:</strong>
+                    \( v_{\text{esc}} = \sqrt{2gR} = \sqrt{2 \times 9.8 \times 6.37 \times 10^6}
+                    \approx 11{,}180 \) m/s ≈ 11.2 km/s. At this speed, the total mechanical energy
+                    is exactly zero — the projectile has just enough kinetic energy to overcome the
+                    gravitational potential well.
+                </div>
+            </div>
+        </div>
+
+        <div class="tab-content">
+            <div class="question-container" data-type="mcq" data-answer="2">
+                <div class="question-text">
+                    At the exact escape velocity, the total mechanical energy (KE + PE) is:
+                </div>
+                <div class="question-options">
+                    <label class="option">
+                        <input type="radio" name="esc-q5" value="0">
+                        <span>Positive — there's energy left over</span>
+                    </label>
+                    <label class="option">
+                        <input type="radio" name="esc-q5" value="1">
+                        <span>Negative — the projectile is still bound</span>
+                    </label>
+                    <label class="option">
+                        <input type="radio" name="esc-q5" value="2">
+                        <span>Exactly zero — KE precisely cancels the depth of the potential well</span>
+                    </label>
+                </div>
+                <div class="question-actions">
+                    <button class="btn-verify">Verify</button>
+                </div>
+                <div class="question-explanation" style="display:none;">
+                    <strong>Explanation:</strong>
+                    At escape velocity: \( E = \frac{1}{2}v_{\text{esc}}^2 - gR = \frac{1}{2}(2gR) - gR = 0 \).
+                    Zero total energy is the critical dividing line:
+                    E &lt; 0 → bound, E = 0 → critical escape, E &gt; 0 → unbound.
+                </div>
+            </div>
+        </div>
+
+        <div class="tab-content">
+            <div class="question-container" data-type="msq" data-answer="0,2">
+                <div class="question-text">
+                    Set v₀ = 8 km/s (bound trajectory). Which statements are correct? (Select all)
+                </div>
+                <div class="question-options">
+                    <label class="option">
+                        <input type="checkbox" value="0">
+                        <span>The projectile reaches a maximum height and falls back</span>
+                    </label>
+                    <label class="option">
+                        <input type="checkbox" value="1">
+                        <span>The maximum height is approximately 1 Earth radius above the surface</span>
+                    </label>
+                    <label class="option">
+                        <input type="checkbox" value="2">
+                        <span>At the turning point, all kinetic energy has been converted to potential energy</span>
+                    </label>
+                    <label class="option">
+                        <input type="checkbox" value="3">
+                        <span>A bound trajectory has positive total energy</span>
+                    </label>
+                </div>
+                <div class="question-actions">
+                    <button class="btn-verify">Verify</button>
+                </div>
+                <div class="question-explanation" style="display:none;">
+                    <strong>Explanation:</strong>
+                    <ul>
+                        <li>✓ When v² = 0, the projectile stops and gravity pulls it back.</li>
+                        <li>✗ At v₀ = 8 km/s, the turning point is at x/R = 1/(1 - v₀²/(2gR)) ≈ 2.04R, so ~1.04R above the surface. Check the explorer — the actual value depends on v₀.</li>
+                        <li>✓ At the turning point, v = 0, so KE = 0. All the initial KE has been converted to the increase in gravitational PE.</li>
+                        <li>✗ Bound trajectories have E &lt; 0. Positive energy means unbound (escape).</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- ============================================================ -->
+<!-- EXPLORER 3: Planetary Escape Calculator -->
+<!-- ============================================================ -->
+<h2>Escape Velocity Across the Solar System</h2>
+
+<p>
+    The formula \( v_{\text{esc}} = \sqrt{2gR} \) applies to any spherical body.
+    How does Earth compare to the Moon, Mars, and Jupiter?
+</p>
+
+<div class="interactive-container" id="planetary-escape">
+    <div class="interactive-title">Explorer: Planetary Escape Calculator</div>
+
+    <p>
+        Select a body or enter custom values for surface gravity and radius.
+        The bar chart compares escape velocities across the solar system.
+    </p>
+
+    <div class="control-panel">
+        <div class="control-group">
+            <label class="control-label" for="esc-body-select">Body:</label>
+            <select class="control-select" id="esc-body-select">
+                <option value="earth">Earth</option>
+                <option value="moon">Moon</option>
+                <option value="mars">Mars</option>
+                <option value="jupiter">Jupiter</option>
+                <option value="custom">Custom</option>
+            </select>
+        </div>
+        <div class="control-group">
+            <label class="control-label" for="esc-gCustom-slider">g (m/s²):</label>
+            <input type="range" class="slider" id="esc-gCustom-slider"
+                   min="0.5" max="30" step="0.1" value="9.8">
+            <span id="esc-gCustom-value">9.8</span>
+        </div>
+        <div class="control-group">
+            <label class="control-label" for="esc-rCustom-slider">R (10⁶ m):</label>
+            <input type="range" class="slider" id="esc-rCustom-slider"
+                   min="0.5" max="80" step="0.5" value="6.37">
+            <span id="esc-rCustom-value">6.37</span>
+        </div>
+        <button class="btn btn-sm" onclick="escPlanetReset()">Reset</button>
+    </div>
+
+    <div class="stats-bar">
+        <div class="stat-item">
+            <span class="stat-label">v_esc</span>
+            <span class="stat-value" id="esc-vesc">11.2 km/s</span>
+        </div>
+        <div class="stat-item">
+            <span class="stat-label">Surface g</span>
+            <span class="stat-value" id="esc-surfG">9.80 m/s²</span>
+        </div>
+        <div class="stat-item">
+            <span class="stat-label">Radius</span>
+            <span class="stat-value" id="esc-radius">6370 km</span>
+        </div>
+    </div>
+
+    <div class="dual-panel">
+        <div class="plot-container" id="esc-barPlot"></div>
+        <div class="plot-container" id="esc-wellPlot"></div>
+    </div>
+
+    <div class="info-box">
+        <div class="info-box-title">What to Try</div>
+        <ul>
+            <li>Compare Earth (11.2 km/s) vs Moon (2.4 km/s) — the Moon's weak gravity makes escape easy.</li>
+            <li>Jupiter's escape velocity is ~60 km/s — its massive gravity traps almost everything.</li>
+            <li>Try "Custom" and crank up g to 30 m/s² with R = 80 × 10⁶ m — you've made a super-Earth!</li>
+            <li>Right plot: the potential wells show why Jupiter is so hard to escape — the well is much deeper.</li>
+        </ul>
+    </div>
+</div>
+
+<!-- Questions Group 3 -->
+<div class="interactive-container question-section">
+    <div class="interactive-title">Test Your Understanding</div>
+
+    <p style="margin-bottom: var(--spacing-md); color: var(--text-secondary);">
+        Use the Planetary Escape Calculator to answer these questions.
+    </p>
+
+    <div class="tabs">
+        <div class="tab-buttons">
+            <button class="tab-button active">Question 7</button>
+            <button class="tab-button">Question 8</button>
+            <button class="tab-button">Question 9</button>
+        </div>
+
+        <div class="tab-content active">
+            <div class="question-container" data-type="fill" data-answer="2.4[2.2,2.6]">
+                <div class="question-text">
+                    The Moon's escape velocity is approximately
+                    <input type="text" class="fill-blank" placeholder="?"> km/s.
+                    (Select "Moon" from the dropdown.)
+                </div>
+                <div class="question-actions">
+                    <button class="btn-verify">Verify</button>
+                </div>
+                <div class="question-explanation" style="display:none;">
+                    <strong>Explanation:</strong>
+                    Moon: \( g = 1.62 \) m/s², \( R = 1.74 \times 10^6 \) m.
+                    \( v_{\text{esc}} = \sqrt{2 \times 1.62 \times 1.74 \times 10^6} \approx 2{,}380 \) m/s
+                    ≈ 2.4 km/s. This is about 1/5 of Earth's escape velocity — lunar escape is
+                    much easier, which is why the Apollo astronauts needed relatively little fuel to leave.
+                </div>
+            </div>
+        </div>
+
+        <div class="tab-content">
+            <div class="question-container" data-type="mcq" data-answer="0">
+                <div class="question-text">
+                    If you double a planet's surface gravity \( g \) while keeping its radius \( R \) the same,
+                    the escape velocity:
+                </div>
+                <div class="question-options">
+                    <label class="option">
+                        <input type="radio" name="esc-q8" value="0">
+                        <span>Increases by a factor of \( \sqrt{2} \approx 1.41 \)</span>
+                    </label>
+                    <label class="option">
+                        <input type="radio" name="esc-q8" value="1">
+                        <span>Doubles</span>
+                    </label>
+                    <label class="option">
+                        <input type="radio" name="esc-q8" value="2">
+                        <span>Quadruples</span>
+                    </label>
+                </div>
+                <div class="question-actions">
+                    <button class="btn-verify">Verify</button>
+                </div>
+                <div class="question-explanation" style="display:none;">
+                    <strong>Explanation:</strong>
+                    \( v_{\text{esc}} = \sqrt{2gR} \). If \( g \to 2g \):
+                    \( v' = \sqrt{2 \cdot 2g \cdot R} = \sqrt{2}\,v_{\text{esc}} \).
+                    The square root means doubling gravity only increases escape velocity by ~41%.
+                    Try it with the custom sliders!
+                </div>
+            </div>
+        </div>
+
+        <div class="tab-content">
+            <div class="question-container" data-type="mcq" data-answer="2">
+                <div class="question-text">
+                    Energy conservation gives us \( v(x) \) — the speed at each position. Why do we still
+                    need numerical methods?
+                </div>
+                <div class="question-options">
+                    <label class="option">
+                        <input type="radio" name="esc-q9" value="0">
+                        <span>The energy formula is only approximate</span>
+                    </label>
+                    <label class="option">
+                        <input type="radio" name="esc-q9" value="1">
+                        <span>We can't compute escape velocity analytically</span>
+                    </label>
+                    <label class="option">
+                        <input type="radio" name="esc-q9" value="2">
+                        <span>We don't get \( x(t) \) — the actual trajectory in time — and we can't add complications like air resistance</span>
+                    </label>
+                </div>
+                <div class="question-actions">
+                    <button class="btn-verify">Verify</button>
+                </div>
+                <div class="question-explanation" style="display:none;">
+                    <strong>Explanation:</strong>
+                    Energy conservation is exact and gives us the escape velocity threshold. But it only
+                    relates \( v \) and \( x \), not \( x \) and \( t \). Questions like "how long
+                    does it take to reach the Moon?" or "what happens with air resistance?" require
+                    solving the full ODE \( \ddot{x} = -gR^2/x^2 \) in time — and that's where
+                    RK4 comes in (Section 4.16).
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- ============================================================ -->
+<!-- CODE EXAMPLES -->
+<!-- ============================================================ -->
+<h2>Python Code</h2>
+
+<div class="tabs">
+    <div class="tab-buttons">
+        <button class="tab-button active">Energy Analysis</button>
+        <button class="tab-button">Planetary Comparison</button>
+        <button class="tab-button">Prompt</button>
+    </div>
+
+    <div class="tab-content active">
+        <div class="code-block-container">
+            <div class="code-header">
+                <span class="code-lang">Python</span>
+                <button class="copy-btn">Copy</button>
+            </div>
+            <pre><code class="language-python">
+import numpy as np
+import plotly.graph_objects as go
+from plotly.subplots import make_subplots
+
+g = 9.8         # m/s^2
+R = 6.37e6      # m (Earth's radius)
+v_esc = np.sqrt(2 * g * R)  # ~11,180 m/s
+
+# v^2 as a function of x for different launch speeds
+x = np.linspace(R, 20 * R, 1000)
+
+fig = make_subplots(rows=1, cols=2,
+    subplot_titles=['v² vs Distance', 'Energy Diagram'])
+
+for v0_kms in [8, 11.2, 15]:
+    v0 = v0_kms * 1000
+    v_sq = v0**2 - 2 * g * R * (1 - R / x)
+    label = f'v₀ = {v0_kms} km/s'
+    fig.add_trace(go.Scatter(x=x/R, y=v_sq/1e6,
+        name=label, mode='lines'), row=1, col=1)
+
+fig.add_hline(y=0, line=dict(color='#808080', dash='dash'), row=1, col=1)
+
+# Energy diagram
+KE = lambda v0, x: 0.5 * v0**2 - g * R * (1 - R/x)
+PE = -g * R**2 / x
+
+for v0_kms in [8, 11.2, 15]:
+    v0 = v0_kms * 1000
+    E_total = 0.5 * v0**2 - g * R
+    fig.add_trace(go.Scatter(x=x/R, y=np.full_like(x, E_total/1e6),
+        name=f'E (v₀={v0_kms})', line=dict(dash='dash'),
+        showlegend=False), row=1, col=2)
+
+fig.add_trace(go.Scatter(x=x/R, y=PE/1e6,
+    name='PE = −gR²/x', line=dict(color='#ff6b6b')), row=1, col=2)
+
+fig.update_layout(template='plotly_dark')
+fig.update_xaxes(title='x/R', gridcolor='#2a2f4a', linecolor='#808080')
+fig.update_yaxes(title='(km/s)²', gridcolor='#2a2f4a', linecolor='#808080',
+    row=1, col=1)
+fig.update_yaxes(title='Energy/m (MJ/kg)', gridcolor='#2a2f4a',
+    linecolor='#808080', row=1, col=2)
+fig.show()
+
+print(f"Escape velocity: {v_esc:.0f} m/s = {v_esc/1000:.1f} km/s")
+            </code></pre>
+        </div>
+    </div>
+
+    <div class="tab-content">
+        <div class="code-block-container">
+            <div class="code-header">
+                <span class="code-lang">Python</span>
+                <button class="copy-btn">Copy</button>
+            </div>
+            <pre><code class="language-python">
+import numpy as np
+import plotly.graph_objects as go
+
+# Solar system bodies: (name, g in m/s², R in meters)
+bodies = {
+    'Moon':    (1.62,  1.74e6),
+    'Mars':    (3.72,  3.39e6),
+    'Earth':   (9.80,  6.37e6),
+    'Neptune': (11.15, 2.48e7),
+    'Jupiter': (24.79, 7.15e7),
+}
+
+names, v_escs, colors = [], [], []
+palette = ['#808080', '#ff6b6b', '#00f3ff', '#00ff9f', '#ff00ff']
+
+for i, (name, (g_val, R_val)) in enumerate(bodies.items()):
+    v_esc = np.sqrt(2 * g_val * R_val) / 1000  # km/s
+    names.append(name)
+    v_escs.append(v_esc)
+    colors.append(palette[i])
+    print(f"{name:10s}: g = {g_val:5.2f} m/s²,  R = {R_val:.2e} m,  "
+          f"v_esc = {v_esc:.1f} km/s")
+
+fig = go.Figure(go.Bar(
+    x=names, y=v_escs,
+    marker=dict(color=colors),
+    text=[f'{v:.1f}' for v in v_escs],
+    textposition='outside',
+    textfont=dict(color='white', size=14)
+))
+
+fig.update_layout(
+    template='plotly_dark',
+    title='Escape Velocities Across the Solar System',
+    yaxis=dict(title='Escape velocity (km/s)',
+               gridcolor='#2a2f4a', linecolor='#808080'),
+    xaxis=dict(linecolor='#808080')
+)
+fig.show()
+            </code></pre>
+        </div>
+    </div>
+
+    <div class="tab-content">
+        <div class="code-block-container">
+            <div class="code-header">
+                <span class="code-lang">Prompt for AI</span>
+                <button class="copy-btn">Copy</button>
+            </div>
+            <pre><code class="language-text">Write a Python script analyzing escape velocity from first principles.
+
+1. Start from the ODE: x'' = -gR²/x² and derive v² = v₀² - 2gR(1 - R/x)
+2. Plot v²(x) for three launch speeds: below, at, and above escape velocity
+3. Create an energy diagram: KE, PE, and total E vs distance
+4. Classify trajectories: bound (E<0), critical (E=0), unbound (E>0)
+5. Compare escape velocities for Moon, Mars, Earth, Jupiter
+6. Compute and display the escape velocity formula v_esc = sqrt(2gR)
+7. Use plotly_dark theme, gray axes (#808080), neon colors for data</code></pre>
+        </div>
+
+        <div class="info-box" style="margin-top: var(--spacing-md);">
+            <div class="info-box-title">Pro Tips for Prompting</div>
+            <ul>
+                <li>Ask for physical units (km/s, Earth radii) rather than SI throughout</li>
+                <li>Request the chain-rule trick derivation as comments in the code</li>
+                <li>Ask for annotations on the plot showing the turning point for bound trajectories</li>
+                <li>Request a table comparing solar system bodies' escape velocities</li>
+            </ul>
+        </div>
+    </div>
+</div>
+
+<div class="info-box">
+    <div class="info-box-title">What's Next?</div>
+    <p>
+        Energy conservation tells us <em>whether</em> a projectile escapes (based on \( v_0 \) vs \( v_{\text{esc}} \))
+        and gives us \( v(x) \). But it doesn't answer: <strong>how long does the journey take?</strong>
+        For that, we need to solve the full ODE \( \ddot{x} = -gR^2/x^2 \) as a function of time.
+        In Section 4.15, we'll non-dimensionalize the problem, and in 4.16, we'll unleash RK4 to
+        compute actual trajectories \( x(t) \).
+    </p>
+</div>
+
+<!-- ============================================================ -->
+<!-- NAVIGATION -->
+<!-- ============================================================ -->
+<div class="btn-group mt-xl">
+    <button class="btn btn-magenta" onclick="navigateToSection('46-method-comparison')">&larr; Previous: Choosing Your Method</button>
+    <button class="btn btn-secondary" onclick="scrollToTop()">&uarr; Back to Top</button>
+    <button class="btn btn-secondary" onclick="navigateToSection('48-nondimensionalization')">Next: Non-dimensionalization &rarr;</button>
+</div>

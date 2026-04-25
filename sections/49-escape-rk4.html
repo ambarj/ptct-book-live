@@ -1,0 +1,751 @@
+<!-- ============================================================
+     Section 4.16: RK4 for Escape Velocity
+     Source: NPTEL Lecture 6 (Escaping the Earth, Part 3)
+     Concept: Applying RK4 to the dimensionless gravitational ODE,
+              validating against exact solution, numerical bisection
+     Time: 15-20 minutes
+     Prerequisites: Sections 4.12 (RK4), 4.14-4.15 (escape physics, non-dim)
+     ============================================================ -->
+
+<h1>RK4 for Escape Velocity</h1>
+
+<p>
+    In Sections 4.14–4.15 we derived the dimensionless ODE and learned that \( V_0 = \sqrt{2} \)
+    is the escape threshold. Energy conservation told us <em>whether</em> escape happens — but not
+    <em>when</em> or <em>how</em>. How long does it take to reach altitude \( X = 5 \)?
+    What does the trajectory look like in time? For this, we need to integrate.
+</p>
+
+<div class="info-box">
+    <div class="info-box-title">Learning Objectives</div>
+    <ul>
+        <li>Solve the dimensionless escape ODE \( \ddot{X} = -1/X^2 \) using RK4 to get actual trajectories \( X(T) \)</li>
+        <li>Validate RK4 against the exact critical solution \( X(T) = (1 + \tfrac{3}{2}\sqrt{2}\,T)^{2/3} \)</li>
+        <li>Use numerical bisection to find escape velocity to arbitrary precision</li>
+        <li>Monitor energy conservation \( E = \tfrac{1}{2}V^2 - 1/X \) as a check on numerical accuracy</li>
+    </ul>
+</div>
+
+<div class="equation-display">
+    <p><strong>The system to solve:</strong></p>
+    $$ \frac{dX}{dT} = V, \qquad \frac{dV}{dT} = -\frac{1}{X^2} $$
+    <p>with \( X(0) = 1 \), \( V(0) = V_0 \). This is a 2D first-order system — exactly what RK4 handles.</p>
+</div>
+
+<p>
+    At the critical speed \( V_0 = \sqrt{2} \), there is an exact analytical solution:
+</p>
+
+<div class="equation-display">
+    $$ X(T) = \left(1 + \tfrac{3}{2}\sqrt{2}\,T\right)^{2/3} $$
+    <p>We'll use this to validate our numerical solver before trusting it on cases where no
+    analytical solution exists.</p>
+</div>
+
+<!-- ============================================================ -->
+<!-- EXPLORER 1: Rocket Launcher -->
+<!-- ============================================================ -->
+<div class="interactive-container" id="rocket-launcher">
+    <div class="interactive-title">Explorer: Rocket Launcher</div>
+
+    <p>
+        Set the dimensionless launch speed \( V_0 \) and watch RK4 compute the trajectory.
+        At \( V_0 = \sqrt{2} \), the exact solution is overlaid for validation.
+    </p>
+
+    <div class="control-panel">
+        <div class="control-group">
+            <label class="control-label" for="rk-v0-slider">V₀ (dimensionless):</label>
+            <input type="range" class="slider" id="rk-v0-slider"
+                   min="0.5" max="2.5" step="0.01" value="1.41">
+            <span id="rk-v0-value">1.41</span>
+        </div>
+        <div class="control-group">
+            <label class="control-label" for="rk-N-slider">RK4 steps N:</label>
+            <input type="range" class="slider" id="rk-N-slider"
+                   min="50" max="2000" step="50" value="500">
+            <span id="rk-N-value">500</span>
+        </div>
+        <button class="btn btn-sm" onclick="rkLaunchReset()">Reset</button>
+    </div>
+
+    <div class="stats-bar">
+        <div class="stat-item">
+            <span class="stat-label">Classification</span>
+            <span class="stat-value" id="rk-class">Critical</span>
+        </div>
+        <div class="stat-item">
+            <span class="stat-label">X(T_final)</span>
+            <span class="stat-value" id="rk-xfinal">—</span>
+        </div>
+        <div class="stat-item">
+            <span class="stat-label">V(T_final)</span>
+            <span class="stat-value" id="rk-vfinal">—</span>
+        </div>
+        <div class="stat-item">
+            <span class="stat-label">Energy drift</span>
+            <span class="stat-value" id="rk-edrift">—</span>
+        </div>
+    </div>
+
+    <div class="dual-panel">
+        <div class="plot-container" id="rk-xtPlot"></div>
+        <div class="plot-container" id="rk-vtPlot"></div>
+    </div>
+
+    <div class="info-box">
+        <div class="info-box-title">What to Try</div>
+        <ul>
+            <li>At V₀ = √2 ≈ 1.41: the RK4 curve (cyan) perfectly overlaps the exact solution (yellow dashed). RK4 is validated!</li>
+            <li>V₀ = 1.0 (bound): X(T) rises, peaks at X = 2, then falls back. V(T) goes from positive to negative.</li>
+            <li>V₀ = 2.0 (unbound): X(T) keeps growing. V(T) decreases but levels off at V_∞ = √(V₀² − 2).</li>
+            <li>Reduce N to 50 steps: at the critical speed, you can see the RK4 curve deviate slightly from exact.</li>
+        </ul>
+    </div>
+</div>
+
+<!-- Questions Group 1 -->
+<div class="interactive-container question-section">
+    <div class="interactive-title">Test Your Understanding</div>
+
+    <p style="margin-bottom: var(--spacing-md); color: var(--text-secondary);">
+        Use the Rocket Launcher to answer these questions.
+    </p>
+
+    <div class="tabs">
+        <div class="tab-buttons">
+            <button class="tab-button active">Question 1</button>
+            <button class="tab-button">Question 2</button>
+            <button class="tab-button">Question 3</button>
+        </div>
+
+        <div class="tab-content active">
+            <div class="question-container" data-type="fill" data-answer="7.9[7.5,8.3]">
+                <div class="question-text">
+                    At the critical speed V₀ = √2 with N = 500, what is X at T = 10?
+                    (Read from the plot or stats bar.) X ≈ <input type="text" class="fill-blank" placeholder="?">
+                </div>
+                <div class="question-actions">
+                    <button class="btn-verify">Verify</button>
+                </div>
+                <div class="question-explanation" style="display:none;">
+                    <strong>Explanation:</strong>
+                    Exact: \( X(10) = (1 + \tfrac{3}{2}\sqrt{2} \cdot 10)^{2/3} = (1 + 15\sqrt{2})^{2/3}
+                    \approx 22.21^{2/3} \approx 7.89 \). The projectile has traveled nearly 8 planet radii
+                    from the center in dimensionless time T = 10.
+                </div>
+            </div>
+        </div>
+
+        <div class="tab-content">
+            <div class="question-container" data-type="mcq" data-answer="1">
+                <div class="question-text">
+                    Set V₀ = 1.0 (bound trajectory). What happens to V(T)?
+                </div>
+                <div class="question-options">
+                    <label class="option">
+                        <input type="radio" name="rk-q2" value="0">
+                        <span>It stays positive and levels off</span>
+                    </label>
+                    <label class="option">
+                        <input type="radio" name="rk-q2" value="1">
+                        <span>It decreases to zero then becomes negative (the projectile falls back)</span>
+                    </label>
+                    <label class="option">
+                        <input type="radio" name="rk-q2" value="2">
+                        <span>It oscillates between positive and negative</span>
+                    </label>
+                </div>
+                <div class="question-actions">
+                    <button class="btn-verify">Verify</button>
+                </div>
+                <div class="question-explanation" style="display:none;">
+                    <strong>Explanation:</strong>
+                    For a bound trajectory, gravity eventually stops the projectile (V = 0 at the turning
+                    point) and pulls it back (V becomes negative). The velocity plot shows a smooth
+                    transition from positive to negative — the projectile rises, stops, and falls.
+                </div>
+            </div>
+        </div>
+
+        <div class="tab-content">
+            <div class="question-container" data-type="mcq" data-answer="2">
+                <div class="question-text">
+                    With V₀ = √2 and N = 50 (very coarse), the energy drift is noticeable.
+                    What does this tell you?
+                </div>
+                <div class="question-options">
+                    <label class="option">
+                        <input type="radio" name="rk-q3" value="0">
+                        <span>The physics is wrong — gravity doesn't conserve energy</span>
+                    </label>
+                    <label class="option">
+                        <input type="radio" name="rk-q3" value="1">
+                        <span>RK4 is a bad algorithm for this problem</span>
+                    </label>
+                    <label class="option">
+                        <input type="radio" name="rk-q3" value="2">
+                        <span>The step size is too large — RK4 needs more steps for accurate conservation</span>
+                    </label>
+                </div>
+                <div class="question-actions">
+                    <button class="btn-verify">Verify</button>
+                </div>
+                <div class="question-explanation" style="display:none;">
+                    <strong>Explanation:</strong>
+                    Energy conservation is exact in the continuous equations, but the discrete RK4 steps
+                    introduce small errors each step. With N = 50 (h = 0.2), these accumulate noticeably.
+                    Increasing to N = 500 (h = 0.02) makes the drift essentially invisible. This is why
+                    monitoring energy conservation is a powerful accuracy check.
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- ============================================================ -->
+<!-- EXPLORER 2: Escape Threshold Finder -->
+<!-- ============================================================ -->
+<h2>Finding Escape Velocity Numerically</h2>
+
+<p>
+    We <em>know</em> the escape velocity is \( V_0 = \sqrt{2} \) from energy conservation.
+    But what if we didn't? We could discover it numerically using <strong>bisection</strong>:
+    run RK4, check if the projectile escapes, and narrow the bracket.
+</p>
+
+<div class="interactive-container" id="threshold-finder">
+    <div class="interactive-title">Explorer: Escape Threshold Finder</div>
+
+    <p>
+        Watch bisection zero in on the escape velocity. Each step runs RK4 at the midpoint
+        of the bracket and checks whether the projectile escapes (reaches X > 10 before T = 20).
+    </p>
+
+    <div class="control-panel">
+        <div class="control-group">
+            <label class="control-label">Bisection:</label>
+            <button class="btn btn-sm" id="rk-bisect-step" onclick="rkBisectStep()">Step</button>
+            <button class="btn btn-sm" id="rk-bisect-auto" onclick="rkBisectAuto()">Auto (20 steps)</button>
+            <button class="btn btn-sm" onclick="rkBisectReset()">Reset</button>
+        </div>
+    </div>
+
+    <div class="stats-bar">
+        <div class="stat-item">
+            <span class="stat-label">Bracket</span>
+            <span class="stat-value" id="rk-bracket">[1.000, 2.000]</span>
+        </div>
+        <div class="stat-item">
+            <span class="stat-label">Midpoint V₀</span>
+            <span class="stat-value" id="rk-midV0">1.500</span>
+        </div>
+        <div class="stat-item">
+            <span class="stat-label">Step</span>
+            <span class="stat-value" id="rk-bisectStep">0</span>
+        </div>
+        <div class="stat-item">
+            <span class="stat-label">|V₀ − √2|</span>
+            <span class="stat-value" id="rk-bisectErr">0.086</span>
+        </div>
+    </div>
+
+    <div class="dual-panel">
+        <div class="plot-container" id="rk-bisectPlot"></div>
+        <div class="plot-container" id="rk-bisectTrajPlot"></div>
+    </div>
+
+    <div class="info-box">
+        <div class="info-box-title">What to Try</div>
+        <ul>
+            <li>Click "Step" repeatedly: the bracket halves each time. After 10 steps, the width is ~0.001.</li>
+            <li>Click "Auto": 20 bisection steps give the escape velocity to 6 decimal places.</li>
+            <li>Left plot: the bracket bounds converge to √2. Right plot: the trajectory at the current midpoint.</li>
+            <li>After 20 steps, compare the numerical result with √2 ≈ 1.414214... — they should agree to ~10⁻⁶.</li>
+        </ul>
+    </div>
+</div>
+
+<!-- Questions Group 2 -->
+<div class="interactive-container question-section">
+    <div class="interactive-title">Test Your Understanding</div>
+
+    <p style="margin-bottom: var(--spacing-md); color: var(--text-secondary);">
+        Use the Escape Threshold Finder to answer these questions.
+    </p>
+
+    <div class="tabs">
+        <div class="tab-buttons">
+            <button class="tab-button active">Question 4</button>
+            <button class="tab-button">Question 5</button>
+            <button class="tab-button">Question 6</button>
+        </div>
+
+        <div class="tab-content active">
+            <div class="question-container" data-type="fill" data-answer="10[9,11]">
+                <div class="question-text">
+                    After 10 bisection steps, the bracket width is approximately \( 1/2^{10} \approx \)
+                    <input type="text" class="fill-blank" placeholder="?"> × 10⁻⁴.
+                    (The initial bracket is [1, 2], width = 1.)
+                </div>
+                <div class="question-actions">
+                    <button class="btn-verify">Verify</button>
+                </div>
+                <div class="question-explanation" style="display:none;">
+                    <strong>Explanation:</strong>
+                    \( 1/2^{10} = 1/1024 \approx 9.77 \times 10^{-4} \approx 10 \times 10^{-4} \).
+                    Each bisection step halves the uncertainty. After 10 steps, we know the escape
+                    velocity to about 3 decimal places — purely from running RK4 simulations, with
+                    no analytical formula!
+                </div>
+            </div>
+        </div>
+
+        <div class="tab-content">
+            <div class="question-container" data-type="mcq" data-answer="0">
+                <div class="question-text">
+                    The bisection method checks whether the projectile reaches X > 10 by T = 20.
+                    Why is this a valid proxy for "escape"?
+                </div>
+                <div class="question-options">
+                    <label class="option">
+                        <input type="radio" name="rk-q5" value="0">
+                        <span>A bound projectile always turns back before reaching large X, so reaching X > 10 means it's escaping</span>
+                    </label>
+                    <label class="option">
+                        <input type="radio" name="rk-q5" value="1">
+                        <span>X = 10 is the edge of the gravitational field</span>
+                    </label>
+                    <label class="option">
+                        <input type="radio" name="rk-q5" value="2">
+                        <span>It's not valid — we need to integrate to T = ∞ to be sure</span>
+                    </label>
+                </div>
+                <div class="question-actions">
+                    <button class="btn-verify">Verify</button>
+                </div>
+                <div class="question-explanation" style="display:none;">
+                    <strong>Explanation:</strong>
+                    A bound trajectory has a turning point at \( X_{\max} = 2/(2 - V_0^2) \). Near the
+                    escape threshold, this approaches infinity, but for clearly sub-escape speeds (e.g.,
+                    V₀ = 1.4), X_max ≈ 25 and the projectile turns around well within T = 20.
+                    Reaching X > 10 in finite time means the trajectory is diverging — effectively an
+                    escape indicator. Larger thresholds give more precision but take more compute time.
+                </div>
+            </div>
+        </div>
+
+        <div class="tab-content">
+            <div class="question-container" data-type="msq" data-answer="1,2">
+                <div class="question-text">
+                    Why is bisection useful even though we already know V₀ = √2 analytically? (Select all)
+                </div>
+                <div class="question-options">
+                    <label class="option">
+                        <input type="checkbox" value="0">
+                        <span>It gives a more accurate answer than the analytical formula</span>
+                    </label>
+                    <label class="option">
+                        <input type="checkbox" value="1">
+                        <span>It works for problems where no analytical solution exists (e.g., with air resistance)</span>
+                    </label>
+                    <label class="option">
+                        <input type="checkbox" value="2">
+                        <span>It validates that our numerical solver is correct by reproducing the known answer</span>
+                    </label>
+                    <label class="option">
+                        <input type="checkbox" value="3">
+                        <span>It's faster than using the formula</span>
+                    </label>
+                </div>
+                <div class="question-actions">
+                    <button class="btn-verify">Verify</button>
+                </div>
+                <div class="question-explanation" style="display:none;">
+                    <strong>Explanation:</strong>
+                    <ul>
+                        <li>The analytical formula √2 is exact — bisection can't beat it for this problem.</li>
+                        <li>✓ When we add air resistance (Section 4.17), there's no analytical escape velocity. Bisection + RK4 is the only way.</li>
+                        <li>✓ Reproducing √2 numerically confirms our code is correct. This is a fundamental validation strategy: test on known problems before tackling unknown ones.</li>
+                        <li>Bisection requires many RK4 runs — it's slower than evaluating √2. Speed isn't the point; generality is.</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- ============================================================ -->
+<!-- EXPLORER 3: Energy Conservation Validator -->
+<!-- ============================================================ -->
+<h2>Energy Conservation as Accuracy Check</h2>
+
+<p>
+    The dimensionless energy \( E = \tfrac{1}{2}V^2 - 1/X \) should remain constant along any trajectory.
+    If RK4 is doing its job, the numerical energy should barely drift from its initial value.
+</p>
+
+<div class="interactive-container" id="energy-validator">
+    <div class="interactive-title">Explorer: Energy Conservation Validator</div>
+
+    <p>
+        Vary the launch speed and step count. Watch how energy conservation degrades with
+        fewer steps, and how it stays near-perfect with enough resolution.
+    </p>
+
+    <div class="control-panel">
+        <div class="control-group">
+            <label class="control-label" for="rk-ev0-slider">V₀:</label>
+            <input type="range" class="slider" id="rk-ev0-slider"
+                   min="0.5" max="2.5" step="0.01" value="1.41">
+            <span id="rk-ev0-value">1.41</span>
+        </div>
+        <div class="control-group">
+            <label class="control-label" for="rk-eN-slider">N (steps):</label>
+            <input type="range" class="slider" id="rk-eN-slider"
+                   min="50" max="2000" step="50" value="200">
+            <span id="rk-eN-value">200</span>
+        </div>
+        <button class="btn btn-sm" onclick="rkEnergyReset()">Reset</button>
+    </div>
+
+    <div class="stats-bar">
+        <div class="stat-item">
+            <span class="stat-label">E(0)</span>
+            <span class="stat-value" id="rk-E0">0.000</span>
+        </div>
+        <div class="stat-item">
+            <span class="stat-label">E(T_final)</span>
+            <span class="stat-value" id="rk-Ef">—</span>
+        </div>
+        <div class="stat-item">
+            <span class="stat-label">Max |ΔE|</span>
+            <span class="stat-value" id="rk-maxDE">—</span>
+        </div>
+        <div class="stat-item">
+            <span class="stat-label">Step size h</span>
+            <span class="stat-value" id="rk-hval">—</span>
+        </div>
+    </div>
+
+    <div class="dual-panel">
+        <div class="plot-container" id="rk-energyPlot"></div>
+        <div class="plot-container" id="rk-edriftPlot"></div>
+    </div>
+
+    <div class="info-box">
+        <div class="info-box-title">What to Try</div>
+        <ul>
+            <li>At N = 200 (h = 0.05): the energy drift is small but visible — maybe 10⁻⁵ or so.</li>
+            <li>Increase to N = 2000 (h = 0.005): the drift shrinks dramatically (RK4 is 4th order!).</li>
+            <li>Drop to N = 50 (h = 0.2): the drift becomes clearly visible — the solver is struggling.</li>
+            <li>Left plot: E(T) should be a flat horizontal line. Any deviation reveals numerical error.</li>
+            <li>Right plot: ΔE = E(T) − E(0) shows the drift accumulation over time.</li>
+        </ul>
+    </div>
+</div>
+
+<!-- Questions Group 3 -->
+<div class="interactive-container question-section">
+    <div class="interactive-title">Test Your Understanding</div>
+
+    <p style="margin-bottom: var(--spacing-md); color: var(--text-secondary);">
+        Use the Energy Conservation Validator to answer these questions.
+    </p>
+
+    <div class="tabs">
+        <div class="tab-buttons">
+            <button class="tab-button active">Question 7</button>
+            <button class="tab-button">Question 8</button>
+            <button class="tab-button">Question 9</button>
+        </div>
+
+        <div class="tab-content active">
+            <div class="question-container" data-type="mcq" data-answer="2">
+                <div class="question-text">
+                    When you double the number of steps N (halve h), the maximum energy drift |ΔE| should:
+                </div>
+                <div class="question-options">
+                    <label class="option">
+                        <input type="radio" name="rk-q7" value="0">
+                        <span>Halve (decrease by factor 2)</span>
+                    </label>
+                    <label class="option">
+                        <input type="radio" name="rk-q7" value="1">
+                        <span>Decrease by factor 4</span>
+                    </label>
+                    <label class="option">
+                        <input type="radio" name="rk-q7" value="2">
+                        <span>Decrease by factor ~16 (RK4 is 4th order: error ∝ h⁴)</span>
+                    </label>
+                </div>
+                <div class="question-actions">
+                    <button class="btn-verify">Verify</button>
+                </div>
+                <div class="question-explanation" style="display:none;">
+                    <strong>Explanation:</strong>
+                    RK4 has local truncation error \( O(h^5) \) and global error \( O(h^4) \).
+                    Doubling N halves h, so the global error decreases by \( 2^4 = 16 \).
+                    Energy drift scales similarly. Try N = 200 vs N = 400 and compare the
+                    max |ΔE| values — they should differ by roughly 16×.
+                </div>
+            </div>
+        </div>
+
+        <div class="tab-content">
+            <div class="question-container" data-type="mcq" data-answer="1">
+                <div class="question-text">
+                    For a bound trajectory (V₀ = 1.0), energy conservation is especially important because:
+                </div>
+                <div class="question-options">
+                    <label class="option">
+                        <input type="radio" name="rk-q8" value="0">
+                        <span>Bound trajectories have more kinetic energy</span>
+                    </label>
+                    <label class="option">
+                        <input type="radio" name="rk-q8" value="1">
+                        <span>Small energy errors can change whether the projectile turns around at the right height</span>
+                    </label>
+                    <label class="option">
+                        <input type="radio" name="rk-q8" value="2">
+                        <span>Energy isn't conserved for bound trajectories</span>
+                    </label>
+                </div>
+                <div class="question-actions">
+                    <button class="btn-verify">Verify</button>
+                </div>
+                <div class="question-explanation" style="display:none;">
+                    <strong>Explanation:</strong>
+                    The turning point occurs where \( V = 0 \), i.e., all kinetic energy has been
+                    converted to potential energy. If the numerical solver gains or loses a little
+                    energy, the turning point shifts. For trajectories near the escape threshold,
+                    even tiny energy errors can change the outcome from "barely escapes" to "falls back."
+                </div>
+            </div>
+        </div>
+
+        <div class="tab-content">
+            <div class="question-container" data-type="msq" data-answer="0,3">
+                <div class="question-text">
+                    Which are good practices when solving ODEs numerically? (Select all)
+                </div>
+                <div class="question-options">
+                    <label class="option">
+                        <input type="checkbox" value="0">
+                        <span>Monitor conserved quantities (energy, momentum) as accuracy indicators</span>
+                    </label>
+                    <label class="option">
+                        <input type="checkbox" value="1">
+                        <span>Always use the smallest possible step size regardless of compute time</span>
+                    </label>
+                    <label class="option">
+                        <input type="checkbox" value="2">
+                        <span>Trust the result if the code runs without errors</span>
+                    </label>
+                    <label class="option">
+                        <input type="checkbox" value="3">
+                        <span>Validate against known solutions before solving new problems</span>
+                    </label>
+                </div>
+                <div class="question-actions">
+                    <button class="btn-verify">Verify</button>
+                </div>
+                <div class="question-explanation" style="display:none;">
+                    <strong>Explanation:</strong>
+                    <ul>
+                        <li>✓ Energy conservation is a powerful diagnostic. If E drifts, the step size is too large.</li>
+                        <li>The smallest h is wasteful — you need "small enough," not "smallest possible." Choose h by checking that the answer doesn't change when you halve it.</li>
+                        <li>Code running without errors doesn't mean the answer is correct. Numerical errors are silent — they don't crash your program.</li>
+                        <li>✓ Validate first, trust second. We tested RK4 against X(T) = (1 + 3√2T/2)^(2/3) before trusting it on new problems. This is the scientific approach.</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- ============================================================ -->
+<!-- CODE EXAMPLES -->
+<!-- ============================================================ -->
+<h2>Python Code</h2>
+
+<div class="tabs">
+    <div class="tab-buttons">
+        <button class="tab-button active">RK4 Escape Solver</button>
+        <button class="tab-button">Bisection Finder</button>
+        <button class="tab-button">Prompt</button>
+    </div>
+
+    <div class="tab-content active">
+        <div class="code-block-container">
+            <div class="code-header">
+                <span class="code-lang">Python</span>
+                <button class="copy-btn">Copy</button>
+            </div>
+            <pre><code class="language-python">
+import numpy as np
+import plotly.graph_objects as go
+from plotly.subplots import make_subplots
+
+def rk4_step(f, y, t, h):
+    k1 = f(y, t)
+    k2 = f(y + h/2 * k1, t + h/2)
+    k3 = f(y + h/2 * k2, t + h/2)
+    k4 = f(y + h * k3, t + h)
+    return y + (h/6) * (k1 + 2*k2 + 2*k3 + k4)
+
+def escape_ode(y, t):
+    X, V = y
+    return np.array([V, -1/X**2])
+
+def solve(V0, T_final=10, N=500):
+    h = T_final / N
+    t = np.zeros(N+1)
+    Y = np.zeros((N+1, 2))
+    Y[0] = [1, V0]  # X(0)=1, V(0)=V0
+    for i in range(N):
+        Y[i+1] = rk4_step(escape_ode, Y[i], t[i], h)
+        t[i+1] = t[i] + h
+        if Y[i+1, 0] < 0.01:  # crashed into planet
+            break
+    return t[:i+2], Y[:i+2]
+
+# Exact solution at critical speed
+def exact_critical(t):
+    return (1 + 1.5 * np.sqrt(2) * t)**(2/3)
+
+# Solve for three speeds
+fig = make_subplots(rows=1, cols=2,
+    subplot_titles=['X(T) Trajectory', 'Energy E(T)'])
+
+for V0, color, label in [(1.0, '#ff6b6b', 'Bound'),
+                           (np.sqrt(2), '#ffff00', 'Critical'),
+                           (2.0, '#00ff9f', 'Unbound')]:
+    t, Y = solve(V0)
+    X, V = Y[:, 0], Y[:, 1]
+    E = 0.5 * V**2 - 1/X
+
+    fig.add_trace(go.Scatter(x=t, y=X, name=f'{label} (V₀={V0:.2f})',
+        line=dict(color=color, width=2)), row=1, col=1)
+    fig.add_trace(go.Scatter(x=t, y=E, name=f'E ({label})',
+        line=dict(color=color, width=2), showlegend=False), row=1, col=2)
+
+# Exact overlay
+t_ex = np.linspace(0, 10, 500)
+fig.add_trace(go.Scatter(x=t_ex, y=exact_critical(t_ex),
+    name='Exact (critical)', line=dict(color='white', dash='dash', width=1)),
+    row=1, col=1)
+
+fig.update_layout(template='plotly_dark')
+fig.update_xaxes(title='T', linecolor='#808080')
+fig.update_yaxes(title='X', linecolor='#808080', row=1, col=1)
+fig.update_yaxes(title='E', linecolor='#808080', row=1, col=2)
+fig.show()
+            </code></pre>
+        </div>
+    </div>
+
+    <div class="tab-content">
+        <div class="code-block-container">
+            <div class="code-header">
+                <span class="code-lang">Python</span>
+                <button class="copy-btn">Copy</button>
+            </div>
+            <pre><code class="language-python">
+import numpy as np
+
+def rk4_step(f, y, t, h):
+    k1 = f(y, t)
+    k2 = f(y + h/2 * k1, t + h/2)
+    k3 = f(y + h/2 * k2, t + h/2)
+    k4 = f(y + h * k3, t + h)
+    return y + (h/6) * (k1 + 2*k2 + 2*k3 + k4)
+
+def escape_ode(y, t):
+    return np.array([y[1], -1/y[0]**2])
+
+def escapes(V0, T=20, N=1000, X_thresh=10):
+    """Return True if projectile reaches X > X_thresh by time T."""
+    h = T / N
+    y = np.array([1.0, V0])
+    for i in range(N):
+        y = rk4_step(escape_ode, y, i*h, h)
+        if y[0] > X_thresh:
+            return True
+        if y[0] < 0.01:  # crashed
+            return False
+    return False
+
+# Bisection
+lo, hi = 1.0, 2.0
+print(f"{'Step':>4s}  {'lo':>10s}  {'hi':>10s}  {'mid':>10s}  {'|mid-√2|':>12s}")
+print("-" * 52)
+
+for step in range(20):
+    mid = (lo + hi) / 2
+    err = abs(mid - np.sqrt(2))
+    print(f"{step:4d}  {lo:10.6f}  {hi:10.6f}  {mid:10.6f}  {err:12.2e}")
+    if escapes(mid):
+        hi = mid  # too fast — lower the upper bound
+    else:
+        lo = mid  # too slow — raise the lower bound
+
+print(f"\nNumerical: V0 = {(lo+hi)/2:.10f}")
+print(f"Exact:     V0 = {np.sqrt(2):.10f}")
+            </code></pre>
+        </div>
+    </div>
+
+    <div class="tab-content">
+        <div class="code-block-container">
+            <div class="code-header">
+                <span class="code-lang">Prompt for AI</span>
+                <button class="copy-btn">Copy</button>
+            </div>
+            <pre><code class="language-text">Solve the dimensionless escape velocity ODE numerically:
+  X'' = -1/X²,  X(0) = 1,  X'(0) = V₀
+
+1. Implement RK4 from scratch (no scipy)
+2. Solve for V₀ = 1.0 (bound), √2 (critical), 2.0 (unbound)
+3. Plot X(T) trajectories and overlay exact solution at critical speed:
+   X(T) = (1 + (3/2)√2 T)^(2/3)
+4. Plot energy E = ½V² - 1/X vs time for each case — should be flat
+5. Implement bisection to find escape velocity numerically:
+   - Bracket [1, 2], 20 steps
+   - Run RK4, check if X exceeds threshold
+6. Print convergence table showing bracket narrowing to √2
+
+Use plotly_dark theme, gray axes (#808080), neon colors.
+Show that 20 bisection steps give ~6 decimal place accuracy.</code></pre>
+        </div>
+
+        <div class="info-box" style="margin-top: var(--spacing-md);">
+            <div class="info-box-title">Pro Tips for Prompting</div>
+            <ul>
+                <li>Ask for the RK4 implementation without scipy — it's more educational</li>
+                <li>Request energy conservation plots as a validation check</li>
+                <li>Ask for a convergence study: vary N and show error scaling as h⁴</li>
+                <li>Challenge: modify for air resistance and find the new escape velocity</li>
+            </ul>
+        </div>
+    </div>
+</div>
+
+<div class="info-box">
+    <div class="info-box-title">What's Next?</div>
+    <p>
+        We've now solved the clean, drag-free escape problem. But real rockets fly through an
+        atmosphere! In Section 4.17, we add air resistance \( F_{\text{drag}} = -\alpha\,e^{-\beta(X-1)}\,V \)
+        to the ODE. The analytical energy trick breaks down — but RK4 and bisection handle it
+        effortlessly. The same tools you just learned extend to problems no textbook can solve analytically.
+    </p>
+</div>
+
+<!-- ============================================================ -->
+<!-- NAVIGATION -->
+<!-- ============================================================ -->
+<div class="btn-group mt-xl">
+    <button class="btn btn-magenta" onclick="navigateToSection('48-nondimensionalization')">&larr; Previous: Non-dimensionalization</button>
+    <button class="btn btn-secondary" onclick="scrollToTop()">&uarr; Back to Top</button>
+    <button class="btn btn-secondary" onclick="navigateToSection('50-air-resistance')">Next: Adding Air Resistance &rarr;</button>
+</div>

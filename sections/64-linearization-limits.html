@@ -1,0 +1,699 @@
+<!-- ============================================================
+     Section 5.14: When Linearization Fails: Edge Cases
+     Source: NPTEL Lecture 8_3 (Part 4) + Lecture8_4
+     Concept: Non-hyperbolic fixed points where linearization
+              is unreliable — centers vs spirals, zero eigenvalues,
+              and the limits of local analysis
+     Time: 20-25 minutes
+     Prerequisites: Sections 5.11-5.13 (linearization, Jacobian,
+                    stability, hyperbolic FPs)
+     ============================================================ -->
+
+<h1>When Linearization Fails</h1>
+
+<p>
+    Linearization is powerful but not infallible. In the last section you learned
+    the trust rule: hyperbolic fixed points are safe. This section explores what
+    goes wrong at the boundary &mdash; <strong>non-hyperbolic</strong> fixed points
+    where tiny nonlinear terms can qualitatively change the behavior. The most
+    dramatic failure: linearization predicts a center, but the true system spirals.
+</p>
+
+<div class="info-box">
+    <div class="info-box-title">Learning Objectives</div>
+    <ul>
+        <li>See concrete examples where linearization <strong>succeeds</strong> (saddle, spiral) and where it <strong>fails</strong> (center → spiral)</li>
+        <li>Understand why centers are <strong>structurally unstable</strong>: any nonlinear perturbation can break closed orbits</li>
+        <li>Recognize the zero-eigenvalue case where linearization is completely inconclusive</li>
+        <li>Build a mental map of the &tau;-&Delta; plane showing which regions are safe and which require caution</li>
+    </ul>
+</div>
+
+<div class="equation-display">
+    <p><strong>The Classic Failure:</strong></p>
+    $$ \dot{r} = \mu r + r^3, \qquad \dot{\theta} = 1 $$
+    <p>
+        When \( \mu = 0 \), the Jacobian at the origin has eigenvalues \( \pm i \) &mdash;
+        a center. But the \( r^3 \) term makes trajectories spiral <em>outward</em>.
+        Linearization misses this entirely because \( r^3 \) vanishes at the origin.
+    </p>
+</div>
+
+<hr>
+
+<!-- ============================================================ -->
+<!-- EXPLORER 1: Success vs Failure -->
+<!-- ============================================================ -->
+<div class="interactive-container" id="success-failure">
+    <div class="interactive-title">Explorer: Success vs Failure</div>
+
+    <p>
+        Two systems with the <strong>same</strong> linearization (a center with
+        &lambda; = &plusmn;i) but different nonlinear terms. The left system has
+        closed orbits (linearization succeeds); the right system spirals outward
+        (linearization fails). Same Jacobian, different truth.
+    </p>
+
+    <div class="dual-panel">
+        <div class="panel">
+            <div class="plot-container" id="lf-successPlot" style="height: 400px;"></div>
+        </div>
+        <div class="panel">
+            <div class="plot-container" id="lf-failurePlot" style="height: 400px;"></div>
+        </div>
+    </div>
+
+    <div id="lf-stats1" class="stats-bar"></div>
+
+    <div class="control-panel">
+        <div class="control-group">
+            <label class="control-label" for="lf-pair-select">Example pair:</label>
+            <select id="lf-pair-select" class="control-select">
+                <option value="centerPair">Center: exact vs broken</option>
+                <option value="weakDamping">Near-center: weak vs strong nonlinearity</option>
+            </select>
+        </div>
+        <div class="control-group">
+            <button class="btn" onclick="lfPairReset()">Reset</button>
+        </div>
+    </div>
+</div>
+
+<div class="info-box">
+    <div class="info-box-title">Why Centers are Fragile</div>
+    <p>
+        A center has pure imaginary eigenvalues: \( \lambda = \pm i\omega \). The orbits
+        are closed because the radial and angular dynamics perfectly balance. But any
+        nonlinear term that gives a net radial push (inward or outward) breaks this
+        balance. The \( \dot{r} = \mu r \) term from linearization is exactly zero at
+        a center &mdash; so the leading-order radial behavior comes from nonlinear
+        terms like \( r^3 \), which linearization cannot see. This is why centers are
+        the <strong>one type you cannot trust</strong> from linearization alone.
+    </p>
+</div>
+
+<!-- ========== Test Your Understanding #1 ========== -->
+<div class="interactive-container question-section">
+    <div class="interactive-title">Test Your Understanding</div>
+
+    <p style="margin-bottom: var(--spacing-md); color: var(--text-secondary);">
+        Use the Success vs Failure explorer to answer these questions.
+    </p>
+
+    <div class="tabs">
+        <div class="tab-buttons">
+            <button class="tab-button active">Question 1</button>
+            <button class="tab-button">Question 2</button>
+            <button class="tab-button">Question 3</button>
+        </div>
+
+        <div class="tab-content active">
+            <div class="question-container" data-type="mcq" data-answer="1">
+                <div class="question-text">
+                    Select <strong>Center: exact vs broken</strong>. Both systems have the
+                    same Jacobian at the origin. Why do they behave differently?
+                </div>
+                <div class="question-options">
+                    <label class="option">
+                        <input type="radio" name="lf-q1" value="0">
+                        <span>They have different eigenvalues</span>
+                    </label>
+                    <label class="option">
+                        <input type="radio" name="lf-q1" value="1">
+                        <span>They have different nonlinear (higher-order) terms that the Jacobian ignores</span>
+                    </label>
+                    <label class="option">
+                        <input type="radio" name="lf-q1" value="2">
+                        <span>One has a fixed point and the other doesn&rsquo;t</span>
+                    </label>
+                    <label class="option">
+                        <input type="radio" name="lf-q1" value="3">
+                        <span>The initial conditions are different</span>
+                    </label>
+                </div>
+                <div class="question-actions">
+                    <button class="btn-verify">Verify</button>
+                </div>
+                <div class="question-explanation" style="display:none;">
+                    <strong>Explanation:</strong>
+                    Both systems have the same Jacobian (same eigenvalues &lambda; = &plusmn;i).
+                    The difference is in the <strong>nonlinear terms</strong> &mdash; the parts
+                    that Taylor expansion drops. In the &ldquo;success&rdquo; system, nonlinear
+                    terms preserve the closed orbits. In the &ldquo;failure&rdquo; system, a
+                    cubic term creates a net outward radial drift. The Jacobian is blind to this.
+                </div>
+            </div>
+        </div>
+
+        <div class="tab-content">
+            <div class="question-container" data-type="fill" data-answer="non-hyperbolic">
+                <div class="question-text">
+                    A fixed point with pure imaginary eigenvalues is called
+                    <select class="fill-blank-select">
+                        <option value=""></option>
+                        <option value="hyperbolic">hyperbolic</option>
+                        <option value="non-hyperbolic">non-hyperbolic</option>
+                        <option value="asymptotic">asymptotic</option>
+                    </select>
+                    because Re(&lambda;) = 0.
+                </div>
+                <div class="question-actions">
+                    <button class="btn-verify">Verify</button>
+                </div>
+                <div class="question-explanation" style="display:none;">
+                    <strong>Explanation:</strong>
+                    <strong>Non-hyperbolic</strong>: at least one eigenvalue has zero real part.
+                    For centers, both eigenvalues are pure imaginary. The Hartman-Grobman theorem
+                    does not apply, so the linearized portrait may not match the true nonlinear one.
+                </div>
+            </div>
+        </div>
+
+        <div class="tab-content">
+            <div class="question-container" data-type="mcq" data-answer="0">
+                <div class="question-text">
+                    Does Lotka-Volterra (predator-prey) have closed orbits at the
+                    coexistence point, even though linearization only predicts a center?
+                </div>
+                <div class="question-options">
+                    <label class="option">
+                        <input type="radio" name="lf-q3" value="0">
+                        <span>Yes &mdash; but this is a lucky coincidence, not guaranteed by linearization</span>
+                    </label>
+                    <label class="option">
+                        <input type="radio" name="lf-q3" value="1">
+                        <span>No &mdash; it actually spirals inward</span>
+                    </label>
+                    <label class="option">
+                        <input type="radio" name="lf-q3" value="2">
+                        <span>Yes &mdash; linearization always gets centers right</span>
+                    </label>
+                    <label class="option">
+                        <input type="radio" name="lf-q3" value="3">
+                        <span>No &mdash; it spirals outward</span>
+                    </label>
+                </div>
+                <div class="question-actions">
+                    <button class="btn-verify">Verify</button>
+                </div>
+                <div class="question-explanation" style="display:none;">
+                    <strong>Explanation:</strong>
+                    Lotka-Volterra does have true closed orbits (provable via a conserved
+                    quantity \( H = x - \ln x + y - \ln y \)). But this is a <strong>special
+                    property</strong> of the specific nonlinear terms, not something linearization
+                    can predict. Other systems with the same linearized center (like the one with
+                    \( r^3 \) terms) can spiral. You need additional analysis (e.g., conserved
+                    quantities) to confirm a true center.
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- ============================================================ -->
+<!-- EXPLORER 2: Nonlinear Effect Tuner -->
+<!-- ============================================================ -->
+<div class="interactive-container" id="nonlinear-tuner">
+    <div class="interactive-title">Explorer: Breaking a Center</div>
+
+    <p>
+        Start with a pure linear center (\( \epsilon = 0 \)) and gradually turn up
+        the nonlinear perturbation \( \epsilon \). Watch closed orbits break into
+        spirals. Positive \( \epsilon \) creates an <strong>unstable spiral</strong>
+        (outward); negative creates a <strong>stable spiral</strong> (inward). The
+        Jacobian never changes &mdash; only the nonlinear terms do.
+    </p>
+
+    <div class="dual-panel">
+        <div class="panel">
+            <div class="plot-container" id="lf-tunerPlot" style="height: 400px;"></div>
+        </div>
+        <div class="panel">
+            <div class="plot-container" id="lf-tunerTimePlot" style="height: 400px;"></div>
+        </div>
+    </div>
+
+    <div id="lf-stats2" class="stats-bar"></div>
+
+    <div class="control-panel">
+        <div class="control-group">
+            <label class="control-label" for="lf-eps-slider">Nonlinear strength &epsilon;:
+                <span id="lf-eps-value">0.00</span>
+            </label>
+            <input type="range" class="slider" id="lf-eps-slider"
+                   min="-0.5" max="0.5" step="0.01" value="0">
+        </div>
+        <div class="control-group">
+            <label class="control-label" for="lf-omega-slider">Frequency &omega;:
+                <span id="lf-omega-value">1.0</span>
+            </label>
+            <input type="range" class="slider" id="lf-omega-slider"
+                   min="0.5" max="3" step="0.1" value="1">
+        </div>
+        <div class="control-group">
+            <button class="btn" onclick="lfTunerReset()">Reset</button>
+        </div>
+    </div>
+</div>
+
+<!-- ========== Test Your Understanding #2 ========== -->
+<div class="interactive-container question-section">
+    <div class="interactive-title">Test Your Understanding</div>
+
+    <p style="margin-bottom: var(--spacing-md); color: var(--text-secondary);">
+        Use the Breaking a Center explorer to answer these questions.
+    </p>
+
+    <div class="tabs">
+        <div class="tab-buttons">
+            <button class="tab-button active">Question 4</button>
+            <button class="tab-button">Question 5</button>
+            <button class="tab-button">Question 6</button>
+        </div>
+
+        <div class="tab-content active">
+            <div class="question-container" data-type="mcq" data-answer="2">
+                <div class="question-text">
+                    Set \( \epsilon = 0 \) (pure center). Now set \( \epsilon = 0.1 \).
+                    What happens to the phase portrait?
+                </div>
+                <div class="question-options">
+                    <label class="option">
+                        <input type="radio" name="lf-q4" value="0">
+                        <span>Nothing &mdash; still closed orbits</span>
+                    </label>
+                    <label class="option">
+                        <input type="radio" name="lf-q4" value="1">
+                        <span>It becomes a saddle</span>
+                    </label>
+                    <label class="option">
+                        <input type="radio" name="lf-q4" value="2">
+                        <span>Orbits spiral outward &mdash; the center becomes an unstable spiral</span>
+                    </label>
+                    <label class="option">
+                        <input type="radio" name="lf-q4" value="3">
+                        <span>Orbits contract to a point instantly</span>
+                    </label>
+                </div>
+                <div class="question-actions">
+                    <button class="btn-verify">Verify</button>
+                </div>
+                <div class="question-explanation" style="display:none;">
+                    <strong>Explanation:</strong>
+                    The nonlinear term \( \epsilon r^2 \) adds a radial drift proportional to
+                    \( r^2 \). When \( \epsilon > 0 \), this drift is outward: trajectories
+                    spiral away from the origin. The Jacobian at the origin is unchanged
+                    (still &lambda; = &plusmn;i&omega;), but the actual behavior is now an
+                    <strong>unstable spiral</strong>. Linearization completely misses this.
+                </div>
+            </div>
+        </div>
+
+        <div class="tab-content">
+            <div class="question-container" data-type="fill" data-answer="stable spiral">
+                <div class="question-text">
+                    Set \( \epsilon = -0.2 \). The trajectories now spiral
+                    <select class="fill-blank-select">
+                        <option value=""></option>
+                        <option value="outward">outward</option>
+                        <option value="inward">inward</option>
+                    </select>,
+                    making the origin a
+                    <select class="fill-blank-select">
+                        <option value=""></option>
+                        <option value="stable spiral">stable spiral</option>
+                        <option value="unstable spiral">unstable spiral</option>
+                        <option value="center">center</option>
+                    </select>.
+                </div>
+                <div class="question-actions">
+                    <button class="btn-verify">Verify</button>
+                </div>
+                <div class="question-explanation" style="display:none;">
+                    <strong>Explanation:</strong>
+                    With \( \epsilon = -0.2 \), the radial drift is \( \dot{r} \approx -0.2 r^3 < 0 \)
+                    (inward). Trajectories spiral <strong>inward</strong> toward the origin,
+                    making it a <strong>stable spiral</strong>. Negative \( \epsilon \) stabilizes;
+                    positive destabilizes. The sign of the nonlinear coefficient determines the
+                    fate that linearization cannot predict.
+                </div>
+            </div>
+        </div>
+
+        <div class="tab-content">
+            <div class="question-container" data-type="msq" data-answer="0,2">
+                <div class="question-text">
+                    Which statements about non-hyperbolic failure are true? (Select all)
+                </div>
+                <div class="question-options">
+                    <label class="option">
+                        <input type="checkbox" value="0">
+                        <span>The Jacobian at the origin is the same for all values of &epsilon;</span>
+                    </label>
+                    <label class="option">
+                        <input type="checkbox" value="1">
+                        <span>Changing &epsilon; changes the eigenvalues of the Jacobian</span>
+                    </label>
+                    <label class="option">
+                        <input type="checkbox" value="2">
+                        <span>To determine stability of a center, you need information beyond the Jacobian</span>
+                    </label>
+                    <label class="option">
+                        <input type="checkbox" value="3">
+                        <span>Linearization failure only occurs for very large nonlinear terms</span>
+                    </label>
+                </div>
+                <div class="question-actions">
+                    <button class="btn-verify">Verify</button>
+                </div>
+                <div class="question-explanation" style="display:none;">
+                    <strong>Explanation:</strong>
+                    <ul>
+                        <li><strong>Same Jacobian:</strong> ✓ The nonlinear terms (\( \epsilon r^2 \)) vanish at the origin, so the Jacobian is always \( \begin{pmatrix} 0 & -\omega \\ \omega & 0 \end{pmatrix} \) regardless of &epsilon;.</li>
+                        <li><strong>Eigenvalues change:</strong> ✗ See above &mdash; the Jacobian is unchanged, so eigenvalues are always &plusmn;i&omega;.</li>
+                        <li><strong>Need more than Jacobian:</strong> ✓ You need to analyze nonlinear terms (e.g., polar coordinate analysis, Lyapunov functions, or conserved quantities).</li>
+                        <li><strong>Only for large nonlinear terms:</strong> ✗ Even infinitesimally small \( \epsilon \neq 0 \) breaks the center into a spiral. The failure is qualitative, not quantitative.</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- ============================================================ -->
+<!-- EXPLORER 3: Trust Region Summary -->
+<!-- ============================================================ -->
+<div class="interactive-container" id="trust-summary">
+    <div class="interactive-title">Explorer: The Trust Map</div>
+
+    <p>
+        The definitive guide: where on the &tau;-&Delta; plane can you trust
+        linearization? Green regions are safe (hyperbolic). The &tau; = 0 axis
+        and &Delta; = 0 axis are the danger zones. Classic physical systems are
+        placed on the map so you can see where they fall.
+    </p>
+
+    <div class="plot-container" id="lf-trustSummaryPlot" style="height: 460px;"></div>
+
+    <div id="lf-stats3" class="stats-bar"></div>
+
+    <div class="control-panel">
+        <div class="control-group">
+            <label class="control-label" for="lf-show-systems">Show systems:</label>
+            <select id="lf-show-systems" class="control-select">
+                <option value="all">All examples</option>
+                <option value="physics">Physics examples only</option>
+                <option value="biology">Biology examples only</option>
+            </select>
+        </div>
+        <div class="control-group">
+            <button class="btn" onclick="lfTrustReset()">Reset</button>
+        </div>
+    </div>
+</div>
+
+<!-- ========== Test Your Understanding #3 ========== -->
+<div class="interactive-container question-section">
+    <div class="interactive-title">Test Your Understanding</div>
+
+    <p style="margin-bottom: var(--spacing-md); color: var(--text-secondary);">
+        Use the Trust Map to answer these questions.
+    </p>
+
+    <div class="tabs">
+        <div class="tab-buttons">
+            <button class="tab-button active">Question 7</button>
+            <button class="tab-button">Question 8</button>
+            <button class="tab-button">Question 9</button>
+        </div>
+
+        <div class="tab-content active">
+            <div class="question-container" data-type="mcq" data-answer="3">
+                <div class="question-text">
+                    Looking at the trust map, what is the <strong>single most important
+                    rule</strong> for linearization reliability?
+                </div>
+                <div class="question-options">
+                    <label class="option">
+                        <input type="radio" name="lf-q7" value="0">
+                        <span>Only trust when Δ > 0</span>
+                    </label>
+                    <label class="option">
+                        <input type="radio" name="lf-q7" value="1">
+                        <span>Only trust when the system is physical</span>
+                    </label>
+                    <label class="option">
+                        <input type="radio" name="lf-q7" value="2">
+                        <span>Only trust when eigenvalues are real</span>
+                    </label>
+                    <label class="option">
+                        <input type="radio" name="lf-q7" value="3">
+                        <span>Trust whenever Re(&lambda;) &ne; 0 for all eigenvalues (hyperbolic)</span>
+                    </label>
+                </div>
+                <div class="question-actions">
+                    <button class="btn-verify">Verify</button>
+                </div>
+                <div class="question-explanation" style="display:none;">
+                    <strong>Explanation:</strong>
+                    The trust criterion is <strong>hyperbolicity</strong>: all eigenvalues must
+                    have nonzero real part. This excludes only the &tau; = 0 axis (centers) and
+                    the &Delta; = 0 axis (zero eigenvalues). Everywhere else &mdash; nodes, spirals,
+                    saddles &mdash; linearization is guaranteed correct by the Hartman-Grobman theorem.
+                </div>
+            </div>
+        </div>
+
+        <div class="tab-content">
+            <div class="question-container" data-type="fill" data-answer="conserved quantity|lyapunov function">
+                <div class="question-text">
+                    When linearization predicts a center, you can confirm true closed orbits
+                    by finding a
+                    <select class="fill-blank-select">
+                        <option value=""></option>
+                        <option value="conserved quantity">conserved quantity</option>
+                        <option value="larger Jacobian">larger Jacobian</option>
+                        <option value="higher derivative">higher derivative</option>
+                        <option value="lyapunov function">Lyapunov function</option>
+                    </select>
+                    that prevents radial drift.
+                </div>
+                <div class="question-actions">
+                    <button class="btn-verify">Verify</button>
+                </div>
+                <div class="question-explanation" style="display:none;">
+                    <strong>Explanation:</strong>
+                    A <strong>conserved quantity</strong> (like energy in a Hamiltonian system, or
+                    \( H = x - \ln x + y - \ln y \) in Lotka-Volterra) forces trajectories to
+                    stay on level curves &mdash; guaranteeing closed orbits. A
+                    <strong>Lyapunov function</strong> can prove stability without solving the ODE.
+                    Both go beyond what the Jacobian alone can tell you.
+                </div>
+            </div>
+        </div>
+
+        <div class="tab-content">
+            <div class="question-container" data-type="mcq" data-answer="1">
+                <div class="question-text">
+                    A student linearizes a nonlinear system and finds eigenvalues
+                    \( \lambda = -0.001 \pm 2i \). Should they trust this prediction of
+                    a stable spiral?
+                </div>
+                <div class="question-options">
+                    <label class="option">
+                        <input type="radio" name="lf-q9" value="0">
+                        <span>No &mdash; the real part is too small to be meaningful</span>
+                    </label>
+                    <label class="option">
+                        <input type="radio" name="lf-q9" value="1">
+                        <span>Technically yes (hyperbolic), but practically they should be cautious since Re(&lambda;) &asymp; 0</span>
+                    </label>
+                    <label class="option">
+                        <input type="radio" name="lf-q9" value="2">
+                        <span>Yes, absolutely &mdash; any nonzero real part means full reliability</span>
+                    </label>
+                    <label class="option">
+                        <input type="radio" name="lf-q9" value="3">
+                        <span>No &mdash; complex eigenvalues are never trustworthy</span>
+                    </label>
+                </div>
+                <div class="question-actions">
+                    <button class="btn-verify">Verify</button>
+                </div>
+                <div class="question-explanation" style="display:none;">
+                    <strong>Explanation:</strong>
+                    Technically, Re(&lambda;) = &minus;0.001 &ne; 0, so the FP is hyperbolic
+                    and the Hartman-Grobman theorem applies. But <strong>practically</strong>,
+                    being so close to the imaginary axis means the system is &ldquo;almost a
+                    center.&rdquo; Nonlinear terms could easily dominate the tiny linear decay,
+                    making the true behavior differ from the linearized prediction at observable
+                    timescales. Mathematical rigor says &ldquo;trust,&rdquo; but physical
+                    intuition says &ldquo;verify.&rdquo;
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- ============================================================ -->
+<!-- PYTHON CODE EXAMPLES -->
+<!-- ============================================================ -->
+<h2>Python Code</h2>
+
+<div class="tabs">
+    <div class="tab-buttons">
+        <button class="tab-button active">Center Breaking</button>
+        <button class="tab-button">Trust Map</button>
+        <button class="tab-button">Prompt</button>
+    </div>
+
+    <div class="tab-content active">
+        <div class="code-block-container">
+            <div class="code-header">
+                <span class="code-lang">Python</span>
+                <button class="copy-btn">Copy</button>
+            </div>
+            <pre><code class="language-python">
+import numpy as np
+import plotly.graph_objects as go
+from plotly.subplots import make_subplots
+
+def rk4(f, g, x0, y0, T, N):
+    h=T/N; X,Y=[x0],[y0]; x,y=x0,y0
+    for _ in range(N):
+        k1x,k1y=f(x,y),g(x,y)
+        k2x,k2y=f(x+h/2*k1x,y+h/2*k1y),g(x+h/2*k1x,y+h/2*k1y)
+        k3x,k3y=f(x+h/2*k2x,y+h/2*k2y),g(x+h/2*k2x,y+h/2*k2y)
+        k4x,k4y=f(x+h*k3x,y+h*k3y),g(x+h*k3x,y+h*k3y)
+        x+=h/6*(k1x+2*k2x+2*k3x+k4x)
+        y+=h/6*(k1y+2*k2y+2*k3y+k4y)
+        if x*x+y*y>100: break
+        X.append(x); Y.append(y)
+    return np.array(X), np.array(Y)
+
+# System: ẋ = -y + ε·x·(x²+y²), ẏ = x + ε·y·(x²+y²)
+# Jacobian at origin: [[0,-1],[1,0]] for ALL ε
+# But ε>0 → unstable spiral, ε<0 → stable spiral
+
+fig = make_subplots(1, 3, subplot_titles=[
+    'ε=0 (Center)', 'ε=0.1 (Unstable spiral)', 'ε=−0.1 (Stable spiral)'])
+
+colors = ['#00f3ff','#ff006e','#ffbe0b','#00ff88']
+for col, eps in enumerate([0, 0.1, -0.1]):
+    f = lambda x,y,e=eps: -y + e*x*(x*x+y*y)
+    g = lambda x,y,e=eps:  x + e*y*(x*x+y*y)
+    for k in range(4):
+        th = k*np.pi/2
+        X, Y = rk4(f, g, np.cos(th), np.sin(th), 15, 3000)
+        fig.add_trace(go.Scatter(x=X, y=Y, mode='lines',
+            line=dict(color=colors[k], width=1.5),
+            showlegend=False), row=1, col=col+1)
+
+for col in range(3):
+    fig.update_xaxes(title='x', range=[-3,3],
+        zerolinecolor='#808080', row=1, col=col+1)
+    fig.update_yaxes(title='y', range=[-3,3],
+        zerolinecolor='#808080', row=1, col=col+1)
+
+fig.update_layout(template='plotly_dark', height=400, width=1000)
+fig.show()
+            </code></pre>
+        </div>
+    </div>
+
+    <div class="tab-content">
+        <div class="code-block-container">
+            <div class="code-header">
+                <span class="code-lang">Python</span>
+                <button class="copy-btn">Copy</button>
+            </div>
+            <pre><code class="language-python">
+import numpy as np
+import plotly.graph_objects as go
+
+fig = go.Figure()
+tau = np.linspace(-5, 5, 400)
+
+# Parabola boundary
+fig.add_trace(go.Scatter(x=tau, y=tau**2/4, mode='lines',
+    line=dict(color='white', width=2), name='τ²=4Δ'))
+
+# Trust regions
+fig.add_shape(type='rect', x0=-5,x1=5,y0=-3,y1=0,
+    fillcolor='rgba(0,255,136,0.1)', line=dict(width=0))
+fig.add_shape(type='rect', x0=-5,x1=-0.1,y0=0,y1=7,
+    fillcolor='rgba(0,255,136,0.08)', line=dict(width=0))
+fig.add_shape(type='rect', x0=0.1,x1=5,y0=0,y1=7,
+    fillcolor='rgba(0,255,136,0.08)', line=dict(width=0))
+
+# Danger zones
+fig.add_trace(go.Scatter(x=[0,0],y=[0,7], mode='lines',
+    line=dict(color='#ffbe0b', width=4),
+    name='τ=0 (DANGER)'))
+fig.add_trace(go.Scatter(x=[-5,5],y=[0,0], mode='lines',
+    line=dict(color='#ff5722', width=2, dash='dash'),
+    name='Δ=0 (DANGER)'))
+
+# Example systems
+examples = [
+    (-0.6, 2, 'Damped\nPendulum', '#00f3ff'),
+    (0, 2, 'Lotka-\nVolterra', '#ffbe0b'),
+    (-4, 3, 'Overdamped\nSHO', '#00f3ff'),
+    (0.6, 2, 'Van der Pol\n(unstable)', '#ff006e'),
+    (-1, -2, 'Competing\nSpecies', '#00ff88'),
+]
+for tau_v, delta_v, label, color in examples:
+    fig.add_trace(go.Scatter(x=[tau_v],y=[delta_v],
+        mode='markers+text', text=[label],
+        textposition='top center',
+        textfont=dict(color=color, size=10),
+        marker=dict(color=color, size=12,
+            line=dict(color='white', width=2)),
+        showlegend=False))
+
+fig.update_layout(template='plotly_dark',
+    xaxis=dict(title='τ', range=[-5,5],
+        zerolinecolor='#808080'),
+    yaxis=dict(title='Δ', range=[-3,7],
+        zerolinecolor='#808080'),
+    height=550, width=650)
+fig.show()
+            </code></pre>
+        </div>
+    </div>
+
+    <div class="tab-content">
+        <div class="code-block-container">
+            <div class="code-header">
+                <span class="code-lang">Prompt for AI</span>
+                <button class="copy-btn">Copy</button>
+            </div>
+            <pre><code class="language-text">Create a Python script using Plotly to demonstrate when
+linearization fails for 2D dynamical systems.
+
+Requirements:
+- Show three phase portraits side by side:
+  1. ε=0: true center (closed orbits)
+  2. ε=0.1: broken center → unstable spiral
+  3. ε=-0.1: broken center → stable spiral
+- System: ẋ=-y+εx(x²+y²), ẏ=x+εy(x²+y²)
+- All three have SAME Jacobian at origin: [[0,-1],[1,0]]
+- Solve with RK4 (not scipy), 4 trajectories from unit circle
+- Also create a "trust map" on the τ-Δ plane showing:
+  - Green regions: safe (hyperbolic)
+  - Yellow line: τ=0 axis (danger — centers)
+  - Orange line: Δ=0 axis (danger — zero eigenvalues)
+  - Place classic systems as labeled markers
+- Use dark theme (plotly_dark) with gray (#808080) axes</code></pre>
+        </div>
+    </div>
+</div>
+
+<!-- ============================================================ -->
+<!-- NAVIGATION -->
+<!-- ============================================================ -->
+<div class="btn-group mt-xl">
+    <button class="btn btn-magenta" onclick="navigateToSection('63-linearization-stability')">&larr; Previous: Stability from Linearization</button>
+    <button class="btn btn-secondary" onclick="scrollToTop()">&uarr; Back to Top</button>
+    <button class="btn btn-secondary" onclick="navigateToSection('65-polar-coordinates')">Next: Polar Coordinates &rarr;</button>
+</div>

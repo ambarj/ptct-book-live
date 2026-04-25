@@ -1,0 +1,648 @@
+<!-- ============================================================
+     Section 7.3: The Binomial Distribution
+     Source: NPTEL Lecture 9 (Random Walks, Part 3)
+     Concept: Exact probability distribution of random walk
+              position — binomial coefficients, bell curve
+              emergence, connection to CLT
+     Time: 20-25 minutes
+     Prerequisites: Sections 7.1-7.2 (random walk, statistics)
+     ============================================================ -->
+
+<h1>The Binomial Distribution</h1>
+
+<p>
+    You know the <em>statistics</em> of random walks: \( \langle x \rangle = 0 \)
+    and \( \langle x^2 \rangle = N \). But what is the <strong>exact probability</strong>
+    of ending at position \( m \) after \( N \) steps? The answer is the
+    <strong>binomial distribution</strong> &mdash; the same distribution that
+    describes coin flips. It starts spiky for small N, but as N grows, it morphs
+    into a smooth bell curve: the Gaussian.
+</p>
+
+<div class="info-box">
+    <div class="info-box-title">Learning Objectives</div>
+    <ul>
+        <li>Derive the probability \( P(n_R) = \binom{N}{n_R} p^{n_R} q^{N-n_R} \) of taking \( n_R \) right steps out of \( N \)</li>
+        <li>Convert between \( n_R \) (right steps) and position \( m = 2n_R - N \)</li>
+        <li>Watch the binomial distribution evolve from <strong>discrete and spiky</strong> (small N) to a <strong>smooth Gaussian</strong> (large N)</li>
+        <li>Verify that simulation histograms match the exact binomial formula</li>
+    </ul>
+</div>
+
+<div class="equation-display">
+    <p><strong>The Binomial Distribution:</strong></p>
+    $$ P(n_R \text{ right steps}) = \binom{N}{n_R} p^{n_R} q^{N - n_R}, \qquad \binom{N}{n_R} = \frac{N!}{n_R!\,(N - n_R)!} $$
+    <p>
+        Position after N steps: \( m = 2n_R - N \) (ranges from \( -N \) to \( +N \)
+        in steps of 2). The peak is at \( n_R = Np \), i.e., \( m = N(p - q) \).
+        The width is \( \sigma = 2\sqrt{Npq} \).
+    </p>
+</div>
+
+<hr>
+
+<!-- ============================================================ -->
+<!-- EXPLORER 1: Binomial Visualizer -->
+<!-- ============================================================ -->
+<div class="interactive-container" id="binomial-visualizer">
+    <div class="interactive-title">Explorer: The Binomial Distribution</div>
+
+    <p>
+        See the exact probability of each position after N steps. For small N,
+        the distribution is discrete with visible gaps. As N grows, it
+        <strong>fills in</strong> and approaches a Gaussian. Adjust p to shift
+        the peak.
+    </p>
+
+    <div class="plot-container" id="bd-distPlot" style="height: 420px;"></div>
+
+    <div id="bd-stats1" class="stats-bar"></div>
+
+    <div class="control-panel">
+        <div class="control-group">
+            <label class="control-label" for="bd-N-slider">Steps N:
+                <span id="bd-N-value">20</span>
+            </label>
+            <input type="range" class="slider" id="bd-N-slider"
+                   min="4" max="100" step="2" value="20">
+        </div>
+        <div class="control-group">
+            <label class="control-label" for="bd-p-slider">Probability p:
+                <span id="bd-p-value">0.50</span>
+            </label>
+            <input type="range" class="slider" id="bd-p-slider"
+                   min="0.2" max="0.8" step="0.01" value="0.5">
+        </div>
+        <div class="control-group">
+            <button class="btn" onclick="bdReset()">Reset</button>
+        </div>
+    </div>
+</div>
+
+<div class="info-box">
+    <div class="info-box-title">Why Only Even or Odd Positions?</div>
+    <p>
+        After N steps, the position \( m = 2n_R - N \) has the same parity as N.
+        If N is even, only even positions are reachable; if N is odd, only odd
+        positions. This is why the distribution has gaps &mdash; you can&rsquo;t
+        be at position 3 after 10 steps, because 10 &minus; 3 = 7 isn&rsquo;t
+        divisible by 2. The gaps disappear visually for large N as the spacing
+        becomes negligible.
+    </p>
+</div>
+
+<!-- ========== Test Your Understanding #1 ========== -->
+<div class="interactive-container question-section">
+    <div class="interactive-title">Test Your Understanding</div>
+
+    <p style="margin-bottom: var(--spacing-md); color: var(--text-secondary);">
+        Use the Binomial Distribution explorer to answer these questions.
+    </p>
+
+    <div class="tabs">
+        <div class="tab-buttons">
+            <button class="tab-button active">Question 1</button>
+            <button class="tab-button">Question 2</button>
+            <button class="tab-button">Question 3</button>
+        </div>
+
+        <div class="tab-content active">
+            <div class="question-container" data-type="mcq" data-answer="0">
+                <div class="question-text">
+                    Set N = 20, p = 0.5. Where is the peak of the distribution?
+                </div>
+                <div class="question-options">
+                    <label class="option">
+                        <input type="radio" name="bd-q1" value="0">
+                        <span>At m = 0 (the origin) &mdash; most likely to be back where you started</span>
+                    </label>
+                    <label class="option">
+                        <input type="radio" name="bd-q1" value="1">
+                        <span>At m = 20 (all steps right)</span>
+                    </label>
+                    <label class="option">
+                        <input type="radio" name="bd-q1" value="2">
+                        <span>At m = &minus;20 (all steps left)</span>
+                    </label>
+                    <label class="option">
+                        <input type="radio" name="bd-q1" value="3">
+                        <span>At a random position each time</span>
+                    </label>
+                </div>
+                <div class="question-actions">
+                    <button class="btn-verify">Verify</button>
+                </div>
+                <div class="question-explanation" style="display:none;">
+                    <strong>Explanation:</strong>
+                    For p = 0.5: peak at \( m = N(p - q) = 0 \). The most probable outcome
+                    is equal numbers of left and right steps, returning to the origin. But the
+                    probability of <em>exactly</em> m = 0 decreases as \( 1/\sqrt{N} \) &mdash;
+                    even the most likely position becomes unlikely for large N.
+                </div>
+            </div>
+        </div>
+
+        <div class="tab-content">
+            <div class="question-container" data-type="fill" data-answer="6[4,8]">
+                <div class="question-text">
+                    With N = 20, p = 0.5: the width (standard deviation) of the distribution
+                    is \( \sigma = 2\sqrt{Npq} = 2\sqrt{20 \times 0.25} \approx \)
+                    <input type="text" class="fill-blank" style="width: 50px">.
+                </div>
+                <div class="question-actions">
+                    <button class="btn-verify">Verify</button>
+                </div>
+                <div class="question-explanation" style="display:none;">
+                    <strong>Explanation:</strong>
+                    \( \sigma = 2\sqrt{Npq} = 2\sqrt{20 \times 0.5 \times 0.5} = 2\sqrt{5} \approx 4.47 \).
+                    Alternatively, since each step has variance 1: \( \sigma = \sqrt{N} = \sqrt{20} \approx 4.47 \).
+                    Most walkers end within about &plusmn;4&ndash;5 of the origin.
+                </div>
+            </div>
+        </div>
+
+        <div class="tab-content">
+            <div class="question-container" data-type="mcq" data-answer="1">
+                <div class="question-text">
+                    Set p = 0.6 (biased). How does the distribution change?
+                </div>
+                <div class="question-options">
+                    <label class="option">
+                        <input type="radio" name="bd-q3" value="0">
+                        <span>It stays centered at 0 &mdash; bias doesn&rsquo;t affect the peak</span>
+                    </label>
+                    <label class="option">
+                        <input type="radio" name="bd-q3" value="1">
+                        <span>The peak shifts rightward to \( m = N(2p - 1) = 4 \)</span>
+                    </label>
+                    <label class="option">
+                        <input type="radio" name="bd-q3" value="2">
+                        <span>It becomes uniform (flat)</span>
+                    </label>
+                    <label class="option">
+                        <input type="radio" name="bd-q3" value="3">
+                        <span>It becomes bimodal (two peaks)</span>
+                    </label>
+                </div>
+                <div class="question-actions">
+                    <button class="btn-verify">Verify</button>
+                </div>
+                <div class="question-explanation" style="display:none;">
+                    <strong>Explanation:</strong>
+                    With p = 0.6, the peak shifts to \( m = N(2p - 1) = 20 \times 0.2 = 4 \).
+                    The distribution is still bell-shaped but <strong>asymmetric</strong> and
+                    centered at the drift value. The width is slightly narrower:
+                    \( \sigma = 2\sqrt{20 \times 0.6 \times 0.4} \approx 4.38 \).
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- ============================================================ -->
+<!-- EXPLORER 2: N Evolution -->
+<!-- ============================================================ -->
+<div class="interactive-container" id="n-evolution">
+    <div class="interactive-title">Explorer: From Spiky to Smooth</div>
+
+    <p>
+        Watch the distribution evolve as N increases. At N = 4, only 5 positions
+        are possible. At N = 100, the distribution is a smooth Gaussian.
+        The <strong>Gaussian overlay</strong> (dashed) shows the CLT approximation.
+    </p>
+
+    <div class="dual-panel">
+        <div class="panel">
+            <div class="plot-container" id="bd-evolSmallPlot" style="height: 400px;"></div>
+        </div>
+        <div class="panel">
+            <div class="plot-container" id="bd-evolLargePlot" style="height: 400px;"></div>
+        </div>
+    </div>
+
+    <div id="bd-stats2" class="stats-bar"></div>
+
+    <div class="control-panel">
+        <div class="control-group">
+            <label class="control-label" for="bd-evol-N-slider">Steps N:
+                <span id="bd-evol-N-value">10</span>
+            </label>
+            <input type="range" class="slider" id="bd-evol-N-slider"
+                   min="4" max="200" step="2" value="10">
+        </div>
+        <div class="control-group">
+            <button class="btn" onclick="bdEvolReset()">Reset</button>
+        </div>
+    </div>
+</div>
+
+<!-- ========== Test Your Understanding #2 ========== -->
+<div class="interactive-container question-section">
+    <div class="interactive-title">Test Your Understanding</div>
+
+    <p style="margin-bottom: var(--spacing-md); color: var(--text-secondary);">
+        Use the N Evolution explorer to answer these questions.
+    </p>
+
+    <div class="tabs">
+        <div class="tab-buttons">
+            <button class="tab-button active">Question 4</button>
+            <button class="tab-button">Question 5</button>
+            <button class="tab-button">Question 6</button>
+        </div>
+
+        <div class="tab-content active">
+            <div class="question-container" data-type="mcq" data-answer="2">
+                <div class="question-text">
+                    Set N = 4. How many distinct positions can the walker reach?
+                </div>
+                <div class="question-options">
+                    <label class="option">
+                        <input type="radio" name="bd-q4" value="0">
+                        <span>4 (one for each step)</span>
+                    </label>
+                    <label class="option">
+                        <input type="radio" name="bd-q4" value="1">
+                        <span>9 (from &minus;4 to +4)</span>
+                    </label>
+                    <label class="option">
+                        <input type="radio" name="bd-q4" value="2">
+                        <span>5: positions &minus;4, &minus;2, 0, 2, 4 (even only)</span>
+                    </label>
+                    <label class="option">
+                        <input type="radio" name="bd-q4" value="3">
+                        <span>Infinitely many</span>
+                    </label>
+                </div>
+                <div class="question-actions">
+                    <button class="btn-verify">Verify</button>
+                </div>
+                <div class="question-explanation" style="display:none;">
+                    <strong>Explanation:</strong>
+                    After N = 4 steps, \( n_R \) ranges from 0 to 4, giving
+                    \( m = 2n_R - 4 \in \{-4, -2, 0, 2, 4\} \). Only <strong>5</strong>
+                    positions, all even (since N is even). The distribution has just 5 bars.
+                </div>
+            </div>
+        </div>
+
+        <div class="tab-content">
+            <div class="question-container" data-type="mcq" data-answer="0">
+                <div class="question-text">
+                    Increase N from 10 to 100. How well does the Gaussian approximation fit?
+                </div>
+                <div class="question-options">
+                    <label class="option">
+                        <input type="radio" name="bd-q5" value="0">
+                        <span>Excellent at N = 100 &mdash; nearly indistinguishable from the exact binomial</span>
+                    </label>
+                    <label class="option">
+                        <input type="radio" name="bd-q5" value="1">
+                        <span>Poor &mdash; the Gaussian is always wrong</span>
+                    </label>
+                    <label class="option">
+                        <input type="radio" name="bd-q5" value="2">
+                        <span>Good only for biased walks</span>
+                    </label>
+                    <label class="option">
+                        <input type="radio" name="bd-q5" value="3">
+                        <span>The fit gets worse as N increases</span>
+                    </label>
+                </div>
+                <div class="question-actions">
+                    <button class="btn-verify">Verify</button>
+                </div>
+                <div class="question-explanation" style="display:none;">
+                    <strong>Explanation:</strong>
+                    The <strong>central limit theorem</strong> guarantees that the binomial
+                    distribution approaches a Gaussian for large N. By N = 100, the match
+                    is <strong>excellent</strong> &mdash; the dashed Gaussian curve sits right
+                    on top of the bars. This is the CLT in action.
+                </div>
+            </div>
+        </div>
+
+        <div class="tab-content">
+            <div class="question-container" data-type="msq" data-answer="0,2">
+                <div class="question-text">
+                    As N increases, which properties of the distribution change? (Select all)
+                </div>
+                <div class="question-options">
+                    <label class="option">
+                        <input type="checkbox" value="0">
+                        <span>The width grows as \( \sqrt{N} \)</span>
+                    </label>
+                    <label class="option">
+                        <input type="checkbox" value="1">
+                        <span>The center shifts to the right</span>
+                    </label>
+                    <label class="option">
+                        <input type="checkbox" value="2">
+                        <span>The peak height decreases as \( 1/\sqrt{N} \)</span>
+                    </label>
+                    <label class="option">
+                        <input type="checkbox" value="3">
+                        <span>The distribution becomes bimodal</span>
+                    </label>
+                </div>
+                <div class="question-actions">
+                    <button class="btn-verify">Verify</button>
+                </div>
+                <div class="question-explanation" style="display:none;">
+                    <strong>Explanation:</strong>
+                    <ul>
+                        <li><strong>Width ∝ √N:</strong> ✓ The standard deviation is \( \sqrt{N} \).</li>
+                        <li><strong>Center shifts:</strong> ✗ For p = 0.5, the center stays at 0. (For biased walks, yes.)</li>
+                        <li><strong>Peak ∝ 1/√N:</strong> ✓ The peak probability is \( P(0) \approx 1/\sqrt{\pi N/2} \), which decreases as the distribution spreads.</li>
+                        <li><strong>Bimodal:</strong> ✗ It remains unimodal (single peak) for all N.</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- ============================================================ -->
+<!-- EXPLORER 3: Simulation vs Theory -->
+<!-- ============================================================ -->
+<div class="interactive-container" id="sim-vs-theory">
+    <div class="interactive-title">Explorer: Simulation vs Exact Theory</div>
+
+    <p>
+        The ultimate test: run thousands of random walks and compare the histogram
+        of final positions with the <strong>exact binomial formula</strong>. They
+        should match &mdash; confirming that the theory correctly describes random walks.
+    </p>
+
+    <div class="plot-container" id="bd-simPlot" style="height: 420px;"></div>
+
+    <div id="bd-stats3" class="stats-bar"></div>
+
+    <div class="control-panel">
+        <div class="control-group">
+            <label class="control-label" for="bd-sim-N-slider">Steps N:
+                <span id="bd-sim-N-value">50</span>
+            </label>
+            <input type="range" class="slider" id="bd-sim-N-slider"
+                   min="10" max="200" step="10" value="50">
+        </div>
+        <div class="control-group">
+            <label class="control-label" for="bd-sim-nw-slider">Walkers:
+                <span id="bd-sim-nw-value">5000</span>
+            </label>
+            <input type="range" class="slider" id="bd-sim-nw-slider"
+                   min="500" max="20000" step="500" value="5000">
+        </div>
+        <div class="control-group">
+            <button class="btn" onclick="bdSimRun()">Run Comparison</button>
+        </div>
+    </div>
+</div>
+
+<!-- ========== Test Your Understanding #3 ========== -->
+<div class="interactive-container question-section">
+    <div class="interactive-title">Test Your Understanding</div>
+
+    <p style="margin-bottom: var(--spacing-md); color: var(--text-secondary);">
+        Use the Simulation vs Theory explorer to answer these questions.
+    </p>
+
+    <div class="tabs">
+        <div class="tab-buttons">
+            <button class="tab-button active">Question 7</button>
+            <button class="tab-button">Question 8</button>
+            <button class="tab-button">Question 9</button>
+        </div>
+
+        <div class="tab-content active">
+            <div class="question-container" data-type="mcq" data-answer="0">
+                <div class="question-text">
+                    Run with N = 50, 5000 walkers. How well does the simulation histogram
+                    match the exact binomial?
+                </div>
+                <div class="question-options">
+                    <label class="option">
+                        <input type="radio" name="bd-q7" value="0">
+                        <span>Very well &mdash; the bars closely follow the theoretical curve</span>
+                    </label>
+                    <label class="option">
+                        <input type="radio" name="bd-q7" value="1">
+                        <span>Poorly &mdash; they disagree significantly</span>
+                    </label>
+                    <label class="option">
+                        <input type="radio" name="bd-q7" value="2">
+                        <span>Only the peak matches</span>
+                    </label>
+                    <label class="option">
+                        <input type="radio" name="bd-q7" value="3">
+                        <span>The simulation always gives a flat histogram</span>
+                    </label>
+                </div>
+                <div class="question-actions">
+                    <button class="btn-verify">Verify</button>
+                </div>
+                <div class="question-explanation" style="display:none;">
+                    <strong>Explanation:</strong>
+                    With 5000 walkers, the histogram closely matches the binomial theory.
+                    Statistical fluctuations are small (\( \sim 1/\sqrt{5000} \)). This is
+                    the <strong>validation</strong>: random walk simulations produce exactly the
+                    distribution predicted by combinatorics.
+                </div>
+            </div>
+        </div>
+
+        <div class="tab-content">
+            <div class="question-container" data-type="fill" data-answer="binomial">
+                <div class="question-text">
+                    The exact probability distribution of a random walk after N steps is the
+                    <select class="fill-blank-select">
+                        <option value=""></option>
+                        <option value="uniform">uniform</option>
+                        <option value="binomial">binomial</option>
+                        <option value="exponential">exponential</option>
+                        <option value="poisson">Poisson</option>
+                    </select>
+                    distribution.
+                </div>
+                <div class="question-actions">
+                    <button class="btn-verify">Verify</button>
+                </div>
+                <div class="question-explanation" style="display:none;">
+                    <strong>Explanation:</strong>
+                    Each step is an independent Bernoulli trial (right with probability p, left
+                    with probability q). The total number of right steps follows the
+                    <strong>binomial</strong> distribution. The position \( m = 2n_R - N \) is
+                    a linear transformation of the binomial random variable.
+                </div>
+            </div>
+        </div>
+
+        <div class="tab-content">
+            <div class="question-container" data-type="mcq" data-answer="2">
+                <div class="question-text">
+                    Increase walkers from 500 to 20,000. What changes?
+                </div>
+                <div class="question-options">
+                    <label class="option">
+                        <input type="radio" name="bd-q9" value="0">
+                        <span>The theoretical curve changes shape</span>
+                    </label>
+                    <label class="option">
+                        <input type="radio" name="bd-q9" value="1">
+                        <span>Nothing changes</span>
+                    </label>
+                    <label class="option">
+                        <input type="radio" name="bd-q9" value="2">
+                        <span>The histogram becomes smoother and matches theory more closely</span>
+                    </label>
+                    <label class="option">
+                        <input type="radio" name="bd-q9" value="3">
+                        <span>The histogram becomes wider</span>
+                    </label>
+                </div>
+                <div class="question-actions">
+                    <button class="btn-verify">Verify</button>
+                </div>
+                <div class="question-explanation" style="display:none;">
+                    <strong>Explanation:</strong>
+                    More walkers = better statistics. The histogram becomes smoother with smaller
+                    bar-to-bar fluctuations, matching the theoretical curve more precisely. The
+                    <em>shape</em> doesn&rsquo;t change (same N, same distribution) &mdash; only
+                    the <em>quality</em> of the histogram improves.
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- ============================================================ -->
+<!-- PYTHON CODE -->
+<!-- ============================================================ -->
+<h2>Python Code</h2>
+
+<div class="tabs">
+    <div class="tab-buttons">
+        <button class="tab-button active">Binomial Distribution</button>
+        <button class="tab-button">Sim vs Theory</button>
+        <button class="tab-button">Prompt</button>
+    </div>
+
+    <div class="tab-content active">
+        <div class="code-block-container">
+            <div class="code-header">
+                <span class="code-lang">Python</span>
+                <button class="copy-btn">Copy</button>
+            </div>
+            <pre><code class="language-python">
+import numpy as np
+import plotly.graph_objects as go
+from math import comb
+
+N, p = 50, 0.5
+q = 1 - p
+
+# Exact binomial P(n_R) for each possible n_R
+n_R_vals = np.arange(0, N + 1)
+m_vals = 2 * n_R_vals - N  # position
+probs = np.array([comb(N, int(nR)) * p**nR * q**(N-nR)
+                  for nR in n_R_vals])
+
+# Gaussian approximation
+mu = N * (p - q)
+sigma = 2 * np.sqrt(N * p * q)
+x = np.linspace(mu - 4*sigma, mu + 4*sigma, 200)
+gauss = np.exp(-(x - mu)**2 / (2 * sigma**2)) / (sigma * np.sqrt(2*np.pi))
+
+fig = go.Figure()
+fig.add_trace(go.Bar(x=m_vals, y=probs,
+    marker_color='#00f3ff', opacity=0.7, name='Binomial'))
+fig.add_trace(go.Scatter(x=x, y=gauss * 2,  # factor 2 for bar spacing
+    mode='lines', line=dict(color='white', width=2, dash='dash'),
+    name=f'Gaussian (σ={sigma:.1f})'))
+
+fig.update_layout(template='plotly_dark',
+    xaxis=dict(title='Position m', zerolinecolor='#808080'),
+    yaxis=dict(title='P(m)', zerolinecolor='#808080'),
+    height=450, width=600)
+fig.show()
+            </code></pre>
+        </div>
+    </div>
+
+    <div class="tab-content">
+        <div class="code-block-container">
+            <div class="code-header">
+                <span class="code-lang">Python</span>
+                <button class="copy-btn">Copy</button>
+            </div>
+            <pre><code class="language-python">
+import numpy as np
+import plotly.graph_objects as go
+from math import comb
+
+N, p, n_walkers = 50, 0.5, 5000
+
+# Simulation
+finals = np.sum(np.random.choice([-1, 1], (n_walkers, N)), axis=1)
+
+# Theory
+n_R_vals = np.arange(0, N + 1)
+m_vals = 2 * n_R_vals - N
+probs = np.array([comb(N, int(nR)) * p**nR * (1-p)**(N-nR)
+                  for nR in n_R_vals])
+
+fig = go.Figure()
+fig.add_trace(go.Histogram(x=finals, nbinsx=N+1,
+    histnorm='probability density',
+    marker_color='#00f3ff', opacity=0.6,
+    name='Simulation'))
+fig.add_trace(go.Bar(x=m_vals, y=probs / 2,  # /2 for density
+    marker_color='#ffbe0b', opacity=0.5,
+    name='Exact binomial'))
+
+fig.update_layout(template='plotly_dark',
+    xaxis=dict(title='Position m', zerolinecolor='#808080'),
+    yaxis=dict(title='Probability density', zerolinecolor='#808080'),
+    barmode='overlay', height=450, width=600)
+fig.show()
+            </code></pre>
+        </div>
+    </div>
+
+    <div class="tab-content">
+        <div class="code-block-container">
+            <div class="code-header">
+                <span class="code-lang">Prompt for AI</span>
+                <button class="copy-btn">Copy</button>
+            </div>
+            <pre><code class="language-text">Create a Python script using Plotly to explore the binomial
+distribution of random walks.
+
+Requirements:
+- Part 1: Exact binomial P(m) for N=50, p=0.5
+  Bar chart of P(m) vs position m
+  Overlay Gaussian approximation (dashed white)
+
+- Part 2: N evolution — show distributions for N = 4, 10, 50, 200
+  4 subplots, each with binomial bars + Gaussian overlay
+  Show how distribution becomes smoother with N
+
+- Part 3: Simulation vs theory comparison
+  Run 5000 walks of N=50 steps
+  Overlay simulation histogram with exact binomial bars
+  Show they match
+
+- Use math.comb for binomial coefficients
+- Use dark theme (plotly_dark) with gray (#808080) axes</code></pre>
+        </div>
+    </div>
+</div>
+
+<!-- ============================================================ -->
+<!-- NAVIGATION -->
+<!-- ============================================================ -->
+<div class="btn-group mt-xl">
+    <button class="btn btn-magenta" onclick="navigateToSection('77-walk-statistics')">&larr; Previous: Statistics of Random Walks</button>
+    <button class="btn btn-secondary" onclick="scrollToTop()">&uarr; Back to Top</button>
+    <button class="btn btn-secondary" onclick="navigateToSection('79-biased-walks')">Next: Biased Walks &amp; Drift &rarr;</button>
+</div>

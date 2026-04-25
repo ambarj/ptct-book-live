@@ -1,0 +1,725 @@
+<!-- ============================================================
+     Section 5.3: Finding Fixed Points
+     Source: NPTEL Lecture 8_1 (Linear Systems & Phase Space, Part 3)
+     Concept: Fixed points as equilibria, nullcline method for
+              locating them, graphical stability analysis
+     Time: 15-20 minutes
+     Prerequisites: Sections 5.1-5.2 (phase space, vector fields)
+     ============================================================ -->
+
+<h1>Finding Fixed Points</h1>
+
+<p>
+    Every phase portrait is organized around its <strong>fixed points</strong> — the
+    equilibria where the system doesn't move. At a fixed point \( (x^*, y^*) \), the
+    velocity is zero: \( f(x^*, y^*) = 0 \) and \( g(x^*, y^*) = 0 \). Find the fixed
+    points, and you've found the skeleton of the dynamics.
+</p>
+
+<div class="info-box">
+    <div class="info-box-title">Learning Objectives</div>
+    <ul>
+        <li>Find fixed points by solving \( \dot{x} = 0 \) and \( \dot{y} = 0 \) simultaneously</li>
+        <li>Use <strong>nullclines</strong> to locate fixed points graphically — even for nonlinear systems</li>
+        <li>Read the flow direction in each region between nullclines</li>
+        <li>Test stability by perturbing fixed points and observing the response</li>
+    </ul>
+</div>
+
+<p>
+    For linear systems, the origin is always the only fixed point (assuming \( \det \mathbf{A} \neq 0 \)).
+    But for <strong>nonlinear</strong> systems, there can be many fixed points, and finding
+    them is the first step in understanding the behavior. The graphical tool for this
+    is <strong>nullclines</strong>.
+</p>
+
+<div class="equation-display">
+    <p><strong>Nullclines:</strong></p>
+    $$ \text{x-nullcline: } f(x,y) = 0 \quad (\text{where } \dot{x} = 0) $$
+    $$ \text{y-nullcline: } g(x,y) = 0 \quad (\text{where } \dot{y} = 0) $$
+    <p>Fixed points are where nullclines <strong>intersect</strong> — both velocity
+    components vanish simultaneously.</p>
+</div>
+
+
+<!-- ============================================================ -->
+<!-- EXPLORER 1: Nullcline Finder -->
+<!-- ============================================================ -->
+<div class="interactive-container" id="nullcline-finder">
+    <div class="interactive-title">Explorer: Nullcline Finder</div>
+
+    <p>
+        The <span style="color:#00f3ff">cyan curves</span> are the x-nullcline (\( \dot{x} = 0 \))
+        and the <span style="color:#ff006e">magenta curves</span> are the y-nullcline (\( \dot{y} = 0 \)).
+        Fixed points (yellow dots) appear wherever these curves cross.
+        Gray streamlines show the actual flow.
+    </p>
+
+    <div class="plot-container" id="fp-nullPlot" style="height: 440px;"></div>
+
+    <div id="fp-stats1" class="stats-bar"></div>
+
+    <div class="control-panel">
+        <div class="control-group">
+            <label class="control-label" for="fp-system1">System:</label>
+            <select id="fp-system1" class="control-select">
+                <option value="pendulum">Simple Pendulum</option>
+                <option value="competition">Competing Species</option>
+                <option value="predatorPrey">Predator-Prey</option>
+            </select>
+        </div>
+        <div class="control-group">
+            <button class="btn" onclick="fpNullReset()">Reset</button>
+        </div>
+    </div>
+</div>
+
+<div class="info-box">
+    <div class="info-box-title">Key Insight</div>
+    <p>
+        <strong>Nullclines organize the flow.</strong> On the x-nullcline, the velocity
+        has no horizontal component — arrows point purely vertically. On the y-nullcline,
+        arrows point purely horizontally. Between nullclines, the flow direction stays
+        consistent. This makes nullclines a powerful tool for sketching phase portraits by hand.
+    </p>
+</div>
+
+
+<!-- Test Your Understanding #1 -->
+<div class="interactive-container question-section">
+    <div class="interactive-title">Test Your Understanding</div>
+
+    <p style="margin-bottom: var(--spacing-md); color: var(--text-secondary);">
+        Use the Nullcline Finder above to answer these questions.
+    </p>
+
+    <div class="tabs">
+        <div class="tab-buttons">
+            <button class="tab-button active">Question 1</button>
+            <button class="tab-button">Question 2</button>
+            <button class="tab-button">Question 3</button>
+        </div>
+
+        <div class="tab-content active">
+            <div class="question-container" data-type="mcq" data-answer="1">
+                <div class="question-text">
+                    How do you find fixed points graphically using nullclines?
+                </div>
+                <div class="question-options">
+                    <label class="option">
+                        <input type="radio" name="fp-q1" value="0">
+                        <span>Find where a single nullcline crosses an axis</span>
+                    </label>
+                    <label class="option">
+                        <input type="radio" name="fp-q1" value="1">
+                        <span>Find where the x-nullcline and y-nullcline intersect</span>
+                    </label>
+                    <label class="option">
+                        <input type="radio" name="fp-q1" value="2">
+                        <span>Find where streamlines cross each other</span>
+                    </label>
+                    <label class="option">
+                        <input type="radio" name="fp-q1" value="3">
+                        <span>Find where a nullcline touches itself</span>
+                    </label>
+                </div>
+                <div class="question-actions">
+                    <button class="btn-verify">Verify</button>
+                </div>
+                <div class="question-explanation" style="display:none;">
+                    <strong>Explanation:</strong>
+                    A fixed point requires <em>both</em> \( \dot{x} = 0 \) and \( \dot{y} = 0 \).
+                    The x-nullcline is where \( \dot{x} = 0 \), the y-nullcline is where \( \dot{y} = 0 \).
+                    Their intersection is the only place where both conditions hold simultaneously.
+                </div>
+            </div>
+        </div>
+
+        <div class="tab-content">
+            <div class="question-container" data-type="fill" data-answer="5">
+                <div class="question-text">
+                    Select "Simple Pendulum." Count the fixed points visible in the plot.
+                    How many are there?
+                    <input type="text" class="fill-blank" style="width:60px">
+                    <br><em>(Hint: look at where the cyan and magenta curves cross.)</em>
+                </div>
+                <div class="question-actions">
+                    <button class="btn-verify">Verify</button>
+                </div>
+                <div class="question-explanation" style="display:none;">
+                    <strong>Explanation:</strong>
+                    The pendulum \( \dot{x} = y, \dot{y} = -\sin x \) has x-nullcline \( y = 0 \)
+                    (the x-axis) and y-nullcline \( \sin x = 0 \) (vertical lines at \( x = n\pi \)).
+                    In the range \([-7, 7]\), there are 5 fixed points: at
+                    \( x = -2\pi, -\pi, 0, \pi, 2\pi \), all with \( y = 0 \).
+                </div>
+            </div>
+        </div>
+
+        <div class="tab-content">
+            <div class="question-container" data-type="msq" data-answer="0,1,3">
+                <div class="question-text">
+                    Select "Competing Species." Which statements are true? (Select all)
+                </div>
+                <div class="question-options">
+                    <label class="option">
+                        <input type="checkbox" value="0">
+                        <span>The x-nullcline includes the y-axis (\( x = 0 \))</span>
+                    </label>
+                    <label class="option">
+                        <input type="checkbox" value="1">
+                        <span>There are exactly 4 fixed points</span>
+                    </label>
+                    <label class="option">
+                        <input type="checkbox" value="2">
+                        <span>All fixed points lie on the axes</span>
+                    </label>
+                    <label class="option">
+                        <input type="checkbox" value="3">
+                        <span>The interior fixed point (away from axes) is where the species coexist</span>
+                    </label>
+                </div>
+                <div class="question-actions">
+                    <button class="btn-verify">Verify</button>
+                </div>
+                <div class="question-explanation" style="display:none;">
+                    <strong>Explanation:</strong>
+                    <ul>
+                        <li><strong>x-nullcline includes y-axis:</strong> TRUE. \( \dot{x} = x(3 - x - 2y) = 0 \) when \( x = 0 \) or \( x + 2y = 3 \).</li>
+                        <li><strong>4 fixed points:</strong> TRUE. They are (0,0), (3,0), (0,2), and (1,1).</li>
+                        <li><strong>All on axes:</strong> FALSE. The point (1,1) is in the interior — not on any axis.</li>
+                        <li><strong>Interior = coexistence:</strong> TRUE. At (1,1), both populations are positive, meaning both species survive.</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+<!-- ============================================================ -->
+<!-- EXPLORER 2: Flow Direction Regions -->
+<!-- ============================================================ -->
+<h2>Reading the Flow Between Nullclines</h2>
+
+<p>
+    Nullclines divide the phase plane into <strong>regions</strong>. Within each region,
+    the signs of \( \dot{x} \) and \( \dot{y} \) are constant — so you know the qualitative
+    flow direction without solving anything. The color code below shows four possible
+    combinations:
+</p>
+
+<ul>
+    <li><span style="color:#00ff88">Green (↗):</span> \( \dot{x} > 0 \) and \( \dot{y} > 0 \) — moving right and up</li>
+    <li><span style="color:#40c4ff">Blue (↘):</span> \( \dot{x} > 0 \) and \( \dot{y} < 0 \) — moving right and down</li>
+    <li><span style="color:#ffbe0b">Yellow (↖):</span> \( \dot{x} < 0 \) and \( \dot{y} > 0 \) — moving left and up</li>
+    <li><span style="color:#ff006e">Magenta (↙):</span> \( \dot{x} < 0 \) and \( \dot{y} < 0 \) — moving left and down</li>
+</ul>
+
+<div class="interactive-container" id="flow-regions">
+    <div class="interactive-title">Explorer: Flow Direction Regions</div>
+
+    <p>
+        Each arrow is colored by the sign of \( (\dot{x}, \dot{y}) \). Notice how the
+        nullclines (thick lines) are the exact boundaries where colors change.
+    </p>
+
+    <div class="plot-container" id="fp-regionPlot" style="height: 440px;"></div>
+
+    <div id="fp-stats2" class="stats-bar"></div>
+
+    <div class="control-panel">
+        <div class="control-group">
+            <label class="control-label" for="fp-system2">System:</label>
+            <select id="fp-system2" class="control-select">
+                <option value="pendulum">Simple Pendulum</option>
+                <option value="competition">Competing Species</option>
+                <option value="predatorPrey">Predator-Prey</option>
+            </select>
+        </div>
+        <div class="control-group">
+            <button class="btn" onclick="fpRegionReset()">Reset</button>
+        </div>
+    </div>
+</div>
+
+
+<!-- Test Your Understanding #2 -->
+<div class="interactive-container question-section">
+    <div class="interactive-title">Test Your Understanding</div>
+
+    <p style="margin-bottom: var(--spacing-md); color: var(--text-secondary);">
+        Use the Flow Direction Regions explorer above to answer these questions.
+    </p>
+
+    <div class="tabs">
+        <div class="tab-buttons">
+            <button class="tab-button active">Question 1</button>
+            <button class="tab-button">Question 2</button>
+            <button class="tab-button">Question 3</button>
+        </div>
+
+        <div class="tab-content active">
+            <div class="question-container" data-type="mcq" data-answer="0">
+                <div class="question-text">
+                    On the x-nullcline (\( \dot{x} = 0 \)), in which direction do the arrows point?
+                </div>
+                <div class="question-options">
+                    <label class="option">
+                        <input type="radio" name="fp-q4" value="0">
+                        <span>Purely vertical (up or down only)</span>
+                    </label>
+                    <label class="option">
+                        <input type="radio" name="fp-q4" value="1">
+                        <span>Purely horizontal (left or right only)</span>
+                    </label>
+                    <label class="option">
+                        <input type="radio" name="fp-q4" value="2">
+                        <span>At 45° diagonals</span>
+                    </label>
+                    <label class="option">
+                        <input type="radio" name="fp-q4" value="3">
+                        <span>They vanish completely</span>
+                    </label>
+                </div>
+                <div class="question-actions">
+                    <button class="btn-verify">Verify</button>
+                </div>
+                <div class="question-explanation" style="display:none;">
+                    <strong>Explanation:</strong>
+                    On the x-nullcline, \( \dot{x} = 0 \) but generally \( \dot{y} \neq 0 \).
+                    The velocity vector is \( (0, \dot{y}) \), which points purely vertically.
+                    Similarly, on the y-nullcline, arrows point purely horizontally. Arrows vanish
+                    only at fixed points where <em>both</em> components are zero.
+                </div>
+            </div>
+        </div>
+
+        <div class="tab-content">
+            <div class="question-container" data-type="fill" data-answer="predatorPrey|predator-prey|Predator-Prey">
+                <div class="question-text">
+                    Which system has nullclines that form a simple "crosshairs" pattern
+                    (two straight horizontal/vertical lines)?
+                    <select class="fill-blank-select">
+                        <option value=""></option>
+                        <option value="pendulum">Simple Pendulum</option>
+                        <option value="competition">Competing Species</option>
+                        <option value="predatorPrey">Predator-Prey</option>
+                    </select>
+                    <br><em>(Hint: look for the one whose non-axis nullclines are both straight lines.)</em>
+                </div>
+                <div class="question-actions">
+                    <button class="btn-verify">Verify</button>
+                </div>
+                <div class="question-explanation" style="display:none;">
+                    <strong>Explanation:</strong>
+                    The <strong>Predator-Prey</strong> system has x-nullclines \( x = 0 \) or
+                    \( y = 2 \) (horizontal line) and y-nullclines \( y = 0 \) or \( x = 1 \)
+                    (vertical line). The non-axis nullclines form a crosshairs at (1, 2) — the
+                    interior fixed point where predator and prey populations are in balance.
+                </div>
+            </div>
+        </div>
+
+        <div class="tab-content">
+            <div class="question-container" data-type="msq" data-answer="1,2">
+                <div class="question-text">
+                    For the "Competing Species" system, look at the region near (1,1).
+                    Which observations are correct? (Select all)
+                </div>
+                <div class="question-options">
+                    <label class="option">
+                        <input type="checkbox" value="0">
+                        <span>All arrows in every region point toward (1,1)</span>
+                    </label>
+                    <label class="option">
+                        <input type="checkbox" value="1">
+                        <span>The flow directions change as you cross a nullcline</span>
+                    </label>
+                    <label class="option">
+                        <input type="checkbox" value="2">
+                        <span>Four different regions meet at the interior fixed point (1,1)</span>
+                    </label>
+                    <label class="option">
+                        <input type="checkbox" value="3">
+                        <span>Arrows in all four regions have the same color</span>
+                    </label>
+                </div>
+                <div class="question-actions">
+                    <button class="btn-verify">Verify</button>
+                </div>
+                <div class="question-explanation" style="display:none;">
+                    <strong>Explanation:</strong>
+                    <ul>
+                        <li><strong>All toward (1,1):</strong> FALSE. The point (1,1) is actually a saddle — some trajectories approach and others flee.</li>
+                        <li><strong>Direction changes at nullclines:</strong> TRUE. Crossing a nullcline flips the sign of one velocity component, so the arrow color changes.</li>
+                        <li><strong>Four regions meet:</strong> TRUE. The two non-axis nullclines (\(x+2y=3\) and \(x+y=2\)) cross at (1,1), creating four distinct regions around it.</li>
+                        <li><strong>Same color everywhere:</strong> FALSE. Each region has a different sign combination, hence a different color.</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+<!-- ============================================================ -->
+<!-- EXPLORER 3: Stability Tester -->
+<!-- ============================================================ -->
+<h2>Stable or Unstable?</h2>
+
+<p>
+    Finding fixed points is step one. Step two: <strong>what happens nearby?</strong>
+    If you nudge the system slightly away from a fixed point, does it return (stable),
+    escape (unstable), or orbit (center)? This is the <em>stability question</em>, which
+    we'll formalize in the next section. For now, let's test it experimentally.
+</p>
+
+<div class="interactive-container" id="stability-tester">
+    <div class="interactive-title">Explorer: Stability Tester</div>
+
+    <p>
+        Select a system and a fixed point. Press <strong>Perturb</strong> to launch 8
+        trajectories from small displacements around the fixed point. Watch whether they
+        converge back, diverge away, or orbit.
+    </p>
+
+    <div class="plot-container" id="fp-stabPlot" style="height: 440px;"></div>
+
+    <div id="fp-stats3" class="stats-bar"></div>
+
+    <div class="control-panel">
+        <div class="control-group">
+            <label class="control-label" for="fp-system3">System:</label>
+            <select id="fp-system3" class="control-select">
+                <option value="pendulum">Simple Pendulum</option>
+                <option value="competition">Competing Species</option>
+                <option value="predatorPrey">Predator-Prey</option>
+            </select>
+        </div>
+        <div class="control-group">
+            <label class="control-label" for="fp-point-select">Fixed Point:</label>
+            <select id="fp-point-select" class="control-select">
+            </select>
+        </div>
+        <div class="control-group">
+            <label class="control-label" for="fp-eps-slider">Perturbation ε:</label>
+            <input type="range" class="slider" id="fp-eps-slider" min="0.1" max="1.0" step="0.1" value="0.3">
+            <span id="fp-eps-value" class="control-value">0.3</span>
+        </div>
+        <div class="control-group">
+            <button class="btn" onclick="fpPerturb()">Perturb</button>
+            <button class="btn" onclick="fpStabReset()">Reset</button>
+        </div>
+    </div>
+</div>
+
+<div class="info-box">
+    <div class="info-box-title">Preview: Classification</div>
+    <p>
+        You've just discovered that different fixed points have different stability
+        properties. In Section 5.4, we'll classify these into the "Big Three" types:
+        <strong>centers</strong> (orbits), <strong>sources/sinks</strong> (diverge/converge),
+        and <strong>saddles</strong> (approach one way, flee another). The eigenvalues of
+        the Jacobian matrix will tell us which is which — without needing to perturb!
+    </p>
+</div>
+
+
+<!-- Test Your Understanding #3 -->
+<div class="interactive-container question-section">
+    <div class="interactive-title">Test Your Understanding</div>
+
+    <p style="margin-bottom: var(--spacing-md); color: var(--text-secondary);">
+        Use the Stability Tester above to answer these questions.
+    </p>
+
+    <div class="tabs">
+        <div class="tab-buttons">
+            <button class="tab-button active">Question 1</button>
+            <button class="tab-button">Question 2</button>
+            <button class="tab-button">Question 3</button>
+        </div>
+
+        <div class="tab-content active">
+            <div class="question-container" data-type="mcq" data-answer="2">
+                <div class="question-text">
+                    What does "stable" mean for a fixed point?
+                </div>
+                <div class="question-options">
+                    <label class="option">
+                        <input type="radio" name="fp-q7" value="0">
+                        <span>The system never leaves the fixed point under any condition</span>
+                    </label>
+                    <label class="option">
+                        <input type="radio" name="fp-q7" value="1">
+                        <span>The fixed point doesn't change when parameters change</span>
+                    </label>
+                    <label class="option">
+                        <input type="radio" name="fp-q7" value="2">
+                        <span>Nearby trajectories stay near or return to the fixed point</span>
+                    </label>
+                    <label class="option">
+                        <input type="radio" name="fp-q7" value="3">
+                        <span>The system oscillates exactly at the fixed point's frequency</span>
+                    </label>
+                </div>
+                <div class="question-actions">
+                    <button class="btn-verify">Verify</button>
+                </div>
+                <div class="question-explanation" style="display:none;">
+                    <strong>Explanation:</strong>
+                    Stability is about the system's response to perturbation. A <em>stable</em> fixed
+                    point attracts nearby trajectories — if you push the system slightly, it comes back.
+                    An <em>unstable</em> fixed point repels them — any tiny displacement grows.
+                </div>
+            </div>
+        </div>
+
+        <div class="tab-content">
+            <div class="question-container" data-type="fill" data-answer="center|saddle">
+                <div class="question-text">
+                    For the Simple Pendulum, perturb the fixed point at \( (0, 0) \) and
+                    then at \( (\pi, 0) \). Classify each:
+                    <br>At \( (0, 0) \): trajectories form closed orbits →
+                    <select class="fill-blank-select">
+                        <option value=""></option>
+                        <option value="center">center</option>
+                        <option value="stable node">stable node</option>
+                        <option value="saddle">saddle</option>
+                        <option value="source">source</option>
+                    </select>
+                    <br>At \( (\pi, 0) \): trajectories approach on one side, flee on another →
+                    <select class="fill-blank-select">
+                        <option value=""></option>
+                        <option value="center">center</option>
+                        <option value="stable node">stable node</option>
+                        <option value="saddle">saddle</option>
+                        <option value="source">source</option>
+                    </select>
+                </div>
+                <div class="question-actions">
+                    <button class="btn-verify">Verify</button>
+                </div>
+                <div class="question-explanation" style="display:none;">
+                    <strong>Explanation:</strong>
+                    At \( (0, 0) \), the pendulum hangs straight down — it's the natural
+                    equilibrium. Small perturbations cause oscillations (closed orbits in phase
+                    space) → <strong>center</strong>.
+                    At \( (\pi, 0) \), the pendulum balances straight up — unstable equilibrium.
+                    Some perturbations bring it back to one side, others push it over the top →
+                    <strong>saddle</strong>.
+                </div>
+            </div>
+        </div>
+
+        <div class="tab-content">
+            <div class="question-container" data-type="msq" data-answer="0,2,3">
+                <div class="question-text">
+                    Which observations about stability testing are correct? (Select all)
+                </div>
+                <div class="question-options">
+                    <label class="option">
+                        <input type="checkbox" value="0">
+                        <span>You should test perturbations in multiple directions, not just one</span>
+                    </label>
+                    <label class="option">
+                        <input type="checkbox" value="1">
+                        <span>A saddle point is stable in all directions</span>
+                    </label>
+                    <label class="option">
+                        <input type="checkbox" value="2">
+                        <span>A center has trajectories that orbit but never converge to the fixed point</span>
+                    </label>
+                    <label class="option">
+                        <input type="checkbox" value="3">
+                        <span>The same system can have both stable and unstable fixed points</span>
+                    </label>
+                </div>
+                <div class="question-actions">
+                    <button class="btn-verify">Verify</button>
+                </div>
+                <div class="question-explanation" style="display:none;">
+                    <strong>Explanation:</strong>
+                    <ul>
+                        <li><strong>Multiple directions:</strong> TRUE. Saddle points are stable in some directions and unstable in others. Testing only one direction can miss this.</li>
+                        <li><strong>Saddle is stable:</strong> FALSE. A saddle is stable along one direction but unstable along another — overall it's classified as unstable.</li>
+                        <li><strong>Center orbits:</strong> TRUE. At a center, trajectories form closed loops — they stay nearby but never actually converge to the fixed point. This is "neutrally stable."</li>
+                        <li><strong>Mixed stability:</strong> TRUE. The pendulum has centers at \(x = 0, \pm 2\pi, \ldots\) and saddles at \(x = \pm\pi, \ldots\) — different types within the same system.</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+<!-- ============================================================ -->
+<!-- PYTHON CODE EXAMPLES -->
+<!-- ============================================================ -->
+<h2>Python Code</h2>
+
+<div class="tabs">
+    <div class="tab-buttons">
+        <button class="tab-button active">Nullclines</button>
+        <button class="tab-button">Stability Test</button>
+        <button class="tab-button">Prompt</button>
+    </div>
+
+    <div class="tab-content active">
+        <div class="code-block-container">
+            <div class="code-header">
+                <span class="code-lang">Python</span>
+                <button class="copy-btn">Copy</button>
+            </div>
+            <pre><code class="language-python">
+import numpy as np
+import plotly.graph_objects as go
+
+# Simple pendulum: dx/dt = y, dy/dt = -sin(x)
+x = np.linspace(-7, 7, 200)
+y = np.linspace(-3, 3, 200)
+X, Y = np.meshgrid(x, y)
+F = Y                  # dx/dt
+G = -np.sin(X)         # dy/dt
+
+fig = go.Figure()
+
+# x-nullcline: dx/dt = y = 0 → horizontal line
+fig.add_trace(go.Contour(
+    z=F, x=x, y=y,
+    contours=dict(start=0, end=0, coloring='lines'),
+    line=dict(color='#00f3ff', width=3),
+    showscale=False, name='ẋ = 0'))
+
+# y-nullcline: dy/dt = -sin(x) = 0 → vertical lines at nπ
+fig.add_trace(go.Contour(
+    z=G, x=x, y=y,
+    contours=dict(start=0, end=0, coloring='lines'),
+    line=dict(color='#ff006e', width=3),
+    showscale=False, name='ẏ = 0'))
+
+# Mark fixed points
+fp_x = [-2*np.pi, -np.pi, 0, np.pi, 2*np.pi]
+fp_y = [0, 0, 0, 0, 0]
+fig.add_trace(go.Scatter(
+    x=fp_x, y=fp_y, mode='markers',
+    marker=dict(color='#ffbe0b', size=12, symbol='circle',
+                line=dict(color='white', width=1)),
+    name='Fixed points'))
+
+fig.update_layout(
+    template='plotly_dark',
+    title='Pendulum Nullclines and Fixed Points',
+    xaxis=dict(range=[-7, 7], title='θ',
+        zerolinecolor='#808080', gridcolor='#2a2f4a'),
+    yaxis=dict(range=[-3, 3], title='dθ/dt',
+        zerolinecolor='#808080', gridcolor='#2a2f4a'),
+    width=700, height=500)
+fig.show()
+            </code></pre>
+        </div>
+    </div>
+
+    <div class="tab-content">
+        <div class="code-block-container">
+            <div class="code-header">
+                <span class="code-lang">Python</span>
+                <button class="copy-btn">Copy</button>
+            </div>
+            <pre><code class="language-python">
+import numpy as np
+import plotly.graph_objects as go
+
+def rk4_step(f, y, h):
+    k1 = f(y)
+    k2 = f(y + h/2 * k1)
+    k3 = f(y + h/2 * k2)
+    k4 = f(y + h * k3)
+    return y + (h/6) * (k1 + 2*k2 + 2*k3 + k4)
+
+# Pendulum system
+def pendulum(y):
+    return np.array([y[1], -np.sin(y[0])])
+
+# Perturb fixed point (0,0) in 8 directions
+fig = go.Figure()
+fp = np.array([0.0, 0.0])
+eps = 0.3
+colors = ['#00f3ff','#ff006e','#ffbe0b','#00ff88',
+          '#bb86fc','#ff5722','#76ff03','#40c4ff']
+
+for k in range(8):
+    theta = k * np.pi / 4
+    y0 = fp + eps * np.array([np.cos(theta), np.sin(theta)])
+    ys = [y0.copy()]
+    for _ in range(3000):
+        y0 = rk4_step(pendulum, y0, 0.01)
+        ys.append(y0.copy())
+    ys = np.array(ys)
+    fig.add_trace(go.Scatter(
+        x=ys[:,0], y=ys[:,1], mode='lines',
+        line=dict(color=colors[k], width=1.5),
+        showlegend=False))
+
+# Mark fixed point
+fig.add_trace(go.Scatter(
+    x=[0], y=[0], mode='markers',
+    marker=dict(color='#ffbe0b', size=12, symbol='circle'),
+    name='Fixed point'))
+
+fig.update_layout(
+    template='plotly_dark',
+    title='Stability Test: Pendulum at (0,0) → Center',
+    xaxis=dict(range=[-1.5, 1.5], title='θ',
+        zerolinecolor='#808080', gridcolor='#2a2f4a'),
+    yaxis=dict(range=[-1.5, 1.5], title='dθ/dt',
+        zerolinecolor='#808080', gridcolor='#2a2f4a'),
+    width=600, height=600)
+fig.show()
+            </code></pre>
+        </div>
+    </div>
+
+    <div class="tab-content">
+        <div class="code-block-container">
+            <div class="code-header">
+                <span class="code-lang">Prompt for AI</span>
+                <button class="copy-btn">Copy</button>
+            </div>
+            <pre><code class="language-text">Create a Python script using Plotly to analyze fixed points of a 2D
+nonlinear dynamical system using nullclines.
+
+Requirements:
+- Implement three systems: simple pendulum, competing species (Lotka-Volterra
+  competition), and predator-prey
+- For each system:
+  1. Compute and plot nullclines as contour lines at z=0 (use go.Contour)
+  2. Mark fixed points with yellow dots
+  3. Add streamlines via RK4 integration from boundary points
+- Use cyan for x-nullcline, magenta for y-nullcline
+- Perform stability test: perturb each fixed point in 8 directions (ε=0.3)
+  and trace trajectories with RK4
+- Use plotly_dark template, gray axes (#808080)
+- Show system equations in the title</code></pre>
+        </div>
+
+        <div class="info-box" style="margin-top: var(--spacing-md);">
+            <div class="info-box-title">Pro Tips for Prompting</div>
+            <ul>
+                <li>Specify <code>go.Contour</code> for nullclines — it handles implicit curves</li>
+                <li>Ask for stability tests with multiple perturbation directions</li>
+                <li>For competing species, use <code>x(3-x-2y)</code> and <code>y(2-x-y)</code></li>
+                <li>Request different axis ranges for different systems</li>
+            </ul>
+        </div>
+    </div>
+</div>
+
+
+<!-- Navigation -->
+<div class="btn-group mt-xl">
+    <button class="btn btn-magenta" onclick="navigateToSection('52-vector-fields-viz')">&larr; Previous: Vector Fields &amp; Streamlines</button>
+    <button class="btn btn-secondary" onclick="scrollToTop()">&uarr; Back to Top</button>
+    <button class="btn btn-secondary" onclick="navigateToSection('54-fixed-point-types')">Next: The Big Three &rarr;</button>
+</div>

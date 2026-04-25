@@ -1,0 +1,663 @@
+<!-- ============================================================
+     Section 6.3: Error Analysis: The 1/√N Rule
+     Source: NPTEL Lecture 8_6 (Monte Carlo, Part 3)
+     Concept: MC error scales as σ/√N (CLT), comparison with
+              deterministic quadrature, dimensional crossover
+     Time: 20-25 minutes
+     Prerequisites: Sections 6.1-6.2 (MC basics, integration),
+                    Chapter 2 (standard deviation, CLT)
+     ============================================================ -->
+
+<h1>Error Analysis: The 1/&radic;N Rule</h1>
+
+<p>
+    You&rsquo;ve seen Monte Carlo estimates get better with more samples. But
+    <em>how much</em> better? The answer is precise: the error drops as
+    \( \sigma / \sqrt{N} \). This is a direct consequence of the
+    <strong>central limit theorem</strong>. It means doubling your accuracy
+    requires <em>four times</em> the work &mdash; slow, but dimension-independent.
+    In this section you&rsquo;ll verify this law, compare it to deterministic
+    methods, and understand exactly when Monte Carlo is the right tool.
+</p>
+
+<div class="info-box">
+    <div class="info-box-title">Learning Objectives</div>
+    <ul>
+        <li>Derive the MC error formula \( \epsilon = \sigma_f / \sqrt{N} \) from the central limit theorem</li>
+        <li>Verify the \( 1/\sqrt{N} \) scaling on a log-log plot (slope = &minus;1/2)</li>
+        <li>Compare MC convergence (\( N^{-1/2} \)) to trapezoidal rule (\( N^{-2} \)) and see that MC loses in 1D</li>
+        <li>Understand the <strong>dimensional crossover</strong>: MC becomes competitive above ~4 dimensions</li>
+    </ul>
+</div>
+
+<div class="equation-display">
+    <p><strong>The MC Error Formula:</strong></p>
+    $$ \epsilon_N = \frac{\sigma_f}{\sqrt{N}}, \qquad \sigma_f^2 = \frac{1}{N-1}\sum_{i=1}^{N}\bigl(f(x_i) - \bar{f}\bigr)^2 $$
+    <p>
+        The error depends on two things: the <strong>sample standard deviation</strong>
+        \( \sigma_f \) (a property of the function) and the <strong>number of samples</strong>
+        \( N \) (under your control). To halve the error: quadruple N.
+    </p>
+</div>
+
+<hr>
+
+<!-- ============================================================ -->
+<!-- EXPLORER 1: Error Scaling Verifier -->
+<!-- ============================================================ -->
+<div class="interactive-container" id="error-scaling-verifier">
+    <div class="interactive-title">Explorer: Verifying the 1/&radic;N Law</div>
+
+    <p>
+        Run the MC integral many times at each value of N. The
+        <strong>spread</strong> of the estimates measures the true error.
+        On a log-log plot, the error vs N should be a straight line with
+        slope &minus;1/2. Try different functions &mdash; the slope is always the same.
+    </p>
+
+    <div class="dual-panel">
+        <div class="panel">
+            <div class="plot-container" id="es-loglogPlot" style="height: 400px;"></div>
+        </div>
+        <div class="panel">
+            <div class="plot-container" id="es-histPlot" style="height: 400px;"></div>
+        </div>
+    </div>
+
+    <div id="es-stats1" class="stats-bar"></div>
+
+    <div class="control-panel">
+        <div class="control-group">
+            <label class="control-label" for="es-func-select">Function:</label>
+            <select id="es-func-select" class="control-select">
+                <option value="inv">1/(1+x) on [0,1]</option>
+                <option value="sin">sin(x) on [0, &pi;]</option>
+                <option value="gauss">e^(&minus;x&sup2;) on [0,2]</option>
+            </select>
+        </div>
+        <div class="control-group">
+            <label class="control-label" for="es-trials-slider">Trials per N:
+                <span id="es-trials-value">200</span>
+            </label>
+            <input type="range" class="slider" id="es-trials-slider"
+                   min="50" max="500" step="50" value="200">
+        </div>
+        <div class="control-group">
+            <button class="btn" onclick="esRunScaling()">Run</button>
+            <button class="btn" onclick="esReset()">Reset</button>
+        </div>
+    </div>
+</div>
+
+<div class="info-box">
+    <div class="info-box-title">Why 1/&radic;N? The Central Limit Theorem</div>
+    <p>
+        Each sample \( f(x_i) \) is a random variable with mean \( \mu \) and
+        variance \( \sigma^2 \). The sample average \( \bar{f} = \frac{1}{N}\sum f(x_i) \)
+        has variance \( \sigma^2 / N \) (by CLT). Taking the square root:
+        the standard error is \( \sigma / \sqrt{N} \). This is universal &mdash; it
+        doesn&rsquo;t depend on the function, the dimension, or the distribution.
+        Only two things matter: the variance of the integrand and the number of samples.
+    </p>
+</div>
+
+<!-- ========== Test Your Understanding #1 ========== -->
+<div class="interactive-container question-section">
+    <div class="interactive-title">Test Your Understanding</div>
+
+    <p style="margin-bottom: var(--spacing-md); color: var(--text-secondary);">
+        Use the Error Scaling Verifier to answer these questions.
+    </p>
+
+    <div class="tabs">
+        <div class="tab-buttons">
+            <button class="tab-button active">Question 1</button>
+            <button class="tab-button">Question 2</button>
+            <button class="tab-button">Question 3</button>
+        </div>
+
+        <div class="tab-content active">
+            <div class="question-container" data-type="fill" data-answer="-0.5[-0.6,-0.4]">
+                <div class="question-text">
+                    Run the scaling test. On the log-log plot, the slope of error vs N is
+                    approximately <input type="text" class="fill-blank" style="width: 60px">.
+                    (This confirms the \( N^{-1/2} \) law.)
+                </div>
+                <div class="question-actions">
+                    <button class="btn-verify">Verify</button>
+                </div>
+                <div class="question-explanation" style="display:none;">
+                    <strong>Explanation:</strong>
+                    On a log-log plot, \( \log(\epsilon) = \log(\sigma) - \frac{1}{2}\log(N) \).
+                    This is a line with slope <strong>&minus;1/2</strong>. The data points should
+                    scatter around this line, confirming the \( 1/\sqrt{N} \) scaling.
+                </div>
+            </div>
+        </div>
+
+        <div class="tab-content">
+            <div class="question-container" data-type="mcq" data-answer="2">
+                <div class="question-text">
+                    You currently have N = 1,000 samples with error &epsilon; &asymp; 0.01.
+                    To reduce the error to 0.001 (10&times; better), how many samples do you need?
+                </div>
+                <div class="question-options">
+                    <label class="option">
+                        <input type="radio" name="es-q2" value="0">
+                        <span>10,000 (10&times; more)</span>
+                    </label>
+                    <label class="option">
+                        <input type="radio" name="es-q2" value="1">
+                        <span>1,000,000 (1000&times; more)</span>
+                    </label>
+                    <label class="option">
+                        <input type="radio" name="es-q2" value="2">
+                        <span>100,000 (100&times; more)</span>
+                    </label>
+                    <label class="option">
+                        <input type="radio" name="es-q2" value="3">
+                        <span>2,000 (2&times; more)</span>
+                    </label>
+                </div>
+                <div class="question-actions">
+                    <button class="btn-verify">Verify</button>
+                </div>
+                <div class="question-explanation" style="display:none;">
+                    <strong>Explanation:</strong>
+                    Error scales as \( 1/\sqrt{N} \). To reduce error by 10&times;:
+                    \( 1/\sqrt{N'} = \frac{1}{10} \cdot 1/\sqrt{N} \), so \( N' = 100N = 100{,}000 \).
+                    This is the <strong>cost of Monte Carlo</strong>: 10&times; better accuracy
+                    requires 100&times; more work.
+                </div>
+            </div>
+        </div>
+
+        <div class="tab-content">
+            <div class="question-container" data-type="mcq" data-answer="1">
+                <div class="question-text">
+                    Look at the histogram of MC estimates (right panel) at N = 100 vs
+                    N = 10,000. How does the histogram change?
+                </div>
+                <div class="question-options">
+                    <label class="option">
+                        <input type="radio" name="es-q3" value="0">
+                        <span>It shifts to a different center</span>
+                    </label>
+                    <label class="option">
+                        <input type="radio" name="es-q3" value="1">
+                        <span>It becomes much narrower (same center, smaller spread)</span>
+                    </label>
+                    <label class="option">
+                        <input type="radio" name="es-q3" value="2">
+                        <span>It stays the same width</span>
+                    </label>
+                    <label class="option">
+                        <input type="radio" name="es-q3" value="3">
+                        <span>It becomes bimodal</span>
+                    </label>
+                </div>
+                <div class="question-actions">
+                    <button class="btn-verify">Verify</button>
+                </div>
+                <div class="question-explanation" style="display:none;">
+                    <strong>Explanation:</strong>
+                    The center stays at the true value (unbiased estimate). The width
+                    (standard deviation of the estimates) shrinks by \( \sqrt{100} = 10 \)
+                    when going from N = 100 to N = 10,000. This is the CLT in action:
+                    the distribution of sample means narrows as \( 1/\sqrt{N} \).
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- ============================================================ -->
+<!-- EXPLORER 2: MC vs Quadrature -->
+<!-- ============================================================ -->
+<div class="interactive-container" id="mc-vs-quadrature">
+    <div class="interactive-title">Explorer: MC vs Trapezoidal Rule</div>
+
+    <p>
+        Compare the error of Monte Carlo (\( \propto N^{-1/2} \)) with the
+        trapezoidal rule (\( \propto N^{-2} \)) for a 1D integral. The trapezoidal
+        rule wins easily in 1D &mdash; so why use Monte Carlo at all? The answer
+        comes in the next explorer.
+    </p>
+
+    <div class="plot-container" id="es-quadPlot" style="height: 420px;"></div>
+
+    <div id="es-stats2" class="stats-bar"></div>
+
+    <div class="control-panel">
+        <div class="control-group">
+            <label class="control-label" for="es-quad-func">Function:</label>
+            <select id="es-quad-func" class="control-select">
+                <option value="inv">1/(1+x) on [0,1]</option>
+                <option value="sin">sin(x) on [0, &pi;]</option>
+            </select>
+        </div>
+        <div class="control-group">
+            <button class="btn" onclick="esQuadRun()">Run Comparison</button>
+        </div>
+    </div>
+</div>
+
+<!-- ========== Test Your Understanding #2 ========== -->
+<div class="interactive-container question-section">
+    <div class="interactive-title">Test Your Understanding</div>
+
+    <p style="margin-bottom: var(--spacing-md); color: var(--text-secondary);">
+        Use the MC vs Quadrature explorer to answer these questions.
+    </p>
+
+    <div class="tabs">
+        <div class="tab-buttons">
+            <button class="tab-button active">Question 4</button>
+            <button class="tab-button">Question 5</button>
+            <button class="tab-button">Question 6</button>
+        </div>
+
+        <div class="tab-content active">
+            <div class="question-container" data-type="mcq" data-answer="0">
+                <div class="question-text">
+                    On the log-log error plot, which line has a steeper slope?
+                </div>
+                <div class="question-options">
+                    <label class="option">
+                        <input type="radio" name="es-q4" value="0">
+                        <span>Trapezoidal (slope &minus;2) &mdash; much steeper than MC (slope &minus;0.5)</span>
+                    </label>
+                    <label class="option">
+                        <input type="radio" name="es-q4" value="1">
+                        <span>Monte Carlo &mdash; random sampling is faster</span>
+                    </label>
+                    <label class="option">
+                        <input type="radio" name="es-q4" value="2">
+                        <span>They have the same slope</span>
+                    </label>
+                    <label class="option">
+                        <input type="radio" name="es-q4" value="3">
+                        <span>Neither has a well-defined slope</span>
+                    </label>
+                </div>
+                <div class="question-actions">
+                    <button class="btn-verify">Verify</button>
+                </div>
+                <div class="question-explanation" style="display:none;">
+                    <strong>Explanation:</strong>
+                    Trapezoidal rule error \( \propto N^{-2} \) (slope &minus;2 on log-log) is
+                    <strong>much steeper</strong> than MC error \( \propto N^{-1/2} \) (slope &minus;0.5).
+                    In 1D, deterministic quadrature converges far faster. MC&rsquo;s advantage
+                    lies elsewhere &mdash; in high dimensions.
+                </div>
+            </div>
+        </div>
+
+        <div class="tab-content">
+            <div class="question-container" data-type="fill" data-answer="4[3,5]">
+                <div class="question-text">
+                    The trapezoidal rule converges as \( N^{-2} \) in 1D. In \( d \) dimensions
+                    with \( n \) points per axis (\( N = n^d \) total), the convergence rate
+                    becomes \( N^{-2/d} \). At what dimension \( d \) does the trapezoidal
+                    exponent (\( 2/d \)) equal the MC exponent (\( 1/2 \))?
+                    \( d = \) <input type="text" class="fill-blank" style="width: 50px">
+                </div>
+                <div class="question-actions">
+                    <button class="btn-verify">Verify</button>
+                </div>
+                <div class="question-explanation" style="display:none;">
+                    <strong>Explanation:</strong>
+                    Set \( 2/d = 1/2 \), giving \( d = 4 \). Above 4 dimensions, the trapezoidal
+                    rule converges <em>slower</em> than MC. This is the <strong>dimensional crossover</strong>:
+                    MC becomes competitive around \( d \approx 4 \) and dominant for \( d \gg 4 \).
+                </div>
+            </div>
+        </div>
+
+        <div class="tab-content">
+            <div class="question-container" data-type="msq" data-answer="0,3">
+                <div class="question-text">
+                    When should you use Monte Carlo instead of deterministic quadrature? (Select all)
+                </div>
+                <div class="question-options">
+                    <label class="option">
+                        <input type="checkbox" value="0">
+                        <span>When the integral is in more than ~4 dimensions</span>
+                    </label>
+                    <label class="option">
+                        <input type="checkbox" value="1">
+                        <span>When you need 15 digits of accuracy in 1D</span>
+                    </label>
+                    <label class="option">
+                        <input type="checkbox" value="2">
+                        <span>When the function is a simple polynomial</span>
+                    </label>
+                    <label class="option">
+                        <input type="checkbox" value="3">
+                        <span>When the integration region has a complicated, irregular shape</span>
+                    </label>
+                </div>
+                <div class="question-actions">
+                    <button class="btn-verify">Verify</button>
+                </div>
+                <div class="question-explanation" style="display:none;">
+                    <strong>Explanation:</strong>
+                    <ul>
+                        <li><strong>High dimensions:</strong> ✓ MC&rsquo;s \( 1/\sqrt{N} \) rate is dimension-independent. Grid methods scale as \( N^{-2/d} \), which collapses in high d.</li>
+                        <li><strong>15-digit accuracy in 1D:</strong> ✗ You&rsquo;d need ~10^30 MC samples. Use Gaussian quadrature instead.</li>
+                        <li><strong>Simple polynomial:</strong> ✗ Exact quadrature formulas exist for polynomials. No need for MC.</li>
+                        <li><strong>Complicated regions:</strong> ✓ MC only needs a point-in-region test. Grid methods need to mesh the boundary.</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- ============================================================ -->
+<!-- EXPLORER 3: Dimensional Crossover -->
+<!-- ============================================================ -->
+<div class="interactive-container" id="dimensional-crossover">
+    <div class="interactive-title">Explorer: The Dimensional Crossover</div>
+
+    <p>
+        Compare the effective convergence rate of grid-based quadrature vs Monte Carlo
+        as dimension increases. Below the crossover, grid methods win. Above it,
+        Monte Carlo is the only practical option.
+    </p>
+
+    <div class="dual-panel">
+        <div class="panel">
+            <div class="plot-container" id="es-crossoverPlot" style="height: 400px;"></div>
+        </div>
+        <div class="panel">
+            <div class="plot-container" id="es-costPlot" style="height: 400px;"></div>
+        </div>
+    </div>
+
+    <div id="es-stats3" class="stats-bar"></div>
+
+    <div class="control-panel">
+        <div class="control-group">
+            <label class="control-label" for="es-target-slider">Target accuracy (digits):
+                <span id="es-target-value">3</span>
+            </label>
+            <input type="range" class="slider" id="es-target-slider"
+                   min="1" max="6" step="1" value="3">
+        </div>
+        <div class="control-group">
+            <button class="btn" onclick="esCrossoverReset()">Reset</button>
+        </div>
+    </div>
+</div>
+
+<!-- ========== Test Your Understanding #3 ========== -->
+<div class="interactive-container question-section">
+    <div class="interactive-title">Test Your Understanding</div>
+
+    <p style="margin-bottom: var(--spacing-md); color: var(--text-secondary);">
+        Use the Dimensional Crossover explorer to answer these questions.
+    </p>
+
+    <div class="tabs">
+        <div class="tab-buttons">
+            <button class="tab-button active">Question 7</button>
+            <button class="tab-button">Question 8</button>
+            <button class="tab-button">Question 9</button>
+        </div>
+
+        <div class="tab-content active">
+            <div class="question-container" data-type="mcq" data-answer="1">
+                <div class="question-text">
+                    Set target accuracy to 3 digits. At dimension d = 10, how many grid
+                    points would be needed compared to MC samples?
+                </div>
+                <div class="question-options">
+                    <label class="option">
+                        <input type="radio" name="es-q7" value="0">
+                        <span>About the same number</span>
+                    </label>
+                    <label class="option">
+                        <input type="radio" name="es-q7" value="1">
+                        <span>Grid needs astronomically more &mdash; billions vs thousands for MC</span>
+                    </label>
+                    <label class="option">
+                        <input type="radio" name="es-q7" value="2">
+                        <span>MC needs more because it converges slowly</span>
+                    </label>
+                    <label class="option">
+                        <input type="radio" name="es-q7" value="3">
+                        <span>Neither method can achieve 3 digits in 10D</span>
+                    </label>
+                </div>
+                <div class="question-actions">
+                    <button class="btn-verify">Verify</button>
+                </div>
+                <div class="question-explanation" style="display:none;">
+                    <strong>Explanation:</strong>
+                    For 3 digits of accuracy (\( \epsilon \sim 10^{-3} \)):
+                    MC needs \( N \sim (\sigma/10^{-3})^2 \sim 10^6 \) samples (regardless of d).
+                    Grid with trapezoidal needs \( n^{10} \) where \( n^{-2} \sim 10^{-3} \), so
+                    \( n \sim 32 \) and total points \( \sim 32^{10} \approx 10^{15} \). The grid
+                    needs a <strong>billion times more</strong> points.
+                </div>
+            </div>
+        </div>
+
+        <div class="tab-content">
+            <div class="question-container" data-type="fill" data-answer="4[3,5]">
+                <div class="question-text">
+                    The crossover dimension where MC becomes competitive with trapezoidal
+                    rule is approximately d &asymp;
+                    <input type="text" class="fill-blank" style="width: 50px">.
+                </div>
+                <div class="question-actions">
+                    <button class="btn-verify">Verify</button>
+                </div>
+                <div class="question-explanation" style="display:none;">
+                    <strong>Explanation:</strong>
+                    The trapezoidal rate in d dimensions is \( N^{-2/d} \). MC rate is \( N^{-1/2} \).
+                    They cross when \( 2/d = 1/2 \), i.e., <strong>d = 4</strong>. Above 4 dimensions,
+                    MC converges faster per sample. In practice, the crossover can be even lower
+                    due to the difficulty of constructing good grids in high dimensions.
+                </div>
+            </div>
+        </div>
+
+        <div class="tab-content">
+            <div class="question-container" data-type="mcq" data-answer="3">
+                <div class="question-text">
+                    What is the <strong>fundamental reason</strong> MC wins in high dimensions?
+                </div>
+                <div class="question-options">
+                    <label class="option">
+                        <input type="radio" name="es-q9" value="0">
+                        <span>MC uses better random numbers in high dimensions</span>
+                    </label>
+                    <label class="option">
+                        <input type="radio" name="es-q9" value="1">
+                        <span>Functions are simpler in high dimensions</span>
+                    </label>
+                    <label class="option">
+                        <input type="radio" name="es-q9" value="2">
+                        <span>Computers are faster with random numbers than with grids</span>
+                    </label>
+                    <label class="option">
+                        <input type="radio" name="es-q9" value="3">
+                        <span>The MC convergence rate \( N^{-1/2} \) doesn&rsquo;t depend on dimension, while grid rates degrade as \( N^{-2/d} \)</span>
+                    </label>
+                </div>
+                <div class="question-actions">
+                    <button class="btn-verify">Verify</button>
+                </div>
+                <div class="question-explanation" style="display:none;">
+                    <strong>Explanation:</strong>
+                    The key insight: MC error \( \sigma/\sqrt{N} \) depends on N and &sigma; only
+                    &mdash; <strong>not on dimension</strong>. Grid-based methods have error
+                    \( \propto N^{-p/d} \) where \( p \) is the method order. As \( d \) grows,
+                    the exponent \( p/d \to 0 \) and the grid method becomes useless. MC doesn&rsquo;t
+                    care about \( d \) at all. This is Monte Carlo&rsquo;s fundamental advantage.
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- ============================================================ -->
+<!-- PYTHON CODE EXAMPLES -->
+<!-- ============================================================ -->
+<h2>Python Code</h2>
+
+<div class="tabs">
+    <div class="tab-buttons">
+        <button class="tab-button active">Error Scaling</button>
+        <button class="tab-button">MC vs Quadrature</button>
+        <button class="tab-button">Prompt</button>
+    </div>
+
+    <div class="tab-content active">
+        <div class="code-block-container">
+            <div class="code-header">
+                <span class="code-lang">Python</span>
+                <button class="copy-btn">Copy</button>
+            </div>
+            <pre><code class="language-python">
+import numpy as np
+import plotly.graph_objects as go
+
+# Verify 1/√N scaling for MC integration of ∫₀¹ 1/(1+x) dx
+f = lambda x: 1 / (1 + x)
+true_val = np.log(2)
+n_trials = 200
+
+Ns = [50, 100, 200, 500, 1000, 2000, 5000, 10000]
+errors = []
+
+for N in Ns:
+    estimates = []
+    for _ in range(n_trials):
+        x = np.random.uniform(0, 1, N)
+        estimates.append(np.mean(f(x)))
+    errors.append(np.std(estimates))
+
+# Fit slope on log-log
+log_N = np.log10(Ns)
+log_err = np.log10(errors)
+slope = np.polyfit(log_N, log_err, 1)[0]
+print(f'Log-log slope: {slope:.3f} (expected: -0.500)')
+
+fig = go.Figure()
+fig.add_trace(go.Scatter(
+    x=Ns, y=errors, mode='markers+lines',
+    marker=dict(color='#00f3ff', size=10),
+    line=dict(color='#00f3ff', width=2),
+    name=f'Measured (slope = {slope:.2f})'))
+
+# Reference 1/√N line
+N_ref = np.array([50, 10000])
+fig.add_trace(go.Scatter(
+    x=N_ref, y=errors[0] * np.sqrt(Ns[0]) / np.sqrt(N_ref),
+    mode='lines',
+    line=dict(color='white', width=1.5, dash='dash'),
+    name='1/√N reference'))
+
+fig.update_layout(
+    template='plotly_dark',
+    xaxis=dict(title='N', type='log', zerolinecolor='#808080'),
+    yaxis=dict(title='Standard error', type='log',
+               zerolinecolor='#808080'),
+    height=450, width=600)
+fig.show()
+            </code></pre>
+        </div>
+    </div>
+
+    <div class="tab-content">
+        <div class="code-block-container">
+            <div class="code-header">
+                <span class="code-lang">Python</span>
+                <button class="copy-btn">Copy</button>
+            </div>
+            <pre><code class="language-python">
+import numpy as np
+import plotly.graph_objects as go
+
+# Compare MC vs trapezoidal for ∫₀¹ 1/(1+x) dx
+f = lambda x: 1 / (1 + x)
+true_val = np.log(2)
+
+Ns = [10, 20, 50, 100, 200, 500, 1000, 2000, 5000]
+mc_errors, trap_errors = [], []
+
+for N in Ns:
+    # Trapezoidal rule
+    x = np.linspace(0, 1, N + 1)
+    h = 1.0 / N
+    trap = h * (f(x[0])/2 + np.sum(f(x[1:-1])) + f(x[-1])/2)
+    trap_errors.append(abs(trap - true_val))
+
+    # MC (average over trials)
+    errs = []
+    for _ in range(100):
+        xr = np.random.uniform(0, 1, N)
+        errs.append(abs(np.mean(f(xr)) - true_val))
+    mc_errors.append(np.mean(errs))
+
+fig = go.Figure()
+fig.add_trace(go.Scatter(x=Ns, y=mc_errors, mode='markers+lines',
+    marker=dict(color='#00f3ff', size=8),
+    line=dict(color='#00f3ff', width=2),
+    name='Monte Carlo (slope ≈ -0.5)'))
+fig.add_trace(go.Scatter(x=Ns, y=trap_errors, mode='markers+lines',
+    marker=dict(color='#ff006e', size=8),
+    line=dict(color='#ff006e', width=2),
+    name='Trapezoidal (slope ≈ -2)'))
+
+fig.update_layout(
+    template='plotly_dark',
+    xaxis=dict(title='N', type='log', zerolinecolor='#808080'),
+    yaxis=dict(title='|Error|', type='log', zerolinecolor='#808080'),
+    height=450, width=600)
+fig.show()
+            </code></pre>
+        </div>
+    </div>
+
+    <div class="tab-content">
+        <div class="code-block-container">
+            <div class="code-header">
+                <span class="code-lang">Prompt for AI</span>
+                <button class="copy-btn">Copy</button>
+            </div>
+            <pre><code class="language-text">Create a Python script using Plotly to analyze Monte Carlo
+error scaling and compare with deterministic quadrature.
+
+Requirements:
+- Part 1: Verify 1/√N law
+  Run MC integration of ∫₀¹ 1/(1+x) dx for N = 50 to 10000
+  Repeat 200 trials per N, measure std of estimates
+  Log-log plot of error vs N, fit slope (should be ≈ -0.5)
+
+- Part 2: MC vs Trapezoidal comparison
+  Both methods for same integral, same N values
+  Log-log error plot showing slope -0.5 (MC) vs -2 (trap)
+
+- Part 3: Dimensional crossover
+  Bar chart showing: for target accuracy 10^-3,
+  how many points needed by grid vs MC for d = 1,2,...,10
+  Grid: N = ceil(10^(3d/2)) (from N^{-2/d} = 10^{-3})
+  MC: N = 10^6 (from σ/√N = 10^{-3} with σ≈1)
+
+- Use dark theme (plotly_dark) with gray (#808080) axes</code></pre>
+        </div>
+    </div>
+</div>
+
+<!-- ============================================================ -->
+<!-- NAVIGATION -->
+<!-- ============================================================ -->
+<div class="btn-group mt-xl">
+    <button class="btn btn-magenta" onclick="navigateToSection('67-mc-integration')">&larr; Previous: MC Integration Basics</button>
+    <button class="btn btn-secondary" onclick="scrollToTop()">&uarr; Back to Top</button>
+    <button class="btn btn-secondary" onclick="navigateToSection('69-importance-sampling')">Next: Importance Sampling &rarr;</button>
+</div>

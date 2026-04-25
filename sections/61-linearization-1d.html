@@ -1,0 +1,744 @@
+<!-- ============================================================
+     Section 5.11: 1D Linearization: The Basics
+     Source: NPTEL Lecture 8_3 (Linearization, Part 1)
+     Concept: Linearizing 1D systems ẋ = f(x) near fixed points
+              using Taylor expansion; stability from f'(x₀)
+     Time: 20-25 minutes
+     Prerequisites: Sections 5.3 (fixed points), 5.7 (eigenvalues),
+                    calculus (derivatives, Taylor series)
+     ============================================================ -->
+
+<h1>1D Linearization: The Basics</h1>
+
+<p>
+    So far you&rsquo;ve analyzed <em>linear</em> systems where everything is
+    determined by eigenvalues. But most real systems are <strong>nonlinear</strong>.
+    The key insight: near a fixed point, every smooth system <em>looks</em> linear.
+    Zoom in close enough, and curves become straight lines. This is
+    <strong>linearization</strong> &mdash; the most powerful tool in dynamical systems.
+    We start with the simplest case: one dimension.
+</p>
+
+<div class="info-box">
+    <div class="info-box-title">Learning Objectives</div>
+    <ul>
+        <li>Find fixed points of a 1D system \( \dot{x} = f(x) \) by solving \( f(x_0) = 0 \)</li>
+        <li>Linearize near a fixed point using Taylor expansion: \( f(x) \approx f'(x_0)(x - x_0) \)</li>
+        <li>Determine stability from the sign of \( \lambda = f'(x_0) \): negative → stable, positive → unstable</li>
+        <li>Understand <strong>when linearization fails</strong>: far from the fixed point, or when \( f'(x_0) = 0 \)</li>
+    </ul>
+</div>
+
+<div class="equation-display">
+    <p><strong>The Linearization Recipe (1D):</strong></p>
+    $$ \dot{x} = f(x) \quad\xrightarrow{\text{near } x_0}\quad \dot{y} \approx \lambda\, y $$
+    <p>
+        where \( y = x - x_0 \) is the deviation from the fixed point and
+        \( \lambda = f'(x_0) \) is the derivative evaluated at the fixed point.
+        The solution is \( y(t) = y_0\, e^{\lambda t} \) &mdash; exponential
+        growth (\( \lambda > 0 \)) or decay (\( \lambda < 0 \)).
+    </p>
+</div>
+
+<hr>
+
+<!-- ============================================================ -->
+<!-- EXPLORER 1: Taylor Expansion Visualizer -->
+<!-- ============================================================ -->
+<div class="interactive-container" id="taylor-visualizer">
+    <div class="interactive-title">Explorer: Taylor Expansion at a Fixed Point</div>
+
+    <p>
+        Choose a nonlinear system and see its function \( f(x) \) plotted alongside
+        the <strong>linear approximation</strong> \( f'(x_0)(x - x_0) \) at each
+        fixed point. The linear approximation (dashed) matches beautifully near the
+        fixed point but diverges away from it.
+    </p>
+
+    <div class="dual-panel">
+        <div class="panel">
+            <div class="plot-container" id="lin-fPlot" style="height: 400px;"></div>
+        </div>
+        <div class="panel">
+            <div class="plot-container" id="lin-phaseLine" style="height: 400px;"></div>
+        </div>
+    </div>
+
+    <div id="lin-stats1" class="stats-bar"></div>
+
+    <div class="control-panel">
+        <div class="control-group">
+            <label class="control-label" for="lin-system-select">System:</label>
+            <select id="lin-system-select" class="control-select">
+                <option value="logistic">Logistic: ẋ = rx(1 − x/K)</option>
+                <option value="cubic">Cubic: ẋ = x − x³</option>
+                <option value="sine">Sine: ẋ = sin(x)</option>
+                <option value="quadratic">Quadratic: ẋ = r − x²</option>
+            </select>
+        </div>
+        <div class="control-group">
+            <label class="control-label" for="lin-fpIdx-select">Fixed point:</label>
+            <select id="lin-fpIdx-select" class="control-select">
+                <option value="0">x₀ = 0</option>
+            </select>
+        </div>
+        <div class="control-group">
+            <label class="control-label" for="lin-r-slider">Parameter r:
+                <span id="lin-r-value">2.0</span>
+            </label>
+            <input type="range" class="slider" id="lin-r-slider"
+                   min="0.5" max="4" step="0.1" value="2">
+        </div>
+        <div class="control-group">
+            <button class="btn" onclick="linTaylorReset()">Reset</button>
+        </div>
+    </div>
+</div>
+
+<div class="info-box">
+    <div class="info-box-title">Why Linearization Works</div>
+    <p>
+        Taylor&rsquo;s theorem says \( f(x) = f(x_0) + f'(x_0)(x - x_0) + \frac{1}{2}f''(x_0)(x - x_0)^2 + \cdots \).
+        At a fixed point, \( f(x_0) = 0 \). If \( x \) is close to \( x_0 \), the
+        \( (x - x_0)^2 \) and higher terms are tiny compared to \( (x - x_0) \).
+        So \( f(x) \approx f'(x_0)(x - x_0) \) &mdash; the system is effectively linear.
+        The approximation breaks down when \( |x - x_0| \) is large enough that
+        quadratic terms matter.
+    </p>
+</div>
+
+<!-- ========== Test Your Understanding #1 ========== -->
+<div class="interactive-container question-section">
+    <div class="interactive-title">Test Your Understanding</div>
+
+    <p style="margin-bottom: var(--spacing-md); color: var(--text-secondary);">
+        Use the Taylor Expansion explorer to answer these questions.
+    </p>
+
+    <div class="tabs">
+        <div class="tab-buttons">
+            <button class="tab-button active">Question 1</button>
+            <button class="tab-button">Question 2</button>
+            <button class="tab-button">Question 3</button>
+        </div>
+
+        <div class="tab-content active">
+            <div class="question-container" data-type="mcq" data-answer="1">
+                <div class="question-text">
+                    Select <strong>Logistic</strong> with r = 2, K = 5. The fixed point at
+                    \( x_0 = 0 \) has \( f'(0) = r = 2 > 0 \). Is this fixed point
+                    stable or unstable?
+                </div>
+                <div class="question-options">
+                    <label class="option">
+                        <input type="radio" name="lin-q1" value="0">
+                        <span>Stable &mdash; small perturbations decay back to zero</span>
+                    </label>
+                    <label class="option">
+                        <input type="radio" name="lin-q1" value="1">
+                        <span>Unstable &mdash; small perturbations grow away from zero</span>
+                    </label>
+                    <label class="option">
+                        <input type="radio" name="lin-q1" value="2">
+                        <span>Neutrally stable &mdash; perturbations neither grow nor decay</span>
+                    </label>
+                    <label class="option">
+                        <input type="radio" name="lin-q1" value="3">
+                        <span>Cannot be determined from linearization</span>
+                    </label>
+                </div>
+                <div class="question-actions">
+                    <button class="btn-verify">Verify</button>
+                </div>
+                <div class="question-explanation" style="display:none;">
+                    <strong>Explanation:</strong>
+                    \( \lambda = f'(0) = r = 2 > 0 \). Near \( x_0 = 0 \), the deviation grows as
+                    \( y(t) = y_0 e^{2t} \). The fixed point is <strong>unstable</strong>: any small
+                    positive perturbation causes the population to grow (toward the carrying capacity).
+                    Check the phase line &mdash; arrows point away from \( x = 0 \).
+                </div>
+            </div>
+        </div>
+
+        <div class="tab-content">
+            <div class="question-container" data-type="fill" data-answer="stable">
+                <div class="question-text">
+                    Now select the fixed point at \( x_0 = K = 5 \) (the carrying capacity).
+                    The linearization gives \( f'(K) = -r \). Since \( -r < 0 \), this
+                    fixed point is
+                    <select class="fill-blank-select">
+                        <option value=""></option>
+                        <option value="stable">stable</option>
+                        <option value="unstable">unstable</option>
+                        <option value="indeterminate">indeterminate</option>
+                    </select>.
+                </div>
+                <div class="question-actions">
+                    <button class="btn-verify">Verify</button>
+                </div>
+                <div class="question-explanation" style="display:none;">
+                    <strong>Explanation:</strong>
+                    \( f'(K) = -r = -2 < 0 \). The linearized equation is \( \dot{y} = -2y \),
+                    giving \( y(t) = y_0 e^{-2t} \to 0 \). The carrying capacity is
+                    <strong>stable</strong>: populations near K return to it. This is why the
+                    logistic equation has a well-defined steady state.
+                </div>
+            </div>
+        </div>
+
+        <div class="tab-content">
+            <div class="question-container" data-type="mcq" data-answer="0">
+                <div class="question-text">
+                    Select <strong>Cubic</strong> (\( \dot{x} = x - x^3 \)). How many fixed
+                    points does it have?
+                </div>
+                <div class="question-options">
+                    <label class="option">
+                        <input type="radio" name="lin-q3" value="0">
+                        <span>Three: \( x = 0, +1, -1 \)</span>
+                    </label>
+                    <label class="option">
+                        <input type="radio" name="lin-q3" value="1">
+                        <span>One: \( x = 0 \)</span>
+                    </label>
+                    <label class="option">
+                        <input type="radio" name="lin-q3" value="2">
+                        <span>Two: \( x = +1, -1 \)</span>
+                    </label>
+                    <label class="option">
+                        <input type="radio" name="lin-q3" value="3">
+                        <span>Infinitely many</span>
+                    </label>
+                </div>
+                <div class="question-actions">
+                    <button class="btn-verify">Verify</button>
+                </div>
+                <div class="question-explanation" style="display:none;">
+                    <strong>Explanation:</strong>
+                    \( f(x) = x - x^3 = x(1 - x^2) = x(1-x)(1+x) = 0 \) gives
+                    \( x = 0, +1, -1 \). Three fixed points! At \( x = 0 \): \( f'(0) = 1 > 0 \)
+                    (unstable). At \( x = \pm 1 \): \( f'(\pm 1) = 1 - 3 = -2 < 0 \) (stable).
+                    The origin repels; the two outer fixed points attract.
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- ============================================================ -->
+<!-- EXPLORER 2: Stability Classifier -->
+<!-- ============================================================ -->
+<div class="interactive-container" id="stability-classifier">
+    <div class="interactive-title">Explorer: 1D Phase Line</div>
+
+    <p>
+        The <strong>phase line</strong> shows the flow on a number line: arrows
+        point in the direction of \( \dot{x} = f(x) \). Stable fixed points have
+        arrows pointing <em>toward</em> them; unstable ones have arrows pointing
+        <em>away</em>. Watch how initial conditions flow along the phase line.
+    </p>
+
+    <div class="dual-panel">
+        <div class="panel">
+            <div class="plot-container" id="lin-flowPlot" style="height: 400px;"></div>
+        </div>
+        <div class="panel">
+            <div class="plot-container" id="lin-trajectoryPlot" style="height: 400px;"></div>
+        </div>
+    </div>
+
+    <div id="lin-stats2" class="stats-bar"></div>
+
+    <div class="control-panel">
+        <div class="control-group">
+            <label class="control-label" for="lin-flow-system">System:</label>
+            <select id="lin-flow-system" class="control-select">
+                <option value="logistic">Logistic: ẋ = rx(1 − x/K)</option>
+                <option value="cubic">Cubic: ẋ = x − x³</option>
+                <option value="sine">Sine: ẋ = sin(x)</option>
+            </select>
+        </div>
+        <div class="control-group">
+            <label class="control-label" for="lin-x0-slider">Initial condition x&#8320;:
+                <span id="lin-x0-value">0.2</span>
+            </label>
+            <input type="range" class="slider" id="lin-x0-slider"
+                   min="-2" max="6" step="0.1" value="0.2">
+        </div>
+        <div class="control-group">
+            <button class="btn" onclick="linFlowReset()">Reset</button>
+        </div>
+    </div>
+</div>
+
+<!-- ========== Test Your Understanding #2 ========== -->
+<div class="interactive-container question-section">
+    <div class="interactive-title">Test Your Understanding</div>
+
+    <p style="margin-bottom: var(--spacing-md); color: var(--text-secondary);">
+        Use the Phase Line explorer to answer these questions.
+    </p>
+
+    <div class="tabs">
+        <div class="tab-buttons">
+            <button class="tab-button active">Question 4</button>
+            <button class="tab-button">Question 5</button>
+            <button class="tab-button">Question 6</button>
+        </div>
+
+        <div class="tab-content active">
+            <div class="question-container" data-type="mcq" data-answer="2">
+                <div class="question-text">
+                    Select <strong>Logistic</strong> and set \( x_0 = 0.2 \). Where does
+                    the trajectory converge to as \( t \to \infty \)?
+                </div>
+                <div class="question-options">
+                    <label class="option">
+                        <input type="radio" name="lin-q4" value="0">
+                        <span>\( x = 0 \) (the origin)</span>
+                    </label>
+                    <label class="option">
+                        <input type="radio" name="lin-q4" value="1">
+                        <span>\( x = \infty \) (unbounded growth)</span>
+                    </label>
+                    <label class="option">
+                        <input type="radio" name="lin-q4" value="2">
+                        <span>\( x = K \) (the carrying capacity)</span>
+                    </label>
+                    <label class="option">
+                        <input type="radio" name="lin-q4" value="3">
+                        <span>It oscillates forever</span>
+                    </label>
+                </div>
+                <div class="question-actions">
+                    <button class="btn-verify">Verify</button>
+                </div>
+                <div class="question-explanation" style="display:none;">
+                    <strong>Explanation:</strong>
+                    Starting at \( x_0 = 0.2 \) (between 0 and K), \( f(x) > 0 \) so \( x \)
+                    increases. It flows away from the unstable fixed point at 0 and toward the
+                    stable fixed point at K. The sigmoid curve in the time series shows the
+                    classic logistic growth approaching the carrying capacity.
+                </div>
+            </div>
+        </div>
+
+        <div class="tab-content">
+            <div class="question-container" data-type="fill" data-answer="stable|unstable|stable">
+                <div class="question-text">
+                    Select <strong>Cubic</strong> (\( \dot{x} = x - x^3 \)). Classify each
+                    fixed point:<br>
+                    \( x = -1 \):
+                    <select class="fill-blank-select">
+                        <option value=""></option>
+                        <option value="stable">stable</option>
+                        <option value="unstable">unstable</option>
+                    </select>,&ensp;
+                    \( x = 0 \):
+                    <select class="fill-blank-select">
+                        <option value=""></option>
+                        <option value="stable">stable</option>
+                        <option value="unstable">unstable</option>
+                    </select>,&ensp;
+                    \( x = +1 \):
+                    <select class="fill-blank-select">
+                        <option value=""></option>
+                        <option value="stable">stable</option>
+                        <option value="unstable">unstable</option>
+                    </select>.
+                </div>
+                <div class="question-actions">
+                    <button class="btn-verify">Verify</button>
+                </div>
+                <div class="question-explanation" style="display:none;">
+                    <strong>Explanation:</strong>
+                    Wait &mdash; let&rsquo;s recheck. \( f'(x) = 1 - 3x^2 \).
+                    At \( x = -1 \): \( f'(-1) = 1 - 3 = -2 < 0 \) → <strong>stable</strong>.
+                    At \( x = 0 \): \( f'(0) = 1 > 0 \) → <strong>unstable</strong>.
+                    At \( x = +1 \): \( f'(1) = -2 < 0 \) → <strong>stable</strong>.
+                    The pattern is stable-unstable-stable: the two outer fixed points attract
+                    and the origin repels.
+                </div>
+            </div>
+        </div>
+
+        <div class="tab-content">
+            <div class="question-container" data-type="msq" data-answer="0,3">
+                <div class="question-text">
+                    Which statements about 1D linearization are true? (Select all)
+                </div>
+                <div class="question-options">
+                    <label class="option">
+                        <input type="checkbox" value="0">
+                        <span>In 1D, only two types of fixed points exist: stable and unstable (no spirals, no saddles)</span>
+                    </label>
+                    <label class="option">
+                        <input type="checkbox" value="1">
+                        <span>Linearization always gives the correct stability, even when \( f'(x_0) = 0 \)</span>
+                    </label>
+                    <label class="option">
+                        <input type="checkbox" value="2">
+                        <span>The linear approximation is exact for polynomial systems</span>
+                    </label>
+                    <label class="option">
+                        <input type="checkbox" value="3">
+                        <span>The linearized decay rate \( |\lambda| = |f'(x_0)| \) tells you how fast the system returns to the fixed point</span>
+                    </label>
+                </div>
+                <div class="question-actions">
+                    <button class="btn-verify">Verify</button>
+                </div>
+                <div class="question-explanation" style="display:none;">
+                    <strong>Explanation:</strong>
+                    <ul>
+                        <li><strong>Only stable/unstable:</strong> ✓ In 1D there&rsquo;s only one eigenvalue \( \lambda = f'(x_0) \). It&rsquo;s either positive (unstable), negative (stable), or zero (indeterminate). No room for spirals or saddles.</li>
+                        <li><strong>Always correct when f' = 0:</strong> ✗ When \( f'(x_0) = 0 \), the linear term vanishes. You need higher-order terms to determine stability. Linearization is <strong>inconclusive</strong>.</li>
+                        <li><strong>Exact for polynomials:</strong> ✗ The linearization drops quadratic and higher terms, even for polynomials. It&rsquo;s only exact for truly linear systems \( f(x) = \lambda x \).</li>
+                        <li><strong>Decay rate:</strong> ✓ Near the fixed point, \( y(t) \approx y_0 e^{\lambda t} \). The timescale is \( \tau = 1/|\lambda| \). Larger \( |\lambda| \) = faster return.</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- ============================================================ -->
+<!-- EXPLORER 3: Linear vs Nonlinear -->
+<!-- ============================================================ -->
+<div class="interactive-container" id="linear-vs-nonlinear">
+    <div class="interactive-title">Explorer: Linear vs Nonlinear Comparison</div>
+
+    <p>
+        Start near a stable fixed point and compare the <strong>exact nonlinear
+        trajectory</strong> with the <strong>linearized prediction</strong>. Close to
+        the fixed point they match perfectly; farther away, the approximation breaks down.
+        How far can you start and still trust the linearization?
+    </p>
+
+    <div class="plot-container" id="lin-comparePlot" style="height: 420px;"></div>
+
+    <div id="lin-stats3" class="stats-bar"></div>
+
+    <div class="control-panel">
+        <div class="control-group">
+            <label class="control-label" for="lin-cmp-system">System:</label>
+            <select id="lin-cmp-system" class="control-select">
+                <option value="logistic">Logistic (near x = K)</option>
+                <option value="cubic">Cubic (near x = 1)</option>
+                <option value="sine">Sine (near x = 0)</option>
+            </select>
+        </div>
+        <div class="control-group">
+            <label class="control-label" for="lin-deviation-slider">Initial deviation y&#8320;:
+                <span id="lin-deviation-value">0.3</span>
+            </label>
+            <input type="range" class="slider" id="lin-deviation-slider"
+                   min="0.05" max="3" step="0.05" value="0.3">
+        </div>
+        <div class="control-group">
+            <button class="btn" onclick="linCompareReset()">Reset</button>
+        </div>
+    </div>
+</div>
+
+<div class="info-box">
+    <div class="info-box-title">When Linearization Fails</div>
+    <p>
+        Linearization tells you the <strong>local</strong> behavior near a fixed point.
+        It fails in two situations:
+    </p>
+    <ul>
+        <li><strong>Too far from the fixed point:</strong> Nonlinear terms dominate. The
+            comparison plot shows this &mdash; increase the deviation and watch the
+            linearized prediction diverge from reality.</li>
+        <li><strong>\( f'(x_0) = 0 \):</strong> The linear term vanishes, and the
+            quadratic or higher terms determine stability. This is a <strong>non-hyperbolic</strong>
+            fixed point &mdash; linearization is inconclusive.</li>
+    </ul>
+</div>
+
+<!-- ========== Test Your Understanding #3 ========== -->
+<div class="interactive-container question-section">
+    <div class="interactive-title">Test Your Understanding</div>
+
+    <p style="margin-bottom: var(--spacing-md); color: var(--text-secondary);">
+        Use the Linear vs Nonlinear explorer to answer these questions.
+    </p>
+
+    <div class="tabs">
+        <div class="tab-buttons">
+            <button class="tab-button active">Question 7</button>
+            <button class="tab-button">Question 8</button>
+            <button class="tab-button">Question 9</button>
+        </div>
+
+        <div class="tab-content active">
+            <div class="question-container" data-type="mcq" data-answer="1">
+                <div class="question-text">
+                    Select <strong>Logistic (near x = K)</strong> and increase the deviation
+                    from 0.3 to 2.0. What happens to the linearized prediction?
+                </div>
+                <div class="question-options">
+                    <label class="option">
+                        <input type="radio" name="lin-q7" value="0">
+                        <span>It remains identical to the exact solution</span>
+                    </label>
+                    <label class="option">
+                        <input type="radio" name="lin-q7" value="1">
+                        <span>It predicts the right trend but wrong timing &mdash; the error grows with distance</span>
+                    </label>
+                    <label class="option">
+                        <input type="radio" name="lin-q7" value="2">
+                        <span>It predicts instability when the exact solution is stable</span>
+                    </label>
+                    <label class="option">
+                        <input type="radio" name="lin-q7" value="3">
+                        <span>It oscillates while the exact solution doesn&rsquo;t</span>
+                    </label>
+                </div>
+                <div class="question-actions">
+                    <button class="btn-verify">Verify</button>
+                </div>
+                <div class="question-explanation" style="display:none;">
+                    <strong>Explanation:</strong>
+                    The linearization correctly predicts stability (\( \lambda = -r < 0 \)) but
+                    the rate of return differs. The linear prediction decays as a pure exponential,
+                    while the actual logistic curve has a different shape (sigmoid). For small
+                    deviations they agree; for large deviations the timing and trajectory shape
+                    differ significantly.
+                </div>
+            </div>
+        </div>
+
+        <div class="tab-content">
+            <div class="question-container" data-type="fill" data-answer="0.5[0.3,0.7]">
+                <div class="question-text">
+                    Select <strong>Sine (near x = 0)</strong>. The linearized system is
+                    \( \dot{y} = y \) (since \( \sin'(0) = 1 \)). Set the deviation to 0.3.
+                    Approximately how long until the linearized and exact solutions diverge
+                    noticeably? t &asymp;
+                    <input type="text" class="fill-blank" style="width: 60px">
+                    (read from the plot)
+                </div>
+                <div class="question-actions">
+                    <button class="btn-verify">Verify</button>
+                </div>
+                <div class="question-explanation" style="display:none;">
+                    <strong>Explanation:</strong>
+                    The sine system has \( f(x) = \sin(x) \approx x - x^3/6 + \cdots \). Near
+                    \( x = 0 \), the cubic correction is small but grows as \( x \) increases.
+                    The linearized exponential \( e^t \) matches well until the trajectory reaches
+                    \( x \approx 1 \) where \( \sin(x) \) bends away from \( x \). This happens
+                    around \( t \approx 0.5 \) for \( y_0 = 0.3 \).
+                </div>
+            </div>
+        </div>
+
+        <div class="tab-content">
+            <div class="question-container" data-type="mcq" data-answer="3">
+                <div class="question-text">
+                    What is the <strong>practical takeaway</strong> of linearization?
+                </div>
+                <div class="question-options">
+                    <label class="option">
+                        <input type="radio" name="lin-q9" value="0">
+                        <span>It replaces numerical simulation entirely</span>
+                    </label>
+                    <label class="option">
+                        <input type="radio" name="lin-q9" value="1">
+                        <span>It only works for linear systems</span>
+                    </label>
+                    <label class="option">
+                        <input type="radio" name="lin-q9" value="2">
+                        <span>It gives exact solutions for all time</span>
+                    </label>
+                    <label class="option">
+                        <input type="radio" name="lin-q9" value="3">
+                        <span>It classifies fixed-point stability without solving the full nonlinear equation</span>
+                    </label>
+                </div>
+                <div class="question-actions">
+                    <button class="btn-verify">Verify</button>
+                </div>
+                <div class="question-explanation" style="display:none;">
+                    <strong>Explanation:</strong>
+                    Linearization doesn&rsquo;t replace simulation &mdash; it <strong>complements</strong> it.
+                    Its power is in <strong>classification</strong>: a single derivative \( f'(x_0) \)
+                    tells you whether a fixed point is stable or unstable, without solving any ODE.
+                    For the full trajectory far from the fixed point, you still need numerical methods.
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- ============================================================ -->
+<!-- PYTHON CODE EXAMPLES -->
+<!-- ============================================================ -->
+<h2>Python Code</h2>
+
+<div class="tabs">
+    <div class="tab-buttons">
+        <button class="tab-button active">1D Linearization</button>
+        <button class="tab-button">Linear vs Nonlinear</button>
+        <button class="tab-button">Prompt</button>
+    </div>
+
+    <div class="tab-content active">
+        <div class="code-block-container">
+            <div class="code-header">
+                <span class="code-lang">Python</span>
+                <button class="copy-btn">Copy</button>
+            </div>
+            <pre><code class="language-python">
+import numpy as np
+import plotly.graph_objects as go
+
+# Logistic equation: ẋ = rx(1 - x/K)
+r, K = 2.0, 5.0
+f = lambda x: r * x * (1 - x / K)
+fp = lambda x: r * (1 - 2 * x / K)  # f'(x)
+
+x = np.linspace(-1, 7, 400)
+
+fig = go.Figure()
+
+# f(x) — the velocity function
+fig.add_trace(go.Scatter(
+    x=x, y=f(x), mode='lines',
+    line=dict(color='#00f3ff', width=2.5), name='f(x)'))
+
+# Zero line
+fig.add_trace(go.Scatter(
+    x=[-1, 7], y=[0, 0], mode='lines',
+    line=dict(color='#808080', width=1, dash='dot'),
+    showlegend=False))
+
+# Fixed points and their linearizations
+fps = [0, K]
+colors = ['#ff006e', '#00ff88']
+for x0, col in zip(fps, colors):
+    lam = fp(x0)
+    label = f'x₀={x0}, λ={lam:.1f}'
+    # Tangent line
+    x_lin = np.linspace(x0 - 2, x0 + 2, 100)
+    fig.add_trace(go.Scatter(
+        x=x_lin, y=lam * (x_lin - x0), mode='lines',
+        line=dict(color=col, width=2, dash='dash'),
+        name=f'Linear: {label}'))
+    # Fixed point marker
+    fig.add_trace(go.Scatter(
+        x=[x0], y=[0], mode='markers',
+        marker=dict(color=col, size=12,
+            symbol='circle' if lam < 0 else 'circle-open',
+            line=dict(color='white', width=2)),
+        name='Stable' if lam < 0 else 'Unstable'))
+
+fig.update_layout(
+    template='plotly_dark',
+    xaxis=dict(title='x', range=[-1, 7],
+               zerolinecolor='#808080'),
+    yaxis=dict(title='f(x) = ẋ', range=[-5, 5],
+               zerolinecolor='#808080'),
+    height=450, width=600)
+fig.show()
+            </code></pre>
+        </div>
+    </div>
+
+    <div class="tab-content">
+        <div class="code-block-container">
+            <div class="code-header">
+                <span class="code-lang">Python</span>
+                <button class="copy-btn">Copy</button>
+            </div>
+            <pre><code class="language-python">
+import numpy as np
+import plotly.graph_objects as go
+
+# Compare exact vs linearized near stable FP
+r, K = 2.0, 5.0
+f = lambda x: r * x * (1 - x / K)
+lam = -r  # f'(K) = -r
+
+# Euler solver for 1D
+def solve_1d(f, x0, T, N):
+    h = T / N; xs, ts = [x0], [0.0]
+    x = x0
+    for i in range(N):
+        k1 = f(x); k2 = f(x + h/2*k1)
+        k3 = f(x + h/2*k2); k4 = f(x + h*k3)
+        x += h/6*(k1 + 2*k2 + 2*k3 + k4)
+        xs.append(x); ts.append((i+1)*h)
+    return np.array(ts), np.array(xs)
+
+fig = go.Figure()
+deviations = [0.3, 1.0, 2.0, 4.0]
+colors = ['#00f3ff', '#ffbe0b', '#ff006e', '#ff5722']
+
+for y0, col in zip(deviations, colors):
+    x0 = K + y0
+    t, x_exact = solve_1d(f, x0, 5, 1000)
+    x_linear = K + y0 * np.exp(lam * t)
+
+    fig.add_trace(go.Scatter(
+        x=t, y=x_exact, mode='lines',
+        line=dict(color=col, width=2),
+        name=f'Exact (y₀={y0})'))
+    fig.add_trace(go.Scatter(
+        x=t, y=x_linear, mode='lines',
+        line=dict(color=col, width=1.5, dash='dash'),
+        name=f'Linear (y₀={y0})'))
+
+# K reference
+fig.add_trace(go.Scatter(
+    x=[0, 5], y=[K, K], mode='lines',
+    line=dict(color='#808080', width=1, dash='dot'),
+    showlegend=False))
+
+fig.update_layout(
+    template='plotly_dark',
+    xaxis=dict(title='Time', range=[0, 5],
+               zerolinecolor='#808080'),
+    yaxis=dict(title='x(t)', range=[0, 10],
+               zerolinecolor='#808080'),
+    height=450, width=600)
+fig.show()
+            </code></pre>
+        </div>
+    </div>
+
+    <div class="tab-content">
+        <div class="code-block-container">
+            <div class="code-header">
+                <span class="code-lang">Prompt for AI</span>
+                <button class="copy-btn">Copy</button>
+            </div>
+            <pre><code class="language-text">Create a Python script using Plotly to demonstrate 1D
+linearization of nonlinear systems.
+
+Requirements:
+- System: logistic equation ẋ = rx(1 - x/K) with r=2, K=5
+- Panel 1: Plot f(x) and its tangent line at each fixed point
+  (x=0 and x=K). Color stable FP green, unstable red.
+  Use filled circle for stable, open circle for unstable.
+- Panel 2: Compare exact trajectory x(t) with linearized
+  prediction x₀ + y₀*exp(λt) for several initial deviations
+  (0.3, 1.0, 2.0, 4.0) from the stable FP at x=K.
+  Exact: solid lines. Linearized: dashed. Same color per pair.
+- Solve exact ODE with RK4 (not scipy)
+- Show that small deviations match well, large deviations diverge
+- Use dark theme (plotly_dark) with gray (#808080) axes
+- Fixed ranges appropriate to logistic equation</code></pre>
+        </div>
+    </div>
+</div>
+
+<!-- ============================================================ -->
+<!-- NAVIGATION -->
+<!-- ============================================================ -->
+<div class="btn-group mt-xl">
+    <button class="btn btn-magenta" onclick="navigateToSection('60-cautious-lovers')">&larr; Previous: Cautious Lovers Model</button>
+    <button class="btn btn-secondary" onclick="scrollToTop()">&uarr; Back to Top</button>
+    <button class="btn btn-secondary" onclick="navigateToSection('62-jacobian-matrix')">Next: Jacobian Matrix for 2D &rarr;</button>
+</div>

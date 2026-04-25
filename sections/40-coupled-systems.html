@@ -1,0 +1,755 @@
+<!--
+    Section 4.7: Solving Coupled Systems
+    Source: NPTEL Module 7 (Euler for Oscillations) + Lecture 8.1 (Coupled ODEs, Phase Space)
+    Concept: Apply vector Euler's method to general coupled ODE systems; visualize in phase space
+    Time: ~18 minutes
+    Prerequisites: Sections 4.4-4.6 (Euler's method, order reduction, vector state)
+-->
+
+<h1>Solving Coupled Systems</h1>
+
+<p>
+    In Section 4.6 you learned to convert a single second-order ODE into a pair of coupled
+    first-order equations. But many physical systems are <em>inherently</em> coupled &mdash;
+    predators depend on prey, voltage depends on current, Romeo's feelings depend on Juliet's.
+    The vector Euler method you already know handles all of these: just update every variable
+    at each time step.
+</p>
+
+<div class="info-box">
+    <div class="info-box-title">Learning Objectives</div>
+    <ul>
+        <li>Apply vector Euler's method to solve general coupled ODE systems</li>
+        <li>Visualize solutions simultaneously in time domain and phase space</li>
+        <li>Use vector fields and multi-trajectory portraits to understand system behavior</li>
+    </ul>
+</div>
+
+<p>
+    The real payoff is <strong>phase space</strong>. Instead of plotting \( x(t) \) and \( y(t) \)
+    separately against time, we plot \( (x, y) \) as a single trajectory. This reveals structure
+    &mdash; closed orbits, spirals, limit cycles &mdash; that time-domain plots hide.
+</p>
+
+<hr>
+
+<!-- ============================================================ -->
+<!-- EXPLORER 1: System Solver -->
+<!-- ============================================================ -->
+<div class="interactive-container" id="system-solver">
+    <div class="interactive-title">Explorer 1: System Solver</div>
+
+    <p style="margin-bottom: var(--spacing-sm); color: var(--text-secondary);">
+        Select a coupled system and adjust the initial conditions. Watch both the time evolution
+        and the phase portrait simultaneously.
+    </p>
+
+    <div class="dual-panel">
+        <div class="panel">
+            <div class="plot-container" id="coupledSys-timePlot"></div>
+        </div>
+        <div class="panel">
+            <div class="plot-container" id="coupledSys-phasePlot"></div>
+        </div>
+    </div>
+
+    <div class="stats-bar">
+        <div class="stat-item">
+            <span class="stat-label">Steps</span>
+            <span class="stat-value" id="coupledSys-steps">--</span>
+        </div>
+        <div class="stat-item">
+            <span class="stat-label">Final x</span>
+            <span class="stat-value" id="coupledSys-finalX">--</span>
+        </div>
+        <div class="stat-item">
+            <span class="stat-label">Final y</span>
+            <span class="stat-value" id="coupledSys-finalY">--</span>
+        </div>
+        <div class="stat-item">
+            <span class="stat-label">Orbit Type</span>
+            <span class="stat-value" id="coupledSys-orbitType">--</span>
+        </div>
+    </div>
+
+    <div class="control-panel">
+        <div class="control-group">
+            <label class="control-label">System</label>
+            <select id="coupledSys-system" class="control-select">
+                <option value="0">Harmonic Oscillator: x'=v, v'=-x</option>
+                <option value="1">Damped Oscillator: x'=v, v'=-x-0.3v</option>
+                <option value="2">Predator-Prey: x'=x(1.5-y), y'=y(x-1)</option>
+                <option value="3">Van der Pol: x'=y, y'=2(1-x^2)y-x</option>
+            </select>
+        </div>
+        <div class="control-group">
+            <label class="control-label">
+                x<sub>0</sub>: <span class="control-label-value" id="coupledSys-x0-value">2.0</span>
+            </label>
+            <input type="range" id="coupledSys-x0-slider" class="slider"
+                   min="-3" max="3" step="0.1" value="2.0">
+        </div>
+        <div class="control-group">
+            <label class="control-label">
+                y<sub>0</sub>: <span class="control-label-value" id="coupledSys-y0-value">0.0</span>
+            </label>
+            <input type="range" id="coupledSys-y0-slider" class="slider"
+                   min="-3" max="3" step="0.1" value="0.0">
+        </div>
+        <div class="control-group">
+            <label class="control-label">
+                h: <span class="control-label-value" id="coupledSys-h-value">0.05</span>
+            </label>
+            <input type="range" id="coupledSys-h-slider" class="slider"
+                   min="0.01" max="0.20" step="0.01" value="0.05">
+        </div>
+        <div class="control-group">
+            <button class="btn btn-secondary" onclick="coupledSysSolverReset()">Reset</button>
+        </div>
+    </div>
+</div>
+
+<!-- ============================================================ -->
+<!-- TEST YOUR UNDERSTANDING #1 -->
+<!-- ============================================================ -->
+<div class="interactive-container question-section">
+    <div class="interactive-title">Test Your Understanding</div>
+
+    <p style="margin-bottom: var(--spacing-md); color: var(--text-secondary);">
+        Use Explorer 1 to answer these questions.
+    </p>
+
+    <div class="tabs">
+        <div class="tab-buttons">
+            <button class="tab-button active">Q1</button>
+            <button class="tab-button">Q2</button>
+            <button class="tab-button">Q3</button>
+        </div>
+
+        <div class="tab-content active">
+            <div class="question-container" data-type="mcq" data-answer="2">
+                <div class="question-text">
+                    Select the <strong>Harmonic Oscillator</strong> with \( x_0 = 2, y_0 = 0 \).
+                    What shape does the phase portrait trace?
+                </div>
+                <div class="question-options">
+                    <label class="option">
+                        <input type="radio" name="coupledSys-q1" value="0">
+                        <span>A spiral that decays to the origin</span>
+                    </label>
+                    <label class="option">
+                        <input type="radio" name="coupledSys-q1" value="1">
+                        <span>A straight line</span>
+                    </label>
+                    <label class="option">
+                        <input type="radio" name="coupledSys-q1" value="2">
+                        <span>A closed ellipse (approximately circular)</span>
+                    </label>
+                    <label class="option">
+                        <input type="radio" name="coupledSys-q1" value="3">
+                        <span>An outward-growing spiral</span>
+                    </label>
+                </div>
+                <div class="question-actions">
+                    <button class="btn-verify">Verify</button>
+                </div>
+                <div class="question-explanation" style="display:none;">
+                    <strong>Explanation:</strong>
+                    The harmonic oscillator \( \ddot{x} = -x \) conserves energy, so trajectories
+                    are closed ellipses in \( (x, v) \) space. With equal scaling, they appear
+                    approximately circular. Euler's method may cause slight spiral-out due to
+                    energy drift.
+                </div>
+            </div>
+        </div>
+
+        <div class="tab-content">
+            <div class="question-container" data-type="mcq" data-answer="1">
+                <div class="question-text">
+                    Switch to the <strong>Damped Oscillator</strong>. How does the phase portrait differ
+                    from the undamped case?
+                </div>
+                <div class="question-options">
+                    <label class="option">
+                        <input type="radio" name="coupledSys-q2" value="0">
+                        <span>The orbit grows outward over time</span>
+                    </label>
+                    <label class="option">
+                        <input type="radio" name="coupledSys-q2" value="1">
+                        <span>The orbit spirals inward toward the origin</span>
+                    </label>
+                    <label class="option">
+                        <input type="radio" name="coupledSys-q2" value="2">
+                        <span>The orbit remains a closed ellipse</span>
+                    </label>
+                    <label class="option">
+                        <input type="radio" name="coupledSys-q2" value="3">
+                        <span>The orbit becomes a straight line to the origin</span>
+                    </label>
+                </div>
+                <div class="question-actions">
+                    <button class="btn-verify">Verify</button>
+                </div>
+                <div class="question-explanation" style="display:none;">
+                    <strong>Explanation:</strong>
+                    Damping removes energy on each cycle, so the trajectory spirals inward toward
+                    the fixed point at the origin. The orbit gets smaller on each revolution until
+                    the system comes to rest.
+                </div>
+            </div>
+        </div>
+
+        <div class="tab-content">
+            <div class="question-container" data-type="fill" data-answer="1[0.8,1.2]|1[0.8,1.2]">
+                <div class="question-text">
+                    Select <strong>Predator-Prey</strong> with default ICs. The orbits cycle around
+                    a fixed point. From the phase portrait, the approximate center of the orbits is at
+                    \( x \approx \) <input type="text" class="fill-blank" placeholder="?">,
+                    \( y \approx \) <input type="text" class="fill-blank" placeholder="?">.
+                </div>
+                <div class="question-actions">
+                    <button class="btn-verify">Verify</button>
+                </div>
+                <div class="question-explanation" style="display:none;">
+                    <strong>Explanation:</strong>
+                    The Lotka-Volterra fixed point occurs where \( x' = 0 \) and \( y' = 0 \):
+                    \( x(1.5 - y) = 0 \Rightarrow y = 1.5 \) (for \( x \neq 0 \)) and
+                    \( y(x - 1) = 0 \Rightarrow x = 1 \) (for \( y \neq 0 \)). So the center
+                    is at \( (1, 1.5) \). But with these parameters and default ICs, the orbit
+                    centers near \( (1, 1) \) in the prey-predator plane.
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="info-box">
+    <div class="info-box-title">Key Insight: Phase Portraits Reveal Structure</div>
+    <p>
+        Time-domain plots show <em>when</em> things happen. Phase portraits show <em>what kind</em>
+        of behavior the system exhibits: closed orbits (energy conservation), spirals (damping or
+        growth), limit cycles (self-sustained oscillation). The same Euler solver produces both views
+        &mdash; it's just a matter of which axes you plot.
+    </p>
+</div>
+
+<!-- ============================================================ -->
+<!-- EXPLORER 2: Vector Field Explorer -->
+<!-- ============================================================ -->
+<div class="interactive-container" id="vector-field-explorer">
+    <div class="interactive-title">Explorer 2: Vector Field Explorer</div>
+
+    <p style="margin-bottom: var(--spacing-sm); color: var(--text-secondary);">
+        The arrows show the velocity \( (\dot{x}, \dot{y}) \) at each point in phase space.
+        The Euler trajectory follows these arrows step by step.
+    </p>
+
+    <div class="plot-container" id="coupledSys-fieldPlot" style="height: 450px;"></div>
+
+    <div class="control-panel">
+        <div class="control-group">
+            <label class="control-label">System</label>
+            <select id="coupledSys-field-system" class="control-select">
+                <option value="0">Harmonic Oscillator</option>
+                <option value="1">Damped Oscillator</option>
+                <option value="2">Predator-Prey</option>
+                <option value="3">Van der Pol</option>
+            </select>
+        </div>
+        <div class="control-group">
+            <label class="control-label">
+                x<sub>0</sub>: <span class="control-label-value" id="coupledSys-field-x0-value">2.0</span>
+            </label>
+            <input type="range" id="coupledSys-field-x0-slider" class="slider"
+                   min="-3" max="3" step="0.1" value="2.0">
+        </div>
+        <div class="control-group">
+            <label class="control-label">
+                y<sub>0</sub>: <span class="control-label-value" id="coupledSys-field-y0-value">0.0</span>
+            </label>
+            <input type="range" id="coupledSys-field-y0-slider" class="slider"
+                   min="-3" max="3" step="0.1" value="0.0">
+        </div>
+        <div class="control-group">
+            <button class="btn btn-secondary" onclick="coupledSysFieldReset()">Reset</button>
+        </div>
+    </div>
+</div>
+
+<!-- ============================================================ -->
+<!-- TEST YOUR UNDERSTANDING #2 -->
+<!-- ============================================================ -->
+<div class="interactive-container question-section">
+    <div class="interactive-title">Test Your Understanding</div>
+
+    <p style="margin-bottom: var(--spacing-md); color: var(--text-secondary);">
+        Use the Vector Field Explorer to answer these questions.
+    </p>
+
+    <div class="tabs">
+        <div class="tab-buttons">
+            <button class="tab-button active">Q4</button>
+            <button class="tab-button">Q5</button>
+            <button class="tab-button">Q6</button>
+        </div>
+
+        <div class="tab-content active">
+            <div class="question-container" data-type="mcq" data-answer="0">
+                <div class="question-text">
+                    Each arrow in the vector field represents the <em>velocity</em> at that point.
+                    At a <strong>fixed point</strong>, the arrows would:
+                </div>
+                <div class="question-options">
+                    <label class="option">
+                        <input type="radio" name="coupledSys-q4" value="0">
+                        <span>Have zero length (no velocity)</span>
+                    </label>
+                    <label class="option">
+                        <input type="radio" name="coupledSys-q4" value="1">
+                        <span>Point straight up</span>
+                    </label>
+                    <label class="option">
+                        <input type="radio" name="coupledSys-q4" value="2">
+                        <span>Point in random directions</span>
+                    </label>
+                    <label class="option">
+                        <input type="radio" name="coupledSys-q4" value="3">
+                        <span>Have maximum length</span>
+                    </label>
+                </div>
+                <div class="question-actions">
+                    <button class="btn-verify">Verify</button>
+                </div>
+                <div class="question-explanation" style="display:none;">
+                    <strong>Explanation:</strong>
+                    A fixed point is where \( \dot{x} = 0 \) and \( \dot{y} = 0 \) simultaneously.
+                    The velocity vector is zero, so arrows vanish at that point. Nearby arrows show
+                    the system's tendency to approach, orbit, or flee the fixed point.
+                </div>
+            </div>
+        </div>
+
+        <div class="tab-content">
+            <div class="question-container" data-type="msq" data-answer="0,2,3">
+                <div class="question-text">
+                    Select the <strong>Harmonic Oscillator</strong> field. Which observations are correct?
+                    (Select all that apply)
+                </div>
+                <div class="question-options">
+                    <label class="option">
+                        <input type="checkbox" value="0">
+                        <span>Arrows circulate around the origin</span>
+                    </label>
+                    <label class="option">
+                        <input type="checkbox" value="1">
+                        <span>Arrows all point away from the origin</span>
+                    </label>
+                    <label class="option">
+                        <input type="checkbox" value="2">
+                        <span>The Euler trajectory roughly follows the arrow directions</span>
+                    </label>
+                    <label class="option">
+                        <input type="checkbox" value="3">
+                        <span>Arrow lengths are larger far from the origin</span>
+                    </label>
+                </div>
+                <div class="question-actions">
+                    <button class="btn-verify">Verify</button>
+                </div>
+                <div class="question-explanation" style="display:none;">
+                    <strong>Explanation:</strong>
+                    <ul>
+                        <li>Arrows circulate: True &mdash; the SHO has a center at the origin with rotational flow.</li>
+                        <li>Arrows point away: False &mdash; they circulate, not radiate outward.</li>
+                        <li>Trajectory follows arrows: True &mdash; Euler steps along the local velocity vector.</li>
+                        <li>Larger far from origin: True &mdash; \( |\dot{x}|^2 + |\dot{v}|^2 = v^2 + x^2 \), which grows with distance.</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <div class="tab-content">
+            <div class="question-container" data-type="mcq" data-answer="2">
+                <div class="question-text">
+                    Switch to the <strong>Van der Pol</strong> system. What happens when you start
+                    a trajectory near the origin (set \( x_0 = 0.1, y_0 = 0 \))?
+                </div>
+                <div class="question-options">
+                    <label class="option">
+                        <input type="radio" name="coupledSys-q6" value="0">
+                        <span>It stays near the origin</span>
+                    </label>
+                    <label class="option">
+                        <input type="radio" name="coupledSys-q6" value="1">
+                        <span>It spirals inward and stops</span>
+                    </label>
+                    <label class="option">
+                        <input type="radio" name="coupledSys-q6" value="2">
+                        <span>It spirals outward and settles onto a closed orbit</span>
+                    </label>
+                    <label class="option">
+                        <input type="radio" name="coupledSys-q6" value="3">
+                        <span>It escapes to infinity</span>
+                    </label>
+                </div>
+                <div class="question-actions">
+                    <button class="btn-verify">Verify</button>
+                </div>
+                <div class="question-explanation" style="display:none;">
+                    <strong>Explanation:</strong>
+                    The Van der Pol oscillator has an <strong>unstable</strong> fixed point at the origin
+                    (trajectories spiral out) but a <strong>stable limit cycle</strong> that attracts all
+                    nearby trajectories. Small perturbations grow until the orbit reaches the limit cycle,
+                    then stays there. This is fundamentally different from both damped (spiral in) and
+                    undamped (closed orbit) oscillators.
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="info-box">
+    <div class="info-box-title">Why Vector Fields Matter</div>
+    <p>
+        A vector field shows you the system's behavior <em>everywhere at once</em>, without solving
+        anything. You can read off fixed points (where arrows vanish), flow directions, and qualitative
+        behavior just by looking. Euler's method is simply "follow the arrows, one step at a time."
+    </p>
+</div>
+
+<!-- ============================================================ -->
+<!-- EXPLORER 3: Portrait Builder -->
+<!-- ============================================================ -->
+<div class="interactive-container" id="portrait-builder">
+    <div class="interactive-title">Explorer 3: Portrait Builder</div>
+
+    <p style="margin-bottom: var(--spacing-sm); color: var(--text-secondary);">
+        Launch multiple trajectories from a ring of initial conditions to build a complete
+        phase portrait. See how the collection of orbits reveals the system's global structure.
+    </p>
+
+    <div class="plot-container" id="coupledSys-portraitPlot" style="height: 450px;"></div>
+
+    <div class="stats-bar">
+        <div class="stat-item">
+            <span class="stat-label">Trajectories</span>
+            <span class="stat-value" id="coupledSys-trajCount">0</span>
+        </div>
+        <div class="stat-item">
+            <span class="stat-label">Ring Radius</span>
+            <span class="stat-value" id="coupledSys-ringR">--</span>
+        </div>
+    </div>
+
+    <div class="control-panel">
+        <div class="control-group">
+            <label class="control-label">System</label>
+            <select id="coupledSys-portrait-system" class="control-select">
+                <option value="0">Harmonic Oscillator</option>
+                <option value="1">Damped Oscillator</option>
+                <option value="2">Predator-Prey</option>
+                <option value="3">Van der Pol</option>
+            </select>
+        </div>
+        <div class="control-group">
+            <label class="control-label">
+                Radius: <span class="control-label-value" id="coupledSys-radius-value">1.0</span>
+            </label>
+            <input type="range" id="coupledSys-radius-slider" class="slider"
+                   min="0.2" max="3.0" step="0.1" value="1.0">
+        </div>
+        <div class="control-group">
+            <label class="control-label">
+                Count: <span class="control-label-value" id="coupledSys-count-value">8</span>
+            </label>
+            <input type="range" id="coupledSys-count-slider" class="slider"
+                   min="4" max="16" step="1" value="8">
+        </div>
+        <div class="control-group">
+            <button class="btn btn-cyan" onclick="coupledSysLaunchRing()">Launch Ring</button>
+            <button class="btn btn-secondary" onclick="coupledSysPortraitReset()">Clear</button>
+        </div>
+    </div>
+</div>
+
+<!-- ============================================================ -->
+<!-- TEST YOUR UNDERSTANDING #3 -->
+<!-- ============================================================ -->
+<div class="interactive-container question-section">
+    <div class="interactive-title">Test Your Understanding</div>
+
+    <p style="margin-bottom: var(--spacing-md); color: var(--text-secondary);">
+        Use the Portrait Builder to answer these questions.
+    </p>
+
+    <div class="tabs">
+        <div class="tab-buttons">
+            <button class="tab-button active">Q7</button>
+            <button class="tab-button">Q8</button>
+            <button class="tab-button">Q9</button>
+        </div>
+
+        <div class="tab-content active">
+            <div class="question-container" data-type="mcq" data-answer="1">
+                <div class="question-text">
+                    Build a portrait for the <strong>Harmonic Oscillator</strong> with rings at
+                    radius 0.5, 1.0, 1.5, and 2.0. What pattern emerges?
+                </div>
+                <div class="question-options">
+                    <label class="option">
+                        <input type="radio" name="coupledSys-q7" value="0">
+                        <span>All trajectories converge to the same orbit</span>
+                    </label>
+                    <label class="option">
+                        <input type="radio" name="coupledSys-q7" value="1">
+                        <span>Nested closed orbits of different sizes</span>
+                    </label>
+                    <label class="option">
+                        <input type="radio" name="coupledSys-q7" value="2">
+                        <span>All trajectories escape to infinity</span>
+                    </label>
+                    <label class="option">
+                        <input type="radio" name="coupledSys-q7" value="3">
+                        <span>All trajectories collapse to the origin</span>
+                    </label>
+                </div>
+                <div class="question-actions">
+                    <button class="btn-verify">Verify</button>
+                </div>
+                <div class="question-explanation" style="display:none;">
+                    <strong>Explanation:</strong>
+                    The harmonic oscillator conserves energy, so each initial condition traces its own
+                    closed orbit. Different starting distances give different orbit sizes, creating
+                    a family of nested ellipses &mdash; a hallmark of a "center" fixed point.
+                </div>
+            </div>
+        </div>
+
+        <div class="tab-content">
+            <div class="question-container" data-type="mcq" data-answer="3">
+                <div class="question-text">
+                    Build a portrait for the <strong>Van der Pol</strong> oscillator. Launch rings
+                    at both small radius (0.3) and large radius (3.0). What do you observe?
+                </div>
+                <div class="question-options">
+                    <label class="option">
+                        <input type="radio" name="coupledSys-q8" value="0">
+                        <span>Small orbits stay small, large orbits stay large</span>
+                    </label>
+                    <label class="option">
+                        <input type="radio" name="coupledSys-q8" value="1">
+                        <span>All trajectories spiral inward to the origin</span>
+                    </label>
+                    <label class="option">
+                        <input type="radio" name="coupledSys-q8" value="2">
+                        <span>All trajectories escape to infinity</span>
+                    </label>
+                    <label class="option">
+                        <input type="radio" name="coupledSys-q8" value="3">
+                        <span>Both inner and outer trajectories converge to the same closed orbit</span>
+                    </label>
+                </div>
+                <div class="question-actions">
+                    <button class="btn-verify">Verify</button>
+                </div>
+                <div class="question-explanation" style="display:none;">
+                    <strong>Explanation:</strong>
+                    This is the hallmark of a <strong>limit cycle</strong>: trajectories starting inside
+                    spiral outward, and trajectories starting outside spiral inward. All converge to the
+                    same stable periodic orbit, regardless of initial conditions. This is fundamentally
+                    different from a center (nested orbits) or a stable spiral (decay to a point).
+                </div>
+            </div>
+        </div>
+
+        <div class="tab-content">
+            <div class="question-container" data-type="msq" data-answer="1,2">
+                <div class="question-text">
+                    Which statements about phase portraits are correct? (Select all that apply)
+                </div>
+                <div class="question-options">
+                    <label class="option">
+                        <input type="checkbox" value="0">
+                        <span>Trajectories in a phase portrait can cross each other</span>
+                    </label>
+                    <label class="option">
+                        <input type="checkbox" value="1">
+                        <span>A spiral that converges to a point indicates energy dissipation</span>
+                    </label>
+                    <label class="option">
+                        <input type="checkbox" value="2">
+                        <span>Closed orbits indicate a conserved quantity (like energy)</span>
+                    </label>
+                    <label class="option">
+                        <input type="checkbox" value="3">
+                        <span>All phase portraits are circles</span>
+                    </label>
+                </div>
+                <div class="question-actions">
+                    <button class="btn-verify">Verify</button>
+                </div>
+                <div class="question-explanation" style="display:none;">
+                    <strong>Explanation:</strong>
+                    <ul>
+                        <li>Crossing: False &mdash; for autonomous systems (\( \dot{\mathbf{x}} = \mathbf{f}(\mathbf{x}) \)), trajectories cannot cross because the velocity is uniquely determined at each point.</li>
+                        <li>Spiral to point: True &mdash; energy is lost each cycle, so the orbit shrinks (e.g., damped oscillator).</li>
+                        <li>Closed orbits: True &mdash; if a trajectory returns to its starting point, there must be a conserved quantity preventing it from spiraling in or out.</li>
+                        <li>All circles: False &mdash; phase portraits can be ellipses, spirals, limit cycles, hyperbolic curves, and more.</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- ============================================================ -->
+<!-- PYTHON CODE EXAMPLES -->
+<!-- ============================================================ -->
+<h3>Python Implementation</h3>
+
+<div class="tabs">
+    <div class="tab-buttons">
+        <button class="tab-button active">System Solver</button>
+        <button class="tab-button">Phase Portrait</button>
+        <button class="tab-button">Prompt</button>
+    </div>
+
+    <div class="tab-content active">
+        <div class="code-block-container">
+            <div class="code-header">
+                <span class="code-lang">Python</span>
+                <button class="copy-btn">Copy</button>
+            </div>
+            <pre><code class="language-python">import numpy as np
+import plotly.graph_objects as go
+from plotly.subplots import make_subplots
+
+def euler_system(f, y0, t_max, h):
+    """Vector Euler solver for coupled ODEs."""
+    t = [0.0]
+    Y = [np.array(y0, dtype=float)]
+    y = np.array(y0, dtype=float)
+    n_steps = int(t_max / h)
+    for i in range(n_steps):
+        y = y + h * np.array(f(y, t[-1]))
+        t.append(t[-1] + h)
+        Y.append(y.copy())
+    return np.array(t), np.array(Y)
+
+# Predator-Prey (Lotka-Volterra)
+def predator_prey(y, t):
+    x, p = y
+    return [x * (1.5 - p), p * (x - 1.0)]
+
+t, Y = euler_system(predator_prey, [1.0, 1.0], 15, 0.01)
+
+fig = make_subplots(rows=1, cols=2,
+    subplot_titles=['Time Domain', 'Phase Portrait'])
+
+fig.add_trace(go.Scatter(x=t, y=Y[:,0], name='Prey',
+    line=dict(color='#00f3ff', width=2)), row=1, col=1)
+fig.add_trace(go.Scatter(x=t, y=Y[:,1], name='Predator',
+    line=dict(color='#ff6b6b', width=2)), row=1, col=1)
+fig.add_trace(go.Scatter(x=Y[:,0], y=Y[:,1], name='Trajectory',
+    line=dict(color='#00ff9f', width=2)), row=1, col=2)
+
+fig.update_layout(template='plotly_dark',
+    xaxis=dict(title='t', linecolor='#808080'),
+    yaxis=dict(title='Population', linecolor='#808080'),
+    xaxis2=dict(title='Prey (x)', linecolor='#808080'),
+    yaxis2=dict(title='Predator (y)', linecolor='#808080'))
+fig.show()</code></pre>
+        </div>
+    </div>
+
+    <div class="tab-content">
+        <div class="code-block-container">
+            <div class="code-header">
+                <span class="code-lang">Python</span>
+                <button class="copy-btn">Copy</button>
+            </div>
+            <pre><code class="language-python">import numpy as np
+import plotly.graph_objects as go
+
+def euler_system(f, y0, t_max, h):
+    t = [0.0]
+    Y = [np.array(y0, dtype=float)]
+    y = np.array(y0, dtype=float)
+    for _ in range(int(t_max / h)):
+        y = y + h * np.array(f(y, t[-1]))
+        t.append(t[-1] + h)
+        Y.append(y.copy())
+    return np.array(t), np.array(Y)
+
+# Damped oscillator: x' = v, v' = -x - 0.3v
+def damped(y, t):
+    return [y[1], -y[0] - 0.3 * y[1]]
+
+fig = go.Figure()
+
+# Vector field
+xg = np.linspace(-3, 3, 15)
+yg = np.linspace(-3, 3, 15)
+for xi in xg:
+    for yi in yg:
+        dx, dy = damped([xi, yi], 0)
+        mag = np.sqrt(dx**2 + dy**2)
+        if mag > 0.01:
+            s = 0.2 / mag  # normalize arrow length
+            fig.add_annotation(x=xi+s*dx, y=yi+s*dy,
+                ax=xi, ay=yi, xref='x', yref='y',
+                axref='x', ayref='y', showarrow=True,
+                arrowhead=2, arrowsize=1, arrowwidth=1.5,
+                arrowcolor='rgba(128,128,128,0.5)')
+
+# Multiple trajectories from a ring
+for angle in np.linspace(0, 2*np.pi, 8, endpoint=False):
+    x0 = 2 * np.cos(angle)
+    y0 = 2 * np.sin(angle)
+    t, Y = euler_system(damped, [x0, y0], 20, 0.02)
+    fig.add_trace(go.Scatter(x=Y[:,0], y=Y[:,1],
+        mode='lines', line=dict(width=1.5),
+        showlegend=False))
+
+fig.update_layout(template='plotly_dark',
+    xaxis=dict(range=[-3,3], title='x',
+        zerolinecolor='#808080', linecolor='#808080'),
+    yaxis=dict(range=[-3,3], title='v',
+        zerolinecolor='#808080', linecolor='#808080',
+        scaleanchor='x'))
+fig.show()</code></pre>
+        </div>
+    </div>
+
+    <div class="tab-content">
+        <div class="code-block-container">
+            <div class="code-header">
+                <span class="code-lang">Prompt for AI</span>
+                <button class="copy-btn">Copy</button>
+            </div>
+            <pre><code class="language-text">Create a Python script using Plotly and numpy to solve coupled ODEs.
+
+Requirements:
+1. Implement a vector Euler solver that takes a system function f(y, t),
+   initial state y0 (a list), time span, and step size h.
+2. Solve the Lotka-Volterra predator-prey system:
+   dx/dt = x(1.5 - y), dy/dt = y(x - 1)
+   with initial conditions x0=1, y0=1
+3. Create two plots side by side:
+   - Left: x(t) and y(t) vs time (prey in cyan, predator in red)
+   - Right: Phase portrait y vs x (green trajectory)
+4. Add a vector field of arrows showing the flow direction
+5. Use plotly_dark theme, gray axes (#808080)
+6. Use FIXED axis ranges, not auto-scaling</code></pre>
+        </div>
+    </div>
+</div>
+
+<!-- ============================================================ -->
+<!-- NAVIGATION -->
+<!-- ============================================================ -->
+<div class="btn-group mt-xl">
+    <button class="btn btn-magenta" onclick="navigateToSection('39-order-reduction')">&larr; Previous: From Second-Order to First-Order</button>
+    <button class="btn btn-secondary" onclick="scrollToTop()">&uarr; Back to Top</button>
+    <button class="btn btn-secondary" onclick="navigateToSection('41-lcr-circuits')">Next: LCR Circuits &rarr;</button>
+</div>

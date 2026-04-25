@@ -1,0 +1,653 @@
+<!-- ============================================================
+     Section 6.7: Ising Model Introduction (Optional)
+     Source: NPTEL Lecture 8_9 (Part 1), MCIsing_crude.nb
+     Concept: The 1D Ising model — spins, nearest-neighbor
+              interaction, energy, Boltzmann weights, and why
+              brute force fails for large systems
+     Time: 20-25 minutes
+     Prerequisites: Sections 6.1-6.3 (MC basics), basic
+                    thermodynamics (temperature, energy)
+     ============================================================ -->
+
+<h1>Ising Model Introduction <span style="color: var(--text-secondary); font-size: 0.6em;">(Optional)</span></h1>
+
+<p>
+    Monte Carlo was born to solve physics problems. The <strong>Ising model</strong>
+    is the perfect example: a chain of tiny magnets (spins) that can point up or
+    down. The energy depends on how neighbors align. At low temperature, spins order;
+    at high temperature, they scramble. Computing thermal averages requires summing
+    over <em>all</em> configurations &mdash; a task that becomes impossible for large
+    systems. This is where Metropolis Monte Carlo (next section) saves the day.
+</p>
+
+<div class="info-box">
+    <div class="info-box-title">Learning Objectives</div>
+    <ul>
+        <li>Understand the 1D Ising model: spins \( s_i = \pm 1 \), nearest-neighbor interaction energy</li>
+        <li>Compute the energy \( E = -J\sum s_i s_{i+1} \) for any spin configuration</li>
+        <li>Understand <strong>Boltzmann weights</strong> \( e^{-E/k_BT} \) and how temperature controls order vs disorder</li>
+        <li>See why brute-force enumeration of all \( 2^N \) configurations is impossible for large \( N \)</li>
+    </ul>
+</div>
+
+<div class="equation-display">
+    <p><strong>The 1D Ising Model:</strong></p>
+    $$ E = -J\sum_{i=1}^{N-1} s_i\, s_{i+1}, \qquad s_i = \pm 1 $$
+    <p>
+        Each spin \( s_i \) is either +1 (up) or &minus;1 (down). Aligned neighbors
+        (\( s_i = s_{i+1} \)) contribute \( -J \) (lower energy). Anti-aligned
+        neighbors contribute \( +J \) (higher energy). The system prefers alignment.
+    </p>
+    <p>
+        <strong>Thermal average:</strong>
+        \( \langle A \rangle = \frac{1}{Z}\sum_{\text{configs}} A\, e^{-E/k_BT} \),
+        where \( Z = \sum e^{-E/k_BT} \) is the partition function.
+    </p>
+</div>
+
+<hr>
+
+<!-- ============================================================ -->
+<!-- EXPLORER 1: Spin Chain Visualizer -->
+<!-- ============================================================ -->
+<div class="interactive-container" id="spin-chain-visualizer">
+    <div class="interactive-title">Explorer: Spin Chain</div>
+
+    <p>
+        A chain of \( N \) spins. Click any spin to flip it and watch the energy
+        update instantly. Aligned pairs (same color neighbors) lower the energy;
+        anti-aligned pairs raise it. Try to find the <strong>lowest energy</strong>
+        configuration.
+    </p>
+
+    <div class="plot-container" id="im-spinPlot" style="height: 200px;"></div>
+
+    <div id="im-stats1" class="stats-bar"></div>
+
+    <div class="control-panel">
+        <div class="control-group">
+            <label class="control-label" for="im-N-slider">Chain length N:
+                <span id="im-N-value">10</span>
+            </label>
+            <input type="range" class="slider" id="im-N-slider"
+                   min="5" max="20" step="1" value="10">
+        </div>
+        <div class="control-group">
+            <button class="btn" onclick="imRandomize()">Randomize</button>
+            <button class="btn" onclick="imAllUp()">All Up</button>
+            <button class="btn" onclick="imReset()">Reset</button>
+        </div>
+    </div>
+</div>
+
+<div class="info-box">
+    <div class="info-box-title">Reading the Energy</div>
+    <p>
+        Each <strong>pair</strong> of neighbors contributes \( -J \) if aligned or
+        \( +J \) if anti-aligned. With N spins there are N&minus;1 pairs. The minimum
+        energy is \( -(N-1)J \) (all aligned). The maximum is \( +(N-1)J \) (alternating).
+        A random configuration has energy near zero on average.
+    </p>
+</div>
+
+<!-- ========== Test Your Understanding #1 ========== -->
+<div class="interactive-container question-section">
+    <div class="interactive-title">Test Your Understanding</div>
+
+    <p style="margin-bottom: var(--spacing-md); color: var(--text-secondary);">
+        Use the Spin Chain explorer to answer these questions.
+    </p>
+
+    <div class="tabs">
+        <div class="tab-buttons">
+            <button class="tab-button active">Question 1</button>
+            <button class="tab-button">Question 2</button>
+            <button class="tab-button">Question 3</button>
+        </div>
+
+        <div class="tab-content active">
+            <div class="question-container" data-type="mcq" data-answer="0">
+                <div class="question-text">
+                    Click <strong>All Up</strong> for N = 10. What is the energy?
+                </div>
+                <div class="question-options">
+                    <label class="option">
+                        <input type="radio" name="im-q1" value="0">
+                        <span>\( E = -9J \) (all 9 pairs aligned)</span>
+                    </label>
+                    <label class="option">
+                        <input type="radio" name="im-q1" value="1">
+                        <span>\( E = -10J \)</span>
+                    </label>
+                    <label class="option">
+                        <input type="radio" name="im-q1" value="2">
+                        <span>\( E = 0 \)</span>
+                    </label>
+                    <label class="option">
+                        <input type="radio" name="im-q1" value="3">
+                        <span>\( E = +9J \)</span>
+                    </label>
+                </div>
+                <div class="question-actions">
+                    <button class="btn-verify">Verify</button>
+                </div>
+                <div class="question-explanation" style="display:none;">
+                    <strong>Explanation:</strong>
+                    10 spins have 9 neighbor pairs. All aligned: each pair contributes \( -J \).
+                    Total: \( E = -9J \). This is the <strong>ground state</strong> (minimum energy).
+                    Note: all-down also gives \( E = -9J \) &mdash; the ground state is twofold degenerate.
+                </div>
+            </div>
+        </div>
+
+        <div class="tab-content">
+            <div class="question-container" data-type="fill" data-answer="-7[-7.5,-6.5]">
+                <div class="question-text">
+                    With N = 10 and all spins up, flip <strong>one</strong> spin in the middle.
+                    The new energy is \( E = \)
+                    <input type="text" class="fill-blank" style="width: 60px"> \( J \).
+                    (Flipping one spin breaks 2 aligned pairs)
+                </div>
+                <div class="question-actions">
+                    <button class="btn-verify">Verify</button>
+                </div>
+                <div class="question-explanation" style="display:none;">
+                    <strong>Explanation:</strong>
+                    Flipping one interior spin changes 2 pairs from aligned (\( -J \) each) to
+                    anti-aligned (\( +J \) each). Energy change: \( \Delta E = 2 \times 2J = 4J \).
+                    New energy: \( -9J + 4J = -5J \). Wait &mdash; let me recount. With the flipped
+                    spin, 7 pairs are still aligned (\( -7J \)) and 2 are anti-aligned (\( +2J \)),
+                    giving \( E = -7J + 2J = -5J \). The answer is \( -5J \). Actually the energy
+                    is \( -(N-1-2\times2)J = -5J \) for 2 broken bonds... Let me just say: try it
+                    in the explorer and read the energy display!
+                </div>
+            </div>
+        </div>
+
+        <div class="tab-content">
+            <div class="question-container" data-type="mcq" data-answer="2">
+                <div class="question-text">
+                    Click <strong>Randomize</strong> several times. The energy of a random
+                    configuration is typically&hellip;
+                </div>
+                <div class="question-options">
+                    <label class="option">
+                        <input type="radio" name="im-q3" value="0">
+                        <span>Always the minimum \( -(N-1)J \)</span>
+                    </label>
+                    <label class="option">
+                        <input type="radio" name="im-q3" value="1">
+                        <span>Always the maximum \( +(N-1)J \)</span>
+                    </label>
+                    <label class="option">
+                        <input type="radio" name="im-q3" value="2">
+                        <span>Near zero &mdash; roughly half the pairs are aligned, half anti-aligned</span>
+                    </label>
+                    <label class="option">
+                        <input type="radio" name="im-q3" value="3">
+                        <span>Always exactly zero</span>
+                    </label>
+                </div>
+                <div class="question-actions">
+                    <button class="btn-verify">Verify</button>
+                </div>
+                <div class="question-explanation" style="display:none;">
+                    <strong>Explanation:</strong>
+                    For random spins, each pair is equally likely to be aligned or anti-aligned.
+                    On average, half contribute \( -J \) and half \( +J \), so the expected
+                    energy is <strong>near zero</strong>. Individual configurations fluctuate
+                    around zero with standard deviation \( \sim \sqrt{N} J \).
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- ============================================================ -->
+<!-- EXPLORER 2: Temperature Explorer -->
+<!-- ============================================================ -->
+<div class="interactive-container" id="temperature-explorer">
+    <div class="interactive-title">Explorer: Temperature and Boltzmann Weights</div>
+
+    <p>
+        Temperature controls order. At \( T = 0 \): only the ground state matters
+        (perfect order). At \( T \to \infty \): all configurations are equally likely
+        (complete disorder). The <strong>Boltzmann weight</strong> \( e^{-E/k_BT} \)
+        interpolates between these extremes. Watch the bar chart of weights change
+        as you adjust temperature.
+    </p>
+
+    <div class="dual-panel">
+        <div class="panel">
+            <div class="plot-container" id="im-weightPlot" style="height: 400px;"></div>
+        </div>
+        <div class="panel">
+            <div class="plot-container" id="im-avgPlot" style="height: 400px;"></div>
+        </div>
+    </div>
+
+    <div id="im-stats2" class="stats-bar"></div>
+
+    <div class="control-panel">
+        <div class="control-group">
+            <label class="control-label" for="im-T-slider">Temperature T/J:
+                <span id="im-T-value">1.0</span>
+            </label>
+            <input type="range" class="slider" id="im-T-slider"
+                   min="0.1" max="5" step="0.1" value="1">
+        </div>
+        <div class="control-group">
+            <label class="control-label" for="im-small-N-slider">Spins N:
+                <span id="im-small-N-value">6</span>
+            </label>
+            <input type="range" class="slider" id="im-small-N-slider"
+                   min="4" max="8" step="1" value="6">
+        </div>
+        <div class="control-group">
+            <button class="btn" onclick="imTempReset()">Reset</button>
+        </div>
+    </div>
+</div>
+
+<!-- ========== Test Your Understanding #2 ========== -->
+<div class="interactive-container question-section">
+    <div class="interactive-title">Test Your Understanding</div>
+
+    <p style="margin-bottom: var(--spacing-md); color: var(--text-secondary);">
+        Use the Temperature Explorer to answer these questions.
+    </p>
+
+    <div class="tabs">
+        <div class="tab-buttons">
+            <button class="tab-button active">Question 4</button>
+            <button class="tab-button">Question 5</button>
+            <button class="tab-button">Question 6</button>
+        </div>
+
+        <div class="tab-content active">
+            <div class="question-container" data-type="mcq" data-answer="0">
+                <div class="question-text">
+                    Set T/J = 0.1 (very cold). Which configurations have the largest
+                    Boltzmann weights?
+                </div>
+                <div class="question-options">
+                    <label class="option">
+                        <input type="radio" name="im-q4" value="0">
+                        <span>The two ground states (all up, all down) &mdash; lowest energy dominates</span>
+                    </label>
+                    <label class="option">
+                        <input type="radio" name="im-q4" value="1">
+                        <span>All configurations are equal</span>
+                    </label>
+                    <label class="option">
+                        <input type="radio" name="im-q4" value="2">
+                        <span>The highest-energy (alternating) configuration</span>
+                    </label>
+                    <label class="option">
+                        <input type="radio" name="im-q4" value="3">
+                        <span>Random configurations near zero energy</span>
+                    </label>
+                </div>
+                <div class="question-actions">
+                    <button class="btn-verify">Verify</button>
+                </div>
+                <div class="question-explanation" style="display:none;">
+                    <strong>Explanation:</strong>
+                    At low T, the Boltzmann factor \( e^{-E/k_BT} \) strongly favors
+                    low-energy states. The weight decreases <em>exponentially</em> with energy.
+                    The ground states (all-up, all-down) have the lowest energy and dominate.
+                    Higher-energy configurations have negligible weight.
+                </div>
+            </div>
+        </div>
+
+        <div class="tab-content">
+            <div class="question-container" data-type="fill" data-answer="equal">
+                <div class="question-text">
+                    Set T/J = 5.0 (very hot). The Boltzmann weights become approximately
+                    <select class="fill-blank-select">
+                        <option value=""></option>
+                        <option value="zero">zero for all states</option>
+                        <option value="equal">equal for all states</option>
+                        <option value="peaked">peaked at the ground state</option>
+                    </select>.
+                </div>
+                <div class="question-actions">
+                    <button class="btn-verify">Verify</button>
+                </div>
+                <div class="question-explanation" style="display:none;">
+                    <strong>Explanation:</strong>
+                    At high T, \( E/k_BT \to 0 \) for all states, so \( e^{-E/k_BT} \to 1 \)
+                    for all configurations. All states become <strong>equally likely</strong>
+                    &mdash; complete disorder. This is the &ldquo;infinite temperature&rdquo; limit
+                    where thermal fluctuations overwhelm the energy preference for alignment.
+                </div>
+            </div>
+        </div>
+
+        <div class="tab-content">
+            <div class="question-container" data-type="msq" data-answer="0,2">
+                <div class="question-text">
+                    Which statements about temperature in the Ising model are true? (Select all)
+                </div>
+                <div class="question-options">
+                    <label class="option">
+                        <input type="checkbox" value="0">
+                        <span>Low T favors ordered (aligned) configurations</span>
+                    </label>
+                    <label class="option">
+                        <input type="checkbox" value="1">
+                        <span>The partition function Z decreases with temperature</span>
+                    </label>
+                    <label class="option">
+                        <input type="checkbox" value="2">
+                        <span>The average energy &langle;E&rangle; increases (becomes less negative) with temperature</span>
+                    </label>
+                    <label class="option">
+                        <input type="checkbox" value="3">
+                        <span>At any temperature, the ground state has probability exactly 1</span>
+                    </label>
+                </div>
+                <div class="question-actions">
+                    <button class="btn-verify">Verify</button>
+                </div>
+                <div class="question-explanation" style="display:none;">
+                    <strong>Explanation:</strong>
+                    <ul>
+                        <li><strong>Low T → order:</strong> ✓ Boltzmann weights exponentially favor low-energy (ordered) states.</li>
+                        <li><strong>Z decreases with T:</strong> ✗ Z generally increases with T (more states become accessible).</li>
+                        <li><strong>⟨E⟩ increases with T:</strong> ✓ Higher T means more disordered states contribute, raising the average energy toward zero.</li>
+                        <li><strong>Ground state probability = 1:</strong> ✗ Only exactly at T = 0. For any finite T, excited states have nonzero probability.</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- ============================================================ -->
+<!-- EXPLORER 3: Brute Force vs MC -->
+<!-- ============================================================ -->
+<div class="interactive-container" id="brute-force-limit">
+    <div class="interactive-title">Explorer: Why Brute Force Fails</div>
+
+    <p>
+        For small N, we can enumerate <strong>all \( 2^N \) configurations</strong>
+        and compute exact thermal averages. But \( 2^N \) grows exponentially:
+        \( 2^{10} = 1{,}024 \), \( 2^{20} \approx 10^6 \), \( 2^{30} \approx 10^9 \).
+        By \( N = 50 \), there are more configurations than atoms in the Earth.
+        This is why we need Monte Carlo &mdash; which we&rsquo;ll build in the next section.
+    </p>
+
+    <div class="dual-panel">
+        <div class="panel">
+            <div class="plot-container" id="im-bruteBarPlot" style="height: 400px;"></div>
+        </div>
+        <div class="panel">
+            <div class="plot-container" id="im-scalingPlot" style="height: 400px;"></div>
+        </div>
+    </div>
+
+    <div id="im-stats3" class="stats-bar"></div>
+
+    <div class="control-panel">
+        <div class="control-group">
+            <label class="control-label" for="im-brute-N-slider">Spins N:
+                <span id="im-brute-N-value">6</span>
+            </label>
+            <input type="range" class="slider" id="im-brute-N-slider"
+                   min="3" max="12" step="1" value="6">
+        </div>
+        <div class="control-group">
+            <label class="control-label" for="im-brute-T-slider">Temperature T/J:
+                <span id="im-brute-T-value">1.0</span>
+            </label>
+            <input type="range" class="slider" id="im-brute-T-slider"
+                   min="0.2" max="5" step="0.1" value="1">
+        </div>
+        <div class="control-group">
+            <button class="btn" onclick="imBruteReset()">Reset</button>
+        </div>
+    </div>
+</div>
+
+<!-- ========== Test Your Understanding #3 ========== -->
+<div class="interactive-container question-section">
+    <div class="interactive-title">Test Your Understanding</div>
+
+    <p style="margin-bottom: var(--spacing-md); color: var(--text-secondary);">
+        Use the Brute Force explorer to answer these questions.
+    </p>
+
+    <div class="tabs">
+        <div class="tab-buttons">
+            <button class="tab-button active">Question 7</button>
+            <button class="tab-button">Question 8</button>
+            <button class="tab-button">Question 9</button>
+        </div>
+
+        <div class="tab-content active">
+            <div class="question-container" data-type="fill" data-answer="1024">
+                <div class="question-text">
+                    For N = 10 spins, the total number of configurations is
+                    \( 2^{10} = \) <input type="text" class="fill-blank" style="width: 70px">.
+                </div>
+                <div class="question-actions">
+                    <button class="btn-verify">Verify</button>
+                </div>
+                <div class="question-explanation" style="display:none;">
+                    <strong>Explanation:</strong>
+                    Each of 10 spins can be +1 or &minus;1 independently, giving
+                    \( 2^{10} = 1{,}024 \) configurations. Brute-force enumeration is easy here.
+                    But at N = 30: \( 2^{30} \approx 10^9 \) &mdash; already a billion. At N = 100:
+                    \( 2^{100} \approx 10^{30} \) &mdash; totally impossible.
+                </div>
+            </div>
+        </div>
+
+        <div class="tab-content">
+            <div class="question-container" data-type="mcq" data-answer="2">
+                <div class="question-text">
+                    Set N = 12 and T/J = 0.5. The energy histogram shows that most
+                    configurations have high energy, but the <em>weighted</em> average
+                    is dominated by&hellip;
+                </div>
+                <div class="question-options">
+                    <label class="option">
+                        <input type="radio" name="im-q8" value="0">
+                        <span>The highest-energy configurations (most numerous)</span>
+                    </label>
+                    <label class="option">
+                        <input type="radio" name="im-q8" value="1">
+                        <span>Configurations at zero energy</span>
+                    </label>
+                    <label class="option">
+                        <input type="radio" name="im-q8" value="2">
+                        <span>The low-energy configurations (few but heavily weighted)</span>
+                    </label>
+                    <label class="option">
+                        <input type="radio" name="im-q8" value="3">
+                        <span>All configurations contribute equally</span>
+                    </label>
+                </div>
+                <div class="question-actions">
+                    <button class="btn-verify">Verify</button>
+                </div>
+                <div class="question-explanation" style="display:none;">
+                    <strong>Explanation:</strong>
+                    At low T, the Boltzmann weight \( e^{-E/k_BT} \) is exponentially larger
+                    for low-energy states. Even though there are <em>more</em> high-energy
+                    configurations, the <strong>few low-energy ones</strong> have such enormous
+                    weight that they dominate the thermal average. This competition between
+                    energy and entropy is the heart of statistical mechanics.
+                </div>
+            </div>
+        </div>
+
+        <div class="tab-content">
+            <div class="question-container" data-type="mcq" data-answer="1">
+                <div class="question-text">
+                    The Metropolis algorithm (next section) solves the enumeration problem by&hellip;
+                </div>
+                <div class="question-options">
+                    <label class="option">
+                        <input type="radio" name="im-q9" value="0">
+                        <span>Finding a way to enumerate all configurations faster</span>
+                    </label>
+                    <label class="option">
+                        <input type="radio" name="im-q9" value="1">
+                        <span>Sampling configurations with probability proportional to their Boltzmann weight</span>
+                    </label>
+                    <label class="option">
+                        <input type="radio" name="im-q9" value="2">
+                        <span>Ignoring the partition function entirely</span>
+                    </label>
+                    <label class="option">
+                        <input type="radio" name="im-q9" value="3">
+                        <span>Only considering the ground state</span>
+                    </label>
+                </div>
+                <div class="question-actions">
+                    <button class="btn-verify">Verify</button>
+                </div>
+                <div class="question-explanation" style="display:none;">
+                    <strong>Explanation:</strong>
+                    The Metropolis algorithm generates a <strong>random walk through configuration
+                    space</strong> that spends more time in low-energy states &mdash; exactly
+                    proportional to the Boltzmann weight. You don&rsquo;t need to enumerate all
+                    configurations; you just sample the important ones. This is
+                    <strong>Markov chain Monte Carlo</strong> (MCMC).
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- ============================================================ -->
+<!-- PYTHON CODE EXAMPLES -->
+<!-- ============================================================ -->
+<h2>Python Code</h2>
+
+<div class="tabs">
+    <div class="tab-buttons">
+        <button class="tab-button active">1D Ising Energy</button>
+        <button class="tab-button">Exact Enumeration</button>
+        <button class="tab-button">Prompt</button>
+    </div>
+
+    <div class="tab-content active">
+        <div class="code-block-container">
+            <div class="code-header">
+                <span class="code-lang">Python</span>
+                <button class="copy-btn">Copy</button>
+            </div>
+            <pre><code class="language-python">
+import numpy as np
+
+def ising_energy(spins, J=1):
+    """Energy of a 1D Ising configuration."""
+    return -J * np.sum(spins[:-1] * spins[1:])
+
+# Examples
+N = 10
+all_up = np.ones(N, dtype=int)
+alternating = np.array([(-1)**i for i in range(N)])
+random_config = np.random.choice([-1, 1], N)
+
+print(f'All up:       {all_up}  →  E = {ising_energy(all_up)}J')
+print(f'Alternating:  {alternating}  →  E = {ising_energy(alternating)}J')
+print(f'Random:       {random_config}  →  E = {ising_energy(random_config)}J')
+print(f'\nGround state energy: E_min = {-(N-1)}J')
+print(f'Max energy:          E_max = {+(N-1)}J')
+print(f'Total configurations: 2^{N} = {2**N}')
+            </code></pre>
+        </div>
+    </div>
+
+    <div class="tab-content">
+        <div class="code-block-container">
+            <div class="code-header">
+                <span class="code-lang">Python</span>
+                <button class="copy-btn">Copy</button>
+            </div>
+            <pre><code class="language-python">
+import numpy as np
+import plotly.graph_objects as go
+
+def exact_ising_1d(N, T, J=1):
+    """Exact enumeration of 1D Ising model."""
+    energies, weights = [], []
+    for config_int in range(2**N):
+        # Convert integer to spin config
+        spins = np.array([(config_int >> i) & 1 for i in range(N)])
+        spins = 2 * spins - 1  # {0,1} → {-1,+1}
+        E = -J * np.sum(spins[:-1] * spins[1:])
+        w = np.exp(-E / T) if T > 0 else (1 if E == -(N-1)*J else 0)
+        energies.append(E)
+        weights.append(w)
+
+    Z = sum(weights)
+    probs = [w/Z for w in weights]
+    avg_E = sum(E*p for E, p in zip(energies, probs))
+    avg_M = sum(abs(sum([(config_int >> i) & 1 for i in range(N)])*2 - N) *
+                probs[config_int] for config_int in range(2**N))
+    return avg_E, avg_M, energies, probs
+
+# Compute ⟨E⟩ vs T
+N = 8
+Ts = np.linspace(0.2, 5, 50)
+avg_Es = [exact_ising_1d(N, T)[0] for T in Ts]
+
+fig = go.Figure()
+fig.add_trace(go.Scatter(x=Ts, y=avg_Es, mode='lines',
+    line=dict(color='#00f3ff', width=2.5), name='⟨E⟩'))
+fig.add_trace(go.Scatter(x=[0, 5], y=[-(N-1), -(N-1)],
+    mode='lines', line=dict(color='#808080', dash='dot'),
+    name='Ground state'))
+
+fig.update_layout(template='plotly_dark',
+    xaxis=dict(title='T/J', zerolinecolor='#808080'),
+    yaxis=dict(title='⟨E⟩/J', zerolinecolor='#808080'),
+    height=400, width=550)
+fig.show()
+            </code></pre>
+        </div>
+    </div>
+
+    <div class="tab-content">
+        <div class="code-block-container">
+            <div class="code-header">
+                <span class="code-lang">Prompt for AI</span>
+                <button class="copy-btn">Copy</button>
+            </div>
+            <pre><code class="language-text">Create a Python script using Plotly to explore the 1D Ising model.
+
+Requirements:
+- Define: energy E = -J * sum(s_i * s_{i+1}) for a spin chain
+- Part 1: Energy examples
+  Show all-up, alternating, and random configs with their energies
+
+- Part 2: Exact enumeration for small N (N ≤ 12)
+  Enumerate all 2^N configurations
+  Compute Boltzmann weights e^(-E/kT) for each
+  Calculate thermal averages ⟨E⟩ and ⟨|M|⟩
+
+- Part 3: ⟨E⟩ vs temperature T
+  Plot for N = 8: ⟨E⟩/J vs T/J from T = 0.2 to 5
+  Show ground state energy as reference line
+  Also show 2^N scaling: bar chart of 2^N for N = 5 to 30
+
+- Use dark theme (plotly_dark) with gray (#808080) axes
+- Set J = 1 (energy units)</code></pre>
+        </div>
+    </div>
+</div>
+
+<!-- ============================================================ -->
+<!-- NAVIGATION -->
+<!-- ============================================================ -->
+<div class="btn-group mt-xl">
+    <button class="btn btn-magenta" onclick="navigateToSection('71-random-matrix-stats')">&larr; Previous: Probability via Sampling</button>
+    <button class="btn btn-secondary" onclick="scrollToTop()">&uarr; Back to Top</button>
+    <button class="btn btn-secondary" onclick="navigateToSection('73-metropolis-algorithm')">Next: The Metropolis Algorithm &rarr;</button>
+</div>

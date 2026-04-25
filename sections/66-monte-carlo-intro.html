@@ -1,0 +1,694 @@
+<!-- ============================================================
+     Section 6.1: Why Use Randomness? The Monte Carlo Idea
+     Source: NPTEL Lecture 8_6 (Monte Carlo, Part 1)
+     Concept: Introduction to Monte Carlo philosophy — using
+              random sampling to estimate deterministic quantities
+     Time: 20-25 minutes
+     Prerequisites: Basic probability (Chapter 2), for loops
+                    (Chapter 4)
+     ============================================================ -->
+
+<h1>Why Use Randomness?</h1>
+
+<p>
+    Everything so far has been deterministic: given the same inputs, you get the
+    same outputs. Now we flip that idea on its head. <strong>Monte Carlo methods</strong>
+    use <em>randomness</em> to solve problems that are perfectly deterministic &mdash;
+    like computing areas, volumes, and integrals. The idea is simple and profound:
+    <strong>throw darts randomly, count the hits, and the fraction that lands inside
+    tells you the answer</strong>.
+</p>
+
+<div class="info-box">
+    <div class="info-box-title">Learning Objectives</div>
+    <ul>
+        <li>Understand the Monte Carlo philosophy: random sampling as a computational tool for deterministic problems</li>
+        <li>Estimate &pi; by throwing random &ldquo;darts&rdquo; at a circle inscribed in a square</li>
+        <li>See why Monte Carlo wins in high dimensions: the <strong>curse of dimensionality</strong> kills grid methods</li>
+        <li>Watch the <strong>law of large numbers</strong> in action: more samples &rarr; better estimate</li>
+    </ul>
+</div>
+
+<div class="equation-display">
+    <p><strong>The Monte Carlo Idea:</strong></p>
+    $$ \text{Quantity} \approx (\text{Total volume}) \times \frac{\text{Hits inside}}{\text{Total samples}} $$
+    <p>
+        Throw \( N \) random points uniformly into a known region. Count how many
+        land inside the target. The fraction \( N_{\text{in}} / N \) estimates the
+        ratio of areas (or volumes). As \( N \to \infty \), the estimate converges
+        to the true value.
+    </p>
+</div>
+
+<hr>
+
+<!-- ============================================================ -->
+<!-- EXPLORER 1: Dart Board Estimator for π -->
+<!-- ============================================================ -->
+<div class="interactive-container" id="dart-board-pi">
+    <div class="interactive-title">Explorer: Estimating &pi; with Darts</div>
+
+    <p>
+        A circle of radius 1 inscribed in a 2&times;2 square. The circle&rsquo;s area
+        is &pi;, the square&rsquo;s area is 4. Throw random darts: the fraction inside
+        the circle estimates &pi;/4. Click <strong>Throw</strong> to add darts and
+        watch your estimate of &pi; converge.
+    </p>
+
+    <div class="dual-panel">
+        <div class="panel">
+            <div class="plot-container" id="mc-dartPlot" style="height: 400px;"></div>
+        </div>
+        <div class="panel">
+            <div class="plot-container" id="mc-piEstPlot" style="height: 400px;"></div>
+        </div>
+    </div>
+
+    <div id="mc-stats1" class="stats-bar"></div>
+
+    <div class="control-panel">
+        <div class="control-group">
+            <label class="control-label" for="mc-batch-select">Darts per throw:</label>
+            <select id="mc-batch-select" class="control-select">
+                <option value="10">10</option>
+                <option value="100" selected>100</option>
+                <option value="1000">1,000</option>
+                <option value="5000">5,000</option>
+            </select>
+        </div>
+        <div class="control-group">
+            <button class="btn" onclick="mcThrowDarts()">Throw</button>
+            <button class="btn" onclick="mcDartReset()">Reset</button>
+        </div>
+    </div>
+</div>
+
+<div class="info-box">
+    <div class="info-box-title">Why &ldquo;Monte Carlo&rdquo;?</div>
+    <p>
+        Named after the famous casino in Monaco. Stanislaw Ulam and John von Neumann
+        developed these methods at Los Alamos in the 1940s while working on nuclear
+        weapons simulations. The name was a code word &mdash; the calculations relied
+        on random numbers, just like casino games. Today, Monte Carlo methods are
+        used everywhere: physics, finance, machine learning, and drug design.
+    </p>
+</div>
+
+<!-- ========== Test Your Understanding #1 ========== -->
+<div class="interactive-container question-section">
+    <div class="interactive-title">Test Your Understanding</div>
+
+    <p style="margin-bottom: var(--spacing-md); color: var(--text-secondary);">
+        Use the Dart Board explorer to answer these questions.
+    </p>
+
+    <div class="tabs">
+        <div class="tab-buttons">
+            <button class="tab-button active">Question 1</button>
+            <button class="tab-button">Question 2</button>
+            <button class="tab-button">Question 3</button>
+        </div>
+
+        <div class="tab-content active">
+            <div class="question-container" data-type="mcq" data-answer="1">
+                <div class="question-text">
+                    After throwing 100 darts, your estimate of &pi; is noisy (maybe 3.0 or 3.3).
+                    After 10,000 darts, it&rsquo;s much closer to 3.14159. Why?
+                </div>
+                <div class="question-options">
+                    <label class="option">
+                        <input type="radio" name="mc-q1" value="0">
+                        <span>The darts become more accurate with practice</span>
+                    </label>
+                    <label class="option">
+                        <input type="radio" name="mc-q1" value="1">
+                        <span>The law of large numbers: random fluctuations average out with more samples</span>
+                    </label>
+                    <label class="option">
+                        <input type="radio" name="mc-q1" value="2">
+                        <span>The computer uses better random numbers for larger batches</span>
+                    </label>
+                    <label class="option">
+                        <input type="radio" name="mc-q1" value="3">
+                        <span>100 darts always gives a wrong answer</span>
+                    </label>
+                </div>
+                <div class="question-actions">
+                    <button class="btn-verify">Verify</button>
+                </div>
+                <div class="question-explanation" style="display:none;">
+                    <strong>Explanation:</strong>
+                    The <strong>law of large numbers</strong> guarantees that as \( N \to \infty \),
+                    the sample average converges to the true average. With 100 darts, random
+                    fluctuations are significant. With 10,000 darts, they average out, and the
+                    estimate stabilizes near &pi;. Each dart is equally &ldquo;accurate&rdquo; &mdash;
+                    it&rsquo;s the <em>averaging</em> that improves.
+                </div>
+            </div>
+        </div>
+
+        <div class="tab-content">
+            <div class="question-container" data-type="fill" data-answer="3.14[3.0,3.3]">
+                <div class="question-text">
+                    Throw 5,000 darts. Your estimate of &pi; is approximately
+                    <input type="text" class="fill-blank" style="width: 60px">.
+                    (Read from the convergence plot)
+                </div>
+                <div class="question-actions">
+                    <button class="btn-verify">Verify</button>
+                </div>
+                <div class="question-explanation" style="display:none;">
+                    <strong>Explanation:</strong>
+                    With 5,000 darts, the estimate should be roughly in the range 3.0&ndash;3.3,
+                    typically within 0.05 of the true value 3.14159. The exact answer varies each
+                    time (it&rsquo;s random!), but the convergence plot shows it settling near &pi;.
+                </div>
+            </div>
+        </div>
+
+        <div class="tab-content">
+            <div class="question-container" data-type="mcq" data-answer="2">
+                <div class="question-text">
+                    If you reset and throw again, will you get the <strong>exact same</strong>
+                    estimate of &pi;?
+                </div>
+                <div class="question-options">
+                    <label class="option">
+                        <input type="radio" name="mc-q3" value="0">
+                        <span>Yes &mdash; the same number of darts always gives the same answer</span>
+                    </label>
+                    <label class="option">
+                        <input type="radio" name="mc-q3" value="1">
+                        <span>Yes &mdash; computers are deterministic</span>
+                    </label>
+                    <label class="option">
+                        <input type="radio" name="mc-q3" value="2">
+                        <span>No &mdash; different random points give a different estimate each time</span>
+                    </label>
+                    <label class="option">
+                        <input type="radio" name="mc-q3" value="3">
+                        <span>No &mdash; but the difference grows with more darts</span>
+                    </label>
+                </div>
+                <div class="question-actions">
+                    <button class="btn-verify">Verify</button>
+                </div>
+                <div class="question-explanation" style="display:none;">
+                    <strong>Explanation:</strong>
+                    Each run uses <strong>different random points</strong>, so you get a different
+                    estimate. This is the fundamental nature of Monte Carlo: the answer is a
+                    <em>random variable</em>. But while individual runs differ, their
+                    <em>average</em> converges to the true value, and the spread shrinks as
+                    \( 1/\sqrt{N} \).
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- ============================================================ -->
+<!-- EXPLORER 2: Curse of Dimensionality -->
+<!-- ============================================================ -->
+<div class="interactive-container" id="curse-dimensionality">
+    <div class="interactive-title">Explorer: The Curse of Dimensionality</div>
+
+    <p>
+        To estimate a volume with a regular grid, you need \( n^d \) points
+        (\( n \) per dimension, \( d \) dimensions). In 2D: 100 points for a
+        10&times;10 grid. In 10D: \( 10^{10} = \) 10 billion points! Monte Carlo
+        doesn&rsquo;t care about dimension &mdash; 1,000 random points work in
+        <em>any</em> dimension.
+    </p>
+
+    <div class="dual-panel">
+        <div class="panel">
+            <div class="plot-container" id="mc-cursePlot" style="height: 400px;"></div>
+        </div>
+        <div class="panel">
+            <div class="plot-container" id="mc-curseBarPlot" style="height: 400px;"></div>
+        </div>
+    </div>
+
+    <div id="mc-stats2" class="stats-bar"></div>
+
+    <div class="control-panel">
+        <div class="control-group">
+            <label class="control-label" for="mc-grid-n-slider">Grid points per axis (n):
+                <span id="mc-grid-n-value">10</span>
+            </label>
+            <input type="range" class="slider" id="mc-grid-n-slider"
+                   min="3" max="20" step="1" value="10">
+        </div>
+        <div class="control-group">
+            <label class="control-label" for="mc-mc-n-slider">MC samples:
+                <span id="mc-mc-n-value">1000</span>
+            </label>
+            <input type="range" class="slider" id="mc-mc-n-slider"
+                   min="100" max="5000" step="100" value="1000">
+        </div>
+        <div class="control-group">
+            <button class="btn" onclick="mcCurseReset()">Reset</button>
+        </div>
+    </div>
+</div>
+
+<!-- ========== Test Your Understanding #2 ========== -->
+<div class="interactive-container question-section">
+    <div class="interactive-title">Test Your Understanding</div>
+
+    <p style="margin-bottom: var(--spacing-md); color: var(--text-secondary);">
+        Use the Curse of Dimensionality explorer to answer these questions.
+    </p>
+
+    <div class="tabs">
+        <div class="tab-buttons">
+            <button class="tab-button active">Question 4</button>
+            <button class="tab-button">Question 5</button>
+            <button class="tab-button">Question 6</button>
+        </div>
+
+        <div class="tab-content active">
+            <div class="question-container" data-type="mcq" data-answer="0">
+                <div class="question-text">
+                    With \( n = 10 \) points per axis, how many total grid points are needed
+                    in 6 dimensions?
+                </div>
+                <div class="question-options">
+                    <label class="option">
+                        <input type="radio" name="mc-q4" value="0">
+                        <span>\( 10^6 = 1{,}000{,}000 \) (one million)</span>
+                    </label>
+                    <label class="option">
+                        <input type="radio" name="mc-q4" value="1">
+                        <span>\( 6 \times 10 = 60 \)</span>
+                    </label>
+                    <label class="option">
+                        <input type="radio" name="mc-q4" value="2">
+                        <span>\( 10 + 6 = 16 \)</span>
+                    </label>
+                    <label class="option">
+                        <input type="radio" name="mc-q4" value="3">
+                        <span>\( 10! = 3{,}628{,}800 \)</span>
+                    </label>
+                </div>
+                <div class="question-actions">
+                    <button class="btn-verify">Verify</button>
+                </div>
+                <div class="question-explanation" style="display:none;">
+                    <strong>Explanation:</strong>
+                    A grid with \( n \) points per axis in \( d \) dimensions has \( n^d \) total
+                    points. With \( n = 10, d = 6 \): \( 10^6 = 1{,}000{,}000 \). This grows
+                    <strong>exponentially</strong> with dimension. By dimension 10, you need
+                    \( 10^{10} \) = 10 billion points &mdash; completely impractical.
+                </div>
+            </div>
+        </div>
+
+        <div class="tab-content">
+            <div class="question-container" data-type="fill" data-answer="1000">
+                <div class="question-text">
+                    Monte Carlo needs how many random points to estimate a volume in
+                    10 dimensions with the same approach as in 2 dimensions?
+                    Answer: <input type="text" class="fill-blank" style="width: 70px">
+                    (the same number &mdash; MC doesn&rsquo;t care about dimension!)
+                </div>
+                <div class="question-actions">
+                    <button class="btn-verify">Verify</button>
+                </div>
+                <div class="question-explanation" style="display:none;">
+                    <strong>Explanation:</strong>
+                    Monte Carlo uses the <strong>same number of samples</strong> regardless of
+                    dimension. If 1,000 samples give a reasonable estimate in 2D, you can use
+                    1,000 samples in 10D too. The convergence rate is \( 1/\sqrt{N} \), which
+                    depends only on \( N \), <strong>not on dimension</strong>. This is Monte
+                    Carlo&rsquo;s superpower.
+                </div>
+            </div>
+        </div>
+
+        <div class="tab-content">
+            <div class="question-container" data-type="msq" data-answer="1,2">
+                <div class="question-text">
+                    When is Monte Carlo preferable to grid-based methods? (Select all)
+                </div>
+                <div class="question-options">
+                    <label class="option">
+                        <input type="checkbox" value="0">
+                        <span>For 1D integrals with smooth functions</span>
+                    </label>
+                    <label class="option">
+                        <input type="checkbox" value="1">
+                        <span>For high-dimensional integrals (d &gt; 4)</span>
+                    </label>
+                    <label class="option">
+                        <input type="checkbox" value="2">
+                        <span>For integrals over complicated, irregular regions</span>
+                    </label>
+                    <label class="option">
+                        <input type="checkbox" value="3">
+                        <span>When you need machine-precision accuracy (15 digits)</span>
+                    </label>
+                </div>
+                <div class="question-actions">
+                    <button class="btn-verify">Verify</button>
+                </div>
+                <div class="question-explanation" style="display:none;">
+                    <strong>Explanation:</strong>
+                    <ul>
+                        <li><strong>1D smooth functions:</strong> ✗ Trapezoidal or Simpson&rsquo;s rule beats MC in low dimensions. MC is overkill here.</li>
+                        <li><strong>High dimensions:</strong> ✓ This is MC&rsquo;s sweet spot. Grids are impossible but random sampling is trivial.</li>
+                        <li><strong>Complicated regions:</strong> ✓ For irregular boundaries (e.g., the inside of a fractal), grid methods need complex boundary detection. MC just checks &ldquo;is this point inside?&rdquo;</li>
+                        <li><strong>Machine precision:</strong> ✗ MC converges as \( 1/\sqrt{N} \) &mdash; terribly slow for high precision. You&rsquo;d need \( 10^{30} \) samples for 15 digits.</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- ============================================================ -->
+<!-- EXPLORER 3: Convergence Watcher -->
+<!-- ============================================================ -->
+<div class="interactive-container" id="convergence-watcher">
+    <div class="interactive-title">Explorer: Watching Convergence</div>
+
+    <p>
+        Estimate a known integral using Monte Carlo and watch the estimate converge.
+        The <strong>running estimate</strong> (cyan) fluctuates wildly at first,
+        then settles near the true value (white dashed). The &plusmn;1&sigma; band
+        (shaded) shows the expected uncertainty, which shrinks as \( 1/\sqrt{N} \).
+    </p>
+
+    <div class="plot-container" id="mc-convergePlot" style="height: 420px;"></div>
+
+    <div id="mc-stats3" class="stats-bar"></div>
+
+    <div class="control-panel">
+        <div class="control-group">
+            <label class="control-label" for="mc-integral-select">Integral:</label>
+            <select id="mc-integral-select" class="control-select">
+                <option value="pi">Area of unit circle (&pi;)</option>
+                <option value="ln2">&int;&#8320;&sup1; 1/(1+x) dx = ln(2)</option>
+                <option value="gaussian">&int;&#8320;&sup3; e^(−x&sup2;) dx &asymp; 0.886</option>
+            </select>
+        </div>
+        <div class="control-group">
+            <label class="control-label" for="mc-maxN-slider">Max samples:
+                <span id="mc-maxN-value">5000</span>
+            </label>
+            <input type="range" class="slider" id="mc-maxN-slider"
+                   min="500" max="20000" step="500" value="5000">
+        </div>
+        <div class="control-group">
+            <button class="btn" onclick="mcConvergeRun()">Run</button>
+            <button class="btn" onclick="mcConvergeReset()">Reset</button>
+        </div>
+    </div>
+</div>
+
+<div class="info-box">
+    <div class="info-box-title">The \( 1/\sqrt{N} \) Rule</div>
+    <p>
+        Monte Carlo error decreases as \( \sigma / \sqrt{N} \) where \( \sigma \) is the
+        standard deviation of the integrand and \( N \) is the number of samples. To
+        halve the error, you need <strong>four times</strong> as many samples. This is
+        slow compared to deterministic methods in low dimensions &mdash; but it&rsquo;s
+        <strong>independent of dimension</strong>. In 100 dimensions, \( 1/\sqrt{N} \)
+        still works the same way. We&rsquo;ll explore this convergence rate in detail
+        in the next section.
+    </p>
+</div>
+
+<!-- ========== Test Your Understanding #3 ========== -->
+<div class="interactive-container question-section">
+    <div class="interactive-title">Test Your Understanding</div>
+
+    <p style="margin-bottom: var(--spacing-md); color: var(--text-secondary);">
+        Use the Convergence Watcher to answer these questions.
+    </p>
+
+    <div class="tabs">
+        <div class="tab-buttons">
+            <button class="tab-button active">Question 7</button>
+            <button class="tab-button">Question 8</button>
+            <button class="tab-button">Question 9</button>
+        </div>
+
+        <div class="tab-content active">
+            <div class="question-container" data-type="mcq" data-answer="2">
+                <div class="question-text">
+                    Run the &pi; estimator with 5,000 samples. Then run it again. Do the
+                    two convergence curves look identical?
+                </div>
+                <div class="question-options">
+                    <label class="option">
+                        <input type="radio" name="mc-q7" value="0">
+                        <span>Yes &mdash; they follow exactly the same path</span>
+                    </label>
+                    <label class="option">
+                        <input type="radio" name="mc-q7" value="1">
+                        <span>No &mdash; they are completely unrelated</span>
+                    </label>
+                    <label class="option">
+                        <input type="radio" name="mc-q7" value="2">
+                        <span>No &mdash; different random paths, but both converge to the same value</span>
+                    </label>
+                    <label class="option">
+                        <input type="radio" name="mc-q7" value="3">
+                        <span>Yes &mdash; the computer uses the same random seed</span>
+                    </label>
+                </div>
+                <div class="question-actions">
+                    <button class="btn-verify">Verify</button>
+                </div>
+                <div class="question-explanation" style="display:none;">
+                    <strong>Explanation:</strong>
+                    Each run uses different random numbers, so the convergence path is different.
+                    But both paths converge to the <strong>same true value</strong>. The
+                    fluctuations are different, but they both shrink as \( 1/\sqrt{N} \). This
+                    is the fundamental promise of Monte Carlo: different random journeys, same destination.
+                </div>
+            </div>
+        </div>
+
+        <div class="tab-content">
+            <div class="question-container" data-type="fill" data-answer="4[3,5]">
+                <div class="question-text">
+                    To halve the Monte Carlo error, you need to multiply the number of samples
+                    by <input type="text" class="fill-blank" style="width: 50px">.
+                    (Since error &prop; \( 1/\sqrt{N} \))
+                </div>
+                <div class="question-actions">
+                    <button class="btn-verify">Verify</button>
+                </div>
+                <div class="question-explanation" style="display:none;">
+                    <strong>Explanation:</strong>
+                    Error \( \propto 1/\sqrt{N} \). To halve the error: \( 1/\sqrt{N'} = \frac{1}{2} \cdot 1/\sqrt{N} \),
+                    so \( \sqrt{N'} = 2\sqrt{N} \), giving \( N' = 4N \). You need
+                    <strong>4 times</strong> as many samples. This is the price of Monte Carlo&rsquo;s
+                    simplicity &mdash; slow convergence, but dimension-independent.
+                </div>
+            </div>
+        </div>
+
+        <div class="tab-content">
+            <div class="question-container" data-type="mcq" data-answer="0">
+                <div class="question-text">
+                    Select the <strong>Gaussian</strong> integral. The true value is
+                    approximately 0.886. Does Monte Carlo still converge to the correct answer?
+                </div>
+                <div class="question-options">
+                    <label class="option">
+                        <input type="radio" name="mc-q9" value="0">
+                        <span>Yes &mdash; MC works for any integrable function, not just areas of shapes</span>
+                    </label>
+                    <label class="option">
+                        <input type="radio" name="mc-q9" value="1">
+                        <span>No &mdash; MC only works for circles and squares</span>
+                    </label>
+                    <label class="option">
+                        <input type="radio" name="mc-q9" value="2">
+                        <span>No &mdash; Gaussians require special treatment</span>
+                    </label>
+                    <label class="option">
+                        <input type="radio" name="mc-q9" value="3">
+                        <span>Only if the function is positive everywhere</span>
+                    </label>
+                </div>
+                <div class="question-actions">
+                    <button class="btn-verify">Verify</button>
+                </div>
+                <div class="question-explanation" style="display:none;">
+                    <strong>Explanation:</strong>
+                    Monte Carlo works for <strong>any</strong> integrable function. The dart-board
+                    (hit/miss) method is just one approach. More generally, you can estimate
+                    \( \int f(x)\,dx \) by sampling random \( x \) values and averaging \( f(x) \).
+                    The Gaussian integral converges just as reliably as the &pi; estimate.
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- ============================================================ -->
+<!-- PYTHON CODE EXAMPLES -->
+<!-- ============================================================ -->
+<h2>Python Code</h2>
+
+<div class="tabs">
+    <div class="tab-buttons">
+        <button class="tab-button active">Estimating &pi;</button>
+        <button class="tab-button">MC Integration</button>
+        <button class="tab-button">Prompt</button>
+    </div>
+
+    <div class="tab-content active">
+        <div class="code-block-container">
+            <div class="code-header">
+                <span class="code-lang">Python</span>
+                <button class="copy-btn">Copy</button>
+            </div>
+            <pre><code class="language-python">
+import numpy as np
+import plotly.graph_objects as go
+
+# Estimate π by throwing darts
+N = 10000
+x = np.random.uniform(-1, 1, N)
+y = np.random.uniform(-1, 1, N)
+inside = x**2 + y**2 <= 1
+
+# Running estimate of π
+cumulative_inside = np.cumsum(inside)
+n_array = np.arange(1, N + 1)
+pi_estimate = 4 * cumulative_inside / n_array
+
+fig = go.Figure()
+fig.add_trace(go.Scatter(
+    x=n_array, y=pi_estimate, mode='lines',
+    line=dict(color='#00f3ff', width=1.5),
+    name='MC estimate'))
+fig.add_trace(go.Scatter(
+    x=[0, N], y=[np.pi, np.pi], mode='lines',
+    line=dict(color='white', width=2, dash='dash'),
+    name='True π'))
+
+fig.update_layout(
+    template='plotly_dark',
+    xaxis=dict(title='Number of samples N',
+               zerolinecolor='#808080', type='log'),
+    yaxis=dict(title='Estimate of π',
+               range=[2.5, 3.8],
+               zerolinecolor='#808080'),
+    height=450, width=600)
+fig.show()
+
+print(f'Final estimate: π ≈ {pi_estimate[-1]:.5f}')
+print(f'True value:     π = {np.pi:.5f}')
+print(f'Error:          {abs(pi_estimate[-1] - np.pi):.5f}')
+            </code></pre>
+        </div>
+    </div>
+
+    <div class="tab-content">
+        <div class="code-block-container">
+            <div class="code-header">
+                <span class="code-lang">Python</span>
+                <button class="copy-btn">Copy</button>
+            </div>
+            <pre><code class="language-python">
+import numpy as np
+import plotly.graph_objects as go
+
+# MC integration: ∫₀¹ 1/(1+x) dx = ln(2) ≈ 0.6931
+N = 10000
+x = np.random.uniform(0, 1, N)
+f_vals = 1 / (1 + x)
+
+# Running average = running integral estimate
+# (interval length = 1, so ∫f dx ≈ mean(f) × 1)
+running_mean = np.cumsum(f_vals) / np.arange(1, N+1)
+true_val = np.log(2)
+
+# Error bands: ± σ/√n
+running_var = np.zeros(N)
+for i in range(N):
+    if i > 0:
+        running_var[i] = np.var(f_vals[:i+1])
+    else:
+        running_var[i] = 0
+running_err = np.sqrt(running_var / np.arange(1, N+1))
+
+n = np.arange(1, N+1)
+fig = go.Figure()
+fig.add_trace(go.Scatter(
+    x=n, y=running_mean, mode='lines',
+    line=dict(color='#00f3ff', width=2),
+    name='MC estimate'))
+fig.add_trace(go.Scatter(
+    x=n, y=running_mean + running_err,
+    mode='lines', line=dict(width=0),
+    showlegend=False))
+fig.add_trace(go.Scatter(
+    x=n, y=running_mean - running_err,
+    mode='lines', line=dict(width=0),
+    fill='tonexty',
+    fillcolor='rgba(0,243,255,0.15)',
+    name='±1σ band'))
+fig.add_trace(go.Scatter(
+    x=[1, N], y=[true_val, true_val],
+    mode='lines',
+    line=dict(color='white', width=2, dash='dash'),
+    name=f'True = ln(2) = {true_val:.4f}'))
+
+fig.update_layout(
+    template='plotly_dark',
+    xaxis=dict(title='N', type='log',
+               zerolinecolor='#808080'),
+    yaxis=dict(title='Estimate',
+               range=[0.5, 0.9],
+               zerolinecolor='#808080'),
+    height=450, width=600)
+fig.show()
+            </code></pre>
+        </div>
+    </div>
+
+    <div class="tab-content">
+        <div class="code-block-container">
+            <div class="code-header">
+                <span class="code-lang">Prompt for AI</span>
+                <button class="copy-btn">Copy</button>
+            </div>
+            <pre><code class="language-text">Create a Python script using Plotly to introduce Monte Carlo
+methods with two classic examples.
+
+Requirements:
+- Example 1: Estimate π by throwing N=10000 random darts at
+  a unit circle inscribed in a square. Show:
+  Panel 1: Scatter plot of darts (cyan=inside, magenta=outside)
+  Panel 2: Running estimate of π vs N (log x-axis)
+  with true π as white dashed line
+
+- Example 2: MC integration of ∫₀¹ 1/(1+x) dx = ln(2).
+  Sample N random x values, compute running average of 1/(1+x).
+  Show convergence with ±1σ error band (shaded cyan).
+
+- Also show: curse of dimensionality bar chart comparing
+  grid points needed (n^d) vs MC samples (constant N=1000)
+  for d = 1, 2, 3, ..., 10 with n = 10 per axis.
+
+- Use dark theme (plotly_dark) with gray (#808080) axes
+- Use numpy for random numbers (not scipy)</code></pre>
+        </div>
+    </div>
+</div>
+
+<!-- ============================================================ -->
+<!-- NAVIGATION -->
+<!-- ============================================================ -->
+<div class="btn-group mt-xl">
+    <button class="btn btn-magenta" onclick="navigateToSection('65-polar-coordinates')">&larr; Previous: Polar Coordinates</button>
+    <button class="btn btn-secondary" onclick="scrollToTop()">&uarr; Back to Top</button>
+    <button class="btn btn-secondary" onclick="navigateToSection('67-mc-integration')">Next: MC Integration Basics &rarr;</button>
+</div>

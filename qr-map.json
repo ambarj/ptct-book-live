@@ -73,5 +73,863 @@
     "page": "06-nondimensionalization",
     "anchor": "pendulum-energy-explorer",
     "description": "Non-Dimensionalization Visualizer"
+  },
+
+  "DAA696": {
+    "page": "07-data-io-plotting",
+    "anchor": "function-to-data",
+    "description": "Function to Data Sampling Explorer"
+  },
+  "DAA580": {
+    "page": "07-data-io-plotting",
+    "anchor": "noise-explorer",
+    "description": "Noise Explorer"
+  },
+  "DA2C7A": {
+    "page": "07-data-io-plotting",
+    "anchor": "scale-explorer",
+    "description": "Linear vs Log Scale Explorer"
+  },
+
+  "DA8421": {
+    "page": "08-random-variables",
+    "anchor": "random-variable-sampler",
+    "description": "Random Variable Sampler"
+  },
+  "DA00EF": {
+    "page": "08-random-variables",
+    "anchor": "sum-explorer",
+    "description": "Sum of N Random Variables & CLT"
+  },
+  "DA6B2B": {
+    "page": "08-random-variables",
+    "anchor": "sample-mean-explorer",
+    "description": "Sample Mean Explorer"
+  },
+
+  "DACAD0": {
+    "page": "09-error-bars",
+    "anchor": "error-bar-builder",
+    "description": "Error Bar Builder"
+  },
+  "DAE376": {
+    "page": "09-error-bars",
+    "anchor": "bessel-correction",
+    "description": "Bessel's Correction Explorer"
+  },
+  "DA78E9": {
+    "page": "09-error-bars",
+    "anchor": "measurement-comparison",
+    "description": "Measurement Comparison Tool"
+  },
+
+  "DA4165": {
+    "page": "10-galileo-workflow",
+    "anchor": "galileo-virtual-lab",
+    "description": "Galileo's Virtual Lab"
+  },
+  "DAA4F9": {
+    "page": "10-galileo-workflow",
+    "anchor": "noise-vs-truth",
+    "description": "Noise vs Truth Coverage Explorer"
+  },
+  "DA5931": {
+    "page": "10-galileo-workflow",
+    "anchor": "extract-g",
+    "description": "Extracting g from Data"
+  },
+
+  "DAA77A": {
+    "page": "11-chi-squared",
+    "anchor": "chi2-slider",
+    "description": "Chi-Squared Parameter Slider"
+  },
+  "DA8F00": {
+    "page": "11-chi-squared",
+    "anchor": "chi2-landscape",
+    "description": "Chi-Squared 2D Landscape"
+  },
+  "DA4C00": {
+    "page": "11-chi-squared",
+    "anchor": "chi2-weighting",
+    "description": "Weighted vs Unweighted Fitting"
+  },
+
+  "DA6C7F": {
+    "page": "12-parameter-exploration",
+    "anchor": "param-playground",
+    "description": "Parameter Playground"
+  },
+  "DAADFB": {
+    "page": "12-parameter-exploration",
+    "anchor": "param-sweep",
+    "description": "Parameter Sweep"
+  },
+  "DACF44": {
+    "page": "12-parameter-exploration",
+    "anchor": "iterative-search",
+    "description": "Iterative Search (Coordinate Descent)"
+  },
+
+  "DA73B1": {
+    "page": "13-automated-fitting",
+    "anchor": "fit-wizard",
+    "description": "Fit Wizard (Automated Fitting)"
+  },
+  "DA0D7A": {
+    "page": "13-automated-fitting",
+    "anchor": "physics-extractor",
+    "description": "Physics Extractor (g from Fit)"
+  },
+  "DA38A1": {
+    "page": "13-automated-fitting",
+    "anchor": "residual-inspector",
+    "description": "Residual Inspector"
+  },
+
+  "DA7706": {
+    "page": "14-model-selection",
+    "anchor": "model-comparator",
+    "description": "Model Comparator (Polynomial Degree)"
+  },
+  "DAD104": {
+    "page": "14-model-selection",
+    "anchor": "overfitting-demo",
+    "description": "Overfitting Demonstrator"
+  },
+  "DA6D23": {
+    "page": "14-model-selection",
+    "anchor": "parsimony-meter",
+    "description": "Parsimony Meter (BIC)"
+  },
+
+  "DAF3C2": {
+    "page": "15-fitting-uncertainties",
+    "anchor": "covariance-explorer",
+    "description": "Covariance Explorer"
+  },
+  "DA1681": {
+    "page": "15-fitting-uncertainties",
+    "anchor": "confidence-ellipse",
+    "description": "Confidence Ellipse"
+  },
+  "DAEEA2": {
+    "page": "15-fitting-uncertainties",
+    "anchor": "bootstrap-simulator",
+    "description": "Bootstrap Simulator"
+  },
+
+  "DA57B3": {
+    "page": "16-superposition-intro",
+    "anchor": "wave-adder",
+    "description": "Wave Adder"
+  },
+  "DA478B": {
+    "page": "16-superposition-intro",
+    "anchor": "linearity-tester",
+    "description": "Linearity Tester"
+  },
+  "DAB724": {
+    "page": "16-superposition-intro",
+    "anchor": "pattern-builder",
+    "description": "Pattern Builder (Fourier Synthesis)"
+  },
+
+  "DA9E11": {
+    "page": "17-interference",
+    "anchor": "interference-visualizer",
+    "description": "Interference Visualizer"
+  },
+  "DAF91D": {
+    "page": "17-interference",
+    "anchor": "phasor-diagram",
+    "description": "Phasor Diagram"
+  },
+  "DA5AD8": {
+    "page": "17-interference",
+    "anchor": "amplitude-challenge",
+    "description": "Amplitude Challenge"
+  },
+
+  "DA8610": {
+    "page": "18-beats",
+    "anchor": "beat-generator",
+    "description": "Beat Generator"
+  },
+  "DAB94C": {
+    "page": "18-beats",
+    "anchor": "beat-anatomy",
+    "description": "Anatomy of a Beat"
+  },
+  "DAD55B": {
+    "page": "18-beats",
+    "anchor": "beat-predictor",
+    "description": "Beat Frequency Predictor"
+  },
+
+  "DA8E67": {
+    "page": "19-lissajous",
+    "anchor": "lissajous-generator",
+    "description": "Lissajous Generator"
+  },
+  "DA26CC": {
+    "page": "19-lissajous",
+    "anchor": "pattern-gallery",
+    "description": "Pattern Gallery"
+  },
+  "DA3E01": {
+    "page": "19-lissajous",
+    "anchor": "rational-explorer",
+    "description": "Rational vs Irrational Explorer"
+  },
+
+  "OS1FA1": {
+    "page": "20-what-oscillates",
+    "anchor": "parameter-explorer",
+    "description": "SHO Parameter Explorer"
+  },
+  "OS4643": {
+    "page": "20-what-oscillates",
+    "anchor": "restoring-force-lab",
+    "description": "Restoring Force Lab"
+  },
+  "OSA4CC": {
+    "page": "20-what-oscillates",
+    "anchor": "pattern-matcher",
+    "description": "Pattern Matcher"
+  },
+
+  "OS4F9E": {
+    "page": "21-sho-equation",
+    "anchor": "ode-visualizer",
+    "description": "ODE Visualizer"
+  },
+  "OS2BCC": {
+    "page": "21-sho-equation",
+    "anchor": "initial-condition-explorer",
+    "description": "Initial Condition Explorer"
+  },
+  "OS0D6D": {
+    "page": "21-sho-equation",
+    "anchor": "solution-verifier",
+    "description": "Solution Verifier"
+  },
+
+  "OS9717": {
+    "page": "22-energy-phase-space",
+    "anchor": "energy-tracker",
+    "description": "Energy Tracker"
+  },
+  "OSE2FB": {
+    "page": "22-energy-phase-space",
+    "anchor": "phase-space-explorer",
+    "description": "Phase Space Explorer"
+  },
+  "OSF1D0": {
+    "page": "22-energy-phase-space",
+    "anchor": "portrait-gallery",
+    "description": "Portrait Gallery"
+  },
+
+  "OS7E0C": {
+    "page": "23-one-equation-many-systems",
+    "anchor": "system-identifier",
+    "description": "System Identifier"
+  },
+  "OS42C3": {
+    "page": "23-one-equation-many-systems",
+    "anchor": "cross-domain-mapper",
+    "description": "Cross-Domain Mapper"
+  },
+  "OS4B93": {
+    "page": "23-one-equation-many-systems",
+    "anchor": "phase-relationship-explorer",
+    "description": "Phase Relationship Explorer"
+  },
+
+  "OSE7E6": {
+    "page": "24-introducing-damping",
+    "anchor": "damping-explorer",
+    "description": "Damping Explorer"
+  },
+  "OSB84F": {
+    "page": "24-introducing-damping",
+    "anchor": "two-time-scales",
+    "description": "Two Time Scales"
+  },
+  "OS3E5E": {
+    "page": "24-introducing-damping",
+    "anchor": "damping-detector",
+    "description": "Damping Detector"
+  },
+
+  "OS39AC": {
+    "page": "25-damping-regimes",
+    "anchor": "regime-explorer",
+    "description": "Regime Explorer"
+  },
+  "OS9724": {
+    "page": "25-damping-regimes",
+    "anchor": "three-panel-comparison",
+    "description": "Three-Regime Comparison"
+  },
+  "OS3E15": {
+    "page": "25-damping-regimes",
+    "anchor": "parameter-space-map",
+    "description": "Parameter Space Map"
+  },
+
+  "OSB91A": {
+    "page": "26-critical-damping",
+    "anchor": "door-closer-designer",
+    "description": "Door Closer Designer"
+  },
+  "OSE3E4": {
+    "page": "26-critical-damping",
+    "anchor": "suspension-tuner",
+    "description": "Suspension Tuner"
+  },
+  "OS62BB": {
+    "page": "26-critical-damping",
+    "anchor": "design-challenge",
+    "description": "Design Challenge"
+  },
+
+  "OS0FA6": {
+    "page": "27-external-forces",
+    "anchor": "transient-decay-animator",
+    "description": "Transient Decay Animator"
+  },
+  "OS29E5": {
+    "page": "27-external-forces",
+    "anchor": "driving-frequency-explorer",
+    "description": "Driving Frequency Explorer"
+  },
+  "OSFE9E": {
+    "page": "27-external-forces",
+    "anchor": "initial-condition-independence",
+    "description": "Initial Condition Independence"
+  },
+
+  "OS0949": {
+    "page": "28-resonance",
+    "anchor": "resonance-explorer",
+    "description": "Resonance Explorer"
+  },
+  "OSADB7": {
+    "page": "28-resonance",
+    "anchor": "damping-effect",
+    "description": "Damping Controls Resonance"
+  },
+  "OS7031": {
+    "page": "28-resonance",
+    "anchor": "q-factor-visualizer",
+    "description": "Q Factor Visualizer"
+  },
+
+  "OS5D7B": {
+    "page": "29-beats-resonance",
+    "anchor": "beat-visualizer",
+    "description": "Beat Visualizer"
+  },
+  "OS83D8": {
+    "page": "29-beats-resonance",
+    "anchor": "approach-to-resonance",
+    "description": "Approaching Resonance"
+  },
+  "OSB252": {
+    "page": "29-beats-resonance",
+    "anchor": "beat-frequency-challenge",
+    "description": "Beat Frequency Challenge"
+  },
+
+  "OS59AF": {
+    "page": "30-resonance-disasters",
+    "anchor": "bridge-stress-simulator",
+    "description": "Bridge Stress Simulator"
+  },
+  "OSFD07": {
+    "page": "30-resonance-disasters",
+    "anchor": "tmd-designer",
+    "description": "TMD Designer"
+  },
+  "OS1365": {
+    "page": "30-resonance-disasters",
+    "anchor": "radio-tuner",
+    "description": "Radio Tuner"
+  },
+
+  "OS82AD": {
+    "page": "31-euler-first-steps",
+    "anchor": "step-by-step-euler",
+    "description": "Step-by-Step Euler Visualizer"
+  },
+  "OSAECF": {
+    "page": "31-euler-first-steps",
+    "anchor": "step-size-explorer",
+    "description": "Step Size Explorer"
+  },
+  "OSA375": {
+    "page": "31-euler-first-steps",
+    "anchor": "error-accumulation-tracker",
+    "description": "Error Accumulation Tracker"
+  },
+
+  "OS9A39": {
+    "page": "32-runge-kutta",
+    "anchor": "algorithm-race",
+    "description": "Algorithm Race (Euler vs RK2)"
+  },
+  "OSAE7D": {
+    "page": "32-runge-kutta",
+    "anchor": "convergence-rate-plotter",
+    "description": "Convergence Rate Plotter"
+  },
+  "OS53C5": {
+    "page": "32-runge-kutta",
+    "anchor": "energy-conservation",
+    "description": "Energy Conservation Comparison"
+  },
+
+  "NMDE3D": {
+    "page": "34-numerical-motivation",
+    "anchor": "equation-sorter",
+    "description": "Equation Sorter — classify ODEs as solvable or unsolvable"
+  },
+  "NMF3F9": {
+    "page": "34-numerical-motivation",
+    "anchor": "nonlinear-wall",
+    "description": "The Nonlinear Wall — pendulum small-angle breakdown"
+  },
+  "NM8E86": {
+    "page": "34-numerical-motivation",
+    "anchor": "slope-field-stepper",
+    "description": "Following the Arrows — step through a slope field"
+  },
+
+  "NM3064": {
+    "page": "35-euler-formula",
+    "anchor": "tangent-to-formula",
+    "description": "From Tangent to Formula — build Euler approximation step by step"
+  },
+  "NM9FC9": {
+    "page": "35-euler-formula",
+    "anchor": "step-size-showdown",
+    "description": "Step Size Showdown — race four step sizes"
+  },
+  "NM7EEE": {
+    "page": "35-euler-formula",
+    "anchor": "euler-lab",
+    "description": "Euler Lab — try Euler on different ODEs"
+  },
+
+  "NM4136": {
+    "page": "36-for-loops",
+    "anchor": "loop-stepper",
+    "description": "Loop Stepper — watch a for loop execute step by step"
+  },
+  "NM8D60": {
+    "page": "36-for-loops",
+    "anchor": "growth-patterns",
+    "description": "Growth Patterns — three update rules compared"
+  },
+  "NM385F": {
+    "page": "36-for-loops",
+    "anchor": "update-recipe",
+    "description": "Update Recipe — bridge from loops to Euler's method"
+  },
+
+  "NM1576": {
+    "page": "37-coding-euler",
+    "anchor": "code-builder",
+    "description": "Code Builder — arrange blocks to build an Euler solver"
+  },
+  "NM5E17": {
+    "page": "37-coding-euler",
+    "anchor": "live-solver",
+    "description": "Live Solver — adjust step size and ICs in real time"
+  },
+  "NM14C7": {
+    "page": "37-coding-euler",
+    "anchor": "function-lab",
+    "description": "Function Lab — try Euler on different ODEs"
+  },
+
+  "NM099C": {
+    "page": "38-euler-validation",
+    "anchor": "solution-comparator",
+    "description": "Solution Comparator — numerical vs analytical side by side"
+  },
+  "NM5231": {
+    "page": "38-euler-validation",
+    "anchor": "error-analyzer",
+    "description": "Error Analyzer — build a convergence plot interactively"
+  },
+  "NM3D46": {
+    "page": "38-euler-validation",
+    "anchor": "convergence-tester",
+    "description": "Convergence Tester — self-convergence for unknown solutions"
+  },
+
+  "NMC940": {
+    "page": "39-order-reduction",
+    "anchor": "ode-transformer",
+    "description": "ODE Transformer — convert 2nd order to 1st order system"
+  },
+  "NM664A": {
+    "page": "39-order-reduction",
+    "anchor": "state-space-viewer",
+    "description": "State Space Viewer — watch [x, v] evolve in phase space"
+  },
+  "NM87F6": {
+    "page": "39-order-reduction",
+    "anchor": "reduction-challenge",
+    "description": "Reduction Challenge — practice order reduction on various ODEs"
+  },
+
+  "NM30A4": {
+    "page": "40-coupled-systems",
+    "anchor": "system-solver",
+    "description": "System Solver — run coupled Euler on the SHO"
+  },
+  "NM4E75": {
+    "page": "40-coupled-systems",
+    "anchor": "vector-field-explorer",
+    "description": "Vector Field Explorer — phase space orbits with adjustable h"
+  },
+  "NMEDBD": {
+    "page": "40-coupled-systems",
+    "anchor": "portrait-builder",
+    "description": "Portrait Builder — build phase portraits from multiple ICs"
+  },
+  "NM9A0E": {
+    "page": "41-lcr-circuits",
+    "anchor": "lcr-simulator",
+    "description": "LCR Simulator — adjust w and h, compare Euler vs exact"
+  },
+  "NMAE19": {
+    "page": "41-lcr-circuits",
+    "anchor": "regime-explorer",
+    "description": "Regime Explorer — sweep across underdamped, critical, overdamped"
+  },
+  "NM06A9": {
+    "page": "41-lcr-circuits",
+    "anchor": "energy-tracker",
+    "description": "Energy Tracker — capacitor, inductor, and resistor energy flow"
+  },
+  "NM1BA0": {
+    "page": "42-damped-mechanics",
+    "anchor": "spring-simulator",
+    "description": "Damped Spring Simulator — adjustable m, k, b parameters"
+  },
+  "NMBC75": {
+    "page": "42-damped-mechanics",
+    "anchor": "cross-domain-mapper",
+    "description": "Cross-Domain Mapper — mechanical vs electrical side by side"
+  },
+  "NM1536": {
+    "page": "42-damped-mechanics",
+    "anchor": "euler-limits",
+    "description": "Euler's Limits — energy drift vs physical damping"
+  },
+  "NM8DF3": {
+    "page": "43-practical-errors",
+    "anchor": "error-dissection",
+    "description": "Error Dissection — truncation vs round-off at various h"
+  },
+  "NMC24D": {
+    "page": "43-practical-errors",
+    "anchor": "convergence-tester",
+    "description": "Convergence Tester — log-log slope and Richardson extrapolation"
+  },
+  "NM9A6F": {
+    "page": "43-practical-errors",
+    "anchor": "step-size-advisor",
+    "description": "Step Size Advisor — cost comparison Euler vs RK4"
+  },
+  "NM1826": {
+    "page": "44-improved-euler",
+    "anchor": "algorithm-race",
+    "description": "Algorithm Race — Euler vs RK2 on SHO, time and phase space"
+  },
+  "NM5F04": {
+    "page": "44-improved-euler",
+    "anchor": "convergence-rate",
+    "description": "Convergence Rate — halve h, see error halve (Euler) or quarter (RK2)"
+  },
+  "NM08FC": {
+    "page": "44-improved-euler",
+    "anchor": "energy-conservation",
+    "description": "Energy Conservation — RK2 holds energy while Euler drifts"
+  },
+  "NM46B4": {
+    "page": "45-rk4-method",
+    "anchor": "algorithm-race-rk4",
+    "description": "Three-Way Race — Euler vs RK2 vs RK4 on driven oscillator"
+  },
+  "NM3E77": {
+    "page": "45-rk4-method",
+    "anchor": "convergence-rk4",
+    "description": "Convergence Verification — slopes 1, 2, 4 on log-log plot"
+  },
+  "NMD880": {
+    "page": "45-rk4-method",
+    "anchor": "efficiency-calculator",
+    "description": "Efficiency Calculator — cost comparison across methods"
+  },
+  "NM2BFD": {
+    "page": "46-method-comparison",
+    "anchor": "fixed-budget-race",
+    "description": "Fixed-Budget Race — same computation, compare accuracy"
+  },
+  "NMFDD0": {
+    "page": "46-method-comparison",
+    "anchor": "scaling-laws",
+    "description": "Scaling Laws — convergence slopes for different equations"
+  },
+  "NM3751": {
+    "page": "46-method-comparison",
+    "anchor": "decision-guide",
+    "description": "Decision Guide — when to use which method"
+  },
+  "NMAC6B": {
+    "page": "47-escape-velocity-physics",
+    "anchor": "gravity-field",
+    "description": "Gravity Field — how gravity weakens with altitude"
+  },
+  "NM629C": {
+    "page": "47-escape-velocity-physics",
+    "anchor": "trajectory-classifier",
+    "description": "Trajectory Classifier — bound, critical, unbound by energy"
+  },
+  "NMC8C1": {
+    "page": "47-escape-velocity-physics",
+    "anchor": "planetary-escape",
+    "description": "Planetary Escape — compare escape velocities across planets"
+  },
+  "NM2830": {
+    "page": "48-nondimensionalization",
+    "anchor": "scaling-collapse",
+    "description": "Scaling Collapse — physical trajectories onto one universal curve"
+  },
+  "NMD2C8": {
+    "page": "48-nondimensionalization",
+    "anchor": "universal-portrait",
+    "description": "Universal Portrait — dimensionless phase space for escape"
+  },
+  "NMCDFF": {
+    "page": "48-nondimensionalization",
+    "anchor": "scale-translator",
+    "description": "Scale Translator — convert dimensionless to physical units"
+  },
+  "NMA8C9": {
+    "page": "49-escape-rk4",
+    "anchor": "rocket-launcher",
+    "description": "Rocket Launcher — launch at different speeds, see trajectories"
+  },
+  "NM2ADB": {
+    "page": "49-escape-rk4",
+    "anchor": "threshold-finder",
+    "description": "Threshold Finder — binary search for escape velocity"
+  },
+  "NM5BC1": {
+    "page": "49-escape-rk4",
+    "anchor": "energy-validator",
+    "description": "Energy Validator — check conservation along trajectories"
+  },
+  "NMFEE7": {
+    "page": "50-air-resistance",
+    "anchor": "drag-visualizer",
+    "description": "Drag Visualizer — launch through atmospheres of different thickness"
+  },
+  "NMBD08": {
+    "page": "50-air-resistance",
+    "anchor": "drag-threshold",
+    "description": "Drag Threshold — binary search for escape velocity with drag"
+  },
+  "NMC8DB": {
+    "page": "50-air-resistance",
+    "anchor": "parameter-sweep",
+    "description": "Parameter Sweep — escape velocity vs drag and atmosphere thickness"
+  },
+  "PS3DE1": {
+    "page": "51-phase-space-intro",
+    "anchor": "state-viewer",
+    "description": "State Viewer — phase portrait with vector field and trajectory"
+  },
+  "PSA91A": {
+    "page": "51-phase-space-intro",
+    "anchor": "time-meets-space",
+    "description": "Time Meets Space — dual view of time series and phase space"
+  },
+  "PS897D": {
+    "page": "51-phase-space-intro",
+    "anchor": "trajectory-zoo",
+    "description": "Trajectory Zoo — gallery of dynamical system types"
+  },
+  "PS0250": {
+    "page": "52-vector-fields-viz",
+    "anchor": "field-builder",
+    "description": "Field Builder — adjust matrix entries and see the flow pattern"
+  },
+  "PS6561": {
+    "page": "52-vector-fields-viz",
+    "anchor": "arrows-to-flow",
+    "description": "Arrows to Flow — switch between quiver and streamline views"
+  },
+  "PS6DE3": {
+    "page": "52-vector-fields-viz",
+    "anchor": "speed-map",
+    "description": "Speed Map — heatmap of flow speed across phase space"
+  },
+  "PS0318": {
+    "page": "53-fixed-points",
+    "anchor": "nullcline-finder",
+    "description": "Nullcline Finder — graphical fixed point identification"
+  },
+  "PSD744": {
+    "page": "53-fixed-points",
+    "anchor": "flow-regions",
+    "description": "Flow Regions — sign of velocity between nullclines"
+  },
+  "PS8ED6": {
+    "page": "53-fixed-points",
+    "anchor": "stability-tester",
+    "description": "Stability Tester — perturb away from FP and watch response"
+  },
+  "PS9212": {
+    "page": "54-fixed-point-types",
+    "anchor": "type-gallery",
+    "description": "Type Gallery — all six fixed point types side by side"
+  },
+  "PS9D87": {
+    "page": "54-fixed-point-types",
+    "anchor": "td-plane",
+    "description": "τ-Δ Plane — click to see phase portrait at any point"
+  },
+  "PS50A4": {
+    "page": "54-fixed-point-types",
+    "anchor": "classify-challenge",
+    "description": "Classification Challenge — identify type from portrait"
+  },
+  "PS9F7D": {
+    "page": "55-trajectory-dynamics",
+    "anchor": "trajectory-launcher",
+    "description": "Trajectory Launcher — launch from different ICs, watch fate"
+  },
+  "PSABA5": {
+    "page": "55-trajectory-dynamics",
+    "anchor": "basin-mapper",
+    "description": "Basin Mapper — color phase plane by long-term fate"
+  },
+  "PS7DB2": {
+    "page": "55-trajectory-dynamics",
+    "anchor": "cloud-evolution",
+    "description": "Cloud Evolution — watch stretching and compression"
+  },
+  "PS8D76": {
+    "page": "56-love-affairs",
+    "anchor": "love-story",
+    "description": "Love Story — watch the love-hate cycle in phase space"
+  },
+  "PSAA36": {
+    "page": "56-love-affairs",
+    "anchor": "personality-params",
+    "description": "Personality Params — adjust a, b, c, d and see the outcome"
+  },
+  "PS4E53": {
+    "page": "56-love-affairs",
+    "anchor": "cautious-lovers",
+    "description": "Cautious Lovers — preview of symmetric model from Section 5.10"
+  },
+  "PS1A4D": {
+    "page": "57-linear-systems-intro",
+    "anchor": "matrix-explorer",
+    "description": "Matrix Explorer — adjust entries, see eigenvalues and portrait"
+  },
+  "PS1B1F": {
+    "page": "57-linear-systems-intro",
+    "anchor": "eigenvector-directions",
+    "description": "Eigenvector Directions — special directions on the portrait"
+  },
+  "PSE556": {
+    "page": "57-linear-systems-intro",
+    "anchor": "solution-decomposition",
+    "description": "Solution Decomposition — see modes and their dominance"
+  },
+  "PSC434": {
+    "page": "58-tau-delta-plane",
+    "anchor": "tau-delta-explorer",
+    "description": "τ-Δ Explorer — click to see phase portrait at any point"
+  },
+  "PSB153": {
+    "page": "58-tau-delta-plane",
+    "anchor": "boundary-navigator",
+    "description": "Boundary Navigator — walk along parabola and axes"
+  },
+  "PSB606": {
+    "page": "58-tau-delta-plane",
+    "anchor": "matrix-classifier",
+    "description": "Matrix Classifier — input matrix, see τ-Δ location"
+  },
+  "PS05C6": {
+    "page": "59-oscillator-phase-space",
+    "anchor": "damping-regime-explorer",
+    "description": "Damping Regime Explorer — adjust b and watch regime change"
+  },
+  "PS05E7": {
+    "page": "59-oscillator-phase-space",
+    "anchor": "three-regimes",
+    "description": "Three Regimes — side-by-side underdamped, critical, overdamped"
+  },
+  "PS7929": {
+    "page": "59-oscillator-phase-space",
+    "anchor": "energy-dissipation",
+    "description": "Energy Dissipation — track energy loss in phase space"
+  },
+  "PS5BD9": {
+    "page": "60-cautious-lovers",
+    "anchor": "personality-explorer",
+    "description": "Personality Explorer — adjust cautiousness and responsiveness"
+  },
+  "PS43CE": {
+    "page": "60-cautious-lovers",
+    "anchor": "parameter-space-map",
+    "description": "Parameter Space Map — saddle vs node regions in (a,b) plane"
+  },
+  "PS0F63": {
+    "page": "60-cautious-lovers",
+    "anchor": "scenario-gallery",
+    "description": "Scenario Gallery — browse personality combinations"
+  },
+  "PSB5E5": {
+    "page": "61-linearization-1d",
+    "anchor": "taylor-visualizer",
+    "description": "Taylor Visualizer — tangent line matches f(x) near FP"
+  },
+  "PS4135": {
+    "page": "61-linearization-1d",
+    "anchor": "stability-classifier",
+    "description": "Stability Classifier — compute f'(x0) and classify"
+  },
+  "PS1259": {
+    "page": "61-linearization-1d",
+    "anchor": "linear-vs-nonlinear",
+    "description": "Linear vs Nonlinear — compare linearized and exact trajectories"
+  },
+  "PS0D6E": {
+    "page": "62-jacobian-matrix",
+    "anchor": "jacobian-calculator",
+    "description": "Jacobian Calculator — compute J at each fixed point"
+  },
+  "PSA0CF": {
+    "page": "62-jacobian-matrix",
+    "anchor": "linearization-comparison",
+    "description": "Linearization Comparison — zoom to see linear match nonlinear"
+  },
+  "PSA62E": {
+    "page": "62-jacobian-matrix",
+    "anchor": "full-pipeline",
+    "description": "Full Pipeline — system → FPs → Jacobian → classify"
   }
 }

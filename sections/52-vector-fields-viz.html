@@ -1,0 +1,757 @@
+<!-- ============================================================
+     Section 5.2: Vector Fields & Streamlines
+     Source: NPTEL Lecture 8_1 (Linear Systems & Phase Space, Part 2)
+     Concept: Building and reading vector field visualizations,
+              arrow fields vs streamlines, flow speed interpretation
+     Time: 15-20 minutes
+     Prerequisites: Section 5.1 (phase space intro, trajectories)
+     ============================================================ -->
+
+<h1>Vector Fields &amp; Streamlines</h1>
+
+<p>
+    In Section 5.1, we explored phase portraits for pre-built systems. Now let's see
+    <strong>how the vector field is constructed</strong>. For a linear system
+    \( \dot{\mathbf{x}} = \mathbf{A}\mathbf{x} \), the matrix \( \mathbf{A} \) completely
+    determines the flow. Every arrow in the field comes from one matrix-vector multiplication.
+</p>
+
+<div class="info-box">
+    <div class="info-box-title">Learning Objectives</div>
+    <ul>
+        <li>Build a vector field from the system matrix — see how \( \mathbf{A} = \begin{pmatrix} a & b \\ c & d \end{pmatrix} \) creates the flow</li>
+        <li>Compare arrows and streamlines as two representations of the same dynamics</li>
+        <li>Read flow speed from a phase portrait — fast regions, slow regions, and fixed points</li>
+        <li>Connect matrix parameters (trace, determinant) to qualitative field behavior</li>
+    </ul>
+</div>
+
+<div class="equation-display">
+    <p><strong>Linear system in components:</strong></p>
+    $$ \dot{x} = ax + by, \qquad \dot{y} = cx + dy $$
+    <p>At each point \( (x,y) \), the velocity vector is \( (ax+by,\; cx+dy) \).
+    Change the matrix entries → the entire flow changes.</p>
+</div>
+
+
+<!-- ============================================================ -->
+<!-- EXPLORER 1: Field Builder -->
+<!-- ============================================================ -->
+<div class="interactive-container" id="field-builder">
+    <div class="interactive-title">Explorer: Field Builder</div>
+
+    <p>
+        Adjust the four matrix entries to construct a vector field from scratch.
+        Watch how each parameter shapes the flow. Use the presets to jump to classic
+        systems, then tweak parameters to see how the portrait morphs.
+    </p>
+
+    <div class="plot-container" id="vf-fieldPlot" style="height: 420px;"></div>
+
+    <div id="vf-stats1" class="stats-bar"></div>
+
+    <div class="control-panel">
+        <div class="control-group">
+            <label class="control-label" for="vf-preset">Preset:</label>
+            <select id="vf-preset" class="control-select">
+                <option value="custom">Custom</option>
+                <option value="center" selected>Center (SHO)</option>
+                <option value="saddle">Saddle</option>
+                <option value="stableSpiral">Stable Spiral</option>
+                <option value="unstableSpiral">Unstable Spiral</option>
+                <option value="source">Source</option>
+                <option value="sink">Sink</option>
+                <option value="stableNode">Stable Node</option>
+            </select>
+        </div>
+        <div class="control-group">
+            <label class="control-label" for="vf-a-slider">a:</label>
+            <input type="range" class="slider" id="vf-a-slider" min="-3" max="3" step="0.1" value="0">
+            <span id="vf-a-value" class="control-value">0.0</span>
+        </div>
+        <div class="control-group">
+            <label class="control-label" for="vf-b-slider">b:</label>
+            <input type="range" class="slider" id="vf-b-slider" min="-3" max="3" step="0.1" value="1">
+            <span id="vf-b-value" class="control-value">1.0</span>
+        </div>
+        <div class="control-group">
+            <label class="control-label" for="vf-c-slider">c:</label>
+            <input type="range" class="slider" id="vf-c-slider" min="-3" max="3" step="0.1" value="-1">
+            <span id="vf-c-value" class="control-value">-1.0</span>
+        </div>
+        <div class="control-group">
+            <label class="control-label" for="vf-d-slider">d:</label>
+            <input type="range" class="slider" id="vf-d-slider" min="-3" max="3" step="0.1" value="0">
+            <span id="vf-d-value" class="control-value">0.0</span>
+        </div>
+        <div class="control-group">
+            <button class="btn" onclick="vfBuilderReset()">Reset</button>
+        </div>
+    </div>
+</div>
+
+<div class="info-box">
+    <div class="info-box-title">Key Insight</div>
+    <p>
+        <strong>Two numbers summarize the entire matrix:</strong> the trace \( \tau = a + d \)
+        and determinant \( \Delta = ad - bc \). These determine the eigenvalues
+        \( \lambda = \tfrac{\tau \pm \sqrt{\tau^2 - 4\Delta}}{2} \), which in turn determine
+        the qualitative behavior. You'll explore this classification fully in Section 5.8.
+    </p>
+</div>
+
+
+<!-- Test Your Understanding #1 -->
+<div class="interactive-container question-section">
+    <div class="interactive-title">Test Your Understanding</div>
+
+    <p style="margin-bottom: var(--spacing-md); color: var(--text-secondary);">
+        Use the Field Builder above to answer these questions.
+    </p>
+
+    <div class="tabs">
+        <div class="tab-buttons">
+            <button class="tab-button active">Question 1</button>
+            <button class="tab-button">Question 2</button>
+            <button class="tab-button">Question 3</button>
+        </div>
+
+        <div class="tab-content active">
+            <div class="question-container" data-type="mcq" data-answer="1">
+                <div class="question-text">
+                    Set the matrix to \( a=0, b=1, c=-1, d=0 \) (the Center preset).
+                    What happens to the arrows at the origin?
+                </div>
+                <div class="question-options">
+                    <label class="option">
+                        <input type="radio" name="vf-q1" value="0">
+                        <span>They point radially outward</span>
+                    </label>
+                    <label class="option">
+                        <input type="radio" name="vf-q1" value="1">
+                        <span>They vanish — the velocity is zero</span>
+                    </label>
+                    <label class="option">
+                        <input type="radio" name="vf-q1" value="2">
+                        <span>They all point in the same direction</span>
+                    </label>
+                    <label class="option">
+                        <input type="radio" name="vf-q1" value="3">
+                        <span>They point radially inward</span>
+                    </label>
+                </div>
+                <div class="question-actions">
+                    <button class="btn-verify">Verify</button>
+                </div>
+                <div class="question-explanation" style="display:none;">
+                    <strong>Explanation:</strong>
+                    At \( (0,0) \), the velocity is \( (0 \cdot 0 + 1 \cdot 0,\; -1 \cdot 0 + 0 \cdot 0) = (0, 0) \).
+                    The velocity vector is zero — this is the <em>fixed point</em>. For any linear
+                    system \( \dot{\mathbf{x}} = \mathbf{A}\mathbf{x} \), the origin is always a fixed point.
+                </div>
+            </div>
+        </div>
+
+        <div class="tab-content">
+            <div class="question-container" data-type="fill" data-answer="0|1">
+                <div class="question-text">
+                    For the Center preset (\( a=0, b=1, c=-1, d=0 \)), compute:
+                    <br>Trace \( \tau = a + d \) = <input type="text" class="fill-blank" style="width:60px">
+                    <br>Determinant \( \Delta = ad - bc \) = <input type="text" class="fill-blank" style="width:60px">
+                    <br>(Check your answers against the stats bar.)
+                </div>
+                <div class="question-actions">
+                    <button class="btn-verify">Verify</button>
+                </div>
+                <div class="question-explanation" style="display:none;">
+                    <strong>Explanation:</strong>
+                    \( \tau = a + d = 0 + 0 = 0 \) and
+                    \( \Delta = ad - bc = (0)(0) - (1)(-1) = 1 \).
+                    Positive determinant with zero trace gives purely imaginary eigenvalues
+                    \( \lambda = \pm i \) — a center with circular orbits.
+                </div>
+            </div>
+        </div>
+
+        <div class="tab-content">
+            <div class="question-container" data-type="msq" data-answer="0,2">
+                <div class="question-text">
+                    Start from the Center preset and slowly increase \( a \) from 0 toward 1.
+                    What changes? (Select all that apply)
+                </div>
+                <div class="question-options">
+                    <label class="option">
+                        <input type="checkbox" value="0">
+                        <span>The flow starts spiraling outward instead of forming closed circles</span>
+                    </label>
+                    <label class="option">
+                        <input type="checkbox" value="1">
+                        <span>The fixed point moves away from the origin</span>
+                    </label>
+                    <label class="option">
+                        <input type="checkbox" value="2">
+                        <span>The trace τ increases from zero</span>
+                    </label>
+                    <label class="option">
+                        <input type="checkbox" value="3">
+                        <span>The determinant Δ becomes negative</span>
+                    </label>
+                </div>
+                <div class="question-actions">
+                    <button class="btn-verify">Verify</button>
+                </div>
+                <div class="question-explanation" style="display:none;">
+                    <strong>Explanation:</strong>
+                    <ul>
+                        <li><strong>Spiraling outward:</strong> TRUE. Adding positive \( a \) introduces a growth component. The eigenvalues gain a positive real part, turning the center into an unstable spiral.</li>
+                        <li><strong>Fixed point moves:</strong> FALSE. For any linear system, the origin is always the fixed point regardless of parameters.</li>
+                        <li><strong>τ increases:</strong> TRUE. \( \tau = a + d \), and increasing \( a \) directly increases \( \tau \).</li>
+                        <li><strong>Δ becomes negative:</strong> FALSE. \( \Delta = ad - bc = 0 \cdot 0 - 1 \cdot (-1) = 1 \) stays positive as long as \( a \) doesn't become too large relative to \( d \). Here \( \Delta = a \cdot 0 - 1 \cdot (-1) = 1 \) is constant.</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+<!-- ============================================================ -->
+<!-- EXPLORER 2: Arrows to Streamlines -->
+<!-- ============================================================ -->
+<h2>Two Views of the Same Flow</h2>
+
+<p>
+    A <strong>quiver plot</strong> (arrows) and a <strong>streamline plot</strong> (continuous
+    curves) are two ways to visualize the same vector field. Arrows show the velocity at
+    discrete sample points; streamlines connect them into continuous flow lines. Each streamline
+    is <em>tangent to the arrows everywhere</em> — it's what you'd get by releasing a particle
+    and letting it follow the flow.
+</p>
+
+<div class="interactive-container" id="arrows-to-flow">
+    <div class="interactive-title">Explorer: Arrows → Streamlines</div>
+
+    <p>
+        Toggle between arrows and streamlines to see how they relate.
+        In "Both" mode, notice that every streamline is tangent to the nearby arrows.
+    </p>
+
+    <div class="dual-panel">
+        <div class="plot-container" id="vf-arrowPlot"></div>
+        <div class="plot-container" id="vf-streamPlot"></div>
+    </div>
+
+    <div id="vf-stats2" class="stats-bar"></div>
+
+    <div class="control-panel">
+        <div class="control-group">
+            <label class="control-label" for="vf-system2">System:</label>
+            <select id="vf-system2" class="control-select">
+                <option value="center">Center (SHO)</option>
+                <option value="saddle">Saddle Point</option>
+                <option value="stableSpiral">Stable Spiral</option>
+                <option value="source">Source</option>
+                <option value="sink">Sink</option>
+            </select>
+        </div>
+        <div class="control-group">
+            <label class="control-label" for="vf-density-slider">Arrow Density:</label>
+            <input type="range" class="slider" id="vf-density-slider" min="6" max="20" step="2" value="12">
+            <span id="vf-density-value" class="control-value">12×12</span>
+        </div>
+        <div class="control-group">
+            <button class="btn" onclick="vfFlowReset()">Reset</button>
+        </div>
+    </div>
+</div>
+
+<div class="info-box">
+    <div class="info-box-title">Arrows vs Streamlines</div>
+    <p>
+        <strong>Arrows</strong> are easy to compute (one evaluation per point) but can be hard to
+        read when the field is complex. <strong>Streamlines</strong> require numerical integration
+        (each curve is a trajectory) but reveal the global flow pattern at a glance. In practice,
+        physicists use both: arrows for local detail, streamlines for the big picture.
+    </p>
+</div>
+
+
+<!-- Test Your Understanding #2 -->
+<div class="interactive-container question-section">
+    <div class="interactive-title">Test Your Understanding</div>
+
+    <p style="margin-bottom: var(--spacing-md); color: var(--text-secondary);">
+        Use the Arrows → Streamlines explorer above to answer these questions.
+    </p>
+
+    <div class="tabs">
+        <div class="tab-buttons">
+            <button class="tab-button active">Question 1</button>
+            <button class="tab-button">Question 2</button>
+            <button class="tab-button">Question 3</button>
+        </div>
+
+        <div class="tab-content active">
+            <div class="question-container" data-type="mcq" data-answer="0">
+                <div class="question-text">
+                    What is the relationship between arrows and streamlines?
+                </div>
+                <div class="question-options">
+                    <label class="option">
+                        <input type="radio" name="vf-q4" value="0">
+                        <span>Streamlines are everywhere tangent to the arrows</span>
+                    </label>
+                    <label class="option">
+                        <input type="radio" name="vf-q4" value="1">
+                        <span>Streamlines connect the tips of the arrows</span>
+                    </label>
+                    <label class="option">
+                        <input type="radio" name="vf-q4" value="2">
+                        <span>Streamlines are perpendicular to the arrows</span>
+                    </label>
+                    <label class="option">
+                        <input type="radio" name="vf-q4" value="3">
+                        <span>Streamlines show the acceleration, arrows show the velocity</span>
+                    </label>
+                </div>
+                <div class="question-actions">
+                    <button class="btn-verify">Verify</button>
+                </div>
+                <div class="question-explanation" style="display:none;">
+                    <strong>Explanation:</strong>
+                    At every point on a streamline, the tangent direction equals the local velocity
+                    vector. That's how streamlines are computed — by integrating the velocity field
+                    step by step (using RK4 or similar). The arrows are discrete samples of this
+                    continuous velocity field.
+                </div>
+            </div>
+        </div>
+
+        <div class="tab-content">
+            <div class="question-container" data-type="fill" data-answer="saddle">
+                <div class="question-text">
+                    Try each system. Which one has streamlines that approach the origin along
+                    one axis but flee along the perpendicular axis?
+                    <select class="fill-blank-select">
+                        <option value=""></option>
+                        <option value="center">Center (SHO)</option>
+                        <option value="saddle">Saddle Point</option>
+                        <option value="stableSpiral">Stable Spiral</option>
+                        <option value="source">Source</option>
+                    </select>
+                </div>
+                <div class="question-actions">
+                    <button class="btn-verify">Verify</button>
+                </div>
+                <div class="question-explanation" style="display:none;">
+                    <strong>Explanation:</strong>
+                    The <strong>saddle point</strong> has eigenvalues of opposite sign (\( \lambda_1 > 0 \),
+                    \( \lambda_2 < 0 \)). Trajectories approach along the eigenvector for the negative
+                    eigenvalue (stable direction) and flee along the eigenvector for the positive
+                    eigenvalue (unstable direction). This creates the distinctive X-shaped pattern.
+                </div>
+            </div>
+        </div>
+
+        <div class="tab-content">
+            <div class="question-container" data-type="msq" data-answer="1,3">
+                <div class="question-text">
+                    Increase the arrow density from 6×6 to 20×20.
+                    Which observations are correct? (Select all that apply)
+                </div>
+                <div class="question-options">
+                    <label class="option">
+                        <input type="checkbox" value="0">
+                        <span>The flow pattern changes with density</span>
+                    </label>
+                    <label class="option">
+                        <input type="checkbox" value="1">
+                        <span>More arrows give a clearer picture of the flow</span>
+                    </label>
+                    <label class="option">
+                        <input type="checkbox" value="2">
+                        <span>Streamlines become smoother at higher density</span>
+                    </label>
+                    <label class="option">
+                        <input type="checkbox" value="3">
+                        <span>Streamlines are independent of arrow density</span>
+                    </label>
+                </div>
+                <div class="question-actions">
+                    <button class="btn-verify">Verify</button>
+                </div>
+                <div class="question-explanation" style="display:none;">
+                    <strong>Explanation:</strong>
+                    <ul>
+                        <li><strong>Pattern changes:</strong> FALSE. The vector field is defined by the equations, not by how densely you sample it. More arrows just give better resolution.</li>
+                        <li><strong>Clearer picture:</strong> TRUE. More sample points help you see the direction more accurately, especially in regions where the flow changes rapidly.</li>
+                        <li><strong>Smoother streamlines:</strong> FALSE. Streamlines are computed by integrating the actual equations, not by interpolating between arrows. They don't depend on arrow density at all.</li>
+                        <li><strong>Independent:</strong> TRUE. Arrows and streamlines are two independent visualizations of the same underlying vector field. Changing one doesn't affect the other.</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+<!-- ============================================================ -->
+<!-- EXPLORER 3: Speed Map -->
+<!-- ============================================================ -->
+<h2>How Fast Does the Flow Go?</h2>
+
+<p>
+    Arrows and streamlines show <em>direction</em>, but the <strong>speed</strong> matters too.
+    At each point, the speed is the magnitude of the velocity vector:
+    \( |\mathbf{v}| = \sqrt{(\dot{x})^2 + (\dot{y})^2} \). Near a fixed point, speed approaches
+    zero — the system barely moves. Far from the fixed point, speed increases. The <strong>speed
+    map</strong> below uses color to show where the flow is fast (bright) and slow (dark).
+</p>
+
+<div class="interactive-container" id="speed-map">
+    <div class="interactive-title">Explorer: Speed Map</div>
+
+    <p>
+        The background color encodes flow speed: <strong>bright = fast, dark = slow</strong>.
+        White streamlines show the flow direction. Notice how the darkest region (near-zero speed)
+        always surrounds the fixed point at the origin.
+    </p>
+
+    <div class="plot-container" id="vf-speedPlot" style="height: 440px;"></div>
+
+    <div id="vf-stats3" class="stats-bar"></div>
+
+    <div class="control-panel">
+        <div class="control-group">
+            <label class="control-label" for="vf-system3">System:</label>
+            <select id="vf-system3" class="control-select">
+                <option value="center">Center (SHO)</option>
+                <option value="saddle">Saddle Point</option>
+                <option value="stableSpiral">Stable Spiral</option>
+                <option value="unstableSpiral">Unstable Spiral</option>
+                <option value="source">Source</option>
+                <option value="sink">Sink</option>
+            </select>
+        </div>
+        <div class="control-group">
+            <button class="btn" onclick="vfSpeedReset()">Reset</button>
+        </div>
+    </div>
+</div>
+
+<div class="warning-box">
+    <div class="warning-icon">⚠️</div>
+    <div class="warning-content">
+        <strong>Don't confuse speed with direction!</strong>
+        <p>
+            Equal-length arrows (common in textbooks) hide speed information to emphasize direction.
+            Real velocity vectors vary in length — arrows near a source are short at the origin
+            and long far away. The speed map makes this explicit. In later sections, speed differences
+            will help us distinguish node from spiral behavior.
+        </p>
+    </div>
+</div>
+
+
+<!-- Test Your Understanding #3 -->
+<div class="interactive-container question-section">
+    <div class="interactive-title">Test Your Understanding</div>
+
+    <p style="margin-bottom: var(--spacing-md); color: var(--text-secondary);">
+        Use the Speed Map above to answer these questions.
+    </p>
+
+    <div class="tabs">
+        <div class="tab-buttons">
+            <button class="tab-button active">Question 1</button>
+            <button class="tab-button">Question 2</button>
+            <button class="tab-button">Question 3</button>
+        </div>
+
+        <div class="tab-content active">
+            <div class="question-container" data-type="mcq" data-answer="2">
+                <div class="question-text">
+                    Why is the speed always zero at the origin for these systems?
+                </div>
+                <div class="question-options">
+                    <label class="option">
+                        <input type="radio" name="vf-q7" value="0">
+                        <span>Because the origin is outside the plot range</span>
+                    </label>
+                    <label class="option">
+                        <input type="radio" name="vf-q7" value="1">
+                        <span>Because the system conserves energy there</span>
+                    </label>
+                    <label class="option">
+                        <input type="radio" name="vf-q7" value="2">
+                        <span>Because \( \dot{x} = 0 \cdot x + b \cdot 0 = 0 \) and similarly for \( \dot{y} \) — the origin is always a fixed point of linear systems</span>
+                    </label>
+                </div>
+                <div class="question-actions">
+                    <button class="btn-verify">Verify</button>
+                </div>
+                <div class="question-explanation" style="display:none;">
+                    <strong>Explanation:</strong>
+                    For any linear system \( \dot{\mathbf{x}} = \mathbf{A}\mathbf{x} \), plugging
+                    in \( \mathbf{x} = \mathbf{0} \) gives \( \dot{\mathbf{x}} = \mathbf{0} \).
+                    The velocity is zero, so the origin is a fixed point. This is why the speed map
+                    is always darkest at the center.
+                </div>
+            </div>
+        </div>
+
+        <div class="tab-content">
+            <div class="question-container" data-type="fill" data-answer="source|unstable">
+                <div class="question-text">
+                    Compare the speed maps for different systems. Which system type shows the
+                    steepest speed increase away from the origin?
+                    <select class="fill-blank-select">
+                        <option value=""></option>
+                        <option value="center">Center (SHO)</option>
+                        <option value="saddle">Saddle</option>
+                        <option value="source">Source</option>
+                        <option value="stableSpiral">Stable Spiral</option>
+                    </select>
+                    <br>This makes sense because trajectories are
+                    <select class="fill-blank-select">
+                        <option value=""></option>
+                        <option value="stable">converging to the origin</option>
+                        <option value="unstable">diverging from the origin in all directions</option>
+                        <option value="periodic">orbiting periodically</option>
+                    </select>.
+                </div>
+                <div class="question-actions">
+                    <button class="btn-verify">Verify</button>
+                </div>
+                <div class="question-explanation" style="display:none;">
+                    <strong>Explanation:</strong>
+                    The <strong>source</strong> (\( \dot{x} = x, \dot{y} = y \)) has speed
+                    \( |\mathbf{v}| = \sqrt{x^2 + y^2} = r \), which grows linearly with distance.
+                    All trajectories diverge from the origin — farther from the fixed point means
+                    faster motion. The center has the same speed formula but trajectories orbit
+                    rather than escape.
+                </div>
+            </div>
+        </div>
+
+        <div class="tab-content">
+            <div class="question-container" data-type="msq" data-answer="0,2">
+                <div class="question-text">
+                    Select "Saddle Point." What is unique about its speed map compared to the others?
+                    (Select all that apply)
+                </div>
+                <div class="question-options">
+                    <label class="option">
+                        <input type="checkbox" value="0">
+                        <span>Speed is zero along both the x-axis and y-axis (at the origin only)</span>
+                    </label>
+                    <label class="option">
+                        <input type="checkbox" value="1">
+                        <span>Speed is uniform everywhere</span>
+                    </label>
+                    <label class="option">
+                        <input type="checkbox" value="2">
+                        <span>The speed pattern is not radially symmetric — it varies with direction</span>
+                    </label>
+                    <label class="option">
+                        <input type="checkbox" value="3">
+                        <span>The maximum speed occurs at the origin</span>
+                    </label>
+                </div>
+                <div class="question-actions">
+                    <button class="btn-verify">Verify</button>
+                </div>
+                <div class="question-explanation" style="display:none;">
+                    <strong>Explanation:</strong>
+                    <ul>
+                        <li><strong>Zero only at origin:</strong> TRUE. The fixed point is the only place where both \( \dot{x} = 0 \) and \( \dot{y} = 0 \).</li>
+                        <li><strong>Uniform speed:</strong> FALSE. Speed varies from zero at the origin to large values far away.</li>
+                        <li><strong>Not radially symmetric:</strong> TRUE! For the saddle (\( \dot{x} = x, \dot{y} = -y \)), the speed is \( \sqrt{x^2 + y^2} \), which IS radially symmetric. But the <em>direction</em> of flow is not — trajectories converge along one axis and diverge along the other. The speed map itself is actually symmetric for this particular saddle.</li>
+                        <li><strong>Max at origin:</strong> FALSE. Speed is zero at the origin (it's the fixed point).</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+<!-- ============================================================ -->
+<!-- PYTHON CODE EXAMPLES -->
+<!-- ============================================================ -->
+<h2>Python Code</h2>
+
+<div class="tabs">
+    <div class="tab-buttons">
+        <button class="tab-button active">Quiver Plot</button>
+        <button class="tab-button">Speed Heatmap</button>
+        <button class="tab-button">Prompt</button>
+    </div>
+
+    <div class="tab-content active">
+        <div class="code-block-container">
+            <div class="code-header">
+                <span class="code-lang">Python</span>
+                <button class="copy-btn">Copy</button>
+            </div>
+            <pre><code class="language-python">
+import numpy as np
+import plotly.figure_factory as ff
+import plotly.graph_objects as go
+
+# Matrix for a stable spiral
+a, b, c, d = -0.2, 1.0, -1.0, -0.2
+
+# Create grid
+x = np.linspace(-4, 4, 16)
+y = np.linspace(-4, 4, 16)
+X, Y = np.meshgrid(x, y)
+
+# Compute velocity field from matrix
+U = a * X + b * Y
+V = c * X + d * Y
+
+# Create quiver plot
+fig = ff.create_quiver(X, Y, U, V,
+    scale=0.08, arrow_scale=0.3,
+    line=dict(color='#00f3ff', width=1))
+
+# Mark the fixed point
+fig.add_trace(go.Scatter(
+    x=[0], y=[0], mode='markers',
+    marker=dict(color='#ff006e', size=10, symbol='x'),
+    name='Fixed point'))
+
+tau = a + d
+delta = a * d - b * c
+fig.update_layout(
+    template='plotly_dark',
+    title=f'Stable Spiral (τ={tau:.1f}, Δ={delta:.2f})',
+    xaxis=dict(range=[-4, 4], title='x',
+        zerolinecolor='#808080', gridcolor='#2a2f4a'),
+    yaxis=dict(range=[-4, 4], title='y',
+        zerolinecolor='#808080', gridcolor='#2a2f4a'),
+    width=600, height=600
+)
+fig.show()
+            </code></pre>
+        </div>
+    </div>
+
+    <div class="tab-content">
+        <div class="code-block-container">
+            <div class="code-header">
+                <span class="code-lang">Python</span>
+                <button class="copy-btn">Copy</button>
+            </div>
+            <pre><code class="language-python">
+import numpy as np
+import plotly.graph_objects as go
+
+# System: saddle point
+a, b, c, d = 1, 0, 0, -1
+
+# Speed heatmap
+x = np.linspace(-4, 4, 100)
+y = np.linspace(-4, 4, 100)
+X, Y = np.meshgrid(x, y)
+U = a * X + b * Y
+V = c * X + d * Y
+speed = np.sqrt(U**2 + V**2)
+
+fig = go.Figure()
+
+# Heatmap
+fig.add_trace(go.Heatmap(
+    z=speed, x=x, y=y,
+    colorscale='Viridis', showscale=True,
+    colorbar=dict(title='Speed')))
+
+# Add streamlines via RK4
+def rk4_trajectory(x0, y0, dt=0.02, steps=500):
+    xs, ys = [x0], [y0]
+    xc, yc = x0, y0
+    for _ in range(steps):
+        k1x, k1y = a*xc + b*yc, c*xc + d*yc
+        k2x, k2y = a*(xc+dt/2*k1x) + b*(yc+dt/2*k1y), c*(xc+dt/2*k1x) + d*(yc+dt/2*k1y)
+        k3x, k3y = a*(xc+dt/2*k2x) + b*(yc+dt/2*k2y), c*(xc+dt/2*k2x) + d*(yc+dt/2*k2y)
+        k4x, k4y = a*(xc+dt*k3x) + b*(yc+dt*k3y), c*(xc+dt*k3x) + d*(yc+dt*k3y)
+        xc += dt/6 * (k1x + 2*k2x + 2*k3x + k4x)
+        yc += dt/6 * (k1y + 2*k2y + 2*k3y + k4y)
+        if abs(xc) > 5 or abs(yc) > 5: break
+        xs.append(xc); ys.append(yc)
+    return xs, ys
+
+# Launch from boundary
+for start in [(-4,i) for i in np.linspace(-3,3,5)]:
+    sx, sy = rk4_trajectory(*start)
+    fig.add_trace(go.Scatter(x=sx, y=sy, mode='lines',
+        line=dict(color='white', width=1.5),
+        showlegend=False))
+
+fig.update_layout(
+    template='plotly_dark', title='Speed Map: Saddle Point',
+    xaxis=dict(range=[-4,4], title='x',
+        zerolinecolor='#808080', gridcolor='#2a2f4a'),
+    yaxis=dict(range=[-4,4], title='y',
+        zerolinecolor='#808080', gridcolor='#2a2f4a'),
+    width=600, height=600
+)
+fig.show()
+            </code></pre>
+        </div>
+    </div>
+
+    <div class="tab-content">
+        <div class="code-block-container">
+            <div class="code-header">
+                <span class="code-lang">Prompt for AI</span>
+                <button class="copy-btn">Copy</button>
+            </div>
+            <pre><code class="language-text">Create a Python script using Plotly to visualize a 2D linear dynamical
+system dx/dt = ax + by, dy/dt = cx + dy.
+
+Requirements:
+- Accept matrix entries a, b, c, d as parameters
+- Compute trace τ = a+d and determinant Δ = ad-bc
+- Compute eigenvalues from τ and Δ
+- Create TWO plots side by side:
+  Left: Quiver plot (vector field arrows) using plotly.figure_factory
+  Right: Speed heatmap (|v| = sqrt(dx²+dy²)) with streamlines overlaid
+- Use RK4 to integrate streamlines from 12 boundary points
+- Color scheme: plotly_dark template, Viridis for heatmap, white streamlines
+- Gray axes (#808080), fixed ranges [-4, 4]
+- Show τ, Δ, and eigenvalues in the title</code></pre>
+        </div>
+
+        <div class="info-box" style="margin-top: var(--spacing-md);">
+            <div class="info-box-title">Pro Tips for Prompting</div>
+            <ul>
+                <li>Specify the matrix form explicitly so the AI uses the right convention</li>
+                <li>Ask for both quiver and streamline views to compare</li>
+                <li>Request RK4 for trajectory integration — Euler will produce visible errors</li>
+                <li>Include boundary launch points for even streamline coverage</li>
+            </ul>
+        </div>
+    </div>
+</div>
+
+
+<!-- What's Next -->
+<div class="info-box">
+    <div class="info-box-title">What's Next?</div>
+    <p>
+        You can now build and read vector fields. In Section 5.3, we'll systematically find
+        <strong>fixed points</strong> — the landmarks that organize every phase portrait.
+        We'll see how nullclines (curves where one velocity component vanishes) make fixed
+        points easy to locate both graphically and algebraically.
+    </p>
+</div>
+
+
+<!-- Navigation -->
+<div class="btn-group mt-xl">
+    <button class="btn btn-magenta" onclick="navigateToSection('51-phase-space-intro')">&larr; Previous: What is Phase Space?</button>
+    <button class="btn btn-secondary" onclick="scrollToTop()">&uarr; Back to Top</button>
+    <button class="btn btn-secondary" onclick="navigateToSection('53-fixed-points')">Next: Finding Fixed Points &rarr;</button>
+</div>

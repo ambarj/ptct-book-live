@@ -1,0 +1,755 @@
+<!--
+    Section 4.3: Programming Loops for Iteration
+    Source: Module 6 — Implementation of Euler's Method (Part 3)
+    Concept: Master loop structures needed for numerical methods
+    Time: ~20 minutes
+    Prerequisites: Euler formula (Section 4.2), basic Python
+-->
+
+<h1>Programming Loops for Iteration</h1>
+
+<p>
+    In the previous section you learned the Euler formula:
+    \( x_{n+1} = x_n + h \cdot f(x_n, t_n) \).
+    You could execute it by hand for a few steps &mdash; but what about 100 steps? 10,000?
+    That&rsquo;s where <strong>loops</strong> come in.
+    A loop is the computer&rsquo;s way of saying <em>&ldquo;repeat this recipe N times.&rdquo;</em>
+    Every numerical method you&rsquo;ll meet &mdash; Euler, Runge&ndash;Kutta, Monte Carlo &mdash; lives
+    inside a loop. Master the loop, and numerical computing opens up.
+</p>
+
+<div class="info-box">
+    <div class="info-box-title">Learning Objectives</div>
+    <ul>
+        <li>Understand the anatomy of a for loop: initialize, update, store</li>
+        <li>Build arrays step-by-step inside loops and watch values accumulate</li>
+        <li>Recognize the <strong>update recipe</strong> pattern <code>x = x + h * f(x)</code> as the engine behind Euler&rsquo;s method</li>
+    </ul>
+</div>
+
+<hr>
+
+<!-- ========== EXPLORER 1: The Loop Stepper ========== -->
+<div class="interactive-container" id="loop-stepper">
+    <div class="interactive-title">Explorer 1: The Loop Stepper</div>
+
+    <p style="margin-bottom: var(--spacing-sm); color: var(--text-secondary);">
+        Watch a <code>for</code> loop execute step by step. Each iteration computes
+        the next value and appends it to the array. Click <strong>Next Step</strong> to advance.
+    </p>
+
+    <div class="dual-panel">
+        <div class="panel">
+            <div class="plot-container" id="forLoops-stepperPlot"></div>
+        </div>
+        <div class="panel">
+            <div id="forLoops-codeDisplay" style="font-family: var(--font-mono); font-size: 0.85rem; background: rgba(0,0,0,0.3); border-radius: 8px; padding: 1rem; line-height: 1.6; overflow-y: auto; max-height: 450px;">
+                <!-- Populated by JS -->
+            </div>
+        </div>
+    </div>
+
+    <div class="control-panel">
+        <div class="control-group">
+            <label class="control-label">Number of steps \(N\):
+                <span class="control-label-value" id="forLoops-N-value">10</span>
+            </label>
+            <input type="range" class="slider" id="forLoops-N-slider"
+                   min="3" max="20" step="1" value="10">
+        </div>
+        <div class="control-group">
+            <label class="control-label">Update rule:
+                <span class="control-label-value" id="forLoops-rule-label">x = x + 0.5</span>
+            </label>
+            <select id="forLoops-rule-select" class="control-select">
+                <option value="additive">x = x + 0.5 (additive)</option>
+                <option value="multiplicative">x = 1.2 * x (multiplicative)</option>
+                <option value="euler-decay">x = x + h*(-2x) (Euler: decay)</option>
+            </select>
+        </div>
+        <div class="btn-group">
+            <button class="btn" id="forLoops-step-btn" onclick="forLoopsStep()">Next Step &#9654;</button>
+            <button class="btn btn-secondary" id="forLoops-run-btn" onclick="forLoopsRun()">Run All</button>
+            <button class="btn btn-secondary" onclick="forLoopsReset()">Reset</button>
+        </div>
+    </div>
+</div>
+
+<!-- ===== Test Your Understanding #1 ===== -->
+<div class="interactive-container question-section">
+    <div class="interactive-title">Test Your Understanding</div>
+
+    <p style="margin-bottom: var(--spacing-md); color: var(--text-secondary);">
+        Use Explorer 1 to answer these questions.
+    </p>
+
+    <div class="tabs">
+        <div class="tab-buttons">
+            <button class="tab-button active">Question 1</button>
+            <button class="tab-button">Question 2</button>
+            <button class="tab-button">Question 3</button>
+        </div>
+
+        <!-- Q1: MCQ -->
+        <div class="tab-content active">
+            <div class="question-container" data-type="mcq" data-answer="1">
+                <div class="question-text">
+                    With the <strong>additive</strong> rule <code>x = x + 0.5</code> and \(N = 10\) steps
+                    starting from \(x_0 = 0\), what is the final value \(x_{10}\)?
+                </div>
+                <div class="question-options">
+                    <label class="option">
+                        <input type="radio" name="q-fl-1" value="0">
+                        <span>\(x_{10} = 0.5\)</span>
+                    </label>
+                    <label class="option">
+                        <input type="radio" name="q-fl-1" value="1">
+                        <span>\(x_{10} = 5.0\)</span>
+                    </label>
+                    <label class="option">
+                        <input type="radio" name="q-fl-1" value="2">
+                        <span>\(x_{10} = 10.0\)</span>
+                    </label>
+                    <label class="option">
+                        <input type="radio" name="q-fl-1" value="3">
+                        <span>\(x_{10} = 50.0\)</span>
+                    </label>
+                </div>
+                <div class="question-actions">
+                    <button class="btn-verify">Verify</button>
+                </div>
+                <div class="question-explanation" style="display:none;">
+                    <strong>Explanation:</strong>
+                    Each step adds 0.5. After 10 steps: \(x_{10} = 0 + 10 \times 0.5 = 5.0\).
+                    The additive rule produces a <em>straight line</em> &mdash; constant increments.
+                </div>
+            </div>
+        </div>
+
+        <!-- Q2: Fill -->
+        <div class="tab-content">
+            <div class="question-container" data-type="fill" data-answer="6.19[6.0,6.4]">
+                <div class="question-text">
+                    Switch to the <strong>multiplicative</strong> rule <code>x = 1.2 * x</code> starting from \(x_0 = 1\).
+                    After \(N = 10\) steps, the final value is approximately
+                    <input type="text" class="fill-blank" placeholder="?">.
+                    <br><em>(Run the loop and read the last value. Round to 2 decimal places.)</em>
+                </div>
+                <div class="question-actions">
+                    <button class="btn-verify">Verify</button>
+                </div>
+                <div class="question-explanation" style="display:none;">
+                    <strong>Explanation:</strong>
+                    Each step multiplies by 1.2: \(x_{10} = 1.0 \times 1.2^{10} = 6.19\).
+                    Multiplicative updates produce <em>exponential growth</em> &mdash; each step
+                    is bigger than the last.
+                </div>
+            </div>
+        </div>
+
+        <!-- Q3: MCQ -->
+        <div class="tab-content">
+            <div class="question-container" data-type="mcq" data-answer="2">
+                <div class="question-text">
+                    Compare the additive and multiplicative rules. Which statement best describes
+                    their difference?
+                </div>
+                <div class="question-options">
+                    <label class="option">
+                        <input type="radio" name="q-fl-3" value="0">
+                        <span>Both produce straight lines, just at different rates</span>
+                    </label>
+                    <label class="option">
+                        <input type="radio" name="q-fl-3" value="1">
+                        <span>Both produce curves, but the additive one curves faster</span>
+                    </label>
+                    <label class="option">
+                        <input type="radio" name="q-fl-3" value="2">
+                        <span>Additive gives a straight line; multiplicative gives an exponential curve</span>
+                    </label>
+                    <label class="option">
+                        <input type="radio" name="q-fl-3" value="3">
+                        <span>Multiplicative gives a straight line; additive gives a curve</span>
+                    </label>
+                </div>
+                <div class="question-actions">
+                    <button class="btn-verify">Verify</button>
+                </div>
+                <div class="question-explanation" style="display:none;">
+                    <strong>Explanation:</strong>
+                    <code>x = x + constant</code> adds the same amount each step &rarr; linear growth.
+                    <code>x = factor * x</code> multiplies by the same factor each step &rarr; exponential growth.
+                    This is the fundamental difference between arithmetic and geometric sequences.
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<hr>
+
+<!-- ========== EXPLORER 2: Growth Patterns ========== -->
+<div class="interactive-container" id="growth-patterns">
+    <div class="interactive-title">Explorer 2: Growth Patterns</div>
+
+    <p style="margin-bottom: var(--spacing-sm); color: var(--text-secondary);">
+        Three update rules, one plot. See how the same loop structure produces
+        wildly different behavior depending on the update recipe inside it.
+    </p>
+
+    <div class="plot-container" id="forLoops-growthPlot"></div>
+
+    <div class="control-panel">
+        <div class="control-group">
+            <label class="control-label">Step size \(h\):
+                <span class="control-label-value" id="forLoops-growth-h-value">0.30</span>
+            </label>
+            <input type="range" class="slider" id="forLoops-growth-h-slider"
+                   min="0.05" max="0.5" step="0.05" value="0.3">
+        </div>
+        <div class="control-group">
+            <label class="control-label">Number of steps \(N\):
+                <span class="control-label-value" id="forLoops-growth-N-value">20</span>
+            </label>
+            <input type="range" class="slider" id="forLoops-growth-N-slider"
+                   min="5" max="50" step="5" value="20">
+        </div>
+        <div class="btn-group">
+            <button class="btn btn-secondary" onclick="forLoopsGrowthReset()">Reset</button>
+        </div>
+    </div>
+</div>
+
+<div class="info-box">
+    <div class="info-box-title">Key Insight: The Update Recipe Determines Everything</div>
+    <p>
+        All three curves come from the <em>same</em> loop structure:
+    </p>
+    <div class="equation-display">
+        <p style="font-family: var(--font-mono); font-size: 0.9rem;">
+            for i in range(N):<br>
+            &nbsp;&nbsp;&nbsp;&nbsp;x = <span style="color: #ffff00;">[update rule]</span><br>
+            &nbsp;&nbsp;&nbsp;&nbsp;t = t + h
+        </p>
+    </div>
+    <p>
+        The loop is just <em>plumbing</em> &mdash; it repeats the recipe.
+        The physics lives in the <strong>update rule</strong>.
+        In Euler&rsquo;s method, that rule is \(x + h \cdot f(x, t)\).
+    </p>
+</div>
+
+<!-- ===== Test Your Understanding #2 ===== -->
+<div class="interactive-container question-section">
+    <div class="interactive-title">Test Your Understanding</div>
+
+    <p style="margin-bottom: var(--spacing-md); color: var(--text-secondary);">
+        Use Explorer 2 to answer these questions.
+    </p>
+
+    <div class="tabs">
+        <div class="tab-buttons">
+            <button class="tab-button active">Question 4</button>
+            <button class="tab-button">Question 5</button>
+            <button class="tab-button">Question 6</button>
+        </div>
+
+        <!-- Q4: Fill with dropdown -->
+        <div class="tab-content active">
+            <div class="question-container" data-type="fill" data-answer="linear|exponential|quadratic">
+                <div class="question-text">
+                    Match the update rule to its growth pattern:
+                    <br><br>
+                    <code>x = x + c</code> &rarr;
+                    <select class="fill-blank-select">
+                        <option value=""></option>
+                        <option value="linear">linear</option>
+                        <option value="exponential">exponential</option>
+                        <option value="quadratic">quadratic</option>
+                    </select>
+                    <br>
+                    <code>x = r * x</code> &rarr;
+                    <select class="fill-blank-select">
+                        <option value=""></option>
+                        <option value="linear">linear</option>
+                        <option value="exponential">exponential</option>
+                        <option value="quadratic">quadratic</option>
+                    </select>
+                    <br>
+                    <code>x = x + c*t</code> &rarr;
+                    <select class="fill-blank-select">
+                        <option value=""></option>
+                        <option value="linear">linear</option>
+                        <option value="exponential">exponential</option>
+                        <option value="quadratic">quadratic</option>
+                    </select>
+                </div>
+                <div class="question-actions">
+                    <button class="btn-verify">Verify</button>
+                </div>
+                <div class="question-explanation" style="display:none;">
+                    <strong>Explanation:</strong>
+                    <ul>
+                        <li><code>x = x + c</code>: constant increment &rarr; <strong>linear</strong> (arithmetic sequence)</li>
+                        <li><code>x = r * x</code>: constant multiplier &rarr; <strong>exponential</strong> (geometric sequence)</li>
+                        <li><code>x = x + c*t</code>: increment grows with time &rarr; <strong>quadratic</strong> (sum of arithmetic series)</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <!-- Q5: MCQ -->
+        <div class="tab-content">
+            <div class="question-container" data-type="mcq" data-answer="1">
+                <div class="question-text">
+                    Set \(h = 0.10\) and \(N = 50\). Both simulations run to \(t = 5\).
+                    Now set \(h = 0.50\) and \(N = 10\) (also \(t = 5\)).
+                    Which statement is true about the <strong>exponential</strong> curve?
+                </div>
+                <div class="question-options">
+                    <label class="option">
+                        <input type="radio" name="q-fl-5" value="0">
+                        <span>The final values are identical in both cases</span>
+                    </label>
+                    <label class="option">
+                        <input type="radio" name="q-fl-5" value="1">
+                        <span>The shape is similar but the final values differ slightly</span>
+                    </label>
+                    <label class="option">
+                        <input type="radio" name="q-fl-5" value="2">
+                        <span>The exponential curve becomes linear with larger \(h\)</span>
+                    </label>
+                </div>
+                <div class="question-actions">
+                    <button class="btn-verify">Verify</button>
+                </div>
+                <div class="question-explanation" style="display:none;">
+                    <strong>Explanation:</strong>
+                    The multiplicative rule \(x_{n+1} = (1 + h) \cdot x_n\) gives \(x_N = (1+h)^N\).
+                    For \(h = 0.1, N = 50\): \((1.1)^{50} \approx 117.4\).
+                    For \(h = 0.5, N = 10\): \((1.5)^{10} \approx 57.7\).
+                    Same total time, different \(h\) &rarr; different final values.
+                    This is exactly the discretization error you met in Section 4.2!
+                </div>
+            </div>
+        </div>
+
+        <!-- Q6: MSQ -->
+        <div class="tab-content">
+            <div class="question-container" data-type="msq" data-answer="0,2,3">
+                <div class="question-text">
+                    Which of the following are true about <strong>for loops</strong> in numerical computing?
+                    (Select all that apply.)
+                </div>
+                <div class="question-options">
+                    <label class="option">
+                        <input type="checkbox" value="0">
+                        <span>The loop body executes exactly \(N\) times for <code>range(N)</code></span>
+                    </label>
+                    <label class="option">
+                        <input type="checkbox" value="1">
+                        <span>Larger \(h\) always produces more accurate results</span>
+                    </label>
+                    <label class="option">
+                        <input type="checkbox" value="2">
+                        <span>The same loop structure can produce linear, quadratic, or exponential curves</span>
+                    </label>
+                    <label class="option">
+                        <input type="checkbox" value="3">
+                        <span>Arrays grow by one element per iteration when you use <code>append</code></span>
+                    </label>
+                </div>
+                <div class="question-actions">
+                    <button class="btn-verify">Verify</button>
+                </div>
+                <div class="question-explanation" style="display:none;">
+                    <strong>Explanation:</strong>
+                    <ul>
+                        <li><strong>True:</strong> <code>range(N)</code> iterates exactly \(N\) times (0 through \(N-1\)).</li>
+                        <li><strong>False:</strong> Larger \(h\) means fewer steps and MORE error &mdash; smaller \(h\) is more accurate.</li>
+                        <li><strong>True:</strong> As Explorer 2 shows, the update rule determines the shape, not the loop.</li>
+                        <li><strong>True:</strong> <code>x_list.append(x)</code> adds one element each iteration, building the solution array.</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<hr>
+
+<!-- ========== EXPLORER 3: The Update Recipe ========== -->
+<div class="interactive-container" id="update-recipe">
+    <div class="interactive-title">Explorer 3: The Update Recipe &mdash; Bridge to Euler</div>
+
+    <p style="margin-bottom: var(--spacing-sm); color: var(--text-secondary);">
+        Now we use the <em>exact</em> loop pattern behind Euler&rsquo;s method:
+        <code>x = x + h * f(x, t)</code>. Choose different <code>f(x, t)</code> and
+        watch the loop build the numerical solution step by step.
+    </p>
+
+    <div class="dual-panel">
+        <div class="panel">
+            <div class="plot-container" id="forLoops-recipePlot"></div>
+        </div>
+        <div class="panel">
+            <div class="plot-container" id="forLoops-errorPlot"></div>
+        </div>
+    </div>
+
+    <div class="control-panel">
+        <div class="control-group">
+            <label class="control-label">ODE:
+                <span class="control-label-value" id="forLoops-ode-label">dx/dt = -2x</span>
+            </label>
+            <select id="forLoops-ode-select" class="control-select">
+                <option value="0">dx/dt = -2x &nbsp; (exponential decay)</option>
+                <option value="1">dx/dt = x &nbsp; (exponential growth)</option>
+                <option value="2">dx/dt = -sin(x) &nbsp; (nonlinear)</option>
+            </select>
+        </div>
+        <div class="control-group">
+            <label class="control-label">Step size \(h\):
+                <span class="control-label-value" id="forLoops-recipe-h-value">0.30</span>
+            </label>
+            <input type="range" class="slider" id="forLoops-recipe-h-slider"
+                   min="0.05" max="0.8" step="0.05" value="0.3">
+        </div>
+        <div class="btn-group">
+            <button class="btn btn-secondary" onclick="forLoopsRecipeReset()">Reset</button>
+        </div>
+    </div>
+</div>
+
+<div class="equation-display">
+    <p><strong>The Euler Loop Recipe:</strong></p>
+    $$
+    \boxed{
+    \begin{aligned}
+    &amp;\texttt{for } i = 0, 1, \ldots, N-1: \\
+    &amp;\quad x_{i+1} = x_i + h \cdot f(x_i,\, t_i) \\
+    &amp;\quad t_{i+1} = t_i + h
+    \end{aligned}
+    }
+    $$
+    <p>
+        The left panel shows the numerical solution (cyan) vs.&nbsp;the exact answer (gray dashed).
+        The right panel shows how the error at each step grows &mdash; smaller \(h\) means smaller error.
+    </p>
+</div>
+
+<div class="warning-box">
+    <div class="warning-icon">&#9888;&#65039;</div>
+    <div class="warning-content">
+        <strong>Watch for instability!</strong>
+        Try setting the <strong>growth</strong> ODE (\(dx/dt = x\)) with \(h = 0.8\).
+        The numerical solution overshoots wildly. Euler&rsquo;s method can blow up when
+        \(h\) is too large relative to the rate of change. This is the
+        <em>stability limit</em> you&rsquo;ll study in Section 4.5.
+    </div>
+</div>
+
+<!-- ===== Test Your Understanding #3 ===== -->
+<div class="interactive-container question-section">
+    <div class="interactive-title">Test Your Understanding</div>
+
+    <p style="margin-bottom: var(--spacing-md); color: var(--text-secondary);">
+        Use Explorer 3 to answer these questions.
+    </p>
+
+    <div class="tabs">
+        <div class="tab-buttons">
+            <button class="tab-button active">Question 7</button>
+            <button class="tab-button">Question 8</button>
+            <button class="tab-button">Question 9</button>
+        </div>
+
+        <!-- Q7: Fill -->
+        <div class="tab-content active">
+            <div class="question-container" data-type="fill" data-answer="0.40[0.35,0.45]">
+                <div class="question-text">
+                    Select the <strong>decay</strong> ODE (\(dx/dt = -2x\)) with \(h = 0.30\), starting from \(x_0 = 1\).
+                    Compute the <em>first step by hand</em>:
+                    <br><br>
+                    \(x_1 = x_0 + h \cdot f(x_0) = 1 + 0.3 \times (-2 \times 1) = \)
+                    <input type="text" class="fill-blank" placeholder="?">
+                    <br><em>(Verify your answer matches the plot!)</em>
+                </div>
+                <div class="question-actions">
+                    <button class="btn-verify">Verify</button>
+                </div>
+                <div class="question-explanation" style="display:none;">
+                    <strong>Explanation:</strong>
+                    \(x_1 = 1 + 0.3 \times (-2) = 1 - 0.6 = 0.4\).
+                    The slope \(f(x_0) = -2 \times 1 = -2\) is steep and negative,
+                    so the solution drops quickly. Check the first point on the cyan curve!
+                </div>
+            </div>
+        </div>
+
+        <!-- Q8: MCQ -->
+        <div class="tab-content">
+            <div class="question-container" data-type="mcq" data-answer="2">
+                <div class="question-text">
+                    Select the <strong>growth</strong> ODE (\(dx/dt = x\)) and increase \(h\) from 0.10 to 0.80.
+                    What happens to the error (right panel)?
+                </div>
+                <div class="question-options">
+                    <label class="option">
+                        <input type="radio" name="q-fl-8" value="0">
+                        <span>Error stays roughly the same</span>
+                    </label>
+                    <label class="option">
+                        <input type="radio" name="q-fl-8" value="1">
+                        <span>Error decreases (bigger steps are better)</span>
+                    </label>
+                    <label class="option">
+                        <input type="radio" name="q-fl-8" value="2">
+                        <span>Error grows dramatically &mdash; the solution may even explode</span>
+                    </label>
+                </div>
+                <div class="question-actions">
+                    <button class="btn-verify">Verify</button>
+                </div>
+                <div class="question-explanation" style="display:none;">
+                    <strong>Explanation:</strong>
+                    For a growth ODE, each Euler step overshoots the true curve.
+                    Larger \(h\) makes the overshoot worse, and the errors compound
+                    exponentially. At \(h = 0.80\), the solution can grow orders of magnitude
+                    too fast &mdash; a clear sign that your step size is too large.
+                </div>
+            </div>
+        </div>
+
+        <!-- Q9: Fill with dropdown -->
+        <div class="tab-content">
+            <div class="question-container" data-type="fill" data-answer="halves|doubles">
+                <div class="question-text">
+                    For the <strong>decay</strong> ODE (\(dx/dt = -2x\)), compare the final error at
+                    \(h = 0.40\) vs.&nbsp;\(h = 0.20\). When you halve the step size, the error roughly:
+                    <select class="fill-blank-select">
+                        <option value=""></option>
+                        <option value="halves">halves</option>
+                        <option value="doubles">doubles</option>
+                        <option value="quarters">quarters</option>
+                        <option value="stays the same">stays the same</option>
+                    </select>
+                    <br>
+                    And the number of steps:
+                    <select class="fill-blank-select">
+                        <option value=""></option>
+                        <option value="halves">halves</option>
+                        <option value="doubles">doubles</option>
+                        <option value="quarters">quarters</option>
+                        <option value="stays the same">stays the same</option>
+                    </select>
+                </div>
+                <div class="question-actions">
+                    <button class="btn-verify">Verify</button>
+                </div>
+                <div class="question-explanation" style="display:none;">
+                    <strong>Explanation:</strong>
+                    Euler&rsquo;s method is <em>first-order accurate</em>: halving \(h\) roughly halves the error.
+                    But you need twice as many steps to cover the same time interval.
+                    This accuracy&ndash;cost tradeoff is the central tension in all numerical methods.
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<hr>
+
+<!-- ========== CODE EXAMPLES ========== -->
+<h2>Python: Writing Your Own Loops</h2>
+
+<div class="tabs">
+    <div class="tab-buttons">
+        <button class="tab-button active">Basic Loop</button>
+        <button class="tab-button">Growth Comparison</button>
+        <button class="tab-button">Euler Loop</button>
+        <button class="tab-button">Prompt</button>
+    </div>
+
+    <!-- Tab 1: Basic loop -->
+    <div class="tab-content active">
+        <div class="code-block-container">
+            <div class="code-header">
+                <span class="code-lang">Python</span>
+                <button class="copy-btn">Copy</button>
+            </div>
+            <pre><code class="language-python">
+# The anatomy of a for loop
+# Initialize → Loop → Store
+
+import numpy as np
+
+# Initialize
+x = 0.0
+h = 0.5
+x_list = [x]       # store initial value
+
+# Loop: repeat 10 times
+for i in range(10):
+    x = x + h       # update rule (additive)
+    x_list.append(x) # store new value
+
+# Result
+t = np.arange(0, len(x_list)) * h
+print("Steps:", len(x_list) - 1)
+print("Final value:", x_list[-1])
+print("All values:", [round(v, 2) for v in x_list])
+            </code></pre>
+        </div>
+    </div>
+
+    <!-- Tab 2: Growth comparison -->
+    <div class="tab-content">
+        <div class="code-block-container">
+            <div class="code-header">
+                <span class="code-lang">Python</span>
+                <button class="copy-btn">Copy</button>
+            </div>
+            <pre><code class="language-python">
+import numpy as np
+import plotly.graph_objects as go
+
+h, N = 0.3, 20
+
+# Three update rules, same loop structure
+t_arr = [0.0]
+x_add = [0.0]   # x = x + 1
+x_mult = [1.0]  # x = (1+h) * x
+x_quad = [0.0]  # x = x + t
+
+for i in range(N):
+    t_new = t_arr[-1] + h
+    x_add.append(x_add[-1] + 1.0)
+    x_mult.append((1 + h) * x_mult[-1])
+    x_quad.append(x_quad[-1] + t_arr[-1] * h)
+    t_arr.append(t_new)
+
+fig = go.Figure()
+fig.add_trace(go.Scatter(x=t_arr, y=x_add, name='x + 1 (linear)',
+    line=dict(color='#00f3ff', width=2), mode='lines+markers'))
+fig.add_trace(go.Scatter(x=t_arr, y=x_mult, name='(1+h)·x (exponential)',
+    line=dict(color='#ff00ff', width=2), mode='lines+markers'))
+fig.add_trace(go.Scatter(x=t_arr, y=x_quad, name='x + t·h (quadratic)',
+    line=dict(color='#ffff00', width=2), mode='lines+markers'))
+
+fig.update_layout(
+    template='plotly_dark',
+    title='Three Growth Patterns from the Same Loop',
+    xaxis=dict(title='t', range=[0, N*h],
+               gridcolor='#2a2f4a', zerolinecolor='#808080', linecolor='#808080'),
+    yaxis=dict(title='x(t)', range=[0, max(x_mult)*1.1],
+               gridcolor='#2a2f4a', zerolinecolor='#808080', linecolor='#808080'),
+)
+fig.show()
+            </code></pre>
+        </div>
+    </div>
+
+    <!-- Tab 3: Euler loop -->
+    <div class="tab-content">
+        <div class="code-block-container">
+            <div class="code-header">
+                <span class="code-lang">Python</span>
+                <button class="copy-btn">Copy</button>
+            </div>
+            <pre><code class="language-python">
+import numpy as np
+import plotly.graph_objects as go
+
+# --- The Euler loop recipe ---
+def euler_solve(f, x0, t_max, h):
+    """Solve dx/dt = f(x, t) using Euler's method."""
+    t_list = [0.0]
+    x_list = [x0]
+
+    t, x = 0.0, x0
+    N = int(t_max / h)
+
+    for i in range(N):
+        x = x + h * f(x, t)   # THE update recipe
+        t = t + h
+        t_list.append(t)
+        x_list.append(x)
+
+    return np.array(t_list), np.array(x_list)
+
+# Solve dx/dt = -2x  (exact: exp(-2t))
+f = lambda x, t: -2 * x
+t_euler, x_euler = euler_solve(f, x0=1.0, t_max=3.0, h=0.2)
+
+# Exact solution for comparison
+t_exact = np.linspace(0, 3, 300)
+x_exact = np.exp(-2 * t_exact)
+
+fig = go.Figure()
+fig.add_trace(go.Scatter(x=t_exact, y=x_exact, name='Exact: exp(-2t)',
+    line=dict(color='#808080', width=2, dash='dash')))
+fig.add_trace(go.Scatter(x=t_euler, y=x_euler, name='Euler (h=0.2)',
+    line=dict(color='#00f3ff', width=2), mode='lines+markers',
+    marker=dict(size=6)))
+
+fig.update_layout(
+    template='plotly_dark',
+    title='Euler Loop in Action: dx/dt = -2x',
+    xaxis=dict(title='t', range=[0, 3],
+               gridcolor='#2a2f4a', zerolinecolor='#808080', linecolor='#808080'),
+    yaxis=dict(title='x(t)', range=[-0.2, 1.2],
+               gridcolor='#2a2f4a', zerolinecolor='#808080', linecolor='#808080'),
+)
+fig.show()
+            </code></pre>
+        </div>
+    </div>
+
+    <!-- Tab 4: Prompt -->
+    <div class="tab-content">
+        <div class="code-block-container">
+            <div class="code-header">
+                <span class="code-lang">Prompt for AI</span>
+                <button class="copy-btn">Copy</button>
+            </div>
+            <pre><code class="language-text">Write a Python script that demonstrates three different loop update rules:
+
+1. ADDITIVE: x = x + c (constant increment, linear growth)
+2. MULTIPLICATIVE: x = (1 + h) * x (exponential growth)
+3. EULER DECAY: x = x + h * (-2 * x) (Euler method for dx/dt = -2x)
+
+Requirements:
+- Use a simple for loop with range(N)
+- Build lists with .append() — no pre-allocated arrays
+- Plot all three on the same graph using Plotly (not matplotlib)
+- Also plot the exact solutions (straight line, exp((1+h)t), exp(-2t))
+- Use dark theme (plotly_dark), fixed axis ranges
+- Colors: cyan (#00f3ff), magenta (#ff00ff), yellow (#ffff00)
+- Gray axes (#808080), grid color #2a2f4a
+- Show step markers on the numerical curves
+- Print the final error for each method
+
+Explain: Why does the additive rule give a straight line?
+Why does the Euler decay eventually match exp(-2t)?</code></pre>
+        </div>
+
+        <div class="info-box" style="margin-top: var(--spacing-md);">
+            <div class="info-box-title">Pro Tips for Prompting</div>
+            <ul>
+                <li>Ask for <code>.append()</code> explicitly &mdash; AI often pre-allocates with <code>np.zeros</code> which hides the loop logic</li>
+                <li>Request exact solutions for comparison &mdash; seeing how close the loop gets builds trust</li>
+                <li>Ask the AI to print intermediate values so you can trace the loop by hand</li>
+            </ul>
+        </div>
+    </div>
+</div>
+
+<hr>
+
+<!-- ========== NAVIGATION ========== -->
+<div class="btn-group mt-xl">
+    <button class="btn btn-magenta" onclick="navigateToSection('35-euler-formula')">&larr; Previous: The Euler Method Formula</button>
+    <button class="btn" onclick="scrollToTop()">&uarr; Back to Top</button>
+    <button class="btn btn-secondary" onclick="navigateToSection('37-coding-euler')">Next: Coding Euler&rsquo;s Method &rarr;</button>
+</div>

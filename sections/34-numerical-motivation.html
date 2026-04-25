@@ -1,0 +1,853 @@
+<!-- Section 4.1: Why Can't We Solve All Equations? -->
+<!-- Source: Module 6 - Implementation of Euler's Method.nb (Part 1) -->
+<!-- Core concept: Motivation for numerical methods — when analytical solutions fail -->
+<!-- Time: ~20 minutes -->
+<!-- Prerequisites: Chapter 3 (SHO, pendulum, basic ODE concepts) -->
+
+<h1>Why Can&rsquo;t We Solve All Equations?</h1>
+
+<p>
+    Throughout Chapter&nbsp;3, you wielded powerful formulas &mdash;
+    \( x = A\cos(\omega t + \varphi) \) for the harmonic oscillator,
+    exponential decay \( e^{-\gamma t} \) for damping, steady-state
+    amplitudes for driven systems.  Every differential equation you met
+    had a neat, closed-form answer.
+</p>
+
+<p>
+    Here&rsquo;s the uncomfortable truth: <strong>you&rsquo;ve been
+    solving the easy ones.</strong>  Most differential equations that
+    arise in real physics &mdash; from planetary orbits to turbulent
+    flow to protein folding &mdash; have <em>no</em> closed-form
+    solution.  Not because we haven&rsquo;t been clever enough, but
+    because the solutions literally cannot be written in terms of
+    functions you know.
+</p>
+
+<p>
+    This isn&rsquo;t a failure of mathematics.  It&rsquo;s a call to
+    build better tools.  In this chapter, you&rsquo;ll learn to solve
+    <em>any</em> differential equation &mdash; not with algebra, but
+    with computation.  First, let&rsquo;s see exactly where pen-and-paper
+    methods hit a wall.
+</p>
+
+<div class="info-box">
+    <div class="info-box-title">Learning Objectives</div>
+    <ul>
+        <li>Recognize which differential equations have analytical solutions and which don&rsquo;t</li>
+        <li>Understand that <em>nonlinearity</em> is what makes most physics equations unsolvable</li>
+        <li>See how the small-angle approximation breaks down for the real pendulum</li>
+        <li>Visualize the core idea behind numerical methods: following slopes step by step</li>
+    </ul>
+</div>
+
+<p>
+    Your analytical toolkit has three main tricks:
+    <strong>direct integration</strong> (when the right-hand side doesn&rsquo;t
+    involve the unknown), <strong>separation of variables</strong> (when you
+    can isolate \(x\) and \(t\) on different sides), and <strong>the
+    characteristic equation</strong> (for linear ODEs with constant
+    coefficients, like the SHO).  These cover a surprising range of
+    problems &mdash; but they all rely on one crucial property:
+    <em>linearity</em>.
+</p>
+
+<hr>
+
+<!-- ========== EXPLORER 1: EQUATION SORTER ========== -->
+
+<div class="interactive-container" id="equation-sorter">
+    <div class="interactive-title">Explorer 1: The Equation Sorter</div>
+
+    <p style="margin-bottom: 0.5rem;">
+        Below are six differential equations from physics.  Click each one
+        to discover whether your analytical toolkit can solve it &mdash;
+        or whether it hits a wall.
+    </p>
+
+    <div id="numMotiv-tally" style="text-align: center; font-size: 1.05em; margin: 1rem 0; color: #ccc;">
+        Explored: <strong id="numMotiv-tally-count">0</strong> / 6
+    </div>
+
+    <div id="numMotiv-card-grid" style="display: grid; grid-template-columns: repeat(auto-fill, minmax(min(100%, 300px), 1fr)); gap: 1rem;">
+
+        <!-- Card 0: Free fall — Solvable -->
+        <div class="numMotiv-card" id="numMotiv-card-0" onclick="revealEquation(0)"
+             style="background: #1a1f3e; border: 2px solid #2a2f4a; border-radius: 8px; padding: 1.2rem; cursor: pointer; transition: border-color 0.3s;">
+            <div style="text-align: center; font-size: 0.85em; color: #888; margin-bottom: 0.3rem;">Dropping a ball</div>
+            <div style="text-align: center;">
+                $$ \frac{dx}{dt} = 2t $$
+            </div>
+            <div id="numMotiv-reveal-0" style="display: none; padding-top: 0.8rem; border-top: 1px solid #2a2f4a;">
+                <div style="color: #00ff9f; font-weight: bold; font-size: 1.05em;">&check; Solvable</div>
+                <p style="margin: 0.4rem 0 0; font-size: 0.9em;">
+                    Direct integration: \( x = t^2 + C \).  The right-hand side is
+                    just \(t\) &mdash; no \(x\) involved.
+                </p>
+            </div>
+            <div id="numMotiv-btn-0" style="text-align: center; color: #00f3ff; font-size: 0.85em; margin-top: 0.6rem;">
+                &#9654; Click to reveal
+            </div>
+        </div>
+
+        <!-- Card 1: Radioactive decay — Solvable -->
+        <div class="numMotiv-card" id="numMotiv-card-1" onclick="revealEquation(1)"
+             style="background: #1a1f3e; border: 2px solid #2a2f4a; border-radius: 8px; padding: 1.2rem; cursor: pointer; transition: border-color 0.3s;">
+            <div style="text-align: center; font-size: 0.85em; color: #888; margin-bottom: 0.3rem;">Radioactive decay</div>
+            <div style="text-align: center;">
+                $$ \frac{dx}{dt} = -3x $$
+            </div>
+            <div id="numMotiv-reveal-1" style="display: none; padding-top: 0.8rem; border-top: 1px solid #2a2f4a;">
+                <div style="color: #00ff9f; font-weight: bold; font-size: 1.05em;">&check; Solvable</div>
+                <p style="margin: 0.4rem 0 0; font-size: 0.9em;">
+                    Separation of variables: \( dx/x = -3\,dt \) gives
+                    \( x = x_0\,e^{-3t} \).
+                </p>
+            </div>
+            <div id="numMotiv-btn-1" style="text-align: center; color: #00f3ff; font-size: 0.85em; margin-top: 0.6rem;">
+                &#9654; Click to reveal
+            </div>
+        </div>
+
+        <!-- Card 2: SHO — Solvable -->
+        <div class="numMotiv-card" id="numMotiv-card-2" onclick="revealEquation(2)"
+             style="background: #1a1f3e; border: 2px solid #2a2f4a; border-radius: 8px; padding: 1.2rem; cursor: pointer; transition: border-color 0.3s;">
+            <div style="text-align: center; font-size: 0.85em; color: #888; margin-bottom: 0.3rem;">Mass on a spring</div>
+            <div style="text-align: center;">
+                $$ \ddot{x} + \omega^2 x = 0 $$
+            </div>
+            <div id="numMotiv-reveal-2" style="display: none; padding-top: 0.8rem; border-top: 1px solid #2a2f4a;">
+                <div style="color: #00ff9f; font-weight: bold; font-size: 1.05em;">&check; Solvable</div>
+                <p style="margin: 0.4rem 0 0; font-size: 0.9em;">
+                    Characteristic equation: \( r^2 + \omega^2 = 0 \) gives
+                    \( x = A\cos(\omega t + \varphi) \).  You solved this in Chapter&nbsp;3!
+                </p>
+            </div>
+            <div id="numMotiv-btn-2" style="text-align: center; color: #00f3ff; font-size: 0.85em; margin-top: 0.6rem;">
+                &#9654; Click to reveal
+            </div>
+        </div>
+
+        <!-- Card 3: Full pendulum — NOT solvable -->
+        <div class="numMotiv-card" id="numMotiv-card-3" onclick="revealEquation(3)"
+             style="background: #1a1f3e; border: 2px solid #2a2f4a; border-radius: 8px; padding: 1.2rem; cursor: pointer; transition: border-color 0.3s;">
+            <div style="text-align: center; font-size: 0.85em; color: #888; margin-bottom: 0.3rem;">Real pendulum</div>
+            <div style="text-align: center;">
+                $$ \ddot{\theta} = -\frac{g}{L}\sin\theta $$
+            </div>
+            <div id="numMotiv-reveal-3" style="display: none; padding-top: 0.8rem; border-top: 1px solid #2a2f4a;">
+                <div style="color: #ff00ff; font-weight: bold; font-size: 1.05em;">&cross; No closed form</div>
+                <p style="margin: 0.4rem 0 0; font-size: 0.9em;">
+                    The \(\sin\theta\) makes this <em>nonlinear</em>.  No combination
+                    of elementary functions solves it exactly.  (The solution involves
+                    &ldquo;elliptic integrals&rdquo; &mdash; not in your toolkit.)
+                </p>
+            </div>
+            <div id="numMotiv-btn-3" style="text-align: center; color: #00f3ff; font-size: 0.85em; margin-top: 0.6rem;">
+                &#9654; Click to reveal
+            </div>
+        </div>
+
+        <!-- Card 4: Duffing — NOT solvable -->
+        <div class="numMotiv-card" id="numMotiv-card-4" onclick="revealEquation(4)"
+             style="background: #1a1f3e; border: 2px solid #2a2f4a; border-radius: 8px; padding: 1.2rem; cursor: pointer; transition: border-color 0.3s;">
+            <div style="text-align: center; font-size: 0.85em; color: #888; margin-bottom: 0.3rem;">Stiffening spring</div>
+            <div style="text-align: center;">
+                $$ \ddot{x} + x^3 = 0 $$
+            </div>
+            <div id="numMotiv-reveal-4" style="display: none; padding-top: 0.8rem; border-top: 1px solid #2a2f4a;">
+                <div style="color: #ff00ff; font-weight: bold; font-size: 1.05em;">&cross; No closed form</div>
+                <p style="margin: 0.4rem 0 0; font-size: 0.9em;">
+                    The cubic \(x^3\) couples the solution to itself nonlinearly.
+                    This is the Duffing oscillator &mdash; important for real springs,
+                    but unsolvable with elementary functions.
+                </p>
+            </div>
+            <div id="numMotiv-btn-4" style="text-align: center; color: #00f3ff; font-size: 0.85em; margin-top: 0.6rem;">
+                &#9654; Click to reveal
+            </div>
+        </div>
+
+        <!-- Card 5: Van der Pol — NOT solvable -->
+        <div class="numMotiv-card" id="numMotiv-card-5" onclick="revealEquation(5)"
+             style="background: #1a1f3e; border: 2px solid #2a2f4a; border-radius: 8px; padding: 1.2rem; cursor: pointer; transition: border-color 0.3s;">
+            <div style="text-align: center; font-size: 0.85em; color: #888; margin-bottom: 0.3rem;">Heartbeat oscillator</div>
+            <div style="text-align: center;">
+                $$ \ddot{x} + \mu(x^2 - 1)\dot{x} + x = 0 $$
+            </div>
+            <div id="numMotiv-reveal-5" style="display: none; padding-top: 0.8rem; border-top: 1px solid #2a2f4a;">
+                <div style="color: #ff00ff; font-weight: bold; font-size: 1.05em;">&cross; No closed form</div>
+                <p style="margin: 0.4rem 0 0; font-size: 0.9em;">
+                    The Van der Pol equation: the \(x^2 - 1\) in the damping creates
+                    self-sustaining oscillations (heartbeats, circuits).  The nonlinear
+                    damping makes it analytically intractable.
+                </p>
+            </div>
+            <div id="numMotiv-btn-5" style="text-align: center; color: #00f3ff; font-size: 0.85em; margin-top: 0.6rem;">
+                &#9654; Click to reveal
+            </div>
+        </div>
+
+    </div>
+
+    <div id="numMotiv-summary" style="display: none; text-align: center; margin-top: 1.2rem; padding: 1rem; background: #1a1f3e; border-radius: 8px; border: 1px solid #ffff00;">
+        <strong style="color: #ffff00; font-size: 1.1em;">The verdict</strong>
+        <p style="margin: 0.5rem 0 0;">
+            Half the equations &mdash; including some of the most important in
+            physics &mdash; have no closed-form solution.  And this is a
+            <em>generous</em> selection.  In the wild, unsolvable equations
+            outnumber solvable ones by a vast margin.
+        </p>
+    </div>
+</div>
+
+<div class="info-box">
+    <div class="info-box-title">Key Insight</div>
+    <p>
+        What makes an equation unsolvable?  In every case above, the culprit
+        is the same: <strong>nonlinearity</strong>.  When the unknown variable
+        appears inside \(\sin\theta\), or as \(x^3\), or multiplied by itself
+        in the damping term, our algebraic tricks break down.  Linear equations
+        are special &mdash; and nature is not usually that generous.
+    </p>
+</div>
+
+<!-- Test Your Understanding #1 -->
+<div class="interactive-container question-section">
+    <div class="interactive-title">Test Your Understanding</div>
+
+    <p style="margin-bottom: var(--spacing-md); color: var(--text-secondary);">
+        Reflect on what you discovered in the Equation Sorter.
+    </p>
+
+    <div class="tabs">
+        <div class="tab-buttons">
+            <button class="tab-button active">Question 1</button>
+            <button class="tab-button">Question 2</button>
+            <button class="tab-button">Question 3</button>
+        </div>
+
+        <!-- Q1: MCQ -->
+        <div class="tab-content active">
+            <div class="question-container" data-type="mcq" data-answer="1">
+                <div class="question-text">
+                    What do the three unsolvable equations in the sorter have in common?
+                </div>
+                <div class="question-options">
+                    <label class="option">
+                        <input type="radio" name="q-nm-1" value="0">
+                        <span>They all involve second derivatives</span>
+                    </label>
+                    <label class="option">
+                        <input type="radio" name="q-nm-1" value="1">
+                        <span>They all contain the unknown inside a nonlinear function</span>
+                    </label>
+                    <label class="option">
+                        <input type="radio" name="q-nm-1" value="2">
+                        <span>They all have time-dependent coefficients</span>
+                    </label>
+                    <label class="option">
+                        <input type="radio" name="q-nm-1" value="3">
+                        <span>They all lack initial conditions</span>
+                    </label>
+                </div>
+                <div class="question-actions">
+                    <button class="btn-verify">Verify</button>
+                </div>
+                <div class="question-explanation" style="display:none;">
+                    <strong>Explanation:</strong>
+                    The unsolvable equations all have the unknown variable (\(\theta\) or \(x\))
+                    appearing inside a nonlinear function: \(\sin\theta\), \(x^3\), and
+                    \(x^2\dot{x}\).  The solvable equations only have \(x\) appearing
+                    linearly (multiplied by a constant, or not at all).
+                </div>
+            </div>
+        </div>
+
+        <!-- Q2: Fill -->
+        <div class="tab-content">
+            <div class="question-container" data-type="fill" data-answer="linear">
+                <div class="question-text">
+                    The property that makes the SHO equation \(\ddot{x} + \omega^2 x = 0\)
+                    solvable by the characteristic equation method is that it is
+                    <input type="text" class="fill-blank" placeholder="?"> in \(x\).
+                </div>
+                <div class="question-actions">
+                    <button class="btn-verify">Verify</button>
+                </div>
+                <div class="question-explanation" style="display:none;">
+                    <strong>Explanation:</strong>
+                    The equation is <em>linear</em> in \(x\): the unknown and its derivatives
+                    appear only to the first power, never inside nonlinear functions.
+                    This linearity is exactly what lets us use the characteristic equation
+                    \(r^2 + \omega^2 = 0\) to find solutions.
+                </div>
+            </div>
+        </div>
+
+        <!-- Q3: MSQ -->
+        <div class="tab-content">
+            <div class="question-container" data-type="msq" data-answer="0,2">
+                <div class="question-text">
+                    Which of these make an ODE <em>nonlinear</em>?  (Select all that apply.)
+                </div>
+                <div class="question-options">
+                    <label class="option">
+                        <input type="checkbox" value="0">
+                        <span>The unknown \(x\) appears inside \(\sin(x)\) or \(\cos(x)\)</span>
+                    </label>
+                    <label class="option">
+                        <input type="checkbox" value="1">
+                        <span>The equation involves a second derivative \(\ddot{x}\)</span>
+                    </label>
+                    <label class="option">
+                        <input type="checkbox" value="2">
+                        <span>The unknown is multiplied by itself, e.g. \(x^2\) or \(x\dot{x}\)</span>
+                    </label>
+                    <label class="option">
+                        <input type="checkbox" value="3">
+                        <span>The equation has time-dependent coefficients like \(t^2\)</span>
+                    </label>
+                </div>
+                <div class="question-actions">
+                    <button class="btn-verify">Verify</button>
+                </div>
+                <div class="question-explanation" style="display:none;">
+                    <strong>Explanation:</strong>
+                    <ul>
+                        <li><strong>\(\sin(x)\), \(\cos(x)\):</strong> Yes &mdash; these are nonlinear functions of the unknown.</li>
+                        <li><strong>Second derivatives:</strong> No &mdash; \(\ddot{x}\) is still <em>linear</em> in \(x\).  The SHO has \(\ddot{x}\) and is perfectly solvable.</li>
+                        <li><strong>\(x^2\), \(x\dot{x}\):</strong> Yes &mdash; products of the unknown with itself break linearity.</li>
+                        <li><strong>Time-dependent coefficients:</strong> No &mdash; \(t^2\) is a known function, not the unknown.  An equation like \(\dot{x} = t^2\) is still linear (and directly integrable).</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<hr>
+
+<!-- ========== EXPLORER 2: THE NONLINEAR WALL ========== -->
+
+<p>
+    Let&rsquo;s see nonlinearity in action with an equation you already
+    know: the pendulum.  In Chapter&nbsp;3, you used the small-angle
+    approximation \(\sin\theta \approx \theta\) to turn the pendulum into
+    a simple harmonic oscillator.  That trick works beautifully at small
+    swings &mdash; but how far can you push it before it breaks?
+</p>
+
+<div class="interactive-container" id="nonlinear-wall">
+    <div class="interactive-title">Explorer 2: The Nonlinear Wall</div>
+
+    <p style="margin-bottom: 0.5rem;">
+        The non-dimensionalized pendulum: \(\ddot{\theta} = -\sin\theta\)
+        (exact) vs. \(\ddot{\theta} = -\theta\) (small-angle).
+        Drag the slider to increase the initial angle and watch the
+        approximation crumble.
+    </p>
+
+    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 300px), 1fr)); gap: 1rem;">
+        <div class="plot-container" id="numMotiv-pendulum-plot"></div>
+        <div class="plot-container" id="numMotiv-period-plot"></div>
+    </div>
+
+    <div id="numMotiv-pendulum-stats" style="display: flex; justify-content: center; gap: 2rem; margin: 0.8rem 0; font-size: 0.9em; color: #ccc; flex-wrap: wrap;">
+        <span>&theta;<sub>0</sub> = <strong id="numMotiv-theta0-display">45&deg;</strong></span>
+        <span>T<sub>exact</sub> = <strong id="numMotiv-t-exact">6.49</strong></span>
+        <span>T<sub>SHO</sub> = <strong>6.28</strong></span>
+        <span>Error: <strong id="numMotiv-period-error" style="color: #ff00ff;">3.3%</strong></span>
+    </div>
+
+    <div class="control-panel">
+        <div class="control-group">
+            <label class="control-label">Initial angle &theta;<sub>0</sub>:
+                <span class="control-label-value" id="numMotiv-theta0-value">45&deg;</span>
+            </label>
+            <input type="range" class="slider" id="numMotiv-theta0-slider"
+                   min="10" max="170" step="5" value="45">
+        </div>
+    </div>
+</div>
+
+<!-- Test Your Understanding #2 -->
+<div class="interactive-container question-section">
+    <div class="interactive-title">Test Your Understanding</div>
+
+    <p style="margin-bottom: var(--spacing-md); color: var(--text-secondary);">
+        Use Explorer&nbsp;2 to answer these questions.
+    </p>
+
+    <div class="tabs">
+        <div class="tab-buttons">
+            <button class="tab-button active">Question 1</button>
+            <button class="tab-button">Question 2</button>
+            <button class="tab-button">Question 3</button>
+        </div>
+
+        <!-- Q4: MCQ -->
+        <div class="tab-content active">
+            <div class="question-container" data-type="mcq" data-answer="2">
+                <div class="question-text">
+                    At \(\theta_0 = 90°\), roughly how much longer is the true pendulum
+                    period compared to the small-angle prediction \(T_{\text{SHO}} = 2\pi\)?
+                </div>
+                <div class="question-options">
+                    <label class="option">
+                        <input type="radio" name="q-nm-4" value="0">
+                        <span>About 1% longer</span>
+                    </label>
+                    <label class="option">
+                        <input type="radio" name="q-nm-4" value="1">
+                        <span>About 5% longer</span>
+                    </label>
+                    <label class="option">
+                        <input type="radio" name="q-nm-4" value="2">
+                        <span>About 18% longer</span>
+                    </label>
+                    <label class="option">
+                        <input type="radio" name="q-nm-4" value="3">
+                        <span>About 50% longer</span>
+                    </label>
+                </div>
+                <div class="question-actions">
+                    <button class="btn-verify">Verify</button>
+                </div>
+                <div class="question-explanation" style="display:none;">
+                    <strong>Explanation:</strong>
+                    Set the slider to 90&deg; and read the stats bar: the exact period
+                    is about 7.42 vs. the SHO prediction of 6.28, giving roughly 18%
+                    error.  The small-angle formula is significantly off at this amplitude.
+                </div>
+            </div>
+        </div>
+
+        <!-- Q5: Fill -->
+        <div class="tab-content">
+            <div class="question-container" data-type="fill" data-answer="50[45,55]">
+                <div class="question-text">
+                    Using the period-ratio curve (right panel), at approximately what
+                    initial angle (in degrees) does the period error first exceed 5%?
+                    <br><br>
+                    &theta;<sub>0</sub> &asymp; <input type="text" class="fill-blank" placeholder="?"> degrees
+                </div>
+                <div class="question-actions">
+                    <button class="btn-verify">Verify</button>
+                </div>
+                <div class="question-explanation" style="display:none;">
+                    <strong>Explanation:</strong>
+                    The 5% error line on the period curve is crossed near
+                    \(\theta_0 \approx 50°\).  Below this, the small-angle
+                    approximation is reasonable; above it, the nonlinear correction
+                    becomes significant.  Many textbooks quote 15&deg;&ndash;20&deg; as
+                    the &ldquo;safe&rdquo; range for high-precision work.
+                </div>
+            </div>
+        </div>
+
+        <!-- Q6: MCQ -->
+        <div class="tab-content">
+            <div class="question-container" data-type="mcq" data-answer="2">
+                <div class="question-text">
+                    As \(\theta_0\) approaches 180&deg;, what happens to the pendulum&rsquo;s period?
+                </div>
+                <div class="question-options">
+                    <label class="option">
+                        <input type="radio" name="q-nm-6" value="0">
+                        <span>It stays at \(2\pi\)</span>
+                    </label>
+                    <label class="option">
+                        <input type="radio" name="q-nm-6" value="1">
+                        <span>It decreases toward zero</span>
+                    </label>
+                    <label class="option">
+                        <input type="radio" name="q-nm-6" value="2">
+                        <span>It increases without bound (diverges)</span>
+                    </label>
+                    <label class="option">
+                        <input type="radio" name="q-nm-6" value="3">
+                        <span>It oscillates unpredictably</span>
+                    </label>
+                </div>
+                <div class="question-actions">
+                    <button class="btn-verify">Verify</button>
+                </div>
+                <div class="question-explanation" style="display:none;">
+                    <strong>Explanation:</strong>
+                    At \(\theta_0 = 180°\) the pendulum balances at the top &mdash;
+                    an unstable equilibrium.  It takes infinitely long to &ldquo;fall&rdquo;
+                    from there, so the period diverges.  Watch the right panel: the
+                    ratio \(T/T_{\text{SHO}}\) shoots upward as you approach 180&deg;.
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<hr>
+
+<!-- ========== EXPLORER 3: SLOPE FIELD STEPPER ========== -->
+
+<p>
+    So we can&rsquo;t solve most equations on paper.  What <em>can</em> we do?
+</p>
+
+<p>
+    Here&rsquo;s the key insight: even when we can&rsquo;t find a formula for
+    the solution, we always know the <strong>slope</strong>.  A first-order ODE
+    \(\dot{x} = f(x, t)\) tells us: &ldquo;wherever you are, this is the
+    direction to go.&rdquo;  A <strong>slope field</strong> draws that direction
+    at every point.  A numerical method simply <em>follows the arrows</em>,
+    one small step at a time.
+</p>
+
+<div class="interactive-container" id="slope-field-stepper">
+    <div class="interactive-title">Explorer 3: Following the Arrows</div>
+
+    <p style="margin-bottom: 0.5rem;">
+        The ODE \(\dot{x} = \sin(x + t)\) has no closed-form solution.
+        The gray ticks show the slope at every point.  Click
+        <strong>Step</strong> to take one Euler step, or <strong>Auto-Run</strong>
+        to watch the solution build itself.  Try changing the step size!
+    </p>
+
+    <div class="plot-container" id="numMotiv-slope-plot"></div>
+
+    <div class="control-panel">
+        <div class="control-group">
+            <label class="control-label">Step size \(h\):
+                <span class="control-label-value" id="numMotiv-h-value">0.30</span>
+            </label>
+            <input type="range" class="slider" id="numMotiv-h-slider"
+                   min="0.05" max="1.0" step="0.05" value="0.3">
+        </div>
+        <div class="btn-group">
+            <button class="btn" id="numMotiv-step-btn" onclick="numMotivStep()">Step</button>
+            <button class="btn" id="numMotiv-run-btn" onclick="numMotivRun()">&#9654; Auto-Run</button>
+            <button class="btn btn-secondary" id="numMotiv-reset-btn" onclick="numMotivReset()">Reset</button>
+        </div>
+    </div>
+
+    <div style="display: flex; justify-content: center; gap: 2rem; margin: 0.5rem 0; font-size: 0.9em; color: #ccc; flex-wrap: wrap;">
+        <span>Steps taken: <strong id="numMotiv-step-count">0</strong></span>
+        <span>Current position: (<strong id="numMotiv-current-t">0.00</strong>, <strong id="numMotiv-current-x">1.00</strong>)</span>
+    </div>
+</div>
+
+<div class="info-box">
+    <div class="info-box-title">Key Insight</div>
+    <p>
+        Numerical methods don&rsquo;t <em>solve</em> differential equations &mdash;
+        they <strong>follow</strong> them.  At each point, they read the slope
+        from \(f(x, t)\), take a small step in that direction, and repeat.  No
+        algebra, no tricks &mdash; just arithmetic.  The smaller your step, the
+        more faithfully you follow the true path.  In the next section,
+        we&rsquo;ll turn this idea into a precise recipe: <strong>Euler&rsquo;s
+        method</strong>.
+    </p>
+</div>
+
+<!-- Test Your Understanding #3 -->
+<div class="interactive-container question-section">
+    <div class="interactive-title">Test Your Understanding</div>
+
+    <p style="margin-bottom: var(--spacing-md); color: var(--text-secondary);">
+        Use Explorer&nbsp;3 to answer these questions.
+    </p>
+
+    <div class="tabs">
+        <div class="tab-buttons">
+            <button class="tab-button active">Question 1</button>
+            <button class="tab-button">Question 2</button>
+            <button class="tab-button">Question 3</button>
+        </div>
+
+        <!-- Q7: MCQ -->
+        <div class="tab-content active">
+            <div class="question-container" data-type="mcq" data-answer="1">
+                <div class="question-text">
+                    What does each short gray line segment in the slope field represent?
+                </div>
+                <div class="question-options">
+                    <label class="option">
+                        <input type="radio" name="q-nm-7" value="0">
+                        <span>The velocity of a particle at that point</span>
+                    </label>
+                    <label class="option">
+                        <input type="radio" name="q-nm-7" value="1">
+                        <span>The slope \(dx/dt\) at that point &mdash; the direction the solution would go</span>
+                    </label>
+                    <label class="option">
+                        <input type="radio" name="q-nm-7" value="2">
+                        <span>The error of the numerical method at that point</span>
+                    </label>
+                    <label class="option">
+                        <input type="radio" name="q-nm-7" value="3">
+                        <span>The acceleration of the solution at that point</span>
+                    </label>
+                </div>
+                <div class="question-actions">
+                    <button class="btn-verify">Verify</button>
+                </div>
+                <div class="question-explanation" style="display:none;">
+                    <strong>Explanation:</strong>
+                    Each tick shows \(dx/dt = f(x, t)\) at that grid point.  It&rsquo;s
+                    the direction the solution <em>would</em> travel if it passed through
+                    that point.  The collection of all these ticks is called a
+                    <strong>slope field</strong> (or direction field).
+                </div>
+            </div>
+        </div>
+
+        <!-- Q8: MCQ -->
+        <div class="tab-content">
+            <div class="question-container" data-type="mcq" data-answer="1">
+                <div class="question-text">
+                    Reset the explorer and try two runs: one with \(h = 1.0\) and
+                    one with \(h = 0.1\).  What happens when you decrease the step size?
+                </div>
+                <div class="question-options">
+                    <label class="option">
+                        <input type="radio" name="q-nm-8" value="0">
+                        <span>The Euler path becomes a straight line</span>
+                    </label>
+                    <label class="option">
+                        <input type="radio" name="q-nm-8" value="1">
+                        <span>The Euler path follows the slope field (and true solution) more closely</span>
+                    </label>
+                    <label class="option">
+                        <input type="radio" name="q-nm-8" value="2">
+                        <span>The slope field itself changes shape</span>
+                    </label>
+                    <label class="option">
+                        <input type="radio" name="q-nm-8" value="3">
+                        <span>The solution diverges faster</span>
+                    </label>
+                </div>
+                <div class="question-actions">
+                    <button class="btn-verify">Verify</button>
+                </div>
+                <div class="question-explanation" style="display:none;">
+                    <strong>Explanation:</strong>
+                    Smaller steps mean the method re-checks the slope more often,
+                    so it stays closer to the true curve (green dashed line).  With
+                    \(h = 1.0\), the steps are so large they overshoot &mdash; with
+                    \(h = 0.1\), the Euler path nearly overlaps the true solution.
+                    The slope field itself never changes; only the path through it does.
+                </div>
+            </div>
+        </div>
+
+        <!-- Q9: MSQ -->
+        <div class="tab-content">
+            <div class="question-container" data-type="msq" data-answer="0,2">
+                <div class="question-text">
+                    Which statements about numerical methods are TRUE?  (Select all that apply.)
+                </div>
+                <div class="question-options">
+                    <label class="option">
+                        <input type="checkbox" value="0">
+                        <span>They approximate the solution step by step</span>
+                    </label>
+                    <label class="option">
+                        <input type="checkbox" value="1">
+                        <span>They always give exact answers</span>
+                    </label>
+                    <label class="option">
+                        <input type="checkbox" value="2">
+                        <span>They only need the slope function \(f(x,t)\) and initial conditions</span>
+                    </label>
+                    <label class="option">
+                        <input type="checkbox" value="3">
+                        <span>They require knowing the analytical solution first</span>
+                    </label>
+                </div>
+                <div class="question-actions">
+                    <button class="btn-verify">Verify</button>
+                </div>
+                <div class="question-explanation" style="display:none;">
+                    <strong>Explanation:</strong>
+                    <ul>
+                        <li><strong>Step by step:</strong> True &mdash; that&rsquo;s exactly how they work: compute slope, step, repeat.</li>
+                        <li><strong>Exact answers:</strong> False &mdash; numerical methods give <em>approximations</em> that get better with smaller steps.</li>
+                        <li><strong>Only need \(f\) and ICs:</strong> True &mdash; you never need to &ldquo;solve&rdquo; the equation.  You just evaluate \(f(x,t)\) at each step.</li>
+                        <li><strong>Need the analytical solution:</strong> False &mdash; the whole point is that no analytical solution exists!</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<hr>
+
+<!-- ========== CODE EXAMPLES ========== -->
+
+<h2 style="margin-top: 2rem;">Python Code Examples</h2>
+
+<div class="tabs">
+    <div class="tab-buttons">
+        <button class="tab-button active">Pendulum Comparison</button>
+        <button class="tab-button">Slope Field</button>
+        <button class="tab-button">Prompt</button>
+    </div>
+
+    <!-- Tab 1: Pendulum -->
+    <div class="tab-content active">
+        <div class="code-block-container">
+            <div class="code-header">
+                <span class="code-lang">Python</span>
+                <button class="copy-btn">Copy</button>
+            </div>
+            <pre><code class="language-python">import numpy as np
+from scipy.integrate import solve_ivp
+import plotly.graph_objects as go
+
+# Non-dimensionalized pendulum: theta'' = -sin(theta)
+def pendulum(t, y):
+    return [y[1], -np.sin(y[0])]
+
+# Small-angle (SHO): theta'' = -theta
+def sho(t, y):
+    return [y[1], -y[0]]
+
+theta0 = np.radians(90)   # Try 30, 90, 150
+t_span = (0, 20)
+t_eval = np.linspace(0, 20, 1000)
+
+sol_full = solve_ivp(pendulum, t_span, [theta0, 0], t_eval=t_eval)
+sol_sho  = solve_ivp(sho,     t_span, [theta0, 0], t_eval=t_eval)
+
+fig = go.Figure()
+fig.add_trace(go.Scatter(
+    x=sol_full.t, y=np.degrees(sol_full.y[0]),
+    mode='lines', name='Full pendulum',
+    line=dict(color='#00f3ff', width=2)))
+fig.add_trace(go.Scatter(
+    x=sol_sho.t, y=np.degrees(sol_sho.y[0]),
+    mode='lines', name='Small-angle approx',
+    line=dict(color='#ff00ff', width=2, dash='dash')))
+
+fig.update_layout(
+    template='plotly_dark',
+    title='Pendulum: Exact vs Small-Angle',
+    xaxis=dict(title='Time (τ)', range=[0, 20],
+        gridcolor='#2a2f4a', zerolinecolor='#808080',
+        linecolor='#808080'),
+    yaxis=dict(title='Angle (degrees)', range=[-180, 180],
+        gridcolor='#2a2f4a', zerolinecolor='#808080',
+        linecolor='#808080'))
+fig.show()</code></pre>
+        </div>
+    </div>
+
+    <!-- Tab 2: Slope Field -->
+    <div class="tab-content">
+        <div class="code-block-container">
+            <div class="code-header">
+                <span class="code-lang">Python</span>
+                <button class="copy-btn">Copy</button>
+            </div>
+            <pre><code class="language-python">import numpy as np
+import plotly.graph_objects as go
+
+# ODE: dx/dt = sin(x + t) — no closed-form solution!
+def f(x, t):
+    return np.sin(x + t)
+
+fig = go.Figure()
+
+# Draw slope field as short line segments
+L = 0.18
+t_ticks, x_ticks = [], []
+for t in np.arange(0, 8.5, 0.5):
+    for x in np.arange(-4, 4.5, 0.5):
+        m = f(x, t)
+        norm = np.sqrt(1 + m**2)
+        dt = L / norm
+        dx = L * m / norm
+        t_ticks.extend([t - dt, t + dt, None])
+        x_ticks.extend([x - dx, x + dx, None])
+
+fig.add_trace(go.Scatter(
+    x=t_ticks, y=x_ticks,
+    mode='lines', line=dict(color='#555', width=1),
+    showlegend=False))
+
+# Euler solution with small h for "truth"
+h = 0.01
+t_sol, x_sol = [0.0], [1.0]
+while t_sol[-1] < 8:
+    x_sol.append(x_sol[-1] + h * f(x_sol[-1], t_sol[-1]))
+    t_sol.append(t_sol[-1] + h)
+
+fig.add_trace(go.Scatter(
+    x=t_sol, y=x_sol, mode='lines',
+    name='Solution from x(0) = 1',
+    line=dict(color='#00f3ff', width=2)))
+
+fig.update_layout(
+    template='plotly_dark',
+    title='Slope Field: dx/dt = sin(x + t)',
+    xaxis=dict(title='t', range=[0, 8],
+        gridcolor='#2a2f4a', zerolinecolor='#808080',
+        linecolor='#808080'),
+    yaxis=dict(title='x', range=[-4, 4],
+        gridcolor='#2a2f4a', zerolinecolor='#808080',
+        linecolor='#808080'))
+fig.show()</code></pre>
+        </div>
+    </div>
+
+    <!-- Tab 3: Prompt -->
+    <div class="tab-content">
+        <div class="code-block-container">
+            <div class="code-header">
+                <span class="code-lang">Prompt for AI</span>
+                <button class="copy-btn">Copy</button>
+            </div>
+            <pre><code class="language-text">Create two Python visualizations using Plotly (not matplotlib):
+
+1. PENDULUM COMPARISON
+   - Solve the nonlinear pendulum θ'' = -sin(θ) numerically
+     using scipy.integrate.solve_ivp
+   - Compare with the small-angle approximation θ(t) = θ₀ cos(t)
+   - Plot both on the same axes for θ₀ = 90°
+   - Show how the exact period is longer than 2π
+
+2. SLOPE FIELD
+   - For the ODE dx/dt = sin(x + t), draw a slope field:
+     short line segments showing the slope at each grid point
+   - Overlay a numerical solution starting from x(0) = 1
+   - Use a single scatter trace with None separators for the ticks
+
+Style requirements:
+- Dark theme: template='plotly_dark'
+- Data colors: cyan (#00f3ff), magenta (#ff00ff) dashed for approx
+- Gray axes: zerolinecolor='#808080', linecolor='#808080'
+- Grid: '#2a2f4a'
+- FIXED axis ranges (not auto-scaling)</code></pre>
+        </div>
+
+        <div class="info-box" style="margin-top: var(--spacing-md);">
+            <div class="info-box-title">Pro Tips for Prompting</div>
+            <ul>
+                <li>Specify <code>Plotly</code> and <code>scipy</code> explicitly &mdash; AI defaults vary</li>
+                <li>Give exact colors and axis ranges for reproducibility</li>
+                <li>Describe the <em>physics</em>, not just the plot &mdash; the AI can help verify your code</li>
+                <li>Ask for slope field ticks as a single trace with <code>None</code> separators for performance</li>
+            </ul>
+        </div>
+    </div>
+</div>
+
+<hr>
+
+<!-- ========== NAVIGATION ========== -->
+<div class="btn-group mt-xl">
+    <button class="btn btn-magenta" onclick="navigateToSection('32-runge-kutta')">&larr; Previous: Better Algorithms (RK2)</button>
+    <button class="btn" onclick="scrollToTop()">&uarr; Back to Top</button>
+    <button class="btn btn-secondary" onclick="navigateToSection('35-euler-formula')">Next: The Euler Method Formula &rarr;</button>
+</div>

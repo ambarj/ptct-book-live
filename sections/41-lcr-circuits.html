@@ -1,0 +1,694 @@
+<!--
+    Section 4.8: LCR Circuits: Electrical Oscillations
+    Source: NPTEL Module 7 (Euler for Oscillations), Module 4 (Oscillations Review), Module 5 (Damping)
+    Concept: Apply vector Euler to LCR circuit; non-dimensionalization reveals single control parameter
+    Time: ~18 minutes
+    Prerequisites: Sections 4.6-4.7 (order reduction, coupled systems), Section 3.4 (one equation many systems)
+-->
+
+<h1>LCR Circuits: Electrical Oscillations</h1>
+
+<p>
+    A charged capacitor in an LCR circuit is a damped oscillator: the charge sloshes back and forth
+    between capacitor and inductor, while the resistor bleeds energy as heat. The governing equation
+    is identical to the mechanical oscillator you already know.
+</p>
+
+<div class="info-box">
+    <div class="info-box-title">Learning Objectives</div>
+    <ul>
+        <li>Solve the LCR circuit equation numerically using vector Euler's method</li>
+        <li>Discover that a single non-dimensional parameter \( w = L/(R^2 C) \) controls the entire behavior</li>
+        <li>Track energy flow between capacitor, inductor, and resistor dissipation</li>
+    </ul>
+</div>
+
+<div class="equation-display">
+    <p><strong>LCR Circuit Equation:</strong></p>
+    $$ L\frac{d^2Q}{dt^2} + R\frac{dQ}{dt} + \frac{Q}{C} = 0 $$
+    <p>Compare with the mechanical oscillator: \( m\ddot{x} + b\dot{x} + kx = 0 \).
+    The mapping is \( L \leftrightarrow m \), \( R \leftrightarrow b \), \( 1/C \leftrightarrow k \).</p>
+</div>
+
+<p>
+    After non-dimensionalizing (scaling time by \( RC \) and charge by \( Q_0 \)), the equation
+    becomes \( \ddot{Q} + \dot{Q} + wQ = 0 \) where the single parameter
+    \( w = L/(R^2 C) \) controls everything. The coupled first-order system is:
+</p>
+
+<div class="equation-display">
+    $$ \frac{dQ}{dt} = I, \qquad \frac{dI}{dt} = -wQ - I $$
+</div>
+
+<hr>
+
+<!-- ============================================================ -->
+<!-- EXPLORER 1: LCR Simulator -->
+<!-- ============================================================ -->
+<div class="interactive-container" id="lcr-simulator">
+    <div class="interactive-title">Explorer 1: LCR Simulator</div>
+
+    <p style="margin-bottom: var(--spacing-sm); color: var(--text-secondary);">
+        Adjust the parameter \( w \) and step size \( h \). The dashed gray curve is the exact
+        analytical solution &mdash; see how Euler's method compares.
+    </p>
+
+    <div class="dual-panel">
+        <div class="panel">
+            <div class="plot-container" id="lcr-timePlot"></div>
+        </div>
+        <div class="panel">
+            <div class="plot-container" id="lcr-phasePlot"></div>
+        </div>
+    </div>
+
+    <div class="stats-bar">
+        <div class="stat-item">
+            <span class="stat-label">Regime</span>
+            <span class="stat-value" id="lcr-regime">--</span>
+        </div>
+        <div class="stat-item">
+            <span class="stat-label">Period</span>
+            <span class="stat-value" id="lcr-period">--</span>
+        </div>
+        <div class="stat-item">
+            <span class="stat-label">Decay Time</span>
+            <span class="stat-value" id="lcr-decay">--</span>
+        </div>
+        <div class="stat-item">
+            <span class="stat-label">Max |Error|</span>
+            <span class="stat-value" id="lcr-maxErr">--</span>
+        </div>
+    </div>
+
+    <div class="control-panel">
+        <div class="control-group">
+            <label class="control-label">
+                w = L/(R&sup2;C): <span class="control-label-value" id="lcr-w-value">10.0</span>
+            </label>
+            <input type="range" id="lcr-w-slider" class="slider"
+                   min="0.05" max="25" step="0.05" value="10.0">
+        </div>
+        <div class="control-group">
+            <label class="control-label">
+                h: <span class="control-label-value" id="lcr-h-value">0.02</span>
+            </label>
+            <input type="range" id="lcr-h-slider" class="slider"
+                   min="0.005" max="0.20" step="0.005" value="0.02">
+        </div>
+        <div class="control-group">
+            <button class="btn btn-secondary" onclick="lcrSimReset()">Reset</button>
+        </div>
+    </div>
+</div>
+
+<!-- ============================================================ -->
+<!-- TEST YOUR UNDERSTANDING #1 -->
+<!-- ============================================================ -->
+<div class="interactive-container question-section">
+    <div class="interactive-title">Test Your Understanding</div>
+
+    <p style="margin-bottom: var(--spacing-md); color: var(--text-secondary);">
+        Use the LCR Simulator to answer these questions.
+    </p>
+
+    <div class="tabs">
+        <div class="tab-buttons">
+            <button class="tab-button active">Q1</button>
+            <button class="tab-button">Q2</button>
+            <button class="tab-button">Q3</button>
+        </div>
+
+        <div class="tab-content active">
+            <div class="question-container" data-type="mcq" data-answer="2">
+                <div class="question-text">
+                    Set \( w = 10 \) and \( h = 0.02 \). What shape does the \( Q(t) \) curve show?
+                </div>
+                <div class="question-options">
+                    <label class="option">
+                        <input type="radio" name="lcr-q1" value="0">
+                        <span>Pure exponential decay (no oscillation)</span>
+                    </label>
+                    <label class="option">
+                        <input type="radio" name="lcr-q1" value="1">
+                        <span>Constant amplitude oscillation</span>
+                    </label>
+                    <label class="option">
+                        <input type="radio" name="lcr-q1" value="2">
+                        <span>Oscillation with decaying amplitude (underdamped)</span>
+                    </label>
+                    <label class="option">
+                        <input type="radio" name="lcr-q1" value="3">
+                        <span>Growing oscillation</span>
+                    </label>
+                </div>
+                <div class="question-actions">
+                    <button class="btn-verify">Verify</button>
+                </div>
+                <div class="question-explanation" style="display:none;">
+                    <strong>Explanation:</strong>
+                    With \( w = 10 \gg 1/4 \), the system is underdamped. The charge oscillates
+                    while the amplitude decays exponentially as \( e^{-t/2} \). The resistor
+                    dissipates energy on each cycle, reducing the oscillation amplitude.
+                </div>
+            </div>
+        </div>
+
+        <div class="tab-content">
+            <div class="question-container" data-type="fill" data-answer="2.0[1.8,2.2]">
+                <div class="question-text">
+                    With \( w = 10 \), read the approximate period of oscillation from the time plot.
+                    \( T \approx \) <input type="text" class="fill-blank" placeholder="?"> (dimensionless time units).
+                </div>
+                <div class="question-actions">
+                    <button class="btn-verify">Verify</button>
+                </div>
+                <div class="question-explanation" style="display:none;">
+                    <strong>Explanation:</strong>
+                    The oscillation frequency is \( \beta = \sqrt{w - 1/4} = \sqrt{9.75} \approx 3.12 \),
+                    so the period is \( T = 2\pi/\beta \approx 2.01 \). This matches the stats bar display
+                    and confirms the analytical prediction.
+                </div>
+            </div>
+        </div>
+
+        <div class="tab-content">
+            <div class="question-container" data-type="mcq" data-answer="1">
+                <div class="question-text">
+                    Slowly decrease \( w \) from 10 toward 0. At approximately what value of \( w \)
+                    do oscillations disappear?
+                </div>
+                <div class="question-options">
+                    <label class="option">
+                        <input type="radio" name="lcr-q3" value="0">
+                        <span>\( w = 1 \)</span>
+                    </label>
+                    <label class="option">
+                        <input type="radio" name="lcr-q3" value="1">
+                        <span>\( w = 0.25 \)</span>
+                    </label>
+                    <label class="option">
+                        <input type="radio" name="lcr-q3" value="2">
+                        <span>\( w = 0.5 \)</span>
+                    </label>
+                    <label class="option">
+                        <input type="radio" name="lcr-q3" value="3">
+                        <span>\( w = 0 \)</span>
+                    </label>
+                </div>
+                <div class="question-actions">
+                    <button class="btn-verify">Verify</button>
+                </div>
+                <div class="question-explanation" style="display:none;">
+                    <strong>Explanation:</strong>
+                    The transition occurs at \( w = 1/4 \). The oscillation frequency
+                    \( \beta = \sqrt{w - 1/4} \) becomes zero at this point. For \( w < 1/4 \),
+                    the system is overdamped and decays without oscillation. This is exactly
+                    the same critical damping condition \( R^2 = 4L/C \) from circuit theory.
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="info-box">
+    <div class="info-box-title">The Power of Non-Dimensionalization</div>
+    <p>
+        An LCR circuit has three physical parameters (\( L, R, C \)), but after
+        non-dimensionalization only <strong>one</strong> number matters: \( w = L/(R^2C) \).
+        This is the ratio of the inductive time scale \( L/R \) to the capacitive time scale
+        \( RC \). When \( w > 1/4 \): underdamped. When \( w = 1/4 \): critical. When
+        \( w < 1/4 \): overdamped. One parameter, three regimes, complete classification.
+    </p>
+</div>
+
+<!-- ============================================================ -->
+<!-- EXPLORER 2: Regime Explorer -->
+<!-- ============================================================ -->
+<div class="interactive-container" id="regime-explorer">
+    <div class="interactive-title">Explorer 2: Regime Explorer</div>
+
+    <p style="margin-bottom: var(--spacing-sm); color: var(--text-secondary);">
+        Sweep \( w \) across the three damping regimes. Watch the transition from oscillatory
+        to non-oscillatory behavior at the critical value \( w = 1/4 \).
+    </p>
+
+    <div class="dual-panel">
+        <div class="panel">
+            <div class="plot-container" id="lcr-regimePlot"></div>
+        </div>
+        <div class="panel">
+            <div class="plot-container" id="lcr-regimeBarPlot"></div>
+        </div>
+    </div>
+
+    <div class="stats-bar">
+        <div class="stat-item">
+            <span class="stat-label">w</span>
+            <span class="stat-value" id="lcr-regime-w">--</span>
+        </div>
+        <div class="stat-item">
+            <span class="stat-label">Regime</span>
+            <span class="stat-value" id="lcr-regime-type">--</span>
+        </div>
+        <div class="stat-item">
+            <span class="stat-label">Settling Time</span>
+            <span class="stat-value" id="lcr-regime-settle">--</span>
+        </div>
+    </div>
+
+    <div class="control-panel">
+        <div class="control-group">
+            <label class="control-label">
+                w: <span class="control-label-value" id="lcr-regime-w-value">5.0</span>
+            </label>
+            <input type="range" id="lcr-regime-w-slider" class="slider"
+                   min="0.05" max="15" step="0.05" value="5.0">
+        </div>
+        <div class="control-group">
+            <button class="btn btn-secondary" onclick="lcrRegimeReset()">Reset</button>
+        </div>
+    </div>
+</div>
+
+<!-- ============================================================ -->
+<!-- TEST YOUR UNDERSTANDING #2 -->
+<!-- ============================================================ -->
+<div class="interactive-container question-section">
+    <div class="interactive-title">Test Your Understanding</div>
+
+    <p style="margin-bottom: var(--spacing-md); color: var(--text-secondary);">
+        Use the Regime Explorer to answer these questions.
+    </p>
+
+    <div class="tabs">
+        <div class="tab-buttons">
+            <button class="tab-button active">Q4</button>
+            <button class="tab-button">Q5</button>
+            <button class="tab-button">Q6</button>
+        </div>
+
+        <div class="tab-content active">
+            <div class="question-container" data-type="mcq" data-answer="3">
+                <div class="question-text">
+                    At \( w = 0.25 \) (critical damping), which statement best describes the behavior?
+                </div>
+                <div class="question-options">
+                    <label class="option">
+                        <input type="radio" name="lcr-q4" value="0">
+                        <span>The charge oscillates but very slowly</span>
+                    </label>
+                    <label class="option">
+                        <input type="radio" name="lcr-q4" value="1">
+                        <span>The charge never returns to zero</span>
+                    </label>
+                    <label class="option">
+                        <input type="radio" name="lcr-q4" value="2">
+                        <span>The charge drops to zero instantly</span>
+                    </label>
+                    <label class="option">
+                        <input type="radio" name="lcr-q4" value="3">
+                        <span>The charge decays to zero as fast as possible without oscillating</span>
+                    </label>
+                </div>
+                <div class="question-actions">
+                    <button class="btn-verify">Verify</button>
+                </div>
+                <div class="question-explanation" style="display:none;">
+                    <strong>Explanation:</strong>
+                    Critical damping is the boundary between oscillation and pure exponential decay.
+                    The solution \( Q(t) = (1 + t/2)e^{-t/2} \) reaches zero faster than any
+                    overdamped solution, but without overshooting (oscillating). This is the
+                    "Goldilocks" regime used in engineering for fast settling.
+                </div>
+            </div>
+        </div>
+
+        <div class="tab-content">
+            <div class="question-container" data-type="fill" data-answer="0.25[0.20,0.30]">
+                <div class="question-text">
+                    The critical damping condition in terms of circuit components is \( R^2 = 4L/C \).
+                    In the non-dimensional parameter, the critical value is \( w = \)
+                    <input type="text" class="fill-blank" placeholder="?">.
+                </div>
+                <div class="question-actions">
+                    <button class="btn-verify">Verify</button>
+                </div>
+                <div class="question-explanation" style="display:none;">
+                    <strong>Explanation:</strong>
+                    From \( R^2 = 4L/C \), divide both sides by \( R^2C \):
+                    \( 1 = 4L/(R^2C) = 4w \), so \( w = 1/4 = 0.25 \). The discriminant
+                    of the characteristic equation \( \lambda^2 + \lambda + w = 0 \) vanishes
+                    when \( 1 - 4w = 0 \).
+                </div>
+            </div>
+        </div>
+
+        <div class="tab-content">
+            <div class="question-container" data-type="msq" data-answer="0,3">
+                <div class="question-text">
+                    Compare the settling time at \( w = 0.10 \) (overdamped) and \( w = 5 \)
+                    (underdamped). Which statements are correct? (Select all that apply)
+                </div>
+                <div class="question-options">
+                    <label class="option">
+                        <input type="checkbox" value="0">
+                        <span>The overdamped case settles more slowly than critical damping</span>
+                    </label>
+                    <label class="option">
+                        <input type="checkbox" value="1">
+                        <span>Higher \( w \) always means faster settling</span>
+                    </label>
+                    <label class="option">
+                        <input type="checkbox" value="2">
+                        <span>The underdamped case never reaches Q = 0</span>
+                    </label>
+                    <label class="option">
+                        <input type="checkbox" value="3">
+                        <span>Critical damping (\( w = 0.25 \)) has the shortest settling time</span>
+                    </label>
+                </div>
+                <div class="question-actions">
+                    <button class="btn-verify">Verify</button>
+                </div>
+                <div class="question-explanation" style="display:none;">
+                    <strong>Explanation:</strong>
+                    <ul>
+                        <li>Overdamped slower: True &mdash; overdamped solutions have a slow exponential tail that takes longer to decay than critical damping.</li>
+                        <li>Higher w = faster: False &mdash; highly underdamped systems ring for many cycles before settling. The fastest settling is at \( w = 0.25 \).</li>
+                        <li>Never reaches zero: False &mdash; underdamped solutions oscillate with decaying amplitude and approach zero asymptotically.</li>
+                        <li>Critical = shortest: True &mdash; this is the defining property of critical damping &mdash; it's the fastest approach to zero without overshoot.</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- ============================================================ -->
+<!-- EXPLORER 3: Energy Tracker -->
+<!-- ============================================================ -->
+<div class="interactive-container" id="energy-tracker">
+    <div class="interactive-title">Explorer 3: Energy Tracker</div>
+
+    <p style="margin-bottom: var(--spacing-sm); color: var(--text-secondary);">
+        Track where the energy goes: between the capacitor (\( \frac{1}{2}wQ^2 \)),
+        the inductor (\( \frac{1}{2}I^2 \)), and cumulative heat dissipated in the resistor.
+    </p>
+
+    <div class="dual-panel">
+        <div class="panel">
+            <div class="plot-container" id="lcr-energyPlot"></div>
+        </div>
+        <div class="panel">
+            <div class="plot-container" id="lcr-energyTotalPlot"></div>
+        </div>
+    </div>
+
+    <div class="stats-bar">
+        <div class="stat-item">
+            <span class="stat-label">Initial E</span>
+            <span class="stat-value" id="lcr-energy-init">--</span>
+        </div>
+        <div class="stat-item">
+            <span class="stat-label">Peak E<sub>L</sub></span>
+            <span class="stat-value" id="lcr-energy-peakL">--</span>
+        </div>
+        <div class="stat-item">
+            <span class="stat-label">Dissipated</span>
+            <span class="stat-value" id="lcr-energy-dissipated">--</span>
+        </div>
+    </div>
+
+    <div class="control-panel">
+        <div class="control-group">
+            <label class="control-label">
+                w: <span class="control-label-value" id="lcr-energy-w-value">5.0</span>
+            </label>
+            <input type="range" id="lcr-energy-w-slider" class="slider"
+                   min="0.10" max="20" step="0.10" value="5.0">
+        </div>
+        <div class="control-group">
+            <button class="btn btn-secondary" onclick="lcrEnergyReset()">Reset</button>
+        </div>
+    </div>
+</div>
+
+<!-- ============================================================ -->
+<!-- TEST YOUR UNDERSTANDING #3 -->
+<!-- ============================================================ -->
+<div class="interactive-container question-section">
+    <div class="interactive-title">Test Your Understanding</div>
+
+    <p style="margin-bottom: var(--spacing-md); color: var(--text-secondary);">
+        Use the Energy Tracker to answer these questions.
+    </p>
+
+    <div class="tabs">
+        <div class="tab-buttons">
+            <button class="tab-button active">Q7</button>
+            <button class="tab-button">Q8</button>
+            <button class="tab-button">Q9</button>
+        </div>
+
+        <div class="tab-content active">
+            <div class="question-container" data-type="mcq" data-answer="1">
+                <div class="question-text">
+                    Set \( w = 5 \). At \( t = 0 \), all the energy is stored in the capacitor.
+                    Where does all the energy eventually end up?
+                </div>
+                <div class="question-options">
+                    <label class="option">
+                        <input type="radio" name="lcr-q7" value="0">
+                        <span>Equally split between capacitor and inductor</span>
+                    </label>
+                    <label class="option">
+                        <input type="radio" name="lcr-q7" value="1">
+                        <span>Entirely dissipated as heat in the resistor</span>
+                    </label>
+                    <label class="option">
+                        <input type="radio" name="lcr-q7" value="2">
+                        <span>All stored in the inductor</span>
+                    </label>
+                    <label class="option">
+                        <input type="radio" name="lcr-q7" value="3">
+                        <span>It stays in the capacitor</span>
+                    </label>
+                </div>
+                <div class="question-actions">
+                    <button class="btn-verify">Verify</button>
+                </div>
+                <div class="question-explanation" style="display:none;">
+                    <strong>Explanation:</strong>
+                    The resistor is the only energy sink. As \( t \to \infty \), both \( Q \to 0 \)
+                    and \( I \to 0 \), so capacitor and inductor energies vanish. All the initial
+                    energy \( E_0 = \frac{1}{2}wQ_0^2 \) is eventually converted to heat via
+                    Joule dissipation \( \int_0^\infty I^2\, dt = E_0 \).
+                </div>
+            </div>
+        </div>
+
+        <div class="tab-content">
+            <div class="question-container" data-type="fill" data-answer="2.5[2.0,3.0]">
+                <div class="question-text">
+                    With \( w = 5 \), the initial capacitor energy is \( E_C(0) = \frac{1}{2}w \cdot 1^2 \).
+                    What is \( E_C(0) \)? <input type="text" class="fill-blank" placeholder="?">.
+                </div>
+                <div class="question-actions">
+                    <button class="btn-verify">Verify</button>
+                </div>
+                <div class="question-explanation" style="display:none;">
+                    <strong>Explanation:</strong>
+                    \( E_C(0) = \frac{1}{2}wQ_0^2 = \frac{1}{2}(5)(1)^2 = 2.5 \). This is the total
+                    energy available for oscillation and eventual dissipation. The initial energy shown
+                    in the stats bar should match this value.
+                </div>
+            </div>
+        </div>
+
+        <div class="tab-content">
+            <div class="question-container" data-type="msq" data-answer="0,2">
+                <div class="question-text">
+                    Which statements about energy in the LCR circuit are correct? (Select all that apply)
+                </div>
+                <div class="question-options">
+                    <label class="option">
+                        <input type="checkbox" value="0">
+                        <span>Capacitor and inductor exchange energy back and forth during oscillation</span>
+                    </label>
+                    <label class="option">
+                        <input type="checkbox" value="1">
+                        <span>Total energy (E<sub>C</sub> + E<sub>L</sub>) is conserved</span>
+                    </label>
+                    <label class="option">
+                        <input type="checkbox" value="2">
+                        <span>Total energy (E<sub>C</sub> + E<sub>L</sub> + E<sub>dissipated</sub>) is conserved</span>
+                    </label>
+                    <label class="option">
+                        <input type="checkbox" value="3">
+                        <span>The inductor energy is always greater than the capacitor energy</span>
+                    </label>
+                </div>
+                <div class="question-actions">
+                    <button class="btn-verify">Verify</button>
+                </div>
+                <div class="question-explanation" style="display:none;">
+                    <strong>Explanation:</strong>
+                    <ul>
+                        <li>Exchange: True &mdash; charge flows from capacitor to inductor and back, converting between electric and magnetic field energy.</li>
+                        <li>E<sub>C</sub> + E<sub>L</sub> conserved: False &mdash; this sum decreases due to resistive dissipation \( dE/dt = -I^2 \).</li>
+                        <li>Including dissipated: True &mdash; total energy (stored + dissipated) equals the initial energy. This is energy conservation.</li>
+                        <li>E<sub>L</sub> always greater: False &mdash; they oscillate, and at \( t = 0 \) the inductor energy is zero while capacitor energy is maximum.</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- ============================================================ -->
+<!-- PYTHON CODE EXAMPLES -->
+<!-- ============================================================ -->
+<h3>Python Implementation</h3>
+
+<div class="tabs">
+    <div class="tab-buttons">
+        <button class="tab-button active">LCR Solver</button>
+        <button class="tab-button">Energy Analysis</button>
+        <button class="tab-button">Prompt</button>
+    </div>
+
+    <div class="tab-content active">
+        <div class="code-block-container">
+            <div class="code-header">
+                <span class="code-lang">Python</span>
+                <button class="copy-btn">Copy</button>
+            </div>
+            <pre><code class="language-python">import numpy as np
+import plotly.graph_objects as go
+from plotly.subplots import make_subplots
+
+def euler_system(f, y0, t_max, h):
+    """Vector Euler solver for coupled ODEs."""
+    t = [0.0]
+    Y = [np.array(y0, dtype=float)]
+    y = np.array(y0, dtype=float)
+    for _ in range(int(t_max / h)):
+        y = y + h * np.array(f(y, t[-1]))
+        t.append(t[-1] + h)
+        Y.append(y.copy())
+    return np.array(t), np.array(Y)
+
+# Non-dimensional LCR: dQ/dt = I, dI/dt = -wQ - I
+w = 10.0  # L/(R^2 C)
+
+def lcr(y, t):
+    Q, I = y
+    return [I, -w * Q - I]
+
+t, Y = euler_system(lcr, [1.0, 0.0], 15, 0.01)
+Q, I = Y[:, 0], Y[:, 1]
+
+# Exact solution (underdamped: w > 0.25)
+beta = np.sqrt(w - 0.25)
+Q_exact = np.exp(-t/2) * (np.cos(beta*t) + np.sin(beta*t)/(2*beta))
+
+fig = make_subplots(rows=1, cols=2,
+    subplot_titles=['Charge Q(t)', 'Phase Portrait'])
+fig.add_trace(go.Scatter(x=t, y=Q, name='Euler Q',
+    line=dict(color='#00f3ff', width=2)), row=1, col=1)
+fig.add_trace(go.Scatter(x=t, y=Q_exact, name='Exact',
+    line=dict(color='#808080', width=2, dash='dash')), row=1, col=1)
+fig.add_trace(go.Scatter(x=Q, y=I, name='(Q, I)',
+    line=dict(color='#00ff9f', width=2)), row=1, col=2)
+
+fig.update_layout(template='plotly_dark')
+fig.show()</code></pre>
+        </div>
+    </div>
+
+    <div class="tab-content">
+        <div class="code-block-container">
+            <div class="code-header">
+                <span class="code-lang">Python</span>
+                <button class="copy-btn">Copy</button>
+            </div>
+            <pre><code class="language-python">import numpy as np
+import plotly.graph_objects as go
+
+def euler_system(f, y0, t_max, h):
+    t = [0.0]
+    Y = [np.array(y0, dtype=float)]
+    y = np.array(y0, dtype=float)
+    for _ in range(int(t_max / h)):
+        y = y + h * np.array(f(y, t[-1]))
+        t.append(t[-1] + h)
+        Y.append(y.copy())
+    return np.array(t), np.array(Y)
+
+w = 5.0
+def lcr(y, t):
+    return [y[1], -w * y[0] - y[1]]
+
+t, Y = euler_system(lcr, [1.0, 0.0], 15, 0.01)
+Q, I = Y[:, 0], Y[:, 1]
+
+# Energy components
+E_cap = 0.5 * w * Q**2          # Capacitor energy
+E_ind = 0.5 * I**2              # Inductor energy
+E_total = E_cap + E_ind         # Total stored
+
+# Cumulative dissipated energy
+h_val = t[1] - t[0]
+E_diss = np.cumsum(I**2 * h_val)  # integral of I^2 dt
+
+fig = go.Figure()
+fig.add_trace(go.Scatter(x=t, y=E_cap, name='Capacitor',
+    fill='tozeroy', line=dict(color='#00f3ff')))
+fig.add_trace(go.Scatter(x=t, y=E_ind, name='Inductor',
+    fill='tozeroy', line=dict(color='#ff00ff')))
+fig.add_trace(go.Scatter(x=t, y=E_total, name='Total Stored',
+    line=dict(color='#ffff00', width=2)))
+fig.add_trace(go.Scatter(x=t, y=E_diss, name='Dissipated',
+    line=dict(color='#ff6b6b', width=2, dash='dash')))
+
+fig.update_layout(template='plotly_dark',
+    xaxis=dict(title='t', linecolor='#808080'),
+    yaxis=dict(title='Energy', linecolor='#808080'))
+fig.show()</code></pre>
+        </div>
+    </div>
+
+    <div class="tab-content">
+        <div class="code-block-container">
+            <div class="code-header">
+                <span class="code-lang">Prompt for AI</span>
+                <button class="copy-btn">Copy</button>
+            </div>
+            <pre><code class="language-text">Create a Python script to simulate an LCR circuit using Euler's method.
+
+Requirements:
+1. Non-dimensional LCR equation: d^2Q/dt^2 + dQ/dt + wQ = 0
+   Coupled form: dQ/dt = I, dI/dt = -wQ - I
+   Single parameter: w = L/(R^2 C)
+2. Initial conditions: Q(0) = 1, I(0) = 0
+3. Compare Euler solution with exact analytical solution:
+   - Underdamped (w > 0.25): Q = exp(-t/2)(cos(bt) + sin(bt)/(2b))
+     where b = sqrt(w - 0.25)
+4. Plot two panels:
+   - Left: Q(t) Euler vs exact, and I(t)
+   - Right: Energy components (capacitor, inductor, dissipated)
+5. Use plotly_dark theme, gray axes (#808080)
+6. Show all three regimes by varying w</code></pre>
+        </div>
+    </div>
+</div>
+
+<!-- ============================================================ -->
+<!-- NAVIGATION -->
+<!-- ============================================================ -->
+<div class="btn-group mt-xl">
+    <button class="btn btn-magenta" onclick="navigateToSection('40-coupled-systems')">&larr; Previous: Solving Coupled Systems</button>
+    <button class="btn btn-secondary" onclick="scrollToTop()">&uarr; Back to Top</button>
+    <button class="btn btn-secondary" onclick="navigateToSection('42-damped-mechanics')">Next: Mechanical Oscillators with Damping &rarr;</button>
+</div>

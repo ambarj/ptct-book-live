@@ -1,0 +1,726 @@
+<!--
+    Section 4.6: From Second-Order to First-Order
+    Source: Module 7 — Application of Euler Method to Oscillations (Parts 1-2)
+    Concept: Reduce any second-order ODE to a system of two first-order ODEs
+    Time: ~22 minutes
+    Prerequisites: Euler solver (4.4), oscillator physics (Ch 3)
+-->
+
+<h1>From Second-Order to First-Order</h1>
+
+<p>
+    Your Euler solver handles \(dx/dt = f(x, t)\) beautifully. But the most important equation
+    in physics &mdash; Newton&rsquo;s second law &mdash; is <em>second</em>-order.
+    The trick is old and powerful: <strong>introduce velocity as a new variable</strong>.
+    One second-order equation becomes two first-order equations &mdash; and your Euler solver
+    can handle both simultaneously.
+</p>
+
+<div class="info-box">
+    <div class="info-box-title">Learning Objectives</div>
+    <ul>
+        <li>Convert a second-order ODE into a pair of coupled first-order ODEs using the substitution \(v = dx/dt\)</li>
+        <li>Understand the <strong>state vector</strong> \([x, v]\) as the complete description of a system</li>
+        <li>Apply Euler&rsquo;s method to the reduced system and recover familiar oscillator behavior</li>
+    </ul>
+</div>
+
+<div class="equation-display">
+    $$ m\frac{d^2x}{dt^2} = F(x, \dot{x}, t) $$
+    <p>Two time derivatives, not one. Euler can&rsquo;t handle this directly.</p>
+</div>
+
+<hr>
+
+<!-- ========== EXPLORER 1: ODE Transformer ========== -->
+<div class="interactive-container" id="ode-transformer">
+    <div class="interactive-title">Explorer 1: The ODE Transformer</div>
+
+    <p style="margin-bottom: var(--spacing-sm); color: var(--text-secondary);">
+        Select a second-order ODE and watch it transform into a pair of first-order equations.
+        Click <strong>Show Steps</strong> to see the substitution unfold.
+    </p>
+
+    <div class="dual-panel">
+        <div class="panel">
+            <div id="orderRed-original" style="background: rgba(0,0,0,0.3); border-radius: 8px; padding: 1.5rem; min-height: 280px;">
+                <!-- Original equation display, populated by JS -->
+            </div>
+        </div>
+        <div class="panel">
+            <div id="orderRed-reduced" style="background: rgba(0,0,0,0.3); border-radius: 8px; padding: 1.5rem; min-height: 280px;">
+                <!-- Reduced system display, populated by JS -->
+            </div>
+        </div>
+    </div>
+
+    <div class="control-panel">
+        <div class="control-group">
+            <label class="control-label">Equation:</label>
+            <select id="orderRed-eq-select" class="control-select">
+                <option value="0">Simple Harmonic Oscillator: d&sup2;x/dt&sup2; = &minus;&omega;&sup2;x</option>
+                <option value="1">Damped Oscillator: d&sup2;x/dt&sup2; = &minus;2&gamma;(dx/dt) &minus; &omega;&sup2;x</option>
+                <option value="2">Driven Oscillator: d&sup2;x/dt&sup2; = &minus;2&gamma;(dx/dt) &minus; &omega;&sup2;x + F&sdot;cos(&omega;<sub>d</sub>t)</option>
+                <option value="3">Real Pendulum: d&sup2;&theta;/dt&sup2; = &minus;(g/L)sin(&theta;)</option>
+            </select>
+        </div>
+        <div class="btn-group">
+            <button class="btn" id="orderRed-show-btn" onclick="orderRedShowSteps()">Show Steps</button>
+            <button class="btn btn-secondary" onclick="orderRedTransformReset()">Reset</button>
+        </div>
+    </div>
+</div>
+
+<div class="info-box">
+    <div class="info-box-title">The Universal Recipe</div>
+    <p>For <em>any</em> second-order ODE \(\ddot{x} = F(x, \dot{x}, t)\):</p>
+    <div class="equation-display">
+        $$
+        \boxed{
+        \text{Define } v = \frac{dx}{dt}, \quad \text{then:} \quad
+        \begin{cases}
+        \dfrac{dx}{dt} = v \\[6pt]
+        \dfrac{dv}{dt} = F(x, v, t)
+        \end{cases}
+        }
+        $$
+    </div>
+    <p>
+        The state vector \(\mathbf{y} = [x, v]\) contains <em>everything</em> you need to know
+        about the system at any instant. Position and velocity together determine the future.
+    </p>
+</div>
+
+<!-- ===== Test Your Understanding #1 ===== -->
+<div class="interactive-container question-section">
+    <div class="interactive-title">Test Your Understanding</div>
+
+    <p style="margin-bottom: var(--spacing-md); color: var(--text-secondary);">
+        Use Explorer 1 to answer these questions.
+    </p>
+
+    <div class="tabs">
+        <div class="tab-buttons">
+            <button class="tab-button active">Question 1</button>
+            <button class="tab-button">Question 2</button>
+            <button class="tab-button">Question 3</button>
+        </div>
+
+        <!-- Q1: MCQ -->
+        <div class="tab-content active">
+            <div class="question-container" data-type="mcq" data-answer="1">
+                <div class="question-text">
+                    What is the key substitution that converts a second-order ODE to a first-order system?
+                </div>
+                <div class="question-options">
+                    <label class="option">
+                        <input type="radio" name="q-or-1" value="0">
+                        <span>Replace \(x\) with \(x^2\)</span>
+                    </label>
+                    <label class="option">
+                        <input type="radio" name="q-or-1" value="1">
+                        <span>Define \(v = dx/dt\) and treat \(v\) as a new variable</span>
+                    </label>
+                    <label class="option">
+                        <input type="radio" name="q-or-1" value="2">
+                        <span>Set the second derivative to zero</span>
+                    </label>
+                    <label class="option">
+                        <input type="radio" name="q-or-1" value="3">
+                        <span>Integrate both sides</span>
+                    </label>
+                </div>
+                <div class="question-actions">
+                    <button class="btn-verify">Verify</button>
+                </div>
+                <div class="question-explanation" style="display:none;">
+                    <strong>Explanation:</strong>
+                    The trick is introducing velocity \(v = dx/dt\) as an independent variable.
+                    Then \(d^2x/dt^2 = dv/dt\), and the single second-order equation splits into
+                    two first-order equations: one for \(x\) and one for \(v\).
+                </div>
+            </div>
+        </div>
+
+        <!-- Q2: Fill with dropdown -->
+        <div class="tab-content">
+            <div class="question-container" data-type="fill" data-answer="2|4">
+                <div class="question-text">
+                    A second-order ODE becomes a system of
+                    <select class="fill-blank-select">
+                        <option value=""></option>
+                        <option value="1">1</option>
+                        <option value="2">2</option>
+                        <option value="3">3</option>
+                        <option value="4">4</option>
+                    </select>
+                    first-order equations.
+                    <br><br>
+                    By extension, a <em>fourth</em>-order ODE would become a system of
+                    <select class="fill-blank-select">
+                        <option value=""></option>
+                        <option value="2">2</option>
+                        <option value="3">3</option>
+                        <option value="4">4</option>
+                        <option value="8">8</option>
+                    </select>
+                    first-order equations.
+                </div>
+                <div class="question-actions">
+                    <button class="btn-verify">Verify</button>
+                </div>
+                <div class="question-explanation" style="display:none;">
+                    <strong>Explanation:</strong>
+                    An \(n\)th-order ODE always reduces to \(n\) first-order equations.
+                    For a 4th-order equation, you introduce 3 new variables
+                    (\(v = x'\), \(a = x''\), \(j = x'''\)) plus the original \(x\),
+                    giving 4 coupled first-order equations.
+                </div>
+            </div>
+        </div>
+
+        <!-- Q3: MCQ -->
+        <div class="tab-content">
+            <div class="question-container" data-type="mcq" data-answer="2">
+                <div class="question-text">
+                    Select the <strong>damped oscillator</strong> in Explorer 1. In the reduced system,
+                    where does the damping term \(-2\gamma v\) appear?
+                </div>
+                <div class="question-options">
+                    <label class="option">
+                        <input type="radio" name="q-or-3" value="0">
+                        <span>In the \(dx/dt\) equation</span>
+                    </label>
+                    <label class="option">
+                        <input type="radio" name="q-or-3" value="1">
+                        <span>In both equations equally</span>
+                    </label>
+                    <label class="option">
+                        <input type="radio" name="q-or-3" value="2">
+                        <span>In the \(dv/dt\) equation only</span>
+                    </label>
+                </div>
+                <div class="question-actions">
+                    <button class="btn-verify">Verify</button>
+                </div>
+                <div class="question-explanation" style="display:none;">
+                    <strong>Explanation:</strong>
+                    The first equation is always \(dx/dt = v\) &mdash; it&rsquo;s just the definition
+                    of velocity and never changes. All the physics (forces, damping, driving) lives
+                    in the \(dv/dt\) equation, which encodes Newton&rsquo;s second law.
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<hr>
+
+<!-- ========== EXPLORER 2: State Space Viewer ========== -->
+<div class="interactive-container" id="state-space-viewer">
+    <div class="interactive-title">Explorer 2: State Space Viewer</div>
+
+    <p style="margin-bottom: var(--spacing-sm); color: var(--text-secondary);">
+        Euler&rsquo;s method applied to the reduced system. The left panel shows \(x(t)\) and
+        \(v(t)\) evolving together; the right panel shows the phase portrait \((x, v)\).
+        Adjust the physics and see how the trajectories change.
+    </p>
+
+    <div class="dual-panel">
+        <div class="panel">
+            <div class="plot-container" id="orderRed-timePlot"></div>
+        </div>
+        <div class="panel">
+            <div class="plot-container" id="orderRed-phasePlot"></div>
+        </div>
+    </div>
+
+    <div style="display: flex; gap: 1rem; justify-content: center; flex-wrap: wrap; margin: 0.5rem 0; font-size: 0.9rem; color: var(--text-secondary);">
+        <span>Steps: <strong id="orderRed-steps" style="color: #00f3ff;">—</strong></span>
+        <span>Period: <strong id="orderRed-period" style="color: #ffff00;">—</strong></span>
+        <span>Energy drift: <strong id="orderRed-energy" style="color: #ff6b6b;">—</strong></span>
+    </div>
+
+    <div class="control-panel">
+        <div class="control-group">
+            <label class="control-label">System:</label>
+            <select id="orderRed-system-select" class="control-select">
+                <option value="0">Simple Harmonic Oscillator</option>
+                <option value="1">Damped Oscillator</option>
+                <option value="2">Real Pendulum (nonlinear)</option>
+            </select>
+        </div>
+        <div class="control-group">
+            <label class="control-label">\(\omega_0\):
+                <span class="control-label-value" id="orderRed-omega-value">2.00</span>
+            </label>
+            <input type="range" class="slider" id="orderRed-omega-slider"
+                   min="0.5" max="5.0" step="0.25" value="2.0">
+        </div>
+        <div class="control-group">
+            <label class="control-label">\(\gamma\) (damping):
+                <span class="control-label-value" id="orderRed-gamma-value">0.00</span>
+            </label>
+            <input type="range" class="slider" id="orderRed-gamma-slider"
+                   min="0.0" max="2.0" step="0.1" value="0.0">
+        </div>
+        <div class="control-group">
+            <label class="control-label">Step size \(h\):
+                <span class="control-label-value" id="orderRed-h-value">0.05</span>
+            </label>
+            <input type="range" class="slider" id="orderRed-h-slider"
+                   min="0.01" max="0.3" step="0.01" value="0.05">
+        </div>
+        <div class="btn-group">
+            <button class="btn btn-secondary" onclick="orderRedViewerReset()">Reset</button>
+        </div>
+    </div>
+</div>
+
+<div class="warning-box">
+    <div class="warning-icon">&#9888;&#65039;</div>
+    <div class="warning-content">
+        <strong>Euler spirals outward!</strong>
+        Set the SHO with \(\gamma = 0\) and \(h = 0.20\). The phase portrait should be a
+        closed ellipse, but Euler traces a <em>spiral</em> &mdash; energy grows each step.
+        This is Euler&rsquo;s systematic energy drift for conservative systems. Shrink \(h\) to
+        see the spiral tighten. (RK4 does much better &mdash; you saw this in Section 3.13.)
+    </div>
+</div>
+
+<!-- ===== Test Your Understanding #2 ===== -->
+<div class="interactive-container question-section">
+    <div class="interactive-title">Test Your Understanding</div>
+
+    <p style="margin-bottom: var(--spacing-md); color: var(--text-secondary);">
+        Use Explorer 2 to answer these questions.
+    </p>
+
+    <div class="tabs">
+        <div class="tab-buttons">
+            <button class="tab-button active">Question 4</button>
+            <button class="tab-button">Question 5</button>
+            <button class="tab-button">Question 6</button>
+        </div>
+
+        <!-- Q4: MCQ -->
+        <div class="tab-content active">
+            <div class="question-container" data-type="mcq" data-answer="0">
+                <div class="question-text">
+                    Select the <strong>SHO</strong> with \(\gamma = 0\) and small \(h\).
+                    What shape does the phase portrait trace?
+                </div>
+                <div class="question-options">
+                    <label class="option">
+                        <input type="radio" name="q-or-4" value="0">
+                        <span>An ellipse (or circle if axes are scaled equally)</span>
+                    </label>
+                    <label class="option">
+                        <input type="radio" name="q-or-4" value="1">
+                        <span>A straight line</span>
+                    </label>
+                    <label class="option">
+                        <input type="radio" name="q-or-4" value="2">
+                        <span>A parabola</span>
+                    </label>
+                </div>
+                <div class="question-actions">
+                    <button class="btn-verify">Verify</button>
+                </div>
+                <div class="question-explanation" style="display:none;">
+                    <strong>Explanation:</strong>
+                    The SHO conserves energy: \(\frac{1}{2}v^2 + \frac{1}{2}\omega_0^2 x^2 = E\).
+                    This is the equation of an ellipse in \((x, v)\) space. With \(v/\omega_0\) on the
+                    vertical axis, it becomes a circle. You saw this in Chapter 3 Section 3.3!
+                </div>
+            </div>
+        </div>
+
+        <!-- Q5: Fill -->
+        <div class="tab-content">
+            <div class="question-container" data-type="fill" data-answer="spiral inward|shrinks">
+                <div class="question-text">
+                    Switch to the <strong>damped oscillator</strong> and set \(\gamma = 0.3\).
+                    The phase portrait now
+                    <select class="fill-blank-select">
+                        <option value=""></option>
+                        <option value="spiral inward">spirals inward</option>
+                        <option value="spiral outward">spirals outward</option>
+                        <option value="stays on a circle">stays on a circle</option>
+                    </select>
+                    because energy
+                    <select class="fill-blank-select">
+                        <option value=""></option>
+                        <option value="grows">grows</option>
+                        <option value="shrinks">shrinks</option>
+                        <option value="stays constant">stays constant</option>
+                    </select>
+                    due to friction.
+                </div>
+                <div class="question-actions">
+                    <button class="btn-verify">Verify</button>
+                </div>
+                <div class="question-explanation" style="display:none;">
+                    <strong>Explanation:</strong>
+                    Damping removes energy from the system. The trajectory spirals inward toward
+                    the equilibrium point \((0, 0)\). Each orbit is smaller than the last because
+                    the amplitude decays as \(e^{-\gamma t}\). This is the same physics you explored
+                    in Chapter 3 Section 3.5, now seen through the numerical lens.
+                </div>
+            </div>
+        </div>
+
+        <!-- Q6: Fill -->
+        <div class="tab-content">
+            <div class="question-container" data-type="fill" data-answer="-0.20[-0.22,-0.18]|1.00[0.98,1.02]">
+                <div class="question-text">
+                    For the <strong>SHO</strong> with \(\gamma = 0\), \(\omega_0 = 2.0\),
+                    and initial conditions \(x_0 = 1\), \(v_0 = 0\),
+                    compute the first Euler step by hand with \(h = 0.05\):
+                    <br><br>
+                    \(v_1 = v_0 + h \cdot (-\omega_0^2 \cdot x_0) = \)
+                    <input type="text" class="fill-blank" placeholder="?">
+                    <br>
+                    \(x_1 = x_0 + h \cdot v_0 = \)
+                    <input type="text" class="fill-blank" placeholder="?">
+                    <br><em>(Remember: use the OLD values for both updates!)</em>
+                </div>
+                <div class="question-actions">
+                    <button class="btn-verify">Verify</button>
+                </div>
+                <div class="question-explanation" style="display:none;">
+                    <strong>Explanation:</strong>
+                    \(v_1 = 0 + 0.05 \times (-4 \times 1) = -0.20\).
+                    \(x_1 = 1 + 0.05 \times 0 = 1.00\).
+                    Notice that \(x\) doesn&rsquo;t change in the first step because \(v_0 = 0\).
+                    But \(v\) jumps to \(-0.20\) because the restoring force \(-\omega_0^2 x\) is nonzero.
+                    Both updates use the <em>old</em> values \((x_0, v_0)\), not the new ones.
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<hr>
+
+<!-- ========== EXPLORER 3: Reduction Challenge ========== -->
+<div class="interactive-container" id="reduction-challenge">
+    <div class="interactive-title">Explorer 3: Reduction Challenge</div>
+
+    <p style="margin-bottom: var(--spacing-sm); color: var(--text-secondary);">
+        Given a second-order ODE, select the correct reduced first-order system.
+        Get it right and the phase portrait appears!
+    </p>
+
+    <div class="dual-panel">
+        <div class="panel">
+            <div id="orderRed-challengeEq" style="background: rgba(0,0,0,0.3); border-radius: 8px; padding: 1.5rem; min-height: 250px; display: flex; align-items: center; justify-content: center;">
+                <!-- Challenge equation -->
+            </div>
+        </div>
+        <div class="panel">
+            <div class="plot-container" id="orderRed-challengePlot"></div>
+        </div>
+    </div>
+
+    <div id="orderRed-challengeOptions" style="margin-top: var(--spacing-sm);">
+        <!-- Options populated by JS -->
+    </div>
+
+    <div id="orderRed-challengeFeedback" style="margin-top: var(--spacing-sm); min-height: 1.5em; font-size: 0.95rem;"></div>
+
+    <div class="control-panel">
+        <div class="btn-group">
+            <button class="btn" onclick="orderRedNextChallenge()">Next Challenge</button>
+            <button class="btn btn-secondary" onclick="orderRedChallengeReset()">Reset Score</button>
+        </div>
+        <div style="font-size: 0.9rem; color: var(--text-secondary);">
+            Score: <strong id="orderRed-score" style="color: #00ff9f;">0</strong> / <strong id="orderRed-total">0</strong>
+        </div>
+    </div>
+</div>
+
+<!-- ===== Test Your Understanding #3 ===== -->
+<div class="interactive-container question-section">
+    <div class="interactive-title">Test Your Understanding</div>
+
+    <p style="margin-bottom: var(--spacing-md); color: var(--text-secondary);">
+        Think about the general reduction technique.
+    </p>
+
+    <div class="tabs">
+        <div class="tab-buttons">
+            <button class="tab-button active">Question 7</button>
+            <button class="tab-button">Question 8</button>
+            <button class="tab-button">Question 9</button>
+        </div>
+
+        <!-- Q7: Fill -->
+        <div class="tab-content active">
+            <div class="question-container" data-type="fill" data-answer="v|-omega^2*x">
+                <div class="question-text">
+                    The simple harmonic oscillator \(\ddot{x} = -\omega^2 x\) reduces to:
+                    <br><br>
+                    \(dx/dt = \) <input type="text" class="fill-blank" placeholder="?">
+                    <br>
+                    \(dv/dt = \) <input type="text" class="fill-blank" placeholder="?">
+                    <br><em>(Use v for velocity and x for position.)</em>
+                </div>
+                <div class="question-actions">
+                    <button class="btn-verify">Verify</button>
+                </div>
+                <div class="question-explanation" style="display:none;">
+                    <strong>Explanation:</strong>
+                    The first equation is always the definition of velocity: \(dx/dt = v\).
+                    The second equation comes from the original ODE with \(\ddot{x}\) replaced by \(dv/dt\):
+                    \(dv/dt = -\omega^2 x\).
+                </div>
+            </div>
+        </div>
+
+        <!-- Q8: MCQ -->
+        <div class="tab-content">
+            <div class="question-container" data-type="mcq" data-answer="2">
+                <div class="question-text">
+                    In the Euler update for a two-equation system, which statement is correct?
+                </div>
+                <div class="question-options">
+                    <label class="option">
+                        <input type="radio" name="q-or-8" value="0">
+                        <span>Update \(x\) first, then use the new \(x\) to update \(v\)</span>
+                    </label>
+                    <label class="option">
+                        <input type="radio" name="q-or-8" value="1">
+                        <span>Update \(v\) first, then use the new \(v\) to update \(x\)</span>
+                    </label>
+                    <label class="option">
+                        <input type="radio" name="q-or-8" value="2">
+                        <span>Compute both updates using the <em>old</em> values, then apply both</span>
+                    </label>
+                </div>
+                <div class="question-actions">
+                    <button class="btn-verify">Verify</button>
+                </div>
+                <div class="question-explanation" style="display:none;">
+                    <strong>Explanation:</strong>
+                    In the standard Euler method, you compute all derivatives at time \(t_n\) using
+                    the current state \((x_n, v_n)\), then update both simultaneously:
+                    \(x_{n+1} = x_n + h \cdot v_n\) and \(v_{n+1} = v_n + h \cdot F(x_n, v_n, t_n)\).
+                    Using old values for both updates is crucial &mdash; mixing old and new gives a
+                    different (symplectic Euler) method.
+                </div>
+            </div>
+        </div>
+
+        <!-- Q9: MSQ -->
+        <div class="tab-content">
+            <div class="question-container" data-type="msq" data-answer="0,1,3">
+                <div class="question-text">
+                    Which of the following can be solved by reducing to first-order and applying Euler?
+                    (Select all that apply.)
+                </div>
+                <div class="question-options">
+                    <label class="option">
+                        <input type="checkbox" value="0">
+                        <span>Simple harmonic oscillator: \(\ddot{x} = -\omega^2 x\)</span>
+                    </label>
+                    <label class="option">
+                        <input type="checkbox" value="1">
+                        <span>Real pendulum: \(\ddot{\theta} = -(g/L)\sin\theta\)</span>
+                    </label>
+                    <label class="option">
+                        <input type="checkbox" value="2">
+                        <span>Algebraic equation: \(x^2 + 3x - 5 = 0\)</span>
+                    </label>
+                    <label class="option">
+                        <input type="checkbox" value="3">
+                        <span>Damped driven oscillator: \(\ddot{x} + 2\gamma\dot{x} + \omega_0^2 x = F_0\cos(\omega_d t)\)</span>
+                    </label>
+                </div>
+                <div class="question-actions">
+                    <button class="btn-verify">Verify</button>
+                </div>
+                <div class="question-explanation" style="display:none;">
+                    <strong>Explanation:</strong>
+                    <ul>
+                        <li><strong>SHO:</strong> Yes &mdash; \(dx/dt = v\), \(dv/dt = -\omega^2 x\).</li>
+                        <li><strong>Pendulum:</strong> Yes &mdash; the \(\sin\theta\) makes it analytically unsolvable, but numerically trivial.</li>
+                        <li><strong>Algebraic:</strong> No &mdash; this isn&rsquo;t a differential equation! No time derivatives.</li>
+                        <li><strong>Driven oscillator:</strong> Yes &mdash; \(dx/dt = v\), \(dv/dt = -2\gamma v - \omega_0^2 x + F_0\cos(\omega_d t)\).</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<hr>
+
+<!-- ========== CODE EXAMPLES ========== -->
+<h2>Python: Euler for Second-Order ODEs</h2>
+
+<div class="tabs">
+    <div class="tab-buttons">
+        <button class="tab-button active">Basic Reduction</button>
+        <button class="tab-button">Euler for Systems</button>
+        <button class="tab-button">Prompt</button>
+    </div>
+
+    <!-- Tab 1: Basic reduction -->
+    <div class="tab-content active">
+        <div class="code-block-container">
+            <div class="code-header">
+                <span class="code-lang">Python</span>
+                <button class="copy-btn">Copy</button>
+            </div>
+            <pre><code class="language-python">
+import numpy as np
+import plotly.graph_objects as go
+from plotly.subplots import make_subplots
+
+# --- The Reduction ---
+# Original: d²x/dt² = -ω²x  (SHO)
+# Reduced:  dx/dt = v
+#           dv/dt = -ω²x
+
+omega = 2.0
+x0, v0 = 1.0, 0.0    # Initial: displaced, at rest
+h = 0.01
+t_max = 10.0
+N = int(t_max / h)
+
+# Euler loop for TWO equations
+t_list, x_list, v_list = [0.0], [x0], [v0]
+x, v, t = x0, v0, 0.0
+
+for i in range(N):
+    # Compute BOTH derivatives using OLD values
+    dx = v
+    dv = -omega**2 * x
+
+    # Update BOTH simultaneously
+    x = x + h * dx
+    v = v + h * dv
+    t = t + h
+
+    t_list.append(t)
+    x_list.append(x)
+    v_list.append(v)
+
+# Exact solution for comparison
+t_ex = np.linspace(0, t_max, 1000)
+x_ex = np.cos(omega * t_ex)
+
+fig = make_subplots(rows=1, cols=2,
+    subplot_titles=['Time Series', 'Phase Portrait'])
+
+fig.add_trace(go.Scatter(x=t_ex, y=x_ex, name='Exact',
+    line=dict(color='#808080', dash='dash')), row=1, col=1)
+fig.add_trace(go.Scatter(x=t_list, y=x_list, name='Euler x(t)',
+    line=dict(color='#00f3ff', width=1.5)), row=1, col=1)
+
+fig.add_trace(go.Scatter(x=x_list, y=v_list, name='Phase',
+    line=dict(color='#ff00ff', width=1.5), mode='lines'), row=1, col=2)
+
+fig.update_layout(template='plotly_dark')
+fig.show()
+            </code></pre>
+        </div>
+    </div>
+
+    <!-- Tab 2: Euler for systems -->
+    <div class="tab-content">
+        <div class="code-block-container">
+            <div class="code-header">
+                <span class="code-lang">Python</span>
+                <button class="copy-btn">Copy</button>
+            </div>
+            <pre><code class="language-python">
+import numpy as np
+import plotly.graph_objects as go
+
+def euler_system(f, y0, t_max, h):
+    """Euler for a system: y' = f(y, t), y = [x, v, ...]"""
+    t_list = [0.0]
+    y_list = [np.array(y0)]
+    y, t = np.array(y0, dtype=float), 0.0
+
+    for i in range(int(t_max / h)):
+        dy = np.array(f(y, t))  # Derivatives at current state
+        y = y + h * dy           # Update ALL components
+        t = t + h
+        t_list.append(t)
+        y_list.append(y.copy())
+
+    return np.array(t_list), np.array(y_list)
+
+# Damped oscillator: ω₀=2, γ=0.3
+omega0, gamma = 2.0, 0.3
+
+def damped_osc(y, t):
+    x, v = y
+    return [v, -2*gamma*v - omega0**2 * x]
+
+t, Y = euler_system(damped_osc, [1.0, 0.0], 15.0, 0.01)
+
+fig = go.Figure()
+fig.add_trace(go.Scatter(x=Y[:,0], y=Y[:,1], name='Phase',
+    line=dict(color='#ff00ff', width=1.5), mode='lines'))
+fig.update_layout(
+    template='plotly_dark',
+    title='Damped Oscillator Phase Portrait',
+    xaxis=dict(title='x', gridcolor='#2a2f4a',
+        zerolinecolor='#808080', linecolor='#808080'),
+    yaxis=dict(title='v', gridcolor='#2a2f4a',
+        zerolinecolor='#808080', linecolor='#808080'),
+)
+fig.show()
+            </code></pre>
+        </div>
+    </div>
+
+    <!-- Tab 3: Prompt -->
+    <div class="tab-content">
+        <div class="code-block-container">
+            <div class="code-header">
+                <span class="code-lang">Prompt for AI</span>
+                <button class="copy-btn">Copy</button>
+            </div>
+            <pre><code class="language-text">Write a Python script to solve a second-order ODE numerically.
+
+Task: Convert d²x/dt² + 2γ(dx/dt) + ω₀²x = 0 into first-order form and solve with Euler.
+
+Requirements:
+1. Show the reduction: define v = dx/dt, get two equations
+2. Implement a general euler_system(f, y0, t_max, h) function
+   that works for ANY system of first-order ODEs
+3. Solve the damped oscillator with ω₀=2, γ=0.3, x(0)=1, v(0)=0
+4. Create two plots:
+   a) Time series: x(t) and v(t) on same axes
+   b) Phase portrait: x vs v
+5. Also solve the undamped case (γ=0) and overlay
+
+Style: plotly_dark, cyan for x(t), magenta for v(t)
+Gray axes (#808080), grid #2a2f4a
+Show: energy E = ½v² + ½ω₀²x² over time to detect Euler drift</code></pre>
+        </div>
+
+        <div class="info-box" style="margin-top: var(--spacing-md);">
+            <div class="info-box-title">Pro Tips for Prompting</div>
+            <ul>
+                <li>Ask for a <em>general</em> system solver &mdash; it works for 2, 3, or 100 equations</li>
+                <li>Request phase portraits to visualize the state space</li>
+                <li>Include energy tracking to detect numerical drift</li>
+            </ul>
+        </div>
+    </div>
+</div>
+
+<hr>
+
+<!-- ========== NAVIGATION ========== -->
+<div class="btn-group mt-xl">
+    <button class="btn btn-magenta" onclick="navigateToSection('38-euler-validation')">&larr; Previous: Testing &amp; Validation</button>
+    <button class="btn" onclick="scrollToTop()">&uarr; Back to Top</button>
+    <button class="btn btn-secondary" onclick="navigateToSection('40-coupled-systems')">Next: Solving Coupled Systems &rarr;</button>
+</div>

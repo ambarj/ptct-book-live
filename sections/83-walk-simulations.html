@@ -1,0 +1,457 @@
+<!-- ============================================================
+     Section 7.8: Numerical Random Walk Simulations
+     Source: NPTEL Lecture 9_3, rwalk.nb
+     Concept: Validating random walk theory with simulations —
+              ensembles, histograms, measured moments vs theory
+     Time: 20-25 minutes
+     Prerequisites: Sections 7.1-7.7 (walks, binomial, continuum,
+                    diffusion, higher-d)
+     ============================================================ -->
+
+<h1>Numerical Random Walk Simulations</h1>
+
+<p>
+    We have built a beautiful theory: random walks → binomial distribution →
+    Gaussian in the continuum limit → diffusion equation. But how do we
+    <em>know</em> the theory is right? The computational-thinking answer is to
+    <strong>simulate</strong>: generate thousands of random walks, measure
+    their statistics, and compare to the formulas we derived. If they agree,
+    theory is validated. If they disagree, something is wrong — in the code or
+    in the theory.
+</p>
+
+<div class="info-box">
+    <div class="info-box-title">Learning Objectives</div>
+    <ul>
+        <li>Generate ensembles of random walks and collect final positions</li>
+        <li>Build histograms and overlay theoretical predictions (binomial, Gaussian)</li>
+        <li>Measure \( \langle m \rangle \) and \( \langle m^2 \rangle \) from data and compare to theory</li>
+        <li>Understand that <strong>simulation is validation</strong>: the third pillar of computational science alongside theory and experiment</li>
+    </ul>
+</div>
+
+<div class="equation-display">
+    <p><strong>Theoretical Predictions (Unbiased 1D Walk, N Steps):</strong></p>
+    $$ \langle m \rangle = 0, \qquad \langle m^2 \rangle = N, \qquad P(m) \approx \frac{1}{\sqrt{2\pi N}} \exp\!\left(-\frac{m^2}{2N}\right) $$
+    <p>
+        Our simulations should reproduce all three: zero mean, variance equal
+        to \( N \), and a Gaussian envelope.
+    </p>
+</div>
+
+<hr>
+
+<!-- ============================================================ -->
+<!-- EXPLORER 1: Ensemble Generator + Histogram -->
+<!-- ============================================================ -->
+<div class="interactive-container" id="ensemble-histogram">
+    <div class="interactive-title">Explorer: Ensemble Histogram vs Theory</div>
+
+    <p>
+        Launch many random walks at once. Each walker takes \( N \) unbiased
+        \( \pm 1 \) steps. Their final positions \( m \) are binned into a
+        histogram, and we overlay the <strong>exact binomial</strong>
+        prediction and the <strong>Gaussian approximation</strong>.
+        As the ensemble grows, the histogram should converge to the theory.
+    </p>
+
+    <div class="plot-container" id="ws-histPlot" style="height: 440px;"></div>
+    <div id="ws-stats1" class="stats-bar"></div>
+
+    <div class="control-panel">
+        <div class="control-group">
+            <label class="control-label" for="ws-nw-slider">Walkers:
+                <span id="ws-nw-value">2000</span>
+            </label>
+            <input type="range" class="slider" id="ws-nw-slider"
+                   min="100" max="20000" step="100" value="2000">
+        </div>
+        <div class="control-group">
+            <label class="control-label" for="ws-ns-slider">Steps N:
+                <span id="ws-ns-value">100</span>
+            </label>
+            <input type="range" class="slider" id="ws-ns-slider"
+                   min="10" max="400" step="10" value="100">
+        </div>
+        <div class="control-group">
+            <button class="btn" onclick="wsHistRun()">Run Simulation</button>
+            <button class="btn" onclick="wsHistReset()">Reset</button>
+        </div>
+    </div>
+</div>
+
+<!-- ========== Test Your Understanding #1 ========== -->
+<div class="interactive-container question-section">
+    <div class="interactive-title">Test Your Understanding</div>
+    <p style="margin-bottom: var(--spacing-md); color: var(--text-secondary);">Use the Ensemble Histogram explorer.</p>
+    <div class="tabs">
+        <div class="tab-buttons">
+            <button class="tab-button active">Question 1</button>
+            <button class="tab-button">Question 2</button>
+            <button class="tab-button">Question 3</button>
+        </div>
+        <div class="tab-content active">
+            <div class="question-container" data-type="mcq" data-answer="2">
+                <div class="question-text">Run with 100 walkers, then with 20,000. What happens to the histogram?</div>
+                <div class="question-options">
+                    <label class="option"><input type="radio" name="ws-q1" value="0"><span>It gets wider &mdash; more walkers means more spread</span></label>
+                    <label class="option"><input type="radio" name="ws-q1" value="1"><span>It becomes narrower and eventually a spike</span></label>
+                    <label class="option"><input type="radio" name="ws-q1" value="2"><span>The same overall shape, but much smoother and closer to the theoretical curve</span></label>
+                    <label class="option"><input type="radio" name="ws-q1" value="3"><span>It flattens into a uniform distribution</span></label>
+                </div>
+                <div class="question-actions"><button class="btn-verify">Verify</button></div>
+                <div class="question-explanation" style="display:none;"><strong>Explanation:</strong> The <em>shape</em> of the distribution is set by the physics (binomial/Gaussian). More walkers just give better statistics — the histogram becomes smoother and hugs the theoretical curve. This is the law of large numbers in action.</div>
+            </div>
+        </div>
+        <div class="tab-content">
+            <div class="question-container" data-type="fill" data-answer="10[8,12]">
+                <div class="question-text">With \( N = 100 \) steps, the theoretical standard deviation is \( \sqrt{N} = \) <input type="text" class="fill-blank" style="width: 50px">. Verify this matches the measured width of the histogram.</div>
+                <div class="question-actions"><button class="btn-verify">Verify</button></div>
+                <div class="question-explanation" style="display:none;"><strong>Explanation:</strong> For \( N = 100 \), \( \sigma = \sqrt{100} = 10 \). The histogram should have about \( 68\% \) of walkers within \( \pm 10 \) of zero, and \( 95\% \) within \( \pm 20 \). The stats bar shows the measured \( \sigma \) from data — it should be very close to 10.</div>
+            </div>
+        </div>
+        <div class="tab-content">
+            <div class="question-container" data-type="mcq" data-answer="1">
+                <div class="question-text">For large \( N \), the binomial (dots) and Gaussian (curve) overlays&hellip;</div>
+                <div class="question-options">
+                    <label class="option"><input type="radio" name="ws-q3" value="0"><span>Diverge from each other &mdash; they describe different physics</span></label>
+                    <label class="option"><input type="radio" name="ws-q3" value="1"><span>Lie almost exactly on top of each other &mdash; the Gaussian is the continuum limit of the binomial</span></label>
+                    <label class="option"><input type="radio" name="ws-q3" value="2"><span>The Gaussian is always above the binomial</span></label>
+                    <label class="option"><input type="radio" name="ws-q3" value="3"><span>Only the binomial is correct; the Gaussian is an approximation that fails</span></label>
+                </div>
+                <div class="question-actions"><button class="btn-verify">Verify</button></div>
+                <div class="question-explanation" style="display:none;"><strong>Explanation:</strong> For large \( N \) (say \( N \geq 30 \)), the binomial and Gaussian are nearly indistinguishable — this is the <strong>central limit theorem</strong> at work. The Gaussian is the <em>continuum limit</em> of the discrete binomial distribution (Section 7.9 will prove this via Stirling's approximation).</div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- ============================================================ -->
+<!-- EXPLORER 2: Measuring Moments -->
+<!-- ============================================================ -->
+<div class="interactive-container" id="moment-tracker">
+    <div class="interactive-title">Explorer: Measured Moments vs Theory</div>
+
+    <p>
+        From the simulated ensemble, we compute the sample mean
+        \( \overline{m} = \frac{1}{N_w}\sum_w m_w \) and sample second moment
+        \( \overline{m^2} = \frac{1}{N_w}\sum_w m_w^2 \), and compare to the
+        theoretical predictions \( \langle m \rangle = 0 \) and
+        \( \langle m^2 \rangle = N \). We sweep the number of steps and plot
+        the agreement.
+    </p>
+
+    <div class="dual-panel">
+        <div class="panel"><div class="plot-container" id="ws-meanPlot" style="height: 400px;"></div></div>
+        <div class="panel"><div class="plot-container" id="ws-varPlot" style="height: 400px;"></div></div>
+    </div>
+    <div id="ws-stats2" class="stats-bar"></div>
+
+    <div class="control-panel">
+        <div class="control-group">
+            <label class="control-label" for="ws-nw2-slider">Walkers per point:
+                <span id="ws-nw2-value">500</span>
+            </label>
+            <input type="range" class="slider" id="ws-nw2-slider"
+                   min="50" max="5000" step="50" value="500">
+        </div>
+        <div class="control-group">
+            <button class="btn" onclick="wsMomRun()">Run Sweep</button>
+            <button class="btn" onclick="wsMomReset()">Reset</button>
+        </div>
+    </div>
+</div>
+
+<!-- ========== Test Your Understanding #2 ========== -->
+<div class="interactive-container question-section">
+    <div class="interactive-title">Test Your Understanding</div>
+    <p style="margin-bottom: var(--spacing-md); color: var(--text-secondary);">Use the Measured Moments explorer.</p>
+    <div class="tabs">
+        <div class="tab-buttons">
+            <button class="tab-button active">Question 4</button>
+            <button class="tab-button">Question 5</button>
+            <button class="tab-button">Question 6</button>
+        </div>
+        <div class="tab-content active">
+            <div class="question-container" data-type="mcq" data-answer="1">
+                <div class="question-text">With 500 walkers per point, what shape does the measured \( \langle m^2 \rangle \) vs \( N \) plot look like?</div>
+                <div class="question-options">
+                    <label class="option"><input type="radio" name="ws-q4" value="0"><span>A flat line &mdash; it does not depend on \( N \)</span></label>
+                    <label class="option"><input type="radio" name="ws-q4" value="1"><span>A straight line with slope 1 &mdash; because \( \langle m^2 \rangle = N \)</span></label>
+                    <label class="option"><input type="radio" name="ws-q4" value="2"><span>A parabola &mdash; because \( \langle m^2 \rangle = N^2 \)</span></label>
+                    <label class="option"><input type="radio" name="ws-q4" value="3"><span>A square root &mdash; because \( \langle m^2 \rangle = \sqrt{N} \)</span></label>
+                </div>
+                <div class="question-actions"><button class="btn-verify">Verify</button></div>
+                <div class="question-explanation" style="display:none;"><strong>Explanation:</strong> For an unbiased walk, \( \langle m^2 \rangle = N \) &mdash; a straight line through the origin with slope 1. Diffusive spread (\( \langle m^2 \rangle \propto N \)) is <em>slower</em> than ballistic (\( \propto N^2 \)) but <em>faster</em> than random jitter (\( \propto \text{const} \)).</div>
+            </div>
+        </div>
+        <div class="tab-content">
+            <div class="question-container" data-type="mcq" data-answer="2">
+                <div class="question-text">The measured mean \( \overline{m} \) fluctuates around zero. As you increase walkers per point, those fluctuations&hellip;</div>
+                <div class="question-options">
+                    <label class="option"><input type="radio" name="ws-q5" value="0"><span>Stay the same size</span></label>
+                    <label class="option"><input type="radio" name="ws-q5" value="1"><span>Grow larger because there are more walkers</span></label>
+                    <label class="option"><input type="radio" name="ws-q5" value="2"><span>Shrink like \( 1/\sqrt{N_w} \) &mdash; the standard error of the mean</span></label>
+                    <label class="option"><input type="radio" name="ws-q5" value="3"><span>Vanish instantly</span></label>
+                </div>
+                <div class="question-actions"><button class="btn-verify">Verify</button></div>
+                <div class="question-explanation" style="display:none;"><strong>Explanation:</strong> Individual walkers have spread \( \sqrt{N} \), so the <em>sample mean</em> of \( N_w \) walkers has spread \( \sqrt{N}/\sqrt{N_w} \) — the standard error. More walkers → tighter agreement with the theoretical \( \langle m \rangle = 0 \). This is exactly the same \( 1/\sqrt{N} \) convergence we saw in Monte Carlo integration (Chapter 6).</div>
+            </div>
+        </div>
+        <div class="tab-content">
+            <div class="question-container" data-type="msq" data-answer="0,1,3">
+                <div class="question-text">Which statements about simulation-as-validation are true? (Select all)</div>
+                <div class="question-options">
+                    <label class="option"><input type="checkbox" value="0"><span>Agreement between simulation and theory increases confidence in both</span></label>
+                    <label class="option"><input type="checkbox" value="1"><span>Disagreement tells us something is wrong &mdash; a bug, or the theory does not apply</span></label>
+                    <label class="option"><input type="checkbox" value="2"><span>Once the simulation matches theory, we no longer need the theory</span></label>
+                    <label class="option"><input type="checkbox" value="3"><span>Simulations are especially useful when analytical theory is hard or impossible</span></label>
+                </div>
+                <div class="question-actions"><button class="btn-verify">Verify</button></div>
+                <div class="question-explanation" style="display:none;"><strong>Explanation:</strong><ul><li><strong>Agreement builds confidence:</strong> ✓ Independent derivations (formula + simulation) rarely both fail the same way.</li><li><strong>Disagreement = debug:</strong> ✓ Always investigate &mdash; sometimes the code is wrong, sometimes an assumption is off.</li><li><strong>Don't need theory:</strong> ✗ Theory generalizes; simulation is one data point. Theory explains <em>why</em>; simulation shows <em>that</em>.</li><li><strong>Simulations handle hard problems:</strong> ✓ Ising models, interacting walkers, absorbing boundaries &mdash; intractable analytically but easy numerically.</li></ul></div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- ============================================================ -->
+<!-- EXPLORER 3: Convergence of the Histogram -->
+<!-- ============================================================ -->
+<div class="interactive-container" id="convergence-movie">
+    <div class="interactive-title">Explorer: Histogram Convergence</div>
+
+    <p>
+        Watch the histogram build up walker by walker. We measure the
+        <strong>RMS deviation</strong> between the measured histogram and the
+        theoretical Gaussian at each stage. Agreement should improve like
+        \( 1/\sqrt{N_w} \): this is the signature of Monte Carlo convergence.
+    </p>
+
+    <div class="dual-panel">
+        <div class="panel"><div class="plot-container" id="ws-convHist" style="height: 400px;"></div></div>
+        <div class="panel"><div class="plot-container" id="ws-convErr" style="height: 400px;"></div></div>
+    </div>
+    <div id="ws-stats3" class="stats-bar"></div>
+
+    <div class="control-panel">
+        <div class="control-group">
+            <label class="control-label" for="ws-conv-ns-slider">Steps N:
+                <span id="ws-conv-ns-value">100</span>
+            </label>
+            <input type="range" class="slider" id="ws-conv-ns-slider"
+                   min="20" max="400" step="10" value="100">
+        </div>
+        <div class="control-group">
+            <button class="btn" onclick="wsConvRun()">Build up</button>
+            <button class="btn" onclick="wsConvReset()">Reset</button>
+        </div>
+    </div>
+</div>
+
+<!-- ========== Test Your Understanding #3 ========== -->
+<div class="interactive-container question-section">
+    <div class="interactive-title">Test Your Understanding</div>
+    <p style="margin-bottom: var(--spacing-md); color: var(--text-secondary);">Use the Histogram Convergence explorer.</p>
+    <div class="tabs">
+        <div class="tab-buttons">
+            <button class="tab-button active">Question 7</button>
+            <button class="tab-button">Question 8</button>
+            <button class="tab-button">Question 9</button>
+        </div>
+        <div class="tab-content active">
+            <div class="question-container" data-type="mcq" data-answer="2">
+                <div class="question-text">On the log-log RMS-error plot, the error falls like a straight line. What slope do you see?</div>
+                <div class="question-options">
+                    <label class="option"><input type="radio" name="ws-q7" value="0"><span>0 (flat) &mdash; error is constant</span></label>
+                    <label class="option"><input type="radio" name="ws-q7" value="1"><span>+1 &mdash; error grows linearly</span></label>
+                    <label class="option"><input type="radio" name="ws-q7" value="2"><span>About \( -1/2 \) &mdash; error shrinks like \( 1/\sqrt{N_w} \)</span></label>
+                    <label class="option"><input type="radio" name="ws-q7" value="3"><span>\( -1 \) &mdash; error shrinks like \( 1/N_w \)</span></label>
+                </div>
+                <div class="question-actions"><button class="btn-verify">Verify</button></div>
+                <div class="question-explanation" style="display:none;"><strong>Explanation:</strong> Monte Carlo error scales as \( 1/\sqrt{N_w} \), so on log-log axes the slope is \( -1/2 \). This is the universal Monte Carlo convergence rate &mdash; the same rate we saw for MC integration in Chapter 6. To halve the error, you need <em>four times</em> the walkers.</div>
+            </div>
+        </div>
+        <div class="tab-content">
+            <div class="question-container" data-type="mcq" data-answer="0">
+                <div class="question-text">To reduce the RMS error by a factor of 10, roughly how many more walkers do you need?</div>
+                <div class="question-options">
+                    <label class="option"><input type="radio" name="ws-q8" value="0"><span>100× more &mdash; because error \( \propto 1/\sqrt{N_w} \)</span></label>
+                    <label class="option"><input type="radio" name="ws-q8" value="1"><span>10× more</span></label>
+                    <label class="option"><input type="radio" name="ws-q8" value="2"><span>\( \sqrt{10} \approx 3.2 \times \) more</span></label>
+                    <label class="option"><input type="radio" name="ws-q8" value="3"><span>Exactly 10× because convergence is linear</span></label>
+                </div>
+                <div class="question-actions"><button class="btn-verify">Verify</button></div>
+                <div class="question-explanation" style="display:none;"><strong>Explanation:</strong> \( \text{error} \propto 1/\sqrt{N_w} \). To divide error by 10, we need \( N_w \to 100 N_w \). This slow convergence is the price of generality &mdash; but it is <em>dimension-independent</em>, which makes Monte Carlo irresistible in high dimensions.</div>
+            </div>
+        </div>
+        <div class="tab-content">
+            <div class="question-container" data-type="mcq" data-answer="1">
+                <div class="question-text">Simulation matches theory to three decimals. What should you conclude?</div>
+                <div class="question-options">
+                    <label class="option"><input type="radio" name="ws-q9" value="0"><span>The theory is proved forever</span></label>
+                    <label class="option"><input type="radio" name="ws-q9" value="1"><span>Strong evidence that both are consistent in this regime &mdash; but extrapolate with care</span></label>
+                    <label class="option"><input type="radio" name="ws-q9" value="2"><span>The simulation replaces the theory</span></label>
+                    <label class="option"><input type="radio" name="ws-q9" value="3"><span>Coincidence &mdash; simulation never proves anything</span></label>
+                </div>
+                <div class="question-actions"><button class="btn-verify">Verify</button></div>
+                <div class="question-explanation" style="display:none;"><strong>Explanation:</strong> Agreement is strong <em>evidence</em> of consistency in the tested regime. Theory still wins for generality (it works for any \( N \)), but simulation confirms we have not made an algebra error and the assumptions hold in practice. Good scientists use both &mdash; and are always suspicious of extrapolation beyond what was tested.</div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- ============================================================ -->
+<!-- KEY INSIGHT -->
+<!-- ============================================================ -->
+<div class="info-box">
+    <div class="info-box-title">Key Insight: Simulation as the Third Pillar</div>
+    <p>
+        Science used to rest on two pillars: <strong>theory</strong> (pen and
+        paper) and <strong>experiment</strong> (lab benches and telescopes).
+        Computational thinking adds a third: <strong>simulation</strong> — a
+        virtual laboratory where we test theory against numerical reality
+        before committing to expensive hardware. When simulation, theory, and
+        experiment all agree, we have very strong evidence we understand the
+        physics.
+    </p>
+</div>
+
+<!-- ============================================================ -->
+<!-- PYTHON CODE -->
+<!-- ============================================================ -->
+<h2>Python Code</h2>
+<div class="tabs">
+    <div class="tab-buttons">
+        <button class="tab-button active">Ensemble + Theory</button>
+        <button class="tab-button">Moment Sweep</button>
+        <button class="tab-button">Convergence</button>
+        <button class="tab-button">Prompt</button>
+    </div>
+    <div class="tab-content active">
+        <div class="code-block-container"><div class="code-header"><span class="code-lang">Python</span><button class="copy-btn">Copy</button></div>
+            <pre><code class="language-python">
+import numpy as np
+import plotly.graph_objects as go
+from math import comb
+
+N, Nw = 100, 5000
+# Each walker: sum of N ±1 steps
+steps = np.random.choice([-1, 1], size=(Nw, N))
+m = steps.sum(axis=1)
+
+# Histogram on even m values
+edges = np.arange(-N-1, N+2, 2)
+hist, _ = np.histogram(m, bins=edges, density=True)
+centers = 0.5*(edges[:-1] + edges[1:])
+
+# Exact binomial and Gaussian
+k = (centers + N) // 2
+binom = np.array([comb(N, int(ki)) * 0.5**N / 2 for ki in k])
+gauss = np.exp(-centers**2/(2*N)) / np.sqrt(2*np.pi*N)
+
+fig = go.Figure()
+fig.add_trace(go.Bar(x=centers, y=hist, name='simulation',
+                     marker_color='#00f3ff', opacity=0.6))
+fig.add_trace(go.Scatter(x=centers, y=binom, mode='markers',
+    marker=dict(color='#ffbe0b', size=6), name='binomial'))
+fig.add_trace(go.Scatter(x=centers, y=gauss, mode='lines',
+    line=dict(color='#ff006e', width=2), name='Gaussian'))
+
+fig.update_layout(template='plotly_dark',
+    xaxis=dict(title='m', zerolinecolor='#808080'),
+    yaxis=dict(title='P(m)', zerolinecolor='#808080'),
+    height=440)
+fig.show()
+
+print(f"mean = {m.mean():.3f}  (theory 0)")
+print(f"⟨m²⟩ = {(m**2).mean():.2f}  (theory {N})")
+            </code></pre>
+        </div>
+    </div>
+    <div class="tab-content">
+        <div class="code-block-container"><div class="code-header"><span class="code-lang">Python</span><button class="copy-btn">Copy</button></div>
+            <pre><code class="language-python">
+import numpy as np
+import plotly.graph_objects as go
+
+Ns = np.arange(10, 301, 10)
+Nw = 500
+means, m2s = [], []
+for N in Ns:
+    walks = np.random.choice([-1, 1], size=(Nw, N)).sum(axis=1)
+    means.append(walks.mean())
+    m2s.append((walks**2).mean())
+
+fig = go.Figure()
+fig.add_trace(go.Scatter(x=Ns, y=m2s, mode='markers',
+    marker=dict(color='#00f3ff', size=8), name='measured ⟨m²⟩'))
+fig.add_trace(go.Scatter(x=Ns, y=Ns, mode='lines',
+    line=dict(color='#ff006e', width=2), name='theory N'))
+fig.update_layout(template='plotly_dark',
+    xaxis=dict(title='Steps N', zerolinecolor='#808080'),
+    yaxis=dict(title='⟨m²⟩', zerolinecolor='#808080'),
+    height=400)
+fig.show()
+            </code></pre>
+        </div>
+    </div>
+    <div class="tab-content">
+        <div class="code-block-container"><div class="code-header"><span class="code-lang">Python</span><button class="copy-btn">Copy</button></div>
+            <pre><code class="language-python">
+import numpy as np
+import plotly.graph_objects as go
+
+N = 100
+Nws = np.logspace(1.5, 4.5, 15).astype(int)
+errs = []
+edges = np.arange(-N-1, N+2, 2)
+centers = 0.5*(edges[:-1] + edges[1:])
+gauss = np.exp(-centers**2/(2*N)) / np.sqrt(2*np.pi*N)
+
+for Nw in Nws:
+    m = np.random.choice([-1, 1], size=(Nw, N)).sum(axis=1)
+    h, _ = np.histogram(m, bins=edges, density=True)
+    errs.append(np.sqrt(np.mean((h - gauss)**2)))
+
+fig = go.Figure()
+fig.add_trace(go.Scatter(x=Nws, y=errs, mode='markers+lines',
+    marker=dict(color='#00f3ff', size=8), name='RMS error'))
+fig.add_trace(go.Scatter(x=Nws, y=errs[0]*np.sqrt(Nws[0]/Nws),
+    mode='lines', line=dict(color='#ff006e', dash='dash'),
+    name='1/√Nw reference'))
+fig.update_layout(template='plotly_dark',
+    xaxis=dict(title='Walkers', type='log', zerolinecolor='#808080'),
+    yaxis=dict(title='RMS error', type='log', zerolinecolor='#808080'),
+    height=400)
+fig.show()
+            </code></pre>
+        </div>
+    </div>
+    <div class="tab-content">
+        <div class="code-block-container"><div class="code-header"><span class="code-lang">Prompt for AI</span><button class="copy-btn">Copy</button></div>
+            <pre><code class="language-text">Create Python with numpy and Plotly to validate 1D random walk theory by simulation.
+
+Requirements:
+- Part 1: Ensemble histogram. Generate Nw = 5000 walkers of N = 100 ±1 steps.
+  Histogram final positions (bin every even integer, density=True).
+  Overlay exact binomial P(m) = C(N,(m+N)/2)/2^N / 2 and Gaussian exp(-m²/(2N))/√(2πN).
+  Print measured mean and ⟨m²⟩ vs theory (0 and N).
+- Part 2: Moment sweep. For N = 10, 20, ..., 300, run 500 walkers each and
+  plot measured ⟨m²⟩ vs N. Overlay the theoretical line y = N.
+- Part 3: Convergence. Fix N = 100. Vary Nw log-spaced from 30 to 30000.
+  Compute RMS deviation between histogram and theoretical Gaussian.
+  Plot on log-log axes; overlay 1/√Nw reference line (slope −1/2).
+- Use dark theme, gray axes (#808080), neon colors cyan/magenta/yellow.
+- Keep code under 40 lines per part; use comments to explain each step.</code></pre>
+        </div>
+    </div>
+</div>
+
+<!-- ============================================================ -->
+<!-- NAVIGATION -->
+<!-- ============================================================ -->
+<div class="btn-group mt-xl">
+    <button class="btn btn-magenta" onclick="navigateToSection('82-diffusion-higher-d')">&larr; Previous: 2D &amp; 3D Diffusion</button>
+    <button class="btn btn-secondary" onclick="scrollToTop()">&uarr; Back to Top</button>
+    <button class="btn btn-secondary" onclick="navigateToSection('84-stirling-gaussian')">Next: Stirling &amp; the Gaussian Limit &rarr;</button>
+</div>
