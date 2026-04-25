@@ -1,0 +1,523 @@
+<!-- ============================================================
+     Section 8.2: Conservation Laws — Energy & Angular Momentum
+     Source: NPTEL Lec 18 transcript (Lec 18 - Central Force
+             Motion.md), § 4 (page 5)
+     Concept: Central forces have no torque ⇒ L conserved ⇒
+              motion in a fixed plane; E also conserved.
+              Numerical violation = numerical error.
+     Time: 22-25 minutes
+     Prerequisites: Section 8.1 (two-body reduction); Newton's
+                    laws + cross product (App. A); RK4 (Ch 4).
+     ============================================================ -->
+
+<h1>Conservation Laws: Energy &amp; Angular Momentum</h1>
+
+<p>
+    Why does a planet's orbit lie in a single, unchanging plane for billions
+    of years? Why does a comet whip past the Sun at perihelion and crawl at
+    aphelion? Both questions have the same one-word answer: <strong>conservation</strong>.
+    For any central force, the angular momentum vector \( \vec L \) and the
+    total energy \( E \) are constants of motion. The first conservation law
+    forces orbits to be planar; the second, combined with the first, controls
+    how fast the body moves at every point along its path. Together they cut
+    a six-dimensional phase-space problem down to one effective degree of
+    freedom — and they give us a built-in correctness check for any numerical
+    orbit we compute.
+</p>
+
+<div class="info-box">
+    <div class="info-icon">💡</div>
+    <div class="info-content">
+        <strong>Learning Objectives:</strong>
+        <ul>
+            <li>State and apply angular-momentum conservation: \( d\vec L/dt = \vec r \times \vec F = 0 \) when \( \vec F \parallel \hat r \)</li>
+            <li>Recognize that \( \vec L \) constant ⇒ orbit lies in a fixed plane perpendicular to \( \vec L \)</li>
+            <li>Reduce the planar problem to polar coordinates: \( \ell = \mu\rho^2\dot\phi \) and \( E = \tfrac{1}{2}\mu\dot\rho^2 + \tfrac{1}{2}\mu\rho^2\dot\phi^2 + U(\rho) \)</li>
+            <li>Use conservation of E and ℓ as a numerical sanity check — drift in either is a bug, not physics</li>
+            <li>See Kepler's second law (equal areas in equal times) as a one-line consequence of angular-momentum conservation</li>
+        </ul>
+    </div>
+</div>
+
+<!-- ============================================================ -->
+<!-- SYMMETRY → CONSERVATION -->
+<!-- ============================================================ -->
+<h2>Symmetry Implies Conservation</h2>
+
+<p>
+    Behind every conservation law lurks a symmetry of nature. We will not
+    prove this here — it's the content of <em>Noether's theorem</em>, one of
+    the deepest results in classical and quantum physics — but the dictionary
+    is short and worth remembering:
+</p>
+
+<ul>
+    <li><strong>Translation symmetry</strong> of empty space ⇒ <strong>linear momentum</strong> is conserved.</li>
+    <li><strong>Rotation symmetry</strong> of \( U(r) \) (depends on \( |\vec r| \), not direction) ⇒ <strong>angular momentum</strong> is conserved.</li>
+    <li><strong>Time-translation symmetry</strong> (laws don't change from one moment to the next) ⇒ <strong>energy</strong> is conserved.</li>
+</ul>
+
+<p>
+    Central force motion enjoys all three. Linear momentum of the
+    <em>two-body</em> system is conserved (CM moves uniformly — already used
+    in Section 8.1). For the <em>relative</em> motion in the CM frame, both
+    energy and angular momentum are conserved.
+</p>
+
+<div class="equation-display">
+    <p><strong>Why \( \vec L \) is constant for a central force:</strong></p>
+    $$ \vec L = \vec r \times \vec p, \qquad \frac{d\vec L}{dt} = \vec r \times \vec F $$
+    <p>
+        For a central force \( \vec F = f(r)\hat r \), the cross product
+        \( \vec r \times \hat r = 0 \). So \( d\vec L/dt = 0 \) — angular
+        momentum is conserved <em>automatically</em>, regardless of the
+        specific form of \( U(r) \).
+    </p>
+</div>
+
+<hr>
+
+<!-- ============================================================ -->
+<!-- EXPLORER 1: 3D Planar Motion -->
+<!-- ============================================================ -->
+<div class="interactive-container" id="planar-motion">
+    <div class="interactive-title">Explorer: Why Is the Orbit Planar?</div>
+
+    <p>
+        Launch a particle from arbitrary 3D position and velocity into a
+        Kepler potential \( U(r) = -1/r \). Numerical integration (RK4)
+        produces the trajectory. Toggle the angular-momentum vector
+        \( \vec L \) and the orbital plane (perpendicular to \( \vec L \))
+        — no matter how you tilt the initial conditions, the orbit stays
+        in that plane.
+    </p>
+
+    <div class="plot-container" id="cl-3dPlot" style="height: 500px;"></div>
+    <div id="cl-stats1" class="stats-bar"></div>
+
+    <div class="control-panel">
+        <div class="control-group">
+            <label class="control-label" for="cl-rx-slider">r₀.x: <span id="cl-rx-value">1.00</span></label>
+            <input type="range" class="slider" id="cl-rx-slider" min="-2" max="2" step="0.05" value="1">
+        </div>
+        <div class="control-group">
+            <label class="control-label" for="cl-ry-slider">r₀.y: <span id="cl-ry-value">0.00</span></label>
+            <input type="range" class="slider" id="cl-ry-slider" min="-2" max="2" step="0.05" value="0">
+        </div>
+        <div class="control-group">
+            <label class="control-label" for="cl-rz-slider">r₀.z: <span id="cl-rz-value">0.30</span></label>
+            <input type="range" class="slider" id="cl-rz-slider" min="-2" max="2" step="0.05" value="0.3">
+        </div>
+        <div class="control-group">
+            <label class="control-label" for="cl-vx-slider">v₀.x: <span id="cl-vx-value">0.00</span></label>
+            <input type="range" class="slider" id="cl-vx-slider" min="-1.5" max="1.5" step="0.05" value="0">
+        </div>
+        <div class="control-group">
+            <label class="control-label" for="cl-vy-slider">v₀.y: <span id="cl-vy-value">0.80</span></label>
+            <input type="range" class="slider" id="cl-vy-slider" min="-1.5" max="1.5" step="0.05" value="0.8">
+        </div>
+        <div class="control-group">
+            <label class="control-label" for="cl-vz-slider">v₀.z: <span id="cl-vz-value">0.20</span></label>
+            <input type="range" class="slider" id="cl-vz-slider" min="-1.5" max="1.5" step="0.05" value="0.2">
+        </div>
+        <div class="control-group">
+            <label class="control-label">
+                <input type="checkbox" id="cl-show-L" checked> Show L⃗ vector
+            </label>
+            <label class="control-label">
+                <input type="checkbox" id="cl-show-plane" checked> Show orbital plane
+            </label>
+        </div>
+        <div class="control-group">
+            <button class="btn" onclick="cl3dReset()">Reset</button>
+        </div>
+    </div>
+</div>
+
+<!-- ========== Test Your Understanding #1 ========== -->
+<div class="interactive-container question-section">
+    <div class="interactive-title">Test Your Understanding</div>
+    <p style="margin-bottom: var(--spacing-md); color: var(--text-secondary);">Use the 3D Planar Motion explorer.</p>
+    <div class="tabs">
+        <div class="tab-buttons">
+            <button class="tab-button active">Question 1</button>
+            <button class="tab-button">Question 2</button>
+            <button class="tab-button">Question 3</button>
+        </div>
+        <div class="tab-content active">
+            <div class="question-container" data-type="mcq" data-answer="0">
+                <div class="question-text">Why is angular momentum \( \vec L \) conserved for <em>any</em> central force, regardless of whether it's gravity, the Coulomb force, or a harmonic spring from the origin?</div>
+                <div class="question-options">
+                    <label class="option"><input type="radio" name="cl-q1" value="0"><span>Because the torque \( \vec r \times \vec F \) vanishes when \( \vec F \) is parallel (or antiparallel) to \( \vec r \)</span></label>
+                    <label class="option"><input type="radio" name="cl-q1" value="1"><span>Because gravity is always attractive</span></label>
+                    <label class="option"><input type="radio" name="cl-q1" value="2"><span>Only for gravity — Coulomb and spring forces don't conserve \( \vec L \)</span></label>
+                    <label class="option"><input type="radio" name="cl-q1" value="3"><span>Because the orbit is always closed</span></label>
+                </div>
+                <div class="question-actions"><button class="btn-verify">Verify</button></div>
+                <div class="question-explanation" style="display:none;"><strong>Explanation:</strong> The angular-momentum theorem says \( d\vec L/dt = \vec r \times \vec F \). For any central force \( \vec F = f(r)\hat r \), the cross product \( \vec r \times \hat r = 0 \). So angular momentum is conserved <em>automatically</em>, regardless of the specific form of \( U(r) \). This is why all of central-force motion shares the planar-orbit feature.</div>
+            </div>
+        </div>
+        <div class="tab-content">
+            <div class="question-container" data-type="msq" data-answer="0,1,3">
+                <div class="question-text">Which of these forces are <strong>central</strong> (so angular momentum is conserved about the force center)? Select all.</div>
+                <div class="question-options">
+                    <label class="option"><input type="checkbox" value="0"><span>Newtonian gravity from a point mass at the origin</span></label>
+                    <label class="option"><input type="checkbox" value="1"><span>Electrostatic Coulomb force from a point charge at the origin</span></label>
+                    <label class="option"><input type="checkbox" value="2"><span>Magnetic Lorentz force \( q\vec v \times \vec B \) on a moving charge</span></label>
+                    <label class="option"><input type="checkbox" value="3"><span>An ideal spring anchored at the origin (Hooke's law)</span></label>
+                    <label class="option"><input type="checkbox" value="4"><span>Air drag, \( -b\vec v \)</span></label>
+                </div>
+                <div class="question-actions"><button class="btn-verify">Verify</button></div>
+                <div class="question-explanation" style="display:none;"><strong>Explanation:</strong><ul><li><strong>Gravity:</strong> ✓ \( \vec F \propto \hat r/r^2 \) — radial.</li><li><strong>Coulomb:</strong> ✓ Same form, with sign depending on charge product.</li><li><strong>Lorentz:</strong> ✗ Depends on velocity, not just position. Not central. (However, kinetic energy is still conserved because \( \vec F \perp \vec v \).)</li><li><strong>Spring (at origin):</strong> ✓ \( \vec F = -k\vec r \) — radial. The 3D harmonic oscillator is a central-force problem.</li><li><strong>Drag:</strong> ✗ Velocity-dependent, dissipative. Neither central nor energy-conserving.</li></ul></div>
+            </div>
+        </div>
+        <div class="tab-content">
+            <div class="question-container" data-type="fill" data-answer="L|xy">
+                <div class="question-text">The orbital plane is perpendicular to <input type="text" class="fill-blank" style="width: 60px"> (which vector? Use the symbol). If \( \vec L = \ell\hat z \), then the orbit lies in the <input type="text" class="fill-blank" style="width: 60px">-plane.</div>
+                <div class="question-actions"><button class="btn-verify">Verify</button></div>
+                <div class="question-explanation" style="display:none;"><strong>Explanation:</strong> Since \( \vec L = \vec r \times \vec p \) is the cross product of two vectors in the orbital plane, \( \vec L \) is perpendicular to that plane. If \( \vec L = \ell\hat z \), the orbit must lie in the plane perpendicular to \( \hat z \) — namely the \( xy \)-plane. Try aligning the initial conditions in the explorer so that \( \vec L \) points along z.</div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- ============================================================ -->
+<!-- 3D → 2D REDUCTION -->
+<!-- ============================================================ -->
+<h2>From 3D to 2D: Polar Coordinates in the Orbital Plane</h2>
+
+<p>
+    Once we know the motion is planar, we choose the orbital plane as the
+    \( xy \)-plane and switch from Cartesian \( (x, y) \) to polar
+    \( (\rho, \phi) \). The kinetic energy in polar coordinates becomes
+    \( v^2 = \dot\rho^2 + \rho^2\dot\phi^2 \) (a result that's worth deriving
+    once with the chain rule). Combined with the potential, the conservation
+    laws read:
+</p>
+
+<div class="equation-display">
+    <p><strong>Conservation of angular momentum:</strong></p>
+    $$ \boxed{\ell = \mu\rho^2\dot\phi = \text{const}} $$
+    <p><strong>Conservation of energy:</strong></p>
+    $$ \boxed{E = \tfrac{1}{2}\mu\dot\rho^2 + \tfrac{1}{2}\mu\rho^2\dot\phi^2 + U(\rho) = \text{const}} $$
+    <p>
+        Two scalar conservation laws collapse a four-dimensional phase space
+        \( (\rho, \dot\rho, \phi, \dot\phi) \) to one effective coordinate.
+        Section 8.4 will use this to define the <em>effective potential</em>.
+    </p>
+</div>
+
+<hr>
+
+<!-- ============================================================ -->
+<!-- EXPLORER 2: Conservation Tracker -->
+<!-- ============================================================ -->
+<div class="interactive-container" id="conservation-tracker">
+    <div class="interactive-title">Explorer: Conservation as a Numerical Sanity Check</div>
+
+    <p>
+        Integrate a planar central-force orbit two ways: with bare
+        <strong>Euler</strong> (first-order) and with <strong>RK4</strong>
+        (fourth-order — the workhorse of Chapter 4). Both should give the
+        same orbit if the integrator is exact. They <em>don't</em>, and the
+        amount by which \( E \) and \( \ell \) drift tells you the
+        magnitude of numerical error. Halve the step \( h \) — Euler error
+        roughly halves; RK4 error drops by a factor of 16.
+    </p>
+
+    <div class="dual-panel">
+        <div class="panel"><div class="plot-container" id="cl-orbitPlot" style="height: 400px;"></div></div>
+        <div class="panel">
+            <div class="plot-container" id="cl-EnergyPlot" style="height: 200px;"></div>
+            <div class="plot-container" id="cl-LPlot" style="height: 200px;"></div>
+        </div>
+    </div>
+    <div id="cl-stats2" class="stats-bar"></div>
+
+    <div class="control-panel">
+        <div class="control-group">
+            <label class="control-label" for="cl-pot-select">Potential U(ρ):</label>
+            <select class="fill-blank-select" id="cl-pot-select" style="min-width: 200px;">
+                <option value="kepler" selected>Kepler  −1/ρ</option>
+                <option value="harmonic">Harmonic  ½ρ²</option>
+                <option value="coulomb">Coulomb repulsive  +1/ρ</option>
+            </select>
+        </div>
+        <div class="control-group">
+            <label class="control-label" for="cl-h-slider">Step size log₁₀(h):
+                <span id="cl-h-value">−2.00</span>
+            </label>
+            <input type="range" class="slider" id="cl-h-slider" min="-3" max="-0.5" step="0.1" value="-2">
+        </div>
+        <div class="control-group">
+            <label class="control-label" for="cl-tmax-slider">Duration:
+                <span id="cl-tmax-value">30</span>
+            </label>
+            <input type="range" class="slider" id="cl-tmax-slider" min="5" max="80" step="5" value="30">
+        </div>
+        <div class="control-group">
+            <button class="btn" onclick="clTrackerRun()">Run</button>
+            <button class="btn" onclick="clTrackerReset()">Reset</button>
+        </div>
+    </div>
+</div>
+
+<!-- ========== Test Your Understanding #2 ========== -->
+<div class="interactive-container question-section">
+    <div class="interactive-title">Test Your Understanding</div>
+    <p style="margin-bottom: var(--spacing-md); color: var(--text-secondary);">Use the Conservation Tracker.</p>
+    <div class="tabs">
+        <div class="tab-buttons">
+            <button class="tab-button active">Question 4</button>
+            <button class="tab-button">Question 5</button>
+            <button class="tab-button">Question 6</button>
+        </div>
+        <div class="tab-content active">
+            <div class="question-container" data-type="mcq" data-answer="2">
+                <div class="question-text">For a perfectly <em>circular</em> orbit in any central potential, both \( E \) and \( \ell \) are constant of course. Which of these is <em>also</em> constant?</div>
+                <div class="question-options">
+                    <label class="option"><input type="radio" name="cl-q4" value="0"><span>Only \( \dot\rho = 0 \) (radial velocity vanishes)</span></label>
+                    <label class="option"><input type="radio" name="cl-q4" value="1"><span>Only \( \dot\phi \) (angular speed)</span></label>
+                    <label class="option"><input type="radio" name="cl-q4" value="2"><span>Both — \( \dot\rho = 0 \) (no radial motion) <em>and</em> \( \dot\phi = \ell/(\mu\rho^2) \) is constant since \( \rho \) is fixed</span></label>
+                    <label class="option"><input type="radio" name="cl-q4" value="3"><span>Neither — \( \dot\phi \) varies even on a circular orbit</span></label>
+                </div>
+                <div class="question-actions"><button class="btn-verify">Verify</button></div>
+                <div class="question-explanation" style="display:none;"><strong>Explanation:</strong> A circular orbit means \( \rho \) is constant in time (no radial motion), so \( \dot\rho = 0 \). Then from \( \ell = \mu\rho^2\dot\phi \), constancy of \( \rho \) and \( \ell \) forces \( \dot\phi \) constant — the planet sweeps angle at a uniform rate. Compare this to an <em>elliptical</em> orbit, where \( \rho \) varies, so \( \dot\phi = \ell/(\mu\rho^2) \) is faster at perihelion (small ρ) and slower at aphelion (large ρ) — Kepler's second law in action.</div>
+            </div>
+        </div>
+        <div class="tab-content">
+            <div class="question-container" data-type="fill" data-answer="2.0e-7[1.5e-7,2.5e-7]|2.7e40[2.4e40,3.0e40]">
+                <div class="question-text">For Earth orbiting the Sun (μ ≈ M_⊕ = 5.97 × 10²⁴ kg, ρ ≈ 1.50 × 10¹¹ m, period \( T = 1 \) yr ≈ 3.15 × 10⁷ s): the angular speed for a (nearly) circular orbit is \( \dot\phi = 2\pi/T \approx \) <input type="text" class="fill-blank" style="width: 70px"> rad/s; the magnitude of angular momentum is \( \ell = \mu\rho^2\dot\phi \approx \) <input type="text" class="fill-blank" style="width: 70px"> J·s. (Use scientific notation like 2.0e-7.)</div>
+                <div class="question-actions"><button class="btn-verify">Verify</button></div>
+                <div class="question-explanation" style="display:none;"><strong>Explanation:</strong> \( \dot\phi = 2\pi/(3.15 \times 10^7) \approx 1.99 \times 10^{-7} \) rad/s. Then \( \ell = (5.97 \times 10^{24})(1.50 \times 10^{11})^2(1.99 \times 10^{-7}) \approx 2.67 \times 10^{40} \) J·s. This is a <em>huge</em> number, and yet \( \ell/\hbar \approx 2.5 \times 10^{74} \) — the Earth has a quantum number of order \( 10^{74} \) for its orbital angular momentum, which is why the classical limit is so accurate for planets.</div>
+            </div>
+        </div>
+        <div class="tab-content">
+            <div class="question-container" data-type="msq" data-answer="0,2,3">
+                <div class="question-text">Your numerical orbit shows \( |\Delta E/E| \) growing slowly with time. Which conclusions are valid? (Select all)</div>
+                <div class="question-options">
+                    <label class="option"><input type="checkbox" value="0"><span>This is numerical error — physics is exact, but your code (or step size) is not</span></label>
+                    <label class="option"><input type="checkbox" value="1"><span>The conservation laws are violated by the physics</span></label>
+                    <label class="option"><input type="checkbox" value="2"><span>Reducing the step size \( h \) should shrink the drift</span></label>
+                    <label class="option"><input type="checkbox" value="3"><span>Switching from Euler to RK4 (or a symplectic integrator) should reduce the drift dramatically</span></label>
+                    <label class="option"><input type="checkbox" value="4"><span>The orbit must be unbounded</span></label>
+                </div>
+                <div class="question-actions"><button class="btn-verify">Verify</button></div>
+                <div class="question-explanation" style="display:none;"><strong>Explanation:</strong><ul><li><strong>Numerical error:</strong> ✓ The physics is exactly conservative; any drift in \( E \) or \( \ell \) is the integrator falling short.</li><li><strong>Physics violated:</strong> ✗ Newton's laws + central force ⇒ exact conservation. Code is approximate; physics is not.</li><li><strong>Smaller h:</strong> ✓ Euler is \( O(h) \) per step; RK4 is \( O(h^4) \) per step. Halving h cuts Euler error in half, RK4 error by 16×.</li><li><strong>Better integrator:</strong> ✓ For long-duration orbits, even RK4 drifts. Symplectic integrators (e.g., Verlet, leapfrog) preserve energy <em>up to bounded oscillations</em>, never secular drift. They are the gold standard for celestial mechanics.</li><li><strong>Unbounded orbit:</strong> ✗ Drift in \( E \) tells you about your code, not about whether the orbit is bound. Use \( E < 0 \) for the Kepler problem to determine boundedness, not the drift magnitude.</li></ul></div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- ============================================================ -->
+<!-- KEPLER'S 2ND LAW -->
+<!-- ============================================================ -->
+<h2>Kepler's Second Law: A Free Gift</h2>
+
+<p>
+    Consider the area swept by the radius vector in time \( dt \). In polar
+    coordinates this is the triangle with sides \( \rho \) and
+    \( \rho\,d\phi \), so
+</p>
+
+<div class="equation-display">
+    $$ \frac{dA}{dt} = \tfrac{1}{2}\rho^2\dot\phi = \frac{\ell}{2\mu} = \text{const} $$
+</div>
+
+<div class="info-box">
+    <div class="info-icon">💡</div>
+    <div class="info-content">
+        <strong>Equal Areas in Equal Times.</strong>
+        <p>
+            Kepler announced this in 1609 from Tycho Brahe's observations of
+            Mars, three generations before Newton. It is one of his three laws
+            of planetary motion. We just derived it in <em>one line</em> from
+            angular-momentum conservation — and our derivation never used the
+            specific form \( U \propto -1/\rho \). Kepler's second law holds
+            for <strong>any</strong> central force: gravitational, Coulomb,
+            harmonic spring, anything. Only the first and third laws are
+            specific to the inverse-square attraction.
+        </p>
+    </div>
+</div>
+
+<!-- ============================================================ -->
+<!-- PYTHON CODE -->
+<!-- ============================================================ -->
+<h2>Python Code</h2>
+<div class="tabs">
+    <div class="tab-buttons">
+        <button class="tab-button active">3D Planar Orbit</button>
+        <button class="tab-button">Euler vs RK4</button>
+        <button class="tab-button">Kepler's 2nd Law</button>
+        <button class="tab-button">Prompt</button>
+    </div>
+    <div class="tab-content active">
+        <div class="code-block-container"><div class="code-header"><span class="code-lang">Python</span><button class="copy-btn">Copy</button></div>
+            <pre><code class="language-python">
+import numpy as np
+import plotly.graph_objects as go
+
+# RK4 on 3D Kepler problem; verify L is conserved and orbit is planar.
+def force(r):
+    return -r / (r @ r) ** 1.5
+
+def rhs(s):
+    r, v = s[:3], s[3:]
+    return np.concatenate([v, force(r)])
+
+def rk4_step(s, h):
+    k1 = rhs(s)
+    k2 = rhs(s + 0.5*h*k1)
+    k3 = rhs(s + 0.5*h*k2)
+    k4 = rhs(s + h*k3)
+    return s + (h/6) * (k1 + 2*k2 + 2*k3 + k4)
+
+# Tilted initial conditions
+s = np.array([1.0, 0, 0.3, 0, 0.8, 0.2])
+h, N = 0.01, 4000
+traj = np.zeros((N, 6))
+for k in range(N):
+    traj[k] = s; s = rk4_step(s, h)
+
+# Angular momentum (constant)
+L = np.cross(traj[:, :3], traj[:, 3:])
+print("L initial:", L[0])
+print("L final:  ", L[-1])
+print("|L| relative drift:", np.abs(np.linalg.norm(L[-1]) - np.linalg.norm(L[0])) / np.linalg.norm(L[0]))
+
+fig = go.Figure(go.Scatter3d(
+    x=traj[:, 0], y=traj[:, 1], z=traj[:, 2],
+    mode='lines', line=dict(color='#00f3ff', width=3)))
+fig.add_trace(go.Scatter3d(
+    x=[0, L[0, 0]], y=[0, L[0, 1]], z=[0, L[0, 2]],
+    mode='lines+markers', line=dict(color='#ffbe0b', width=4), name='L⃗'))
+fig.update_layout(template='plotly_dark', height=500,
+    scene=dict(
+        xaxis=dict(zerolinecolor='#808080', range=[-2, 2]),
+        yaxis=dict(zerolinecolor='#808080', range=[-2, 2]),
+        zaxis=dict(zerolinecolor='#808080', range=[-2, 2])))
+fig.show()
+            </code></pre>
+        </div>
+    </div>
+    <div class="tab-content">
+        <div class="code-block-container"><div class="code-header"><span class="code-lang">Python</span><button class="copy-btn">Copy</button></div>
+            <pre><code class="language-python">
+import numpy as np
+import plotly.graph_objects as go
+from plotly.subplots import make_subplots
+
+# Compare Euler vs RK4 for energy/L conservation in planar Kepler.
+def F(r):    # radial force from U = -1/r
+    return -r / (r @ r) ** 1.5
+
+def euler_step(s, h):
+    r, v = s[:2], s[2:]
+    return np.concatenate([r + h*v, v + h*F(r)])
+
+def rk4_step(s, h):
+    def rhs(s):
+        return np.concatenate([s[2:], F(s[:2])])
+    k1 = rhs(s); k2 = rhs(s + 0.5*h*k1)
+    k3 = rhs(s + 0.5*h*k2); k4 = rhs(s + h*k3)
+    return s + (h/6)*(k1 + 2*k2 + 2*k3 + k4)
+
+def integrate(stepper, s0, h, N):
+    out = np.zeros((N, 4)); s = s0.copy()
+    for k in range(N):
+        out[k] = s; s = stepper(s, h)
+    return out
+
+s0 = np.array([1.0, 0.0, 0.0, 0.9])  # initial r, v
+h, N = 0.05, 1000
+eu = integrate(euler_step, s0, h, N)
+rk = integrate(rk4_step, s0, h, N)
+
+def E(s):  # energy per μ
+    r, v = s[:, :2], s[:, 2:]
+    return 0.5*(v*v).sum(1) - 1/np.sqrt((r*r).sum(1))
+
+def L(s):  # z-angular momentum per μ
+    return s[:, 0]*s[:, 3] - s[:, 1]*s[:, 2]
+
+t = np.arange(N) * h
+print(f"Euler  ΔE/E max: {np.max(np.abs((E(eu) - E(eu)[0])/E(eu)[0])):.2e}")
+print(f"RK4    ΔE/E max: {np.max(np.abs((E(rk) - E(rk)[0])/E(rk)[0])):.2e}")
+            </code></pre>
+        </div>
+    </div>
+    <div class="tab-content">
+        <div class="code-block-container"><div class="code-header"><span class="code-lang">Python</span><button class="copy-btn">Copy</button></div>
+            <pre><code class="language-python">
+import numpy as np
+import plotly.graph_objects as go
+
+# Verify Kepler's 2nd law: dA/dt = ℓ/(2μ) is constant.
+# Sweep an elliptical orbit; compute area swept per unit time numerically.
+
+# Use the trajectory `rk` from the previous tab (planar).
+# Area between adjacent radii: (1/2) |r_n × r_{n+1}|
+r = rk[:, :2]
+dA = 0.5 * np.abs(r[:-1, 0] * r[1:, 1] - r[:-1, 1] * r[1:, 0])
+dA_dt = dA / h
+
+t = np.arange(len(dA)) * h
+fig = go.Figure()
+fig.add_trace(go.Scatter(x=t, y=dA_dt, mode='lines',
+    line=dict(color='#00f3ff', width=2), name='dA/dt (measured)'))
+fig.add_hline(y=dA_dt.mean(), line=dict(color='#ff006e', dash='dash'),
+              annotation_text=f'mean = {dA_dt.mean():.4f}')
+fig.update_layout(template='plotly_dark',
+    xaxis=dict(title='t', zerolinecolor='#808080'),
+    yaxis=dict(title='dA/dt', zerolinecolor='#808080'),
+    title="Kepler's 2nd law: equal areas in equal times",
+    height=400)
+fig.show()
+print(f"std/mean of dA/dt: {dA_dt.std()/dA_dt.mean():.2e}  (should be ≈ 0)")
+            </code></pre>
+        </div>
+    </div>
+    <div class="tab-content">
+        <div class="code-block-container"><div class="code-header"><span class="code-lang">Prompt for AI</span><button class="copy-btn">Copy</button></div>
+            <pre><code class="language-text">Create Python with numpy and Plotly to demonstrate central-force conservation laws.
+
+Requirements:
+- Part 1: Integrate the 3D Kepler problem (U = -1/r) with RK4 from a tilted initial
+  state (position has a non-zero z; velocity has small z-component).
+  Verify (i) the angular momentum vector L = r × v is constant, (ii) the trajectory
+  stays in the plane perpendicular to L. Plot orbit in 3D with L⃗ overlaid as an
+  arrow at the origin.
+- Part 2: Planar Kepler comparison of Euler vs RK4 conservation. Same potential, same
+  initial conditions. Compute energy E and angular momentum L over time for both
+  integrators. Plot ΔE/E vs t and ΔL/L vs t — Euler drifts visibly, RK4 stays flat.
+  Also report max absolute drift of each.
+- Part 3: Verify Kepler's second law for a planar elliptical orbit. Compute area
+  swept per unit time using cross products of adjacent radius vectors. Plot dA/dt
+  vs t — should be a flat line at ℓ/(2μ).
+- Use dark theme, gray axes (#808080), neon colors.
+- Each part under 35 lines.</code></pre>
+        </div>
+
+        <div class="info-box" style="margin-top: var(--spacing-md);">
+            <div class="info-icon">💡</div>
+            <div class="info-content">
+                <strong>Pro Tips for Prompting:</strong>
+                <ul>
+                    <li>Ask the AI to <em>verify</em> conservation, not just assert it — print drift values.</li>
+                    <li>For Part 2, fix all parameters except the integrator so the comparison is honest.</li>
+                    <li>Symplectic integrators (Verlet, leapfrog) are the right tool for long orbital integrations — ask the AI to compare those too if you're curious.</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- ============================================================ -->
+<!-- NAVIGATION -->
+<!-- ============================================================ -->
+<div class="btn-group mt-xl">
+    <button class="btn btn-magenta" onclick="navigateToSection('86-two-body-reduction')">&larr; Previous: Two-Body Reduction</button>
+    <button class="btn btn-secondary" onclick="scrollToTop()">&uarr; Back to Top</button>
+    <button class="btn btn-secondary" onclick="navigateToSection('88-polar-equations')">Next: Polar Coordinates &amp; The Radial Equation &rarr;</button>
+</div>

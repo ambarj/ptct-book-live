@@ -1,0 +1,545 @@
+<!-- ============================================================
+     Section 8.7: Other Central Potentials (Optional)
+     Source: Lec 19 transcript § 3 (Group Problem 2 —
+             Coulomb-repulsive + harmonic spring); Section 8.5
+             Bertrand's theorem reflection; classical mechanics
+             canon (Yukawa, Lennard-Jones).
+     Concept: Apply the U_eff method (8.4) and live RK4 (8.6)
+              to non-Kepler central forces. Verify Bertrand's
+              theorem experimentally.
+     Time: 20-25 minutes
+     Prerequisites: §§ 8.4, 8.5, 8.6.
+     ============================================================ -->
+
+<h1>Other Central Potentials</h1>
+
+<p>
+    Bertrand's theorem (1873) told us that only two central potentials
+    produce closed orbits for all bounded initial conditions: the Kepler
+    potential \( U \propto -1/\rho \) and the 3-D harmonic oscillator
+    \( U \propto \rho^2 \). Every other attractive central force gives
+    <strong>precessing rosettes</strong> — orbits that look almost-elliptical
+    but never quite close. This section is the experimental confirmation.
+    We'll plug Coulomb-repulsion, the harmonic spring, the Yukawa
+    (screened-Coulomb) potential, and the Lennard-Jones molecular potential
+    into the U_eff machinery (§ 8.4) and the live RK4 integrator (§ 8.6) —
+    no code change needed beyond a one-line force swap. The orbits speak for
+    themselves.
+</p>
+
+<div class="info-box">
+    <div class="info-icon">💡</div>
+    <div class="info-content">
+        <strong>Learning Objectives:</strong>
+        <ul>
+            <li>Apply the U_eff energy-diagram method (§ 8.4) to four non-Kepler central potentials</li>
+            <li>Predict bound vs unbound from U_eff shape: Coulomb-repulsion (always unbound), harmonic (always bound), Lennard-Jones (bound for E < 0)</li>
+            <li>Recognize that the harmonic-spring orbit is an ellipse <em>centered on</em> the force center, not <em>focused at</em> it (Kepler vs Hooke)</li>
+            <li>Demonstrate Bertrand's theorem numerically: Yukawa and \( -1/\rho^{1.01} \) precess; Kepler and harmonic close</li>
+            <li>Connect orbit precession to real physics — Mercury's perihelion advance and the historical motivation for general relativity</li>
+        </ul>
+    </div>
+</div>
+
+<!-- ============================================================ -->
+<!-- THE CATALOG OF POTENTIALS -->
+<!-- ============================================================ -->
+<h2>A Catalog of Central Potentials</h2>
+
+<p>
+    Four canonical non-Kepler systems that occur all over physics:
+</p>
+
+<div class="equation-display">
+    <p><strong>Coulomb-repulsive</strong> (like-charges):</p>
+    $$ U(\rho) = +\frac{k_C\,q_1 q_2}{\rho} \qquad (k_C\,q_1q_2 > 0) $$
+    <p><strong>3-D Harmonic Oscillator / Spring</strong>:</p>
+    $$ U(\rho) = \tfrac{1}{2}K\rho^2 $$
+    <p><strong>Yukawa (screened Coulomb)</strong> — nuclear strong force, plasmas:</p>
+    $$ U(\rho) = -\frac{k}{\rho}\,e^{-\rho/\rho_0} $$
+    <p><strong>Lennard-Jones</strong> — molecular interactions:</p>
+    $$ U(\rho) = 4\varepsilon\!\left[\!\left(\frac{\sigma}{\rho}\right)^{\!12} - \left(\frac{\sigma}{\rho}\right)^{\!6}\right] $$
+</div>
+
+<p>
+    Each appears in a different corner of physics. Coulomb-repulsion governs
+    Rutherford scattering (alpha particles bouncing off gold nuclei). The
+    harmonic spring is two masses tethered by an idealized spring — and the
+    small-oscillation limit of any potential well. Yukawa is the workhorse of
+    nuclear physics: it's the form Hideki Yukawa proposed in 1935 for the
+    strong force between nucleons (predicting the pion's mass from
+    \( \rho_0 \)). Lennard-Jones models intermolecular interactions in
+    liquids and gases — its minimum sets the equilibrium bond length, and
+    the second derivative there gives the molecular vibration frequency.
+</p>
+
+<div class="info-box">
+    <div class="info-icon">💡</div>
+    <div class="info-content">
+        <strong>Bertrand's Theorem Recap.</strong>
+        <p>
+            Of all attractive central potentials, only \( U \propto -1/\rho \)
+            (Kepler) and \( U \propto \rho^2 \) (harmonic) produce
+            <strong>closed</strong> orbits for <em>all</em> bounded initial
+            conditions. Three immediate consequences:
+        </p>
+        <ul>
+            <li><strong>Mercury's perihelion precesses</strong> by ~43"/century beyond Newtonian predictions — a small \( -1/\rho^3 \) correction in Einstein's general relativity explains it exactly.</li>
+            <li><strong>Newton's gravity is special.</strong> The exact \( 1/r^2 \) force is one of only two integrable cases. Any deviation from inverse-square instantly produces precession.</li>
+            <li><strong>Molecular vibrations look pendulum-like.</strong> Near the bottom of a Lennard-Jones (or any) well, the curvature is locally quadratic — small oscillations are simple harmonic. This is why so much of physics looks like SHO.</li>
+        </ul>
+    </div>
+</div>
+
+<hr>
+
+<!-- ============================================================ -->
+<!-- EXPLORER 1: Energy Diagram Zoo -->
+<!-- ============================================================ -->
+<div class="interactive-container" id="potential-zoo">
+    <div class="interactive-title">Explorer: Energy Diagram Zoo</div>
+
+    <p>
+        Pick a potential. The <strong>left panel</strong> shows
+        \( U_{\text{eff}}(\rho) = U(\rho) + \ell^2/(2\mu\rho^2) \) using the
+        same energy-diagram machinery from § 8.4 — horizontal \( E \) line,
+        ★ turning points, allowed-region shading, ♦ minimum (when one
+        exists). The <strong>right panel</strong> annotates what the U_eff
+        shape tells you about the orbits.
+    </p>
+
+    <div class="dual-panel">
+        <div class="panel"><div class="plot-container" id="op-uPlot" style="height: 440px;"></div></div>
+        <div class="panel">
+            <div class="plot-container" id="op-summaryPlot" style="height: 440px;"></div>
+        </div>
+    </div>
+    <div id="op-stats1" class="stats-bar"></div>
+
+    <div class="control-panel">
+        <div class="control-group">
+            <label class="control-label" for="op-pot-select">Potential U(ρ):</label>
+            <select class="fill-blank-select" id="op-pot-select" style="min-width: 240px;">
+                <option value="coulomb-rep" selected>Coulomb-repulsive  +k/ρ</option>
+                <option value="harmonic">Harmonic spring  ½Kρ²</option>
+                <option value="yukawa">Yukawa  −(k/ρ) e^(−ρ/ρ₀)</option>
+                <option value="lj">Lennard-Jones  4ε[(σ/ρ)¹²−(σ/ρ)⁶]</option>
+            </select>
+        </div>
+        <div class="control-group">
+            <label class="control-label" for="op-ell-slider">ℓ:
+                <span id="op-ell-value">0.50</span>
+            </label>
+            <input type="range" class="slider" id="op-ell-slider" min="0.1" max="2" step="0.05" value="0.50">
+        </div>
+        <div class="control-group">
+            <label class="control-label" for="op-k-slider">Strength k / K / ε:
+                <span id="op-k-value">1.00</span>
+            </label>
+            <input type="range" class="slider" id="op-k-slider" min="0.3" max="3" step="0.1" value="1.0">
+        </div>
+        <div class="control-group">
+            <label class="control-label" for="op-aux-slider">Range ρ₀ / σ:
+                <span id="op-aux-value">2.00</span>
+            </label>
+            <input type="range" class="slider" id="op-aux-slider" min="0.5" max="5" step="0.1" value="2.0">
+        </div>
+        <div class="control-group">
+            <label class="control-label" for="op-E-slider">Energy E:
+                <span id="op-E-value">0.50</span>
+            </label>
+            <input type="range" class="slider" id="op-E-slider" min="-2" max="3" step="0.05" value="0.50">
+        </div>
+        <div class="control-group">
+            <button class="btn" onclick="opJumpEmin()">E = U_eff min (or just above)</button>
+            <button class="btn" onclick="opReset()">Reset</button>
+        </div>
+    </div>
+</div>
+
+<!-- ========== Test Your Understanding #1 ========== -->
+<div class="interactive-container question-section">
+    <div class="interactive-title">Test Your Understanding</div>
+    <p style="margin-bottom: var(--spacing-md); color: var(--text-secondary);">Use the Energy Diagram Zoo.</p>
+    <div class="tabs">
+        <div class="tab-buttons">
+            <button class="tab-button active">Question 1</button>
+            <button class="tab-button">Question 2</button>
+            <button class="tab-button">Question 3</button>
+        </div>
+        <div class="tab-content active">
+            <div class="question-container" data-type="mcq" data-answer="2">
+                <div class="question-text">Two like charges interact via \( U(\rho) = +k/\rho \). Looking at the U_eff energy diagram, what kind of orbit do they have?</div>
+                <div class="question-options">
+                    <label class="option"><input type="radio" name="op-q1" value="0"><span>Bound circular at the U_eff minimum</span></label>
+                    <label class="option"><input type="radio" name="op-q1" value="1"><span>Bound elliptical, oscillating between two turning points</span></label>
+                    <label class="option"><input type="radio" name="op-q1" value="2"><span>Always unbound — U_eff has no minimum, the particle either escapes outward or is reflected by the centrifugal+Coulomb barrier</span></label>
+                    <label class="option"><input type="radio" name="op-q1" value="3"><span>Closed precessing rosette</span></label>
+                </div>
+                <div class="question-actions"><button class="btn-verify">Verify</button></div>
+                <div class="question-explanation" style="display:none;"><strong>Explanation:</strong> For \( U = +k/\rho \), \( U_{\text{eff}} = +k/\rho + \ell^2/(2\mu\rho^2) \) — both terms positive, both go to 0 as \( \rho \to \infty \), both diverge as \( \rho \to 0 \). No minimum, no bound state. Like charges always escape. This is the geometry of Rutherford scattering (alpha-particle off gold nucleus): the alpha approaches, reaches a closest approach (turning point), then bounces away. Click "Coulomb-repulsive" in the dropdown to confirm.</div>
+            </div>
+        </div>
+        <div class="tab-content">
+            <div class="question-container" data-type="msq" data-answer="0,1,3">
+                <div class="question-text">Which of these potentials admit at least one bound state? (Select all.)</div>
+                <div class="question-options">
+                    <label class="option"><input type="checkbox" value="0"><span>Kepler  \( U = -k/\rho \)</span></label>
+                    <label class="option"><input type="checkbox" value="1"><span>Harmonic spring  \( U = \tfrac{1}{2}K\rho^2 \)</span></label>
+                    <label class="option"><input type="checkbox" value="2"><span>Coulomb-repulsive  \( U = +k/\rho \)</span></label>
+                    <label class="option"><input type="checkbox" value="3"><span>Lennard-Jones  \( U = 4\varepsilon[(\sigma/\rho)^{12} - (\sigma/\rho)^{6}] \)</span></label>
+                    <label class="option"><input type="checkbox" value="4"><span>Free particle  \( U = 0 \)</span></label>
+                </div>
+                <div class="question-actions"><button class="btn-verify">Verify</button></div>
+                <div class="question-explanation" style="display:none;"><strong>Explanation:</strong><ul><li><strong>Kepler:</strong> ✓ Bound for \( E_{\min} \le E < 0 \).</li><li><strong>Harmonic:</strong> ✓ All orbits bound (well rises to ∞).</li><li><strong>Coulomb-repulsive:</strong> ✗ No minimum; always escapes.</li><li><strong>Lennard-Jones:</strong> ✓ Has a minimum at the bond length; bound for E below the well depth (atomic/molecular bound state).</li><li><strong>Free particle:</strong> ✗ No force, no centrifugal-only barrier alone can produce a *minimum* in \( U_{\text{eff}} \), and even if it could, free particles drift forever in straight lines — never bound.</li></ul></div>
+            </div>
+        </div>
+        <div class="tab-content">
+            <div class="question-container" data-type="fill" data-answer="1[0.95,1.05]">
+                <div class="question-text">For the harmonic spring with \( K = \mu = \ell = 1 \), the circular-orbit radius from the U_eff minimum (Section 8.4 method) is \( \rho_{\text{circ}} = (\ell^2/(\mu K))^{1/4} = \) <input type="text" class="fill-blank" style="width: 50px">. (Verify with the explorer.)</div>
+                <div class="question-actions"><button class="btn-verify">Verify</button></div>
+                <div class="question-explanation" style="display:none;"><strong>Explanation:</strong> \( dU_{\text{eff}}/d\rho = K\rho - \ell^2/(\mu\rho^3) = 0 \) ⇒ \( K\rho^4 = \ell^2/\mu \) ⇒ \( \rho_{\text{circ}} = (\ell^2/(\mu K))^{1/4} \). With unit values, \( \rho_{\text{circ}} = 1 \). Compare to Kepler's \( \rho_{\text{circ}} = \ell^2/(\mu k) = 1 \) — both give 1 with our unit choice, but the underlying scaling is different (\( \ell^{1/2} \) for harmonic vs \( \ell^2 \) for Kepler).</div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- ============================================================ -->
+<!-- EXPLORER 2: Bertrand Demonstrator -->
+<!-- ============================================================ -->
+<div class="interactive-container" id="bertrand-demo">
+    <div class="interactive-title">Explorer: Bertrand Demonstrator</div>
+
+    <p>
+        The same RK4 integrator from § 8.6 — but now you can swap in any
+        central force. Pick a potential, set initial conditions, and click
+        Launch. The <strong>left panel</strong> shows the orbit trace; the
+        <strong>right panel</strong> shows ρ(t). For Kepler and the harmonic
+        spring, the orbit closes exactly. For Yukawa and the
+        \( -1/\rho^{1.01} \) potential — barely 1% off Kepler — the orbit
+        precesses visibly within a few periods. Bertrand's theorem in action:
+        only the two special powers give closure; everything else rotates.
+    </p>
+
+    <div class="dual-panel">
+        <div class="panel"><div class="plot-container" id="op-orbitPlot" style="height: 440px;"></div></div>
+        <div class="panel"><div class="plot-container" id="op-rhoPlot" style="height: 440px;"></div></div>
+    </div>
+    <div id="op-stats2" class="stats-bar"></div>
+
+    <div class="control-panel">
+        <div class="control-group">
+            <label class="control-label" for="op-bd-pot-select">Potential:</label>
+            <select class="fill-blank-select" id="op-bd-pot-select" style="min-width: 240px;">
+                <option value="kepler" selected>Kepler  −1/ρ  (closes)</option>
+                <option value="harmonic">Harmonic from origin  ½ρ²  (closes)</option>
+                <option value="yukawa">Yukawa  −e^(−ρ/3)/ρ  (precesses)</option>
+                <option value="power101">Power-law  −1/ρ^1.01  (precesses slowly)</option>
+            </select>
+        </div>
+        <div class="control-group">
+            <label class="control-label" for="op-bd-r0-slider">r₀:
+                <span id="op-bd-r0-value">1.00</span>
+            </label>
+            <input type="range" class="slider" id="op-bd-r0-slider" min="0.5" max="2" step="0.05" value="1.0">
+        </div>
+        <div class="control-group">
+            <label class="control-label" for="op-bd-vy0-slider">v_{y0}:
+                <span id="op-bd-vy0-value">0.95</span>
+            </label>
+            <input type="range" class="slider" id="op-bd-vy0-slider" min="0.5" max="1.4" step="0.02" value="0.95">
+        </div>
+        <div class="control-group">
+            <label class="control-label" for="op-bd-h-slider">log₁₀(h):
+                <span id="op-bd-h-value">−1.7</span>
+            </label>
+            <input type="range" class="slider" id="op-bd-h-slider" min="-3" max="-1" step="0.1" value="-1.7">
+        </div>
+        <div class="control-group">
+            <button class="btn" onclick="opBdLaunch()" id="op-bd-launch-btn">Launch</button>
+            <button class="btn" onclick="opBdStop()">Stop</button>
+            <button class="btn" onclick="opBdReset()">Reset</button>
+        </div>
+    </div>
+</div>
+
+<!-- ========== Test Your Understanding #2 ========== -->
+<div class="interactive-container question-section">
+    <div class="interactive-title">Test Your Understanding</div>
+    <p style="margin-bottom: var(--spacing-md); color: var(--text-secondary);">Use the Bertrand Demonstrator.</p>
+    <div class="tabs">
+        <div class="tab-buttons">
+            <button class="tab-button active">Question 4</button>
+            <button class="tab-button">Question 5</button>
+            <button class="tab-button">Question 6</button>
+        </div>
+        <div class="tab-content active">
+            <div class="question-container" data-type="mcq" data-answer="1">
+                <div class="question-text">The harmonic-spring orbit \( U = \tfrac{1}{2}K\rho^2 \) (force toward the origin proportional to displacement) gives a closed orbit. What's the geometric difference from a Kepler ellipse?</div>
+                <div class="question-options">
+                    <label class="option"><input type="radio" name="op-q4" value="0"><span>It closes after one revolution, just like Kepler — no geometric difference</span></label>
+                    <label class="option"><input type="radio" name="op-q4" value="1"><span>The ellipse is <em>centered</em> on the force center (both foci coincide there), while Kepler's ellipse has the force center at one focus</span></label>
+                    <label class="option"><input type="radio" name="op-q4" value="2"><span>It's a circle, never an ellipse</span></label>
+                    <label class="option"><input type="radio" name="op-q4" value="3"><span>It precesses slowly — only Kepler closes exactly</span></label>
+                </div>
+                <div class="question-actions"><button class="btn-verify">Verify</button></div>
+                <div class="question-explanation" style="display:none;"><strong>Explanation:</strong> For the 3-D harmonic oscillator, the orbit is an ellipse <em>centered on the origin</em> — both foci collapse to the force center. Equivalently: ρ(φ) = a√(1−e²cos²φ) — minimum and maximum each occur <em>twice</em> per orbit. So the orbit closes after \( \pi \) of angular advance, not \( 2\pi \). Kepler ρ(φ) = p/(1+e cos φ) has minimum and maximum once per orbit, force center at one focus, closing only after \( 2\pi \). Both close — but in geometrically distinct ways. Both are blessed by Bertrand's theorem.</div>
+            </div>
+        </div>
+        <div class="tab-content">
+            <div class="question-container" data-type="mcq" data-answer="2">
+                <div class="question-text">Mercury's perihelion advances by ~43"/century beyond Newton's prediction (after subtracting effects from other planets). The leading explanation is …</div>
+                <div class="question-options">
+                    <label class="option"><input type="radio" name="op-q5" value="0"><span>A measurement error in the 19th-century data</span></label>
+                    <label class="option"><input type="radio" name="op-q5" value="1"><span>Extra mass between Mercury and the Sun (an undetected planet "Vulcan")</span></label>
+                    <label class="option"><input type="radio" name="op-q5" value="2"><span>A small \( -1/\rho^3 \) correction to the gravitational potential, predicted by Einstein's general relativity</span></label>
+                    <label class="option"><input type="radio" name="op-q5" value="3"><span>Bertrand's theorem doesn't apply to gravitational orbits</span></label>
+                </div>
+                <div class="question-actions"><button class="btn-verify">Verify</button></div>
+                <div class="question-explanation" style="display:none;"><strong>Explanation:</strong> Le Verrier (in 1859) postulated planet "Vulcan" to explain Mercury's anomalous precession; it was never found. Einstein (in 1915) showed general relativity adds a small \( -1/\rho^3 \) correction to the effective Newtonian potential — a non-Bertrand term that makes orbits precess. The predicted rate matched the observed 43"/century to within measurement precision. This was one of GR's first triumphs and a vindication of Bertrand's theorem: any deviation from \( 1/\rho \) — even relativistic corrections — produces precession.</div>
+            </div>
+        </div>
+        <div class="tab-content">
+            <div class="question-container" data-type="msq" data-answer="0,1,2">
+                <div class="question-text">Which statements about Bertrand's theorem and physical systems are true? (Select all.)</div>
+                <div class="question-options">
+                    <label class="option"><input type="checkbox" value="0"><span>The Yukawa potential gives precessing orbits — closure requires the integer power \( -1 \) exactly</span></label>
+                    <label class="option"><input type="checkbox" value="1"><span>Lennard-Jones near its minimum is approximately harmonic — small molecular vibrations behave like SHO</span></label>
+                    <label class="option"><input type="checkbox" value="2"><span>Bertrand's theorem says only \( -1/\rho \) and \( \rho^2 \) give closed orbits for <em>all</em> bound initial conditions</span></label>
+                    <label class="option"><input type="checkbox" value="3"><span>Precessing orbits are chaotic</span></label>
+                    <label class="option"><input type="checkbox" value="4"><span>Quantum-mechanical bound states require Bertrand-blessed potentials</span></label>
+                </div>
+                <div class="question-actions"><button class="btn-verify">Verify</button></div>
+                <div class="question-explanation" style="display:none;"><strong>Explanation:</strong><ul><li><strong>Yukawa precesses:</strong> ✓ It's not a power law and contains an exponential; not Bertrand-blessed.</li><li><strong>LJ ≈ harmonic near minimum:</strong> ✓ Taylor-expand any potential around its minimum and the leading term is quadratic. This is why the SHO is omnipresent in physics.</li><li><strong>Bertrand statement:</strong> ✓ Exactly the theorem.</li><li><strong>Precessing = chaotic:</strong> ✗ Precession is regular and quasi-periodic — predictable. Chaos is sensitive dependence on initial conditions and exponential divergence — irregular. Mercury's orbit precesses but is not chaotic.</li><li><strong>QM requires Bertrand:</strong> ✗ QM bound states exist for any well — Yukawa, LJ, square-well, etc. Bertrand is about classical orbital closure, a different question entirely.</li></ul></div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- ============================================================ -->
+<!-- THE UNIVERSAL TOOL -->
+<!-- ============================================================ -->
+<div class="info-box">
+    <div class="info-icon">💡</div>
+    <div class="info-content">
+        <strong>Key Insight: One Integrator, Many Worlds.</strong>
+        <p>
+            We just changed <em>one function</em> — the central force — and
+            the same RK4 integrator handled four wildly different physical
+            systems: like-charge electrostatic flyby, vibrating diatomic
+            molecule, screened nuclear interaction, near-Kepler precession.
+            This is the universality of the numerical approach. Section
+            8.5's analytical conic was a beautiful and rare exception. Most
+            central potentials in real physics — molecular Lennard-Jones,
+            nuclear Yukawa, relativistic Schwarzschild — admit no
+            closed-form orbital solution. The numerical integrator is the
+            <em>only</em> path forward, and you now have it.
+        </p>
+    </div>
+</div>
+
+<!-- ============================================================ -->
+<!-- PYTHON CODE -->
+<!-- ============================================================ -->
+<h2>Python Code</h2>
+<div class="tabs">
+    <div class="tab-buttons">
+        <button class="tab-button active">Generic Central Force</button>
+        <button class="tab-button">Four Potentials Side-By-Side</button>
+        <button class="tab-button">Precession Quantification</button>
+        <button class="tab-button">Prompt</button>
+    </div>
+    <div class="tab-content active">
+        <div class="code-block-container"><div class="code-header"><span class="code-lang">Python</span><button class="copy-btn">Copy</button></div>
+            <pre><code class="language-python">
+import numpy as np
+import plotly.graph_objects as go
+
+# Generic RK4 central-force integrator. Force passed as a callable F(r) → -∇U.
+def make_F(potential, **p):
+    if potential == 'kepler':         # U = -k/r,  F = -k r̂/r²
+        return lambda r: -p['k'] * r / (r @ r) ** 1.5
+    if potential == 'harmonic':       # U = ½K r², F = -K r
+        return lambda r: -p['K'] * r
+    if potential == 'yukawa':         # U = -k e^(-r/r0)/r
+        def F_y(r):
+            rmag = np.sqrt(r @ r)
+            return -p['k'] * r * np.exp(-rmag/p['r0']) * (
+                1/rmag**3 + 1/(p['r0']*rmag**2))
+        return F_y
+    if potential == 'power101':       # U = -k/r^(1.01)
+        return lambda r: -1.01 * p['k'] * r / (r @ r) ** (2.01/2 + 1)
+
+def rk4(F, s, h, N):
+    rhs = lambda s: np.concatenate([s[2:], F(s[:2])])
+    out = np.zeros((N, 4)); out[0] = s
+    for i in range(1, N):
+        k1 = rhs(out[i-1])
+        k2 = rhs(out[i-1] + 0.5*h*k1)
+        k3 = rhs(out[i-1] + 0.5*h*k2)
+        k4 = rhs(out[i-1] + h*k3)
+        out[i] = out[i-1] + (h/6)*(k1 + 2*k2 + 2*k3 + k4)
+    return out
+
+# Demo: Kepler orbit
+s0 = np.array([1.0, 0.0, 0.0, 0.95])
+traj = rk4(make_F('kepler', k=1.0), s0, 0.02, 2000)
+
+fig = go.Figure(go.Scatter(x=traj[:,0], y=traj[:,1], mode='lines',
+    line=dict(color='#00f3ff', width=2), name='Kepler'))
+fig.update_layout(template='plotly_dark',
+    xaxis=dict(range=[-3, 3], scaleanchor='y', zerolinecolor='#808080'),
+    yaxis=dict(range=[-3, 3], zerolinecolor='#808080'),
+    height=500)
+fig.show()
+            </code></pre>
+        </div>
+    </div>
+    <div class="tab-content">
+        <div class="code-block-container"><div class="code-header"><span class="code-lang">Python</span><button class="copy-btn">Copy</button></div>
+            <pre><code class="language-python">
+import numpy as np
+import plotly.graph_objects as go
+from plotly.subplots import make_subplots
+
+# Same s0, four different potentials — Bertrand's theorem in 4 panels.
+s0 = np.array([1.0, 0.0, 0.0, 0.95])
+h, N = 0.02, 3000
+
+cases = [
+    ('Kepler  (closes)',          'kepler',   {'k': 1.0},          '#00f3ff'),
+    ('Harmonic (closes, centered)','harmonic', {'K': 1.0},          '#ffbe0b'),
+    ('Yukawa  (precesses)',       'yukawa',   {'k': 1.0, 'r0': 3}, '#ff006e'),
+    ('Power -1.01 (precesses)',   'power101', {'k': 1.0},          '#00ff88'),
+]
+
+fig = make_subplots(rows=2, cols=2, subplot_titles=[c[0] for c in cases])
+for i, (label, pot, params, color) in enumerate(cases):
+    traj = rk4(make_F(pot, **params), s0, h, N)
+    r, c = i//2 + 1, i%2 + 1
+    fig.add_trace(go.Scatter(x=traj[:,0], y=traj[:,1], mode='lines',
+        line=dict(color=color, width=1.5), showlegend=False), row=r, col=c)
+    fig.add_trace(go.Scatter(x=[0], y=[0], mode='markers',
+        marker=dict(color='#ffbe0b', size=8, symbol='star'), showlegend=False), row=r, col=c)
+
+fig.update_layout(template='plotly_dark', height=700)
+for ax in ['xaxis', 'xaxis2', 'xaxis3', 'xaxis4']:
+    fig.update_layout(**{ax: dict(range=[-2.5, 2.5], zerolinecolor='#808080')})
+for ax in ['yaxis', 'yaxis2', 'yaxis3', 'yaxis4']:
+    fig.update_layout(**{ax: dict(range=[-2.5, 2.5], zerolinecolor='#808080',
+                                  scaleanchor=ax.replace('y', 'x'))})
+fig.show()
+            </code></pre>
+        </div>
+    </div>
+    <div class="tab-content">
+        <div class="code-block-container"><div class="code-header"><span class="code-lang">Python</span><button class="copy-btn">Copy</button></div>
+            <pre><code class="language-python">
+import numpy as np
+
+# Quantify precession: angle between successive perihelia.
+def perihelion_angles(traj):
+    r = np.sqrt(traj[:,0]**2 + traj[:,1]**2)
+    # local minima of r
+    mins = (r[1:-1] < r[:-2]) & (r[1:-1] < r[2:])
+    idx = np.where(mins)[0] + 1
+    angles = np.arctan2(traj[idx, 1], traj[idx, 0])
+    return idx, angles
+
+s0 = np.array([1.0, 0.0, 0.0, 0.95])
+h, N = 0.005, 12000
+
+for label, pot, params in [
+    ('Kepler',     'kepler',   {'k': 1.0}),
+    ('Harmonic',   'harmonic', {'K': 1.0}),
+    ('Yukawa',     'yukawa',   {'k': 1.0, 'r0': 3}),
+    ('Power-1.01', 'power101', {'k': 1.0})]:
+    traj = rk4(make_F(pot, **params), s0, h, N)
+    _, ang = perihelion_angles(traj)
+    if len(ang) >= 2:
+        # Convert successive angle differences mod 2π
+        d = np.diff(np.unwrap(ang))
+        precess_per_orbit = (d.mean() - 2*np.pi if d.mean() > np.pi else d.mean()) * 180/np.pi
+        print(f'{label:12s}: {len(ang)} perihelia, precession ≈ {precess_per_orbit:+.2f}° / orbit')
+    else:
+        print(f'{label:12s}: only {len(ang)} perihelion seen — extend integration')
+            </code></pre>
+        </div>
+    </div>
+    <div class="tab-content">
+        <div class="code-block-container"><div class="code-header"><span class="code-lang">Prompt for AI</span><button class="copy-btn">Copy</button></div>
+            <pre><code class="language-text">Create Python with numpy and Plotly to explore non-Kepler central potentials.
+
+Requirements:
+- Part 1: A make_F(potential, **params) factory that returns the central
+  force F(r) → -∇U for four potentials: 'kepler' (U = -k/r), 'harmonic'
+  (U = K r²/2), 'yukawa' (U = -k e^(-r/r0)/r), 'power101' (U = -k/r^1.01).
+  Generic RK4 integrator that takes any F. Demo with Kepler from
+  (r0, 0, 0, 0.95) for 2000 steps with h = 0.02.
+- Part 2: Plot all four potentials side-by-side from the same initial
+  conditions. Should visually show: Kepler closes, harmonic closes
+  (ellipse centered on origin not focused), Yukawa precesses, power-1.01
+  precesses slowly. Use a 2×2 subplot grid.
+- Part 3: Quantify precession by detecting perihelia (local minima of r(t))
+  and computing the angular difference between successive perihelia.
+  Print precession rate (degrees per orbit) for each potential. Kepler
+  and harmonic should give ~0; Yukawa and power-1.01 should give finite
+  values.
+- Use dark theme, gray axes (#808080), neon colors (cyan, magenta, yellow, green).
+- Each part under 35 lines.</code></pre>
+        </div>
+
+        <div class="info-box" style="margin-top: var(--spacing-md);">
+            <div class="info-icon">💡</div>
+            <div class="info-content">
+                <strong>Pro Tips for Prompting:</strong>
+                <ul>
+                    <li>Asking the AI for a <em>side-by-side</em> comparison is the cleanest way to demonstrate Bertrand's theorem visually.</li>
+                    <li>Quantifying precession is harder than visualizing it — local-minimum detection plus angle unwrapping is the standard technique.</li>
+                    <li>The same RK4 + force-factory pattern generalizes to any central potential — even ones you invent.</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- ============================================================ -->
+<!-- CHAPTER 8 SUMMARY -->
+<!-- ============================================================ -->
+<h2>Chapter 8 Wrap-Up</h2>
+
+<div class="info-box">
+    <div class="info-icon">💡</div>
+    <div class="info-content">
+        <strong>Chapter 8 in One Paragraph.</strong>
+        <p>
+            We started with two coupled gravitational bodies (§ 8.1) and
+            cut the problem in half via center-of-mass and relative
+            coordinates. Conservation laws (§ 8.2) — energy and angular
+            momentum — turned out to be both physical theorems <em>and</em>
+            numerical sanity checks. Polar coordinates (§ 8.3) revealed the
+            angular-momentum conservation as the φ-equation of motion and
+            gave us a 1-D radial equation with a centrifugal term. The
+            effective potential (§ 8.4) collapsed the orbit-classification
+            problem into reading horizontal lines on a 1-D plot. For the
+            special Kepler case (§ 8.5) we solved the trajectory integral
+            analytically and recovered all three of Kepler's empirical
+            laws as theorems of Newton's gravity. The numerical integrator
+            (§ 8.6) gave us a reliable computational tool that matches
+            Section 8.5's analytical answers and works for any potential.
+            And finally (§ 8.7) we showed that nature is rich beyond the
+            Kepler problem — Bertrand's theorem says only \( -1/\rho \) and
+            \( \rho^2 \) close; everything else precesses, and that
+            precession is the doorway to general relativity, molecular
+            physics, nuclear physics, and beyond.
+        </p>
+    </div>
+</div>
+
+<!-- ============================================================ -->
+<!-- NAVIGATION -->
+<!-- ============================================================ -->
+<div class="btn-group mt-xl">
+    <button class="btn btn-magenta" onclick="navigateToSection('91-orbit-integration')">&larr; Previous: Numerical Integration of Orbits</button>
+    <button class="btn btn-secondary" onclick="scrollToTop()">&uarr; Back to Top</button>
+</div>

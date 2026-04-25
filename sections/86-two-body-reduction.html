@@ -1,0 +1,513 @@
+<!-- ============================================================
+     Section 8.1: The Two-Body Problem — Reduction to One Body
+     Source: NPTEL Lec 18 (transcript: NPTEL Lectures/Lec 18 -
+             Central Force Motion.md), pages 1-3 + page 7
+     Concept: Two coupled gravitating bodies → one equivalent
+              particle of reduced mass μ in a central potential
+     Time: 22-25 minutes
+     Prerequisites: Newton's laws, vector addition (App. A),
+                    coupled ODEs (Ch 4)
+     ============================================================ -->
+
+<h1>The Two-Body Problem: Reduction to One Body</h1>
+
+<p>
+    The Earth orbits the Sun. The Moon orbits the Earth. An electron orbits a
+    proton. Two stars orbit each other. <em>Every</em> two-body gravitational
+    or electrostatic system looks coupled at first glance — a pair of
+    differential equations whose right-hand sides depend on both bodies'
+    positions. In this section we'll see that a clever change of coordinates
+    cuts the problem in half: the center of mass drifts uniformly through
+    space, while the <em>relative</em> motion reduces to a <strong>single
+    particle of reduced mass μ</strong> moving in a central potential. This
+    is the most important coordinate change in classical mechanics.
+</p>
+
+<div class="info-box">
+    <div class="info-icon">💡</div>
+    <div class="info-content">
+        <strong>Learning Objectives:</strong>
+        <ul>
+            <li>Set up the coupled equations of motion for two gravitating bodies</li>
+            <li>Define the center-of-mass and relative coordinates and verify the system decouples</li>
+            <li>Compute the reduced mass \( \mu = m_1 m_2 / (m_1 + m_2) \) and understand its limiting cases</li>
+            <li>Recognize that everything from this point on uses the equivalent one-body problem of mass μ in a potential U(r)</li>
+        </ul>
+    </div>
+</div>
+
+<!-- ============================================================ -->
+<!-- HOOK: Earth-Moon problem -->
+<!-- ============================================================ -->
+<h2>The Hook: Earth and Moon</h2>
+
+<p>
+    Let the Earth have mass \( m_E \) and position \( \vec r_E \), and the
+    Moon have mass \( m_M \) and position \( \vec r_M \), measured in some
+    Sun-centered inertial frame. <em>Ignoring the Sun's gravity</em> (a
+    simplification that lets us focus on the Earth–Moon dance), Newton's
+    second law plus Newton's law of gravitation give:
+</p>
+
+<div class="equation-display">
+    <p><strong>Coupled equations of motion:</strong></p>
+    $$ m_E\,\ddot{\vec r}_E = -\frac{G\,m_E\,m_M}{|\vec r_E - \vec r_M|^3}(\vec r_E - \vec r_M) $$
+    $$ m_M\,\ddot{\vec r}_M = +\frac{G\,m_E\,m_M}{|\vec r_E - \vec r_M|^3}(\vec r_E - \vec r_M) $$
+    <p>
+        These are <strong>six coupled second-order ODEs</strong> (three
+        components per body). The right-hand sides depend on <em>both</em>
+        bodies' positions. Can you simplify?
+    </p>
+</div>
+
+<hr>
+
+<!-- ============================================================ -->
+<!-- EXPLORER 1: Coupled to Decoupled Animator -->
+<!-- ============================================================ -->
+<div class="interactive-container" id="two-body-animator">
+    <div class="interactive-title">Explorer: Coupled → Decoupled</div>
+
+    <p>
+        Watch a real two-body orbit play out. The <strong>left panel</strong>
+        shows the original frame: both bodies orbit their common center of
+        mass (★, marked). The <strong>right panel</strong> shows the same
+        physics in two equivalent decoupled views — the CM frame (both bodies
+        orbiting a fixed midpoint) and the <em>relative coordinate</em>
+        \( \vec r = \vec r_1 - \vec r_2 \), a single particle moving around a
+        fixed origin. Slide the mass ratio: heavy/light gives Sun-Earth-like
+        behaviour; equal masses give a symmetric binary.
+    </p>
+
+    <div class="dual-panel">
+        <div class="panel"><div class="plot-container" id="tb-origPlot" style="height: 420px;"></div></div>
+        <div class="panel"><div class="plot-container" id="tb-cmPlot" style="height: 420px;"></div></div>
+    </div>
+    <div id="tb-stats1" class="stats-bar"></div>
+
+    <div class="control-panel">
+        <div class="control-group">
+            <label class="control-label" for="tb-ratio-slider">Mass ratio m₂/m₁:
+                <span id="tb-ratio-value">1.000</span>
+            </label>
+            <input type="range" class="slider" id="tb-ratio-slider"
+                   min="-3" max="0" step="0.05" value="0">
+            <small style="color:#888">log scale: 0.001 → 1.0</small>
+        </div>
+        <div class="control-group">
+            <label class="control-label" for="tb-ecc-slider">Eccentricity:
+                <span id="tb-ecc-value">0.40</span>
+            </label>
+            <input type="range" class="slider" id="tb-ecc-slider"
+                   min="0" max="0.8" step="0.02" value="0.40">
+        </div>
+        <div class="control-group">
+            <label class="control-label" for="tb-time-slider">Time t:
+                <span id="tb-time-value">0.00</span>
+            </label>
+            <input type="range" class="slider" id="tb-time-slider"
+                   min="0" max="1" step="0.005" value="0">
+        </div>
+        <div class="control-group">
+            <button class="btn" onclick="tbAnimToggle()" id="tb-play-btn">▶ Play</button>
+            <button class="btn" onclick="tbAnimReset()">Reset</button>
+        </div>
+    </div>
+</div>
+
+<!-- ========== Test Your Understanding #1 ========== -->
+<div class="interactive-container question-section">
+    <div class="interactive-title">Test Your Understanding</div>
+    <p style="margin-bottom: var(--spacing-md); color: var(--text-secondary);">Use the Coupled→Decoupled explorer.</p>
+    <div class="tabs">
+        <div class="tab-buttons">
+            <button class="tab-button active">Question 1</button>
+            <button class="tab-button">Question 2</button>
+            <button class="tab-button">Question 3</button>
+        </div>
+        <div class="tab-content active">
+            <div class="question-container" data-type="mcq" data-answer="1">
+                <div class="question-text">Set m₂/m₁ ≈ 1 (equal masses) and watch the orbit. Where is the center of mass?</div>
+                <div class="question-options">
+                    <label class="option"><input type="radio" name="tb-q1" value="0"><span>At the position of the heavier body</span></label>
+                    <label class="option"><input type="radio" name="tb-q1" value="1"><span>Exactly halfway between the two bodies — equal mass means equal lever-arms</span></label>
+                    <label class="option"><input type="radio" name="tb-q1" value="2"><span>It oscillates between the two bodies</span></label>
+                    <label class="option"><input type="radio" name="tb-q1" value="3"><span>It's outside the orbit</span></label>
+                </div>
+                <div class="question-actions"><button class="btn-verify">Verify</button></div>
+                <div class="question-explanation" style="display:none;"><strong>Explanation:</strong> \( \vec R = (m_1 \vec r_1 + m_2 \vec r_2)/(m_1 + m_2) \). When \( m_1 = m_2 \), \( \vec R = (\vec r_1 + \vec r_2)/2 \) — the midpoint. When \( m_1 \gg m_2 \), \( \vec R \approx \vec r_1 \) — the heavy body sits almost on the CM. Try sliding the mass ratio from 1.0 down to 0.001 and watch the ★ migrate toward the heavier body.</div>
+            </div>
+        </div>
+        <div class="tab-content">
+            <div class="question-container" data-type="fill" data-answer="4670[4500,4900]">
+                <div class="question-text">For the real Earth-Moon system, \( m_E = 81.3\,m_M \) and the Earth–Moon separation is 384,400 km. The center of mass sits a distance \( d = m_M \cdot 384{,}400 / (m_E + m_M) \approx \) <input type="text" class="fill-blank" style="width: 70px"> km from Earth's center. (Earth's radius is 6371 km — what does that tell you?)</div>
+                <div class="question-actions"><button class="btn-verify">Verify</button></div>
+                <div class="question-explanation" style="display:none;"><strong>Explanation:</strong> \( d = 384{,}400 / (81.3 + 1) \approx 4670 \) km — about 1700 km <em>below Earth's surface</em>. The Earth-Moon CM (called the <em>barycenter</em>) lies <strong>inside the Earth</strong>. Earth doesn't quite "orbit" the Moon, but it does wobble around a point inside itself as the Moon goes around. This wobble is exactly what astronomers detect when they search for exoplanets via radial velocity.</div>
+            </div>
+        </div>
+        <div class="tab-content">
+            <div class="question-container" data-type="msq" data-answer="0,1,3">
+                <div class="question-text">Which statements about the CM frame and the equivalent one-body problem are true? (Select all)</div>
+                <div class="question-options">
+                    <label class="option"><input type="checkbox" value="0"><span>The center of mass moves uniformly (constant velocity) in any inertial frame</span></label>
+                    <label class="option"><input type="checkbox" value="1"><span>In the CM frame, both bodies orbit a fixed point — the CM itself</span></label>
+                    <label class="option"><input type="checkbox" value="2"><span>The relative coordinate \( \vec r = \vec r_1 - \vec r_2 \) obeys an equation that involves both \( m_1 \) and \( m_2 \) separately</span></label>
+                    <label class="option"><input type="checkbox" value="3"><span>The relative motion is described by a single equation \( \mu \ddot{\vec r} = \vec f(r) \) — a one-body problem in disguise</span></label>
+                </div>
+                <div class="question-actions"><button class="btn-verify">Verify</button></div>
+                <div class="question-explanation" style="display:none;"><strong>Explanation:</strong><ul><li><strong>CM uniform:</strong> ✓ No external forces ⇒ \( M\ddot{\vec R} = 0 \) ⇒ CM drifts at constant velocity.</li><li><strong>Both orbit fixed CM:</strong> ✓ In a frame moving with the CM, \( \vec R = 0 \), and each body executes a closed orbit around it.</li><li><strong>Relative EOM has m₁, m₂ separately:</strong> ✗ Subtracting the two coupled EOMs gives \( \ddot{\vec r} = \vec f/m_1 + \vec f/m_2 = \vec f(1/m_1 + 1/m_2) = \vec f/\mu \). Only the <em>combination</em> μ appears, not m₁ and m₂ separately.</li><li><strong>One-body in disguise:</strong> ✓ This is the punchline of the whole reduction — the entire rest of Chapter 8 studies this single equation.</li></ul></div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- ============================================================ -->
+<!-- THE REDUCTION (walkthrough) -->
+<!-- ============================================================ -->
+<h2>The Reduction in One Page</h2>
+
+<p>
+    Define new variables. Instead of two position vectors \( \vec r_1, \vec r_2 \),
+    use the center of mass and the relative coordinate:
+</p>
+
+<div class="equation-display">
+    $$ \vec R = \frac{m_1 \vec r_1 + m_2 \vec r_2}{m_1 + m_2}, \qquad \vec r = \vec r_1 - \vec r_2 $$
+</div>
+
+<p>
+    Add the two coupled EOMs (multiplied by m₁ and m₂) — the internal forces
+    cancel by Newton's third law, leaving \( M\ddot{\vec R} = 0 \). Subtract
+    them — the masses recombine into a single coefficient. The result is
+    a remarkable separation:
+</p>
+
+<div class="equation-display">
+    <p><strong>Decoupled equations of motion:</strong></p>
+    $$ \boxed{\ddot{\vec R} = 0, \qquad \mu\,\ddot{\vec r} = \vec f(r)} $$
+    <p>where the <strong>reduced mass</strong> is</p>
+    $$ \mu = \frac{m_1 m_2}{m_1 + m_2} \qquad \Leftrightarrow \qquad \frac{1}{\mu} = \frac{1}{m_1} + \frac{1}{m_2} $$
+</div>
+
+<div class="info-box">
+    <div class="info-icon">💡</div>
+    <div class="info-content">
+        <strong>Key Insight: 6 ODEs → 3 ODEs.</strong>
+        <p>
+            What looked like six coupled second-order ODEs splits into two
+            independent pieces: three trivial ones for the CM (uniform
+            motion, immediately solved), and three for \( \vec r(t) \) — the
+            same form as a <em>single particle</em> of mass μ in the
+            potential \( U(r) \). Newton used this in the <em>Principia</em>
+            (1687) to handle the Earth–Moon system. Every chapter from here
+            on studies the equivalent one-body equation.
+        </p>
+    </div>
+</div>
+
+<!-- ============================================================ -->
+<!-- EXPLORER 2: Reduced Mass Calculator -->
+<!-- ============================================================ -->
+<div class="interactive-container" id="reduced-mass-calc">
+    <div class="interactive-title">Explorer: Reduced Mass Across the Universe</div>
+
+    <p>
+        How big is the reduced mass for real systems? The <strong>left panel</strong>
+        shows m₁, m₂, and μ on a log scale for canonical pairs — from the
+        Sun-Earth system (μ ≈ Earth's mass) to the hydrogen atom
+        (μ ≈ electron mass) to equal-mass binary stars (μ = m/2). The
+        <strong>right panel</strong> plots μ/m₁ vs the mass ratio m₂/m₁ —
+        revealing two limits: <em>μ → m₂</em> when m₂ ≪ m₁ (light particle
+        wins), and <em>μ = m₁/2</em> when m₂ = m₁ (equal share).
+    </p>
+
+    <div class="dual-panel">
+        <div class="panel"><div class="plot-container" id="rm-barPlot" style="height: 440px;"></div></div>
+        <div class="panel"><div class="plot-container" id="rm-ratioPlot" style="height: 440px;"></div></div>
+    </div>
+    <div id="rm-stats" class="stats-bar"></div>
+
+    <div class="control-panel">
+        <div class="control-group">
+            <label class="control-label" for="rm-system-select">System:</label>
+            <select class="fill-blank-select" id="rm-system-select" style="min-width: 220px;">
+                <option value="0">Sun-Earth</option>
+                <option value="1">Earth-Moon</option>
+                <option value="2">Pluto-Charon</option>
+                <option value="3" selected>Equal binary stars</option>
+                <option value="4">Hydrogen atom (proton-electron)</option>
+                <option value="5">Custom</option>
+            </select>
+        </div>
+        <div class="control-group">
+            <label class="control-label" for="rm-m1-slider">log₁₀(m₁):
+                <span id="rm-m1-value">0.00</span>
+            </label>
+            <input type="range" class="slider" id="rm-m1-slider"
+                   min="-3" max="3" step="0.05" value="0">
+        </div>
+        <div class="control-group">
+            <label class="control-label" for="rm-m2-slider">log₁₀(m₂):
+                <span id="rm-m2-value">0.00</span>
+            </label>
+            <input type="range" class="slider" id="rm-m2-slider"
+                   min="-3" max="3" step="0.05" value="0">
+        </div>
+    </div>
+</div>
+
+<!-- ========== Test Your Understanding #2 ========== -->
+<div class="interactive-container question-section">
+    <div class="interactive-title">Test Your Understanding</div>
+    <p style="margin-bottom: var(--spacing-md); color: var(--text-secondary);">Use the Reduced Mass explorer.</p>
+    <div class="tabs">
+        <div class="tab-buttons">
+            <button class="tab-button active">Question 4</button>
+            <button class="tab-button">Question 5</button>
+            <button class="tab-button">Question 6</button>
+        </div>
+        <div class="tab-content active">
+            <div class="question-container" data-type="fill" data-answer="3[1,5]">
+                <div class="question-text">For the Sun (M_☉ = 1.99×10³⁰ kg) and the Earth (M_⊕ = 5.97×10²⁴ kg): the reduced mass μ is essentially equal to M_⊕, differing by only about <input type="text" class="fill-blank" style="width: 50px"> parts per million. (Hint: μ/m_2 = m_1/(m_1+m_2) ≈ 1 − m_2/m_1.)</div>
+                <div class="question-actions"><button class="btn-verify">Verify</button></div>
+                <div class="question-explanation" style="display:none;"><strong>Explanation:</strong> \( m_2/m_1 = 5.97 \times 10^{24}/1.99 \times 10^{30} = 3.0 \times 10^{-6} \) ≈ 3 ppm. So \( \mu = m_2 \cdot (1 - m_2/m_1) \approx m_2 - 3 \) ppm. For practical purposes, in any planet-Sun system, \( \mu \approx \text{(planet mass)} \) and we often just call it "the planet's mass." But the correction matters for high-precision ephemerides and for spectroscopy of light atoms.</div>
+            </div>
+        </div>
+        <div class="tab-content">
+            <div class="question-container" data-type="mcq" data-answer="1">
+                <div class="question-text">In the hydrogen atom (proton mass 1836× electron mass), the reduced mass is \( \mu = m_e \cdot 1836/1837 \approx 0.99946\, m_e \). What measurable consequence does this have?</div>
+                <div class="question-options">
+                    <label class="option"><input type="radio" name="tb-q5" value="0"><span>None — the proton-electron mass ratio is too large to matter</span></label>
+                    <label class="option"><input type="radio" name="tb-q5" value="1"><span>The Rydberg constant for hydrogen differs from the infinite-mass value by about 0.054%, shifting every spectral line by a measurable amount</span></label>
+                    <label class="option"><input type="radio" name="tb-q5" value="2"><span>The hydrogen atom has no defined energy levels</span></label>
+                    <label class="option"><input type="radio" name="tb-q5" value="3"><span>The electron orbits a stationary proton exactly</span></label>
+                </div>
+                <div class="question-actions"><button class="btn-verify">Verify</button></div>
+                <div class="question-explanation" style="display:none;"><strong>Explanation:</strong> The Rydberg formula contains \( \mu \), not \( m_e \). The hydrogen Rydberg \( R_H = R_\infty \cdot \mu/m_e = R_\infty \cdot 1836/1837 \) is shifted by \( \sim 1/1837 \approx 0.054\% \) from the textbook \( R_\infty \) — observable in any decent spectrometer. Even more dramatically, deuterium (proton replaced by a deuteron, twice as heavy) has a slightly <em>different</em> shift, and the small wavelength difference between H and D Lyman lines was how Urey discovered deuterium in 1931. Reduced mass is a real, measurable quantity.</div>
+            </div>
+        </div>
+        <div class="tab-content">
+            <div class="question-container" data-type="msq" data-answer="0,2">
+                <div class="question-text">Now think about three bodies (e.g., Sun-Earth-Moon, or three stars). Which statements are true? (Select all)</div>
+                <div class="question-options">
+                    <label class="option"><input type="checkbox" value="0"><span>The CM still moves uniformly — that part of the reduction always works</span></label>
+                    <label class="option"><input type="checkbox" value="1"><span>The same trick reduces three bodies to two equivalent one-body problems</span></label>
+                    <label class="option"><input type="checkbox" value="2"><span>The general three-body problem has no closed-form solution — Poincaré proved this in the 1880s</span></label>
+                    <label class="option"><input type="checkbox" value="3"><span>Three-body systems are always chaotic</span></label>
+                </div>
+                <div class="question-actions"><button class="btn-verify">Verify</button></div>
+                <div class="question-explanation" style="display:none;"><strong>Explanation:</strong><ul><li><strong>CM still uniform:</strong> ✓ Newton's third law works for any number of bodies — internal forces cancel pairwise, so total momentum is conserved.</li><li><strong>Reduces to two one-bodies:</strong> ✗ This is the deep failure: there's no clever change of coordinates that decouples three bodies. The reason: three bodies have 9 position components, but only 6 conserved quantities (CM position, CM momentum, energy, angular momentum) — not enough to make the system integrable.</li><li><strong>No closed form:</strong> ✓ Poincaré won the 1887 King Oscar Prize by proving the general 3-body problem is non-integrable. Solutions exist numerically and in special cases (Lagrange points, figure-8 orbit), but no general formula.</li><li><strong>Always chaotic:</strong> ✗ Some configurations are stable (e.g., Sun-Earth-Moon over millions of years; the Lagrange L4/L5 points). Chaos depends on the configuration.</li></ul></div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- ============================================================ -->
+<!-- NON-DIMENSIONALIZATION SNEAK PEEK -->
+<!-- ============================================================ -->
+<h2>What's Next: Non-Dimensionalization</h2>
+
+<div class="info-box">
+    <div class="info-icon">💡</div>
+    <div class="info-content">
+        <strong>Forward Reference: μ disappears too.</strong>
+        <p>
+            In Chapter 1 (Section 1.6) we learned that smart unit choices can
+            absorb dimensional parameters into the variables themselves. The
+            same trick works here. Starting in Section 8.3, we will rescale
+            the radial coordinate, time, and energy by combinations of \( \mu \),
+            \( \ell \) (angular momentum), and \( E \) (energy) — and the
+            equations become <em>parameter-free</em> except for the
+            <em>shape</em> of the central potential \( U(r) \). The
+            rescaling is:
+        </p>
+        $$ \rho \to \frac{\ell}{\sqrt{\mu E}}\,\rho, \qquad t \to \frac{\ell}{E}\,t, \qquad U \to E\,U $$
+        <p>
+            For now, just remember the main lesson of this section: from this
+            point onward, μ is the <em>only</em> mass that appears. Whether
+            you're studying the Sun-Earth system or the hydrogen atom or a
+            binary pulsar, the math is identical — only μ and the form of
+            \( U(r) \) change.
+        </p>
+    </div>
+</div>
+
+<!-- ============================================================ -->
+<!-- PYTHON CODE -->
+<!-- ============================================================ -->
+<h2>Python Code</h2>
+<div class="tabs">
+    <div class="tab-buttons">
+        <button class="tab-button active">Two-Body Integration</button>
+        <button class="tab-button">Reduction Verification</button>
+        <button class="tab-button">μ Database</button>
+        <button class="tab-button">Prompt</button>
+    </div>
+    <div class="tab-content active">
+        <div class="code-block-container"><div class="code-header"><span class="code-lang">Python</span><button class="copy-btn">Copy</button></div>
+            <pre><code class="language-python">
+import numpy as np
+import plotly.graph_objects as go
+
+# Solve coupled two-body system in 2D using RK4
+# State: [x1, y1, vx1, vy1, x2, y2, vx2, vy2]
+
+G  = 1.0        # use G = 1 units
+m1 = 1.0
+m2 = 0.3        # try varying this
+
+def rhs(state):
+    x1, y1, vx1, vy1, x2, y2, vx2, vy2 = state
+    dx, dy = x2 - x1, y2 - y1
+    r3 = (dx*dx + dy*dy) ** 1.5
+    fx, fy = G * dx / r3, G * dy / r3
+    return np.array([vx1, vy1,  m2*fx,  m2*fy,
+                     vx2, vy2, -m1*fx, -m1*fy])
+
+def rk4_step(s, h):
+    k1 = rhs(s)
+    k2 = rhs(s + 0.5*h*k1)
+    k3 = rhs(s + 0.5*h*k2)
+    k4 = rhs(s + h*k3)
+    return s + (h/6) * (k1 + 2*k2 + 2*k3 + k4)
+
+# Initial conditions: bodies on x-axis, perpendicular velocities → orbit
+s = np.array([-m2/(m1+m2), 0, 0, -0.7,
+              +m1/(m1+m2), 0, 0, +0.7*m1/m2])
+h, N = 0.02, 1500
+traj = np.zeros((N, 8))
+for k in range(N):
+    traj[k] = s; s = rk4_step(s, h)
+
+fig = go.Figure()
+fig.add_trace(go.Scatter(x=traj[:,0], y=traj[:,1], mode='lines',
+    line=dict(color='#00f3ff', width=2), name='m₁'))
+fig.add_trace(go.Scatter(x=traj[:,4], y=traj[:,5], mode='lines',
+    line=dict(color='#ff006e', width=2), name='m₂'))
+fig.update_layout(template='plotly_dark',
+    xaxis=dict(range=[-2, 2], scaleanchor='y',
+               zerolinecolor='#808080', linecolor='#808080'),
+    yaxis=dict(range=[-2, 2],
+               zerolinecolor='#808080', linecolor='#808080'),
+    height=500)
+fig.show()
+            </code></pre>
+        </div>
+    </div>
+    <div class="tab-content">
+        <div class="code-block-container"><div class="code-header"><span class="code-lang">Python</span><button class="copy-btn">Copy</button></div>
+            <pre><code class="language-python">
+import numpy as np
+import plotly.graph_objects as go
+
+# Verify the reduction: from full trajectory above, compute R(t) and r(t)
+# Check (i) R drifts uniformly, (ii) r obeys μ r̈ = f(r)
+
+m1, m2 = 1.0, 0.3
+mu = m1*m2/(m1+m2)
+M  = m1 + m2
+
+# Assume traj from previous tab is available
+# R = (m1 r1 + m2 r2)/M
+Rx = (m1*traj[:,0] + m2*traj[:,4]) / M
+Ry = (m1*traj[:,1] + m2*traj[:,5]) / M
+
+# Relative coordinate
+rx = traj[:,0] - traj[:,4]
+ry = traj[:,1] - traj[:,5]
+
+t = np.arange(len(traj)) * 0.02
+
+fig = go.Figure()
+fig.add_trace(go.Scatter(x=t, y=Rx, mode='lines',
+    line=dict(color='#00f3ff', width=2), name='R_x(t)'))
+fig.add_trace(go.Scatter(x=t, y=Ry, mode='lines',
+    line=dict(color='#ffbe0b', width=2), name='R_y(t)'))
+fig.update_layout(template='plotly_dark',
+    xaxis=dict(title='t', zerolinecolor='#808080'),
+    yaxis=dict(title='R', zerolinecolor='#808080'),
+    title='Center of mass should be straight lines (uniform drift)',
+    height=400)
+fig.show()
+
+print(f"μ = {mu:.4f},  μ/m₁ = {mu/m1:.4f},  μ/m₂ = {mu/m2:.4f}")
+print(f"Expected: μ < min(m₁, m₂) = {min(m1, m2)}")
+            </code></pre>
+        </div>
+    </div>
+    <div class="tab-content">
+        <div class="code-block-container"><div class="code-header"><span class="code-lang">Python</span><button class="copy-btn">Copy</button></div>
+            <pre><code class="language-python">
+def reduced_mass(m1, m2):
+    """μ = m1·m2 / (m1 + m2). Always smaller than min(m1, m2)."""
+    return m1 * m2 / (m1 + m2)
+
+# Canonical systems (masses in kg)
+M_SUN = 1.989e30
+M_EARTH = 5.972e24
+M_MOON = 7.342e22
+M_PLUTO = 1.303e22
+M_CHARON = 1.586e21
+M_PROTON = 1.673e-27
+M_ELECTRON = 9.109e-31
+
+systems = [
+    ("Sun-Earth",    M_SUN,    M_EARTH),
+    ("Earth-Moon",   M_EARTH,  M_MOON),
+    ("Pluto-Charon", M_PLUTO,  M_CHARON),
+    ("Equal binary", M_SUN,    M_SUN),
+    ("Hydrogen atom", M_PROTON, M_ELECTRON),
+]
+
+print(f"{'system':18s}  {'m1':>11s}  {'m2':>11s}  {'μ':>11s}  {'μ/m_lighter':>12s}")
+for name, m1, m2 in systems:
+    mu = reduced_mass(m1, m2)
+    ratio = mu / min(m1, m2)
+    print(f"{name:18s}  {m1:>11.3e}  {m2:>11.3e}  {mu:>11.3e}  {ratio:>12.6f}")
+            </code></pre>
+        </div>
+    </div>
+    <div class="tab-content">
+        <div class="code-block-container"><div class="code-header"><span class="code-lang">Prompt for AI</span><button class="copy-btn">Copy</button></div>
+            <pre><code class="language-text">Create a Python program with numpy and Plotly to demonstrate two-body reduction.
+
+Requirements:
+- Part 1: Numerically integrate two gravitating point masses in 2D using RK4.
+  State vector: [x1, y1, vx1, vy1, x2, y2, vx2, vy2].
+  G = 1, m1 = 1, m2 = adjustable.
+  Initial conditions: bodies symmetric about origin with perpendicular velocities,
+  scaled so total momentum is zero (CM stationary).
+  Plot both trajectories with bodies in cyan and magenta.
+- Part 2: From the same trajectory, compute the center of mass R(t) and relative
+  coordinate r(t). Verify (i) R is constant or drifts linearly, (ii) r executes a
+  closed orbit. Plot R_x, R_y vs time — both should be straight lines.
+- Part 3: A reduced_mass(m1, m2) function and a table of canonical systems
+  (Sun-Earth, Earth-Moon, Pluto-Charon, equal binary, hydrogen atom). Print μ
+  and μ/min(m1, m2) for each — students should see μ ≈ m_lighter when masses are
+  unequal, and μ = m/2 when masses are equal.
+- Use dark theme, gray axes (#808080), neon colors (cyan/magenta/yellow).
+- Equal aspect ratio for orbit plots (scaleanchor='y').</code></pre>
+        </div>
+
+        <div class="info-box" style="margin-top: var(--spacing-md);">
+            <div class="info-icon">💡</div>
+            <div class="info-content">
+                <strong>Pro Tips for Prompting:</strong>
+                <ul>
+                    <li>Be specific about initial conditions — "zero total momentum" rules out drift.</li>
+                    <li>Ask the AI to <em>verify</em> the reduction numerically, not just state it.</li>
+                    <li>Use canonical systems (real masses) so the output is interpretable.</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- ============================================================ -->
+<!-- NAVIGATION -->
+<!-- ============================================================ -->
+<div class="btn-group mt-xl">
+    <button class="btn btn-magenta" onclick="navigateToSection('85-diffusion-applications')">&larr; Previous: Diffusion in the Real World</button>
+    <button class="btn btn-secondary" onclick="scrollToTop()">&uarr; Back to Top</button>
+    <button class="btn btn-secondary" onclick="navigateToSection('87-conservation-laws')">Next: Conservation Laws &rarr;</button>
+</div>

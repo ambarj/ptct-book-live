@@ -931,5 +931,50 @@
     "page": "62-jacobian-matrix",
     "anchor": "full-pipeline",
     "description": "Full Pipeline — system → FPs → Jacobian → classify"
+  },
+  "PSB211": {
+    "page": "63-linearization-stability",
+    "anchor": "stability-pipeline",
+    "description": "Stability Pipeline — nonlinear vs linearized portraits side by side"
+  },
+  "PS6637": {
+    "page": "63-linearization-stability",
+    "anchor": "trust-boundary",
+    "description": "Trust Boundary — slide across τ-Δ plane, see when linearization fails"
+  },
+  "PSDA61": {
+    "page": "63-linearization-stability",
+    "anchor": "example-gallery",
+    "description": "Example Gallery — physical systems with FPs color-coded by hyperbolicity"
+  },
+  "PSEF61": {
+    "page": "64-linearization-limits",
+    "anchor": "success-failure",
+    "description": "Success vs Failure — two systems, same Jacobian, different behavior"
+  },
+  "PS54A6": {
+    "page": "64-linearization-limits",
+    "anchor": "nonlinear-tuner",
+    "description": "Breaking a Center — slide ε to see closed orbits break into spirals"
+  },
+  "PSFE39": {
+    "page": "64-linearization-limits",
+    "anchor": "trust-summary",
+    "description": "Trust Map — classic systems placed on τ-Δ plane with safe/danger zones"
+  },
+  "PSB7A1": {
+    "page": "65-polar-coordinates",
+    "anchor": "polar-transformer",
+    "description": "Polar Transformer — Cartesian to polar with decoupled radial equation"
+  },
+  "PS63E5": {
+    "page": "65-polar-coordinates",
+    "anchor": "radial-analyzer",
+    "description": "Radial Analyzer — find limit cycles from zeros of ṙ(r)"
+  },
+  "PS0348": {
+    "page": "65-polar-coordinates",
+    "anchor": "center-resolver",
+    "description": "Center Resolver — resolve spiral vs center via polar analysis"
   }
 }

@@ -1,0 +1,575 @@
+<!-- ============================================================
+     Section 8.3: Polar Coordinates & The Radial Equation
+     Source: NPTEL Lec 18 transcript (Lec 18 - Central Force
+             Motion.md), § 3 (page 4) + parts of § 4 and § 5.
+     Concept: In polar coords, the φ-EOM IS angular-momentum
+              conservation; eliminating φ̇ gives a 1D radial
+              equation with a centrifugal +ℓ²/(μρ³) term.
+     Time: 20-22 minutes
+     Prerequisites: Sections 8.1, 8.2; chain rule; polar coordinates
+                    (App. A).
+     ============================================================ -->
+
+<h1>Polar Coordinates &amp; The Radial Equation</h1>
+
+<p>
+    Cartesian coordinates were a great choice in Section 8.1 — they made the
+    two-body reduction transparent. But for central forces, where the force
+    vector points along \( \hat r \) and the potential depends only on
+    \( |\vec r| \), Cartesian \( (x, y) \) <em>hides</em> the rotational
+    symmetry. Polar coordinates \( (\rho, \phi) \) reveal it. We will derive
+    the equations of motion in polar form, watch angular-momentum conservation
+    pop out as the φ-equation without ever invoking torque, and use it to
+    eliminate \( \dot\phi \) in favor of the constant \( \ell \). What's left
+    is a single second-order ODE in \( \rho(t) \) — and it carries an extra
+    term that looks like a force pushing outward: the famous
+    <strong>centrifugal barrier</strong>.
+</p>
+
+<div class="info-box">
+    <div class="info-icon">💡</div>
+    <div class="info-content">
+        <strong>Learning Objectives:</strong>
+        <ul>
+            <li>Decompose velocity and acceleration into radial and tangential components in polar coordinates</li>
+            <li>Identify the four polar-acceleration terms and know which vanish when (circular orbit, radial fall, etc.)</li>
+            <li>Derive the polar EOM \( \mu(\ddot\rho - \rho\dot\phi^2) = f(\rho) \) and \( \mu(\rho\ddot\phi + 2\dot\rho\dot\phi) = 0 \)</li>
+            <li>Recognize that the φ-equation <em>is</em> angular-momentum conservation: \( \ell = \mu\rho^2\dot\phi = \text{const} \)</li>
+            <li>Use ℓ to eliminate \( \dot\phi \) and obtain the radial equation \( \mu\ddot\rho = -dU/d\rho + \ell^2/(\mu\rho^3) \) with its centrifugal term</li>
+        </ul>
+    </div>
+</div>
+
+<!-- ============================================================ -->
+<!-- POLAR BASIS, VELOCITY, ACCELERATION -->
+<!-- ============================================================ -->
+<h2>Velocity and Acceleration in Polar Coordinates</h2>
+
+<p>
+    The polar basis vectors \( \hat\rho \) and \( \hat\phi \) are orthonormal,
+    but unlike \( \hat x \) and \( \hat y \), they <em>rotate with the
+    particle</em>: \( \hat\rho \) always points outward from the origin to
+    the particle, and \( \hat\phi \) points in the direction of increasing
+    angle. Because the basis vectors themselves change in time, when we
+    differentiate position to get velocity (and again to get acceleration),
+    we pick up extra terms from \( d\hat\rho/dt = \dot\phi\,\hat\phi \) and
+    \( d\hat\phi/dt = -\dot\phi\,\hat\rho \).
+</p>
+
+<div class="equation-display">
+    <p><strong>Position:</strong></p>
+    $$ \vec r = \rho\,\hat\rho $$
+    <p><strong>Velocity (one differentiation):</strong></p>
+    $$ \vec v = \dot\rho\,\hat\rho + \rho\dot\phi\,\hat\phi, \qquad v^2 = \dot\rho^2 + \rho^2\dot\phi^2 $$
+    <p><strong>Acceleration (two differentiations):</strong></p>
+    $$ \vec a = \underbrace{(\ddot\rho - \rho\dot\phi^2)}_{\text{radial}}\,\hat\rho + \underbrace{(\rho\ddot\phi + 2\dot\rho\dot\phi)}_{\text{tangential}}\,\hat\phi $$
+</div>
+
+<div class="info-box">
+    <div class="info-icon">💡</div>
+    <div class="info-content">
+        <strong>Where Do the Weird Terms Come From?</strong>
+        <p>
+            The acceleration has <em>four</em> terms, not just \( \ddot\rho \)
+            and \( \rho\ddot\phi \). The two extra terms — \( -\rho\dot\phi^2 \)
+            (centripetal) and \( 2\dot\rho\dot\phi \) (Coriolis) — come from
+            the rotation of the basis vectors themselves. They are <em>not</em>
+            extra physical forces; they are bookkeeping costs of using a
+            rotating coordinate system.
+        </p>
+        <p>
+            <strong>Sanity check:</strong> on a uniform circular orbit,
+            \( \dot\rho = 0 \) and \( \rho \) is constant, so the only
+            surviving term is \( -\rho\dot\phi^2\,\hat\rho \) — the
+            familiar centripetal acceleration \( v^2/\rho \) pointing
+            inward. ✓
+        </p>
+    </div>
+</div>
+
+<hr>
+
+<!-- ============================================================ -->
+<!-- EXPLORER 1: Polar Decomposition Visualizer -->
+<!-- ============================================================ -->
+<div class="interactive-container" id="polar-decomp">
+    <div class="interactive-title">Explorer: Cartesian vs Polar Velocity Decomposition</div>
+
+    <p>
+        Pick a trajectory shape and watch how the same velocity vector
+        \( \vec v \) decomposes two different ways — into Cartesian
+        components \( v_x\,\hat x + v_y\,\hat y \) on the left, and into
+        polar components \( \dot\rho\,\hat\rho + \rho\dot\phi\,\hat\phi \)
+        in the middle. The right panel tracks \( \rho(t) \) and \( \phi(t) \)
+        as the particle moves. For circular orbits, \( \dot\rho = 0 \) and
+        the velocity is purely tangential. For radial fall, \( \dot\phi = 0 \)
+        and the velocity is purely radial. Polar coordinates "see" the
+        motion the way the symmetry sees it.
+    </p>
+
+    <div style="display: flex; gap: 10px; margin-bottom: 1rem;">
+        <div style="flex: 1; min-width: 0;"><div class="plot-container" id="pe-cartPlot" style="height: 360px;"></div></div>
+        <div style="flex: 1; min-width: 0;"><div class="plot-container" id="pe-polarPlot" style="height: 360px;"></div></div>
+        <div style="flex: 1; min-width: 0;"><div class="plot-container" id="pe-timePlot" style="height: 360px;"></div></div>
+    </div>
+    <div id="pe-stats1" class="stats-bar"></div>
+
+    <div class="control-panel">
+        <div class="control-group">
+            <label class="control-label" for="pe-traj-select">Trajectory:</label>
+            <select class="fill-blank-select" id="pe-traj-select" style="min-width: 200px;">
+                <option value="circle" selected>Circle (uniform)</option>
+                <option value="ellipse">Ellipse</option>
+                <option value="line">Straight line through origin</option>
+                <option value="spiral">Outward spiral</option>
+            </select>
+        </div>
+        <div class="control-group">
+            <label class="control-label" for="pe-param-slider">Shape parameter:
+                <span id="pe-param-value">0.50</span>
+            </label>
+            <input type="range" class="slider" id="pe-param-slider" min="0.1" max="0.9" step="0.05" value="0.5">
+        </div>
+        <div class="control-group">
+            <label class="control-label" for="pe-time-slider">Time t:
+                <span id="pe-time-value">0.30</span>
+            </label>
+            <input type="range" class="slider" id="pe-time-slider" min="0" max="1" step="0.005" value="0.30">
+        </div>
+        <div class="control-group">
+            <button class="btn" onclick="pePlayToggle()" id="pe-play-btn">▶ Play</button>
+            <button class="btn" onclick="pePolarReset()">Reset</button>
+        </div>
+    </div>
+</div>
+
+<!-- ========== Test Your Understanding #1 ========== -->
+<div class="interactive-container question-section">
+    <div class="interactive-title">Test Your Understanding</div>
+    <p style="margin-bottom: var(--spacing-md); color: var(--text-secondary);">Use the Polar Decomposition explorer.</p>
+    <div class="tabs">
+        <div class="tab-buttons">
+            <button class="tab-button active">Question 1</button>
+            <button class="tab-button">Question 2</button>
+            <button class="tab-button">Question 3</button>
+        </div>
+        <div class="tab-content active">
+            <div class="question-container" data-type="mcq" data-answer="0">
+                <div class="question-text">Set the trajectory to "Circle". What is \( \dot\rho \) over the whole orbit?</div>
+                <div class="question-options">
+                    <label class="option"><input type="radio" name="pe-q1" value="0"><span>Exactly zero — radius stays constant on a circle</span></label>
+                    <label class="option"><input type="radio" name="pe-q1" value="1"><span>Equal to the orbital speed</span></label>
+                    <label class="option"><input type="radio" name="pe-q1" value="2"><span>Equal to \( \rho\dot\phi \)</span></label>
+                    <label class="option"><input type="radio" name="pe-q1" value="3"><span>Periodic, oscillating like a sine wave</span></label>
+                </div>
+                <div class="question-actions"><button class="btn-verify">Verify</button></div>
+                <div class="question-explanation" style="display:none;"><strong>Explanation:</strong> Circular means constant \( \rho \), so \( \dot\rho = 0 \). All of the velocity is in the tangential direction: \( |\vec v| = \rho\dot\phi \). Try the time slider — the polar-decomposition arrow points entirely in \( \hat\phi \), never along \( \hat\rho \).</div>
+            </div>
+        </div>
+        <div class="tab-content">
+            <div class="question-container" data-type="mcq" data-answer="2">
+                <div class="question-text">In \( v^2 = \dot\rho^2 + \rho^2\dot\phi^2 \), why does \( \dot\phi^2 \) carry an extra factor of \( \rho^2 \)?</div>
+                <div class="question-options">
+                    <label class="option"><input type="radio" name="pe-q2" value="0"><span>Because \( \rho \) is always positive</span></label>
+                    <label class="option"><input type="radio" name="pe-q2" value="1"><span>It's a typo — both terms should look identical</span></label>
+                    <label class="option"><input type="radio" name="pe-q2" value="2"><span>Because the tangential velocity is \( v_\phi = \rho\dot\phi \) — bigger circles cover more distance per unit angle</span></label>
+                    <label class="option"><input type="radio" name="pe-q2" value="3"><span>Because angular speed \( \dot\phi \) has units of inverse seconds, but \( \dot\rho \) has units of m/s</span></label>
+                </div>
+                <div class="question-actions"><button class="btn-verify">Verify</button></div>
+                <div class="question-explanation" style="display:none;"><strong>Explanation:</strong> Tangential speed \( v_\phi = \rho\dot\phi \): if you stand 1 m from the origin and rotate at 1 rad/s, you move at 1 m/s; if you stand 10 m out and rotate at 1 rad/s, you move at 10 m/s. So \( v_\phi^2 = \rho^2\dot\phi^2 \). Option (3) is also correct in spirit — it's the units argument — but option (2) is the real physical reason.</div>
+            </div>
+        </div>
+        <div class="tab-content">
+            <div class="question-container" data-type="msq" data-answer="0,1,2">
+                <div class="question-text">For a particle moving on a <em>straight line through the origin</em> with constant speed, which terms in the polar acceleration \( \vec a = (\ddot\rho - \rho\dot\phi^2)\hat\rho + (\rho\ddot\phi + 2\dot\rho\dot\phi)\hat\phi \) are zero? (Select all)</div>
+                <div class="question-options">
+                    <label class="option"><input type="checkbox" value="0"><span>The centripetal term \( -\rho\dot\phi^2 \)</span></label>
+                    <label class="option"><input type="checkbox" value="1"><span>The angular-acceleration term \( \rho\ddot\phi \)</span></label>
+                    <label class="option"><input type="checkbox" value="2"><span>The Coriolis term \( 2\dot\rho\dot\phi \)</span></label>
+                    <label class="option"><input type="checkbox" value="3"><span>The radial term \( \ddot\rho \)</span></label>
+                </div>
+                <div class="question-actions"><button class="btn-verify">Verify</button></div>
+                <div class="question-explanation" style="display:none;"><strong>Explanation:</strong> A straight line through the origin has \( \dot\phi = 0 \) (the angle never changes), so any term containing \( \dot\phi \) or \( \ddot\phi \) vanishes — that kills options 0, 1, and 2. The remaining term is \( \ddot\rho \). For <em>constant-speed</em> motion along the line, \( \ddot\rho = 0 \) too, so all four terms vanish — consistent with zero net force on a free particle.</div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- ============================================================ -->
+<!-- THE POLAR EOM DERIVATION -->
+<!-- ============================================================ -->
+<h2>The Polar Equations of Motion</h2>
+
+<p>
+    Newton's second law for the equivalent one-body problem is
+    \( \mu\ddot{\vec r} = \vec f(r) \). For a central force,
+    \( \vec f = f(\rho)\,\hat\rho \) — purely radial, no \( \hat\phi \)
+    component. Writing both sides in the polar basis:
+</p>
+
+<div class="equation-display">
+    <p><strong>Polar equations of motion:</strong></p>
+    $$ \mu(\ddot\rho - \rho\dot\phi^2) = f(\rho) \qquad \text{(radial)} $$
+    $$ \mu(\rho\ddot\phi + 2\dot\rho\dot\phi) = 0 \qquad \text{(tangential)} $$
+    <p>
+        Two coupled second-order ODEs in \( \rho(t) \) and \( \phi(t) \). The
+        radial equation has the central force on the right-hand side; the
+        tangential equation has <strong>zero</strong> on the right because
+        the central force has no \( \hat\phi \) component.
+    </p>
+</div>
+
+<p>
+    The φ-equation looks complicated, but it is hiding a clean conservation
+    law. Multiply both sides by \( \rho \):
+</p>
+
+<div class="equation-display">
+    $$ \rho \cdot \mu(\rho\ddot\phi + 2\dot\rho\dot\phi) = \mu(\rho^2\ddot\phi + 2\rho\dot\rho\dot\phi) = \mu \cdot \frac{d}{dt}\!\left(\rho^2\dot\phi\right) = 0 $$
+    <p>
+        The expression in parentheses on the second equality is exactly
+        \( d(\rho^2\dot\phi)/dt \) by the product rule (try it!). So
+    </p>
+    $$ \boxed{\ell \equiv \mu\rho^2\dot\phi = \text{const}} $$
+</div>
+
+<div class="info-box">
+    <div class="info-icon">💡</div>
+    <div class="info-content">
+        <strong>Key Insight: the φ-EOM <em>is</em> angular-momentum conservation.</strong>
+        <p>
+            We just derived \( \ell = \mu\rho^2\dot\phi = \text{const} \)
+            without invoking torque, cross products, or the angular-momentum
+            theorem. It fell out of the tangential equation of motion because
+            central forces have no φ-component. This is the <em>same</em>
+            ℓ from Section 8.2 — but here it appears as an algebraic
+            consequence of choosing the right coordinates rather than a
+            symmetry argument. Both viewpoints are correct; both are useful.
+        </p>
+    </div>
+</div>
+
+<!-- ============================================================ -->
+<!-- ELIMINATING φ̇ -->
+<!-- ============================================================ -->
+<h2>Eliminating \( \dot\phi \): The Radial Equation</h2>
+
+<p>
+    Conservation of \( \ell \) means \( \dot\phi = \ell/(\mu\rho^2) \). We
+    can substitute this into the radial equation to eliminate \( \dot\phi \)
+    entirely, leaving a single ODE in \( \rho(t) \):
+</p>
+
+<div class="equation-display">
+    $$ \mu(\ddot\rho - \rho\dot\phi^2) = f(\rho) \;\Rightarrow\; \mu\ddot\rho = f(\rho) + \mu\rho\dot\phi^2 = f(\rho) + \mu\rho \cdot \frac{\ell^2}{\mu^2\rho^4} $$
+    <p>For a conservative central force, \( f(\rho) = -dU/d\rho \), so:</p>
+    $$ \boxed{\mu\ddot\rho = -\frac{dU}{d\rho} + \frac{\ell^2}{\mu\rho^3}} $$
+</div>
+
+<p>
+    The extra term \( +\ell^2/(\mu\rho^3) \) is the <strong>centrifugal
+    force</strong>. It pushes outward (positive sign) and grows like
+    \( 1/\rho^3 \) as the particle approaches the origin. For any \( \ell > 0 \),
+    the centrifugal term diverges at \( \rho \to 0 \) — creating an
+    "angular-momentum barrier" that prevents the orbiting particle from
+    ever reaching the origin (no matter how attractive \( U(\rho) \) is, as
+    long as it's not <em>more</em> singular than \( 1/\rho^2 \)).
+</p>
+
+<hr>
+
+<!-- ============================================================ -->
+<!-- EXPLORER 2: Centrifugal Barrier -->
+<!-- ============================================================ -->
+<div class="interactive-container" id="centrifugal-barrier">
+    <div class="interactive-title">Explorer: The Centrifugal Barrier</div>
+
+    <p>
+        Pick an attractive potential \( U(\rho) \) and a value of angular
+        momentum \( \ell \). The <strong>left panel</strong> shows
+        \( U(\rho) \), the centrifugal contribution \( \ell^2/(2\mu\rho^2) \)
+        (which we'll formally call part of the effective potential in
+        Section 8.4), and their sum. The <strong>right panel</strong> shows
+        the corresponding <em>forces</em>: the attractive radial force
+        \( -dU/d\rho \), the outward centrifugal force \( \ell^2/(\mu\rho^3) \),
+        and their net. Slide \( \ell \) to zero and the centrifugal term
+        vanishes — for any non-zero \( \ell \) it builds an outward wall
+        that protects the origin.
+    </p>
+
+    <div class="dual-panel">
+        <div class="panel"><div class="plot-container" id="pe-potPlot" style="height: 400px;"></div></div>
+        <div class="panel"><div class="plot-container" id="pe-forcePlot" style="height: 400px;"></div></div>
+    </div>
+    <div id="pe-stats2" class="stats-bar"></div>
+
+    <div class="control-panel">
+        <div class="control-group">
+            <label class="control-label" for="pe-pot-select">Potential U(ρ):</label>
+            <select class="fill-blank-select" id="pe-pot-select" style="min-width: 200px;">
+                <option value="kepler" selected>Kepler:  −k/ρ</option>
+                <option value="harmonic">Harmonic:  ½ k ρ²</option>
+                <option value="yukawa">Yukawa:  −k e^(−ρ/μ_Y) /ρ</option>
+            </select>
+        </div>
+        <div class="control-group">
+            <label class="control-label" for="pe-ell-slider">Angular momentum ℓ:
+                <span id="pe-ell-value">1.00</span>
+            </label>
+            <input type="range" class="slider" id="pe-ell-slider" min="0" max="2.5" step="0.05" value="1.0">
+        </div>
+        <div class="control-group">
+            <label class="control-label" for="pe-k-slider">Strength k:
+                <span id="pe-k-value">1.00</span>
+            </label>
+            <input type="range" class="slider" id="pe-k-slider" min="0.2" max="3" step="0.1" value="1.0">
+        </div>
+        <div class="control-group">
+            <label class="control-label" for="pe-yuk-slider">Yukawa range μ_Y:
+                <span id="pe-yuk-value">2.00</span>
+            </label>
+            <input type="range" class="slider" id="pe-yuk-slider" min="0.5" max="5" step="0.1" value="2.0">
+        </div>
+        <div class="control-group">
+            <button class="btn" onclick="peCentReset()">Reset</button>
+        </div>
+    </div>
+</div>
+
+<!-- ========== Test Your Understanding #2 ========== -->
+<div class="interactive-container question-section">
+    <div class="interactive-title">Test Your Understanding</div>
+    <p style="margin-bottom: var(--spacing-md); color: var(--text-secondary);">Use the Centrifugal Barrier explorer.</p>
+    <div class="tabs">
+        <div class="tab-buttons">
+            <button class="tab-button active">Question 4</button>
+            <button class="tab-button">Question 5</button>
+            <button class="tab-button">Question 6</button>
+        </div>
+        <div class="tab-content active">
+            <div class="question-container" data-type="mcq" data-answer="1">
+                <div class="question-text">Set \( \ell = 0 \) (head-on radial fall). What does the radial equation \( \mu\ddot\rho = -dU/d\rho + \ell^2/(\mu\rho^3) \) reduce to?</div>
+                <div class="question-options">
+                    <label class="option"><input type="radio" name="pe-q4" value="0"><span>\( \mu\ddot\rho = +\ell^2/(\mu\rho^3) \) — pure centrifugal repulsion</span></label>
+                    <label class="option"><input type="radio" name="pe-q4" value="1"><span>\( \mu\ddot\rho = -dU/d\rho \) — ordinary 1D Newtonian motion in U(ρ)</span></label>
+                    <label class="option"><input type="radio" name="pe-q4" value="2"><span>The equation has no solution</span></label>
+                    <label class="option"><input type="radio" name="pe-q4" value="3"><span>\( \rho \) becomes negative</span></label>
+                </div>
+                <div class="question-actions"><button class="btn-verify">Verify</button></div>
+                <div class="question-explanation" style="display:none;"><strong>Explanation:</strong> With \( \ell = 0 \), the centrifugal term vanishes and we get \( \mu\ddot\rho = -dU/d\rho \) — ordinary one-dimensional motion in the bare potential \( U(\rho) \). This is the <em>only</em> case where the particle can plunge straight to \( \rho = 0 \). For any \( \ell > 0 \), the centrifugal barrier prevents this. (Try the slider!)</div>
+            </div>
+        </div>
+        <div class="tab-content">
+            <div class="question-container" data-type="fill" data-answer="ell^2/(mu*k)|l^2/(mu k)|l²/(μk)|ℓ²/(μk)">
+                <div class="question-text">For Kepler \( U = -k/\rho \), the radial equation reads \( \mu\ddot\rho = -k/\rho^2 + \ell^2/(\mu\rho^3) \). A <strong>circular orbit</strong> requires \( \ddot\rho = 0 \). Setting the right-hand side to zero gives the circular-orbit radius \( \rho_{\text{circ}} = \) <input type="text" class="fill-blank" style="width:120px"> (in symbols, e.g. <code>ell^2/(mu*k)</code>).</div>
+                <div class="question-actions"><button class="btn-verify">Verify</button></div>
+                <div class="question-explanation" style="display:none;"><strong>Explanation:</strong> Set \( -k/\rho^2 + \ell^2/(\mu\rho^3) = 0 \) ⇒ \( \ell^2/(\mu\rho^3) = k/\rho^2 \) ⇒ \( \rho_{\text{circ}} = \ell^2/(\mu k) \). This is also the location of the minimum of the effective potential \( U_{\text{eff}} = -k/\rho + \ell^2/(2\mu\rho^2) \) — a result we'll use heavily in Section 8.4. Notice how increasing \( \ell \) increases the orbital radius (more angular momentum → bigger orbit), and increasing \( k \) (stronger gravity) decreases it (gravity wins, orbit shrinks).</div>
+            </div>
+        </div>
+        <div class="tab-content">
+            <div class="question-container" data-type="msq" data-answer="0,2,3">
+                <div class="question-text">Why is the centrifugal term \( +\ell^2/(\mu\rho^3) \) called <em>fictitious</em>? (Select all that apply.)</div>
+                <div class="question-options">
+                    <label class="option"><input type="checkbox" value="0"><span>It does not appear in the Cartesian formulation of Newton's laws — it's an artifact of choosing polar coordinates and substituting in conservation of ℓ</span></label>
+                    <label class="option"><input type="checkbox" value="1"><span>It is a real physical force in the inertial frame, like gravity</span></label>
+                    <label class="option"><input type="checkbox" value="2"><span>It arises because \( \dot\phi \neq 0 \) — the particle's coordinate system "rotates" with it, in effect</span></label>
+                    <label class="option"><input type="checkbox" value="3"><span>Its <em>consequences</em> are real — it changes the radial equation in a way that shapes real physical orbits (circular radii, turning points, etc.)</span></label>
+                </div>
+                <div class="question-actions"><button class="btn-verify">Verify</button></div>
+                <div class="question-explanation" style="display:none;"><strong>Explanation:</strong><ul><li><strong>Not in Cartesian:</strong> ✓ In Cartesian coordinates, the EOM is just \( m\ddot{\vec r} = \vec F \) — no centrifugal term anywhere.</li><li><strong>Real physical force:</strong> ✗ It is <em>not</em> a fundamental force. It's a bookkeeping term that appears because polar coordinates aren't inertial in the same way Cartesian are.</li><li><strong>Comes from rotation:</strong> ✓ Closely related to centrifugal forces in rotating reference frames in introductory mechanics.</li><li><strong>Consequences are real:</strong> ✓ Don't dismiss it — it determines real physical observables like circular-orbit radii and the size of the Kepler problem's "well."</li></ul></div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- ============================================================ -->
+<!-- TEASER for 8.4 -->
+<!-- ============================================================ -->
+<h2>What's Next: The Effective Potential</h2>
+
+<div class="info-box">
+    <div class="info-icon">💡</div>
+    <div class="info-content">
+        <strong>Forward Reference: a 1-D problem in disguise.</strong>
+        <p>
+            The radial equation \( \mu\ddot\rho = -dU/d\rho + \ell^2/(\mu\rho^3) \)
+            <em>looks</em> like 1-D Newtonian motion in some new potential.
+            We just have to identify it. Notice that
+            \( -d/d\rho\,[U(\rho) + \ell^2/(2\mu\rho^2)] = -dU/d\rho + \ell^2/(\mu\rho^3) \)
+            — the right-hand side is exactly the negative gradient of a single
+            function. That function is the <strong>effective potential</strong>:
+        </p>
+        $$ U_{\text{eff}}(\rho) = U(\rho) + \frac{\ell^2}{2\mu\rho^2} $$
+        <p>
+            and the radial equation becomes \( \mu\ddot\rho = -dU_{\text{eff}}/d\rho \) —
+            a particle of mass μ moving in 1-D in the potential \( U_{\text{eff}} \).
+            Section 8.4 will plot this potential for various choices of
+            \( U(\rho) \) and use it to read off circular-orbit radii,
+            turning points, and bound vs unbound orbits — by inspection,
+            without ever solving an ODE.
+        </p>
+    </div>
+</div>
+
+<!-- ============================================================ -->
+<!-- PYTHON CODE -->
+<!-- ============================================================ -->
+<h2>Python Code</h2>
+<div class="tabs">
+    <div class="tab-buttons">
+        <button class="tab-button active">Cartesian → Polar</button>
+        <button class="tab-button">Verify ℓ from Cartesian Orbit</button>
+        <button class="tab-button">Centrifugal Barrier Plot</button>
+        <button class="tab-button">Prompt</button>
+    </div>
+    <div class="tab-content active">
+        <div class="code-block-container"><div class="code-header"><span class="code-lang">Python</span><button class="copy-btn">Copy</button></div>
+            <pre><code class="language-python">
+import numpy as np
+import plotly.graph_objects as go
+
+# Convert Cartesian (x,y,vx,vy) to polar (ρ, φ, ρ̇, φ̇), and back.
+def cart_to_polar(x, y, vx, vy):
+    rho   = np.sqrt(x**2 + y**2)
+    phi   = np.arctan2(y, x)
+    # ρ̇ = (x vx + y vy) / ρ; φ̇ = (x vy − y vx) / ρ²
+    rdot  = (x*vx + y*vy) / rho
+    pdot  = (x*vy - y*vx) / rho**2
+    return rho, phi, rdot, pdot
+
+def polar_to_cart(rho, phi, rdot, pdot):
+    x = rho * np.cos(phi);  y = rho * np.sin(phi)
+    # v = ρ̇ ρ̂ + ρ φ̇ φ̂; ρ̂ = (cos φ, sin φ), φ̂ = (−sin φ, cos φ)
+    vx = rdot * np.cos(phi) - rho * pdot * np.sin(phi)
+    vy = rdot * np.sin(phi) + rho * pdot * np.cos(phi)
+    return x, y, vx, vy
+
+# Sanity check: round-trip
+x0, y0, vx0, vy0 = 1.0, 0.5, -0.2, 0.7
+rho, phi, rd, pd = cart_to_polar(x0, y0, vx0, vy0)
+xb, yb, vxb, vyb = polar_to_cart(rho, phi, rd, pd)
+print(f"original: ({x0:.3f}, {y0:.3f}, {vx0:.3f}, {vy0:.3f})")
+print(f"recovered: ({xb:.3f}, {yb:.3f}, {vxb:.3f}, {vyb:.3f})")
+print(f"|v|² = {vx0**2 + vy0**2:.4f}  (Cartesian)")
+print(f"ρ̇² + ρ²φ̇² = {rd**2 + (rho*pd)**2:.4f}  (polar)")
+            </code></pre>
+        </div>
+    </div>
+    <div class="tab-content">
+        <div class="code-block-container"><div class="code-header"><span class="code-lang">Python</span><button class="copy-btn">Copy</button></div>
+            <pre><code class="language-python">
+import numpy as np
+import plotly.graph_objects as go
+
+# Integrate Kepler in Cartesian, then verify ρ²φ̇ is constant in time.
+mu = 1.0
+def F(r):  return -r / (r @ r) ** 1.5
+
+def rhs(s):
+    return np.concatenate([s[2:], F(s[:2])])
+
+def rk4_step(s, h):
+    k1 = rhs(s); k2 = rhs(s + 0.5*h*k1)
+    k3 = rhs(s + 0.5*h*k2); k4 = rhs(s + h*k3)
+    return s + (h/6)*(k1 + 2*k2 + 2*k3 + k4)
+
+s = np.array([1.0, 0.0, 0.0, 0.9])
+h, N = 0.02, 1500
+traj = np.zeros((N, 4))
+for k in range(N):
+    traj[k] = s; s = rk4_step(s, h)
+
+x, y, vx, vy = traj[:, 0], traj[:, 1], traj[:, 2], traj[:, 3]
+rho   = np.sqrt(x**2 + y**2)
+pdot  = (x*vy - y*vx) / rho**2
+ell   = mu * rho**2 * pdot
+
+t = np.arange(N) * h
+fig = go.Figure()
+fig.add_trace(go.Scatter(x=t, y=ell, mode='lines',
+    line=dict(color='#00f3ff', width=2), name='ℓ = μρ²φ̇ (measured)'))
+fig.add_hline(y=ell[0], line=dict(color='#ff006e', dash='dash'),
+              annotation_text=f'ℓ₀ = {ell[0]:.4f}')
+fig.update_layout(template='plotly_dark',
+    xaxis=dict(title='t', zerolinecolor='#808080'),
+    yaxis=dict(title='ℓ', zerolinecolor='#808080'),
+    title='Angular momentum is constant — the φ-EOM in action',
+    height=400)
+fig.show()
+print(f"ℓ relative drift: {np.max(np.abs((ell - ell[0])/ell[0])):.2e}")
+            </code></pre>
+        </div>
+    </div>
+    <div class="tab-content">
+        <div class="code-block-container"><div class="code-header"><span class="code-lang">Python</span><button class="copy-btn">Copy</button></div>
+            <pre><code class="language-python">
+import numpy as np
+import plotly.graph_objects as go
+
+# Plot U(ρ), centrifugal term ℓ²/(2μρ²), and their sum for various ℓ.
+mu = 1.0
+k  = 1.0
+rho = np.linspace(0.1, 8, 500)
+U_kepler = -k / rho
+
+fig = go.Figure()
+fig.add_trace(go.Scatter(x=rho, y=U_kepler, mode='lines',
+    line=dict(color='#00f3ff', width=2), name='U(ρ) = −k/ρ'))
+for ell, color in zip([0.0, 0.5, 1.0, 1.5], ['#888', '#00ff88', '#ffbe0b', '#ff006e']):
+    Ueff = U_kepler + ell**2 / (2 * mu * rho**2)
+    fig.add_trace(go.Scatter(x=rho, y=Ueff, mode='lines',
+        line=dict(color=color, width=2),
+        name=f'U + ℓ²/(2μρ²), ℓ = {ell}'))
+
+fig.update_layout(template='plotly_dark',
+    xaxis=dict(title='ρ', range=[0, 8], zerolinecolor='#808080'),
+    yaxis=dict(title='U_eff', range=[-1.5, 1.5], zerolinecolor='#808080'),
+    title='Centrifugal barrier raises the effective potential at small ρ',
+    height=420)
+fig.show()
+            </code></pre>
+        </div>
+    </div>
+    <div class="tab-content">
+        <div class="code-block-container"><div class="code-header"><span class="code-lang">Prompt for AI</span><button class="copy-btn">Copy</button></div>
+            <pre><code class="language-text">Create Python with numpy and Plotly to demonstrate polar coordinates and the
+radial equation for central-force motion.
+
+Requirements:
+- Part 1: Functions cart_to_polar and polar_to_cart that convert (x, y, vx, vy)
+  to (ρ, φ, ρ̇, φ̇) and back. Verify the round trip preserves the original
+  values to machine precision. Print |v|² computed both ways — should agree.
+- Part 2: Numerically integrate a Kepler orbit (U = -1/r) in Cartesian using
+  RK4. From the trajectory, compute ρ(t), φ̇(t), and the product ρ²φ̇.
+  Show that ρ²φ̇ is constant — this is the φ-EOM ⇒ ℓ conservation in action.
+  Print the maximum relative drift.
+- Part 3: For an attractive Kepler potential U = -k/ρ, plot U(ρ) and the
+  effective potential U_eff = U + ℓ²/(2μρ²) for several values of ℓ
+  (including ℓ = 0). Show how the centrifugal barrier creates a minimum
+  (= circular orbit) at ρ_circ = ℓ²/(μk) for non-zero ℓ.
+- Use dark theme, gray axes (#808080), neon colors.
+- Each part under 35 lines.</code></pre>
+        </div>
+
+        <div class="info-box" style="margin-top: var(--spacing-md);">
+            <div class="info-icon">💡</div>
+            <div class="info-content">
+                <strong>Pro Tips for Prompting:</strong>
+                <ul>
+                    <li>Round-trip tests are powerful: if the AI's polar↔Cartesian conversions don't round-trip exactly, there's a bug.</li>
+                    <li>Plotting ρ²φ̇ vs t is a clean visual check of the angular-momentum derivation.</li>
+                    <li>Asking for ℓ = 0 alongside non-zero ℓ in Part 3 makes the centrifugal barrier visually obvious.</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- ============================================================ -->
+<!-- NAVIGATION -->
+<!-- ============================================================ -->
+<div class="btn-group mt-xl">
+    <button class="btn btn-magenta" onclick="navigateToSection('87-conservation-laws')">&larr; Previous: Conservation Laws</button>
+    <button class="btn btn-secondary" onclick="scrollToTop()">&uarr; Back to Top</button>
+    <button class="btn btn-secondary" onclick="navigateToSection('89-effective-potential')">Next: The Effective Potential &rarr;</button>
+</div>

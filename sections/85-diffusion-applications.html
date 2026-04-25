@@ -66,13 +66,13 @@
     <div class="control-panel">
         <div class="control-group">
             <label class="control-label" for="da-system-select">System:</label>
-            <select class="slider" id="da-system-select" style="width: 220px; height: 32px;">
+            <select class="fill-blank-select" id="da-system-select" style="min-width: 220px;">
                 <option value="0">Heat in iron (κ = 2.3×10⁻⁵ m²/s)</option>
                 <option value="1">Ink in water (D = 1×10⁻⁹ m²/s)</option>
                 <option value="2">O₂ in air (D = 2×10⁻⁵ m²/s)</option>
                 <option value="3">Dopant in silicon (D = 1×10⁻¹⁶ m²/s)</option>
                 <option value="4">Stock price (σ² = 0.04/yr)</option>
-                <option value="5">Bacteria in agar (D = 5×10⁻¹⁰ m²/s)</option>
+                <option value="5">Bacteria in agar — passive diffusion (D = 5×10⁻¹⁰ m²/s)</option>
             </select>
         </div>
         <div class="control-group">
@@ -296,6 +296,34 @@
             </div>
         </div>
     </div>
+</div>
+
+<!-- ============================================================ -->
+<!-- BEYOND PLAIN DIFFUSION -->
+<!-- ============================================================ -->
+<div class="info-box">
+    <div class="info-box-title">Beyond Plain Diffusion: Two Important Cousins</div>
+    <p>
+        <strong>Reaction–diffusion equations</strong> add a source term:
+        \( \partial u/\partial t = D\,\nabla^2 u + R(u) \). The reaction
+        \( R(u) \) creates or destroys \( u \) locally while diffusion
+        spreads it. This combination produces some of the most striking
+        patterns in nature — Turing patterns on animal coats, spiral waves
+        in the Belousov–Zhabotinsky reaction, action-potential propagation
+        in nerves, and morphogen gradients that pattern an embryo. Same
+        Laplacian, plus a non-linear source.
+    </p>
+    <p>
+        <strong>Active motion (chemotaxis, run-and-tumble).</strong> The
+        "Bacteria in agar" entry in our explorer treats bacteria as
+        <em>passive</em> tracers — only valid when they are dead or chemically
+        inert. Real bacteria like <em>E. coli</em> swim in straight "runs"
+        and randomly "tumble" to reorient, biasing their motion up
+        attractant gradients. This is <em>not</em> diffusion: it is
+        directed, energy-consuming, and described by drift–diffusion or
+        more elaborate active-matter equations. Pure diffusion is the
+        long-time, coarse-grained limit when the bias averages out.
+    </p>
 </div>
 
 <!-- ============================================================ -->

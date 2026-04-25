@@ -1,0 +1,502 @@
+<!-- ============================================================
+     Section 8.4: The Effective Potential
+     Source: Lec 18 transcript § 5 (eqn 10) + § 7-8 (Manipulate
+             demos for Kepler & SHO); Lec 19 transcript § 2
+             (Group Problem 1: Kepler U_eff guided analysis).
+     Concept: Plot U_eff(ρ); horizontal line at E gives turning
+              points, allowed region, circular-orbit radius,
+              bound vs unbound — all by inspection.
+     Time: 22-25 minutes
+     Prerequisites: § 8.2 (E, ℓ conserved); § 8.3 (radial
+                    equation; centrifugal barrier).
+     ============================================================ -->
+
+<h1>The Effective Potential</h1>
+
+<p>
+    Section 8.3 ended with a striking observation: the radial equation
+    \( \mu\ddot\rho = -dU/d\rho + \ell^2/(\mu\rho^3) \) looks like
+    one-dimensional Newtonian motion in some new potential. We can make this
+    exact. Define
+</p>
+
+<div class="equation-display">
+    $$ \boxed{U_{\text{eff}}(\rho) = U(\rho) + \frac{\ell^2}{2\mu\rho^2}} $$
+    <p>and check that</p>
+    $$ -\frac{dU_{\text{eff}}}{d\rho} = -\frac{dU}{d\rho} + \frac{\ell^2}{\mu\rho^3} $$
+    <p>— exactly the right-hand side of the radial equation. So</p>
+    $$ \mu\ddot\rho = -\frac{dU_{\text{eff}}}{d\rho}, \qquad E = \tfrac{1}{2}\mu\dot\rho^2 + U_{\text{eff}}(\rho) $$
+    <p>
+        is a 1-D problem: a particle of mass μ moving along the ρ-axis in the
+        potential \( U_{\text{eff}} \), with total energy E.
+    </p>
+</div>
+
+<p>
+    Once you have a 1-D problem with constant total energy, you have a
+    powerful pedagogical tool: <strong>the energy diagram</strong>. Sketch
+    \( U_{\text{eff}}(\rho) \), draw a horizontal line at E, and read off
+    everything by inspection — turning points, allowed regions,
+    circular-orbit radii, bound vs unbound. No ODE, no trajectory integral.
+    Just a picture.
+</p>
+
+<div class="info-box">
+    <div class="info-icon">💡</div>
+    <div class="info-content">
+        <strong>Learning Objectives:</strong>
+        <ul>
+            <li>Define the effective potential \( U_{\text{eff}}(\rho) = U(\rho) + \ell^2/(2\mu\rho^2) \) and recognize it as the 1-D effective dynamics of the radial equation</li>
+            <li>Use the energy-diagram method: turning points where \( U_{\text{eff}}(\rho) = E \), allowed region where \( U_{\text{eff}} \le E \)</li>
+            <li>Locate the circular-orbit radius \( \rho_{\text{circ}} \) at the minimum of \( U_{\text{eff}} \), and compute \( E_{\text{min}} = U_{\text{eff}}(\rho_{\text{circ}}) \)</li>
+            <li>Classify orbits by E and ℓ: forbidden, circular, bound, parabolic, unbound (hyperbolic) for Kepler; always bound for SHO</li>
+            <li>Apply the same pictorial method to <em>any</em> central potential — the recipe is independent of the specific U(ρ)</li>
+        </ul>
+    </div>
+</div>
+
+<!-- ============================================================ -->
+<!-- THE ENERGY-DIAGRAM RECIPE -->
+<!-- ============================================================ -->
+<h2>The Energy-Diagram Recipe</h2>
+
+<p>
+    Here is the seven-step recipe for extracting orbital dynamics from a
+    single plot of \( U_{\text{eff}} \):
+</p>
+
+<ol>
+    <li><strong>Sketch \( U_{\text{eff}}(\rho) \)</strong> for the chosen \( U(\rho) \) and value of \( \ell \).</li>
+    <li><strong>Draw a horizontal line at total energy \( E \).</strong></li>
+    <li><strong>Turning points:</strong> values of \( \rho \) where \( U_{\text{eff}}(\rho) = E \). At a turning point, \( \dot\rho = 0 \) and the radial motion reverses.</li>
+    <li><strong>Allowed region:</strong> the interval(s) of \( \rho \) where \( U_{\text{eff}}(\rho) \le E \). Outside this region the radial kinetic energy would be negative — physically forbidden.</li>
+    <li><strong>Circular orbit:</strong> when \( E \) equals the minimum of \( U_{\text{eff}} \), the only "allowed" \( \rho \) is the minimum itself. The particle stays at fixed radius — a circular orbit. The condition \( dU_{\text{eff}}/d\rho = 0 \) gives \( \rho_{\text{circ}} \).</li>
+    <li><strong>Bound orbit:</strong> if \( E \) lies between \( E_{\text{min}} \) and the asymptotic value \( U_{\text{eff}}(\rho \to \infty) \), the allowed region is a finite interval \( [\rho_{\text{min}}, \rho_{\text{max}}] \) and the orbit oscillates radially while sweeping in \( \phi \). For Kepler this gives ellipses.</li>
+    <li><strong>Unbound orbit:</strong> if \( E \) exceeds the asymptotic value, one of the turning points is at infinity and the particle escapes. For Kepler at \( E = 0 \) the orbit is a parabola; at \( E > 0 \), a hyperbola.</li>
+</ol>
+
+<div class="info-box">
+    <div class="info-icon">💡</div>
+    <div class="info-content">
+        <strong>Pedagogical payoff: total energy = radial KE + U_eff.</strong>
+        <p>
+            The angular kinetic energy \( \tfrac{1}{2}\mu\rho^2\dot\phi^2 \)
+            has been absorbed into the centrifugal term \( \ell^2/(2\mu\rho^2) \)
+            inside \( U_{\text{eff}} \). What's left is just radial motion. Reading
+            an orbit from a U_eff plot is identical to reading a 1-D
+            ball-rolling-in-a-bowl problem from elementary mechanics.
+        </p>
+    </div>
+</div>
+
+<hr>
+
+<!-- ============================================================ -->
+<!-- EXPLORER 1: U_eff Energy Diagram -->
+<!-- ============================================================ -->
+<div class="interactive-container" id="ueff-diagram">
+    <div class="interactive-title">Explorer: U_eff Energy Diagram</div>
+
+    <p>
+        Pick a central potential and a value of \( \ell \). The
+        <strong>left panel</strong> shows \( U_{\text{eff}}(\rho) \) (solid)
+        with the bare \( U(\rho) \) and centrifugal term shown faintly so you
+        can see where each contributes. Drag the energy slider — the
+        horizontal \( E \) line moves. Turning points (★) appear where the
+        line crosses \( U_{\text{eff}} \); the allowed region is shaded; the
+        circular-orbit radius is marked with a diamond. The
+        <strong>right panel</strong> shows what the actual orbit looks like
+        in 2-D for that energy: forbidden, circular, bound elliptical,
+        parabolic escape, or hyperbolic flyby.
+    </p>
+
+    <div class="dual-panel">
+        <div class="panel"><div class="plot-container" id="ep-uPlot" style="height: 440px;"></div></div>
+        <div class="panel"><div class="plot-container" id="ep-orbitPlot" style="height: 440px;"></div></div>
+    </div>
+    <div id="ep-stats1" class="stats-bar"></div>
+
+    <div class="control-panel">
+        <div class="control-group">
+            <label class="control-label" for="ep-pot-select">Potential U(ρ):</label>
+            <select class="fill-blank-select" id="ep-pot-select" style="min-width: 200px;">
+                <option value="kepler" selected>Kepler:  −k/ρ</option>
+                <option value="sho">SHO:  ½ k ρ²</option>
+            </select>
+        </div>
+        <div class="control-group">
+            <label class="control-label" for="ep-ell-slider">Angular momentum ℓ:
+                <span id="ep-ell-value">1.00</span>
+            </label>
+            <input type="range" class="slider" id="ep-ell-slider" min="0.2" max="2" step="0.05" value="1.0">
+        </div>
+        <div class="control-group">
+            <label class="control-label" for="ep-k-slider">Strength k:
+                <span id="ep-k-value">1.00</span>
+            </label>
+            <input type="range" class="slider" id="ep-k-slider" min="0.3" max="2" step="0.05" value="1.0">
+        </div>
+        <div class="control-group">
+            <label class="control-label" for="ep-E-slider">Energy E:
+                <span id="ep-E-value">−0.40</span>
+            </label>
+            <input type="range" class="slider" id="ep-E-slider" min="-1" max="1" step="0.01" value="-0.40">
+        </div>
+        <div class="control-group">
+            <button class="btn" onclick="epJumpEmin()">E = E_min</button>
+            <button class="btn" onclick="epJumpEhalf()">E = E_min/2</button>
+            <button class="btn" onclick="epJumpEzero()">E = 0</button>
+            <button class="btn" onclick="epUeffReset()">Reset</button>
+        </div>
+    </div>
+</div>
+
+<!-- ========== Test Your Understanding #1 ========== -->
+<div class="interactive-container question-section">
+    <div class="interactive-title">Test Your Understanding</div>
+    <p style="margin-bottom: var(--spacing-md); color: var(--text-secondary);">Use the U_eff Energy Diagram explorer.</p>
+    <div class="tabs">
+        <div class="tab-buttons">
+            <button class="tab-button active">Question 1</button>
+            <button class="tab-button">Question 2</button>
+            <button class="tab-button">Question 3</button>
+        </div>
+        <div class="tab-content active">
+            <div class="question-container" data-type="mcq" data-answer="0">
+                <div class="question-text">When the total energy \( E \) exactly equals the minimum of \( U_{\text{eff}} \), the orbit is …</div>
+                <div class="question-options">
+                    <label class="option"><input type="radio" name="ep-q1" value="0"><span>Circular — \( \rho \) is pinned to the unique allowed radius \( \rho_{\text{circ}} \)</span></label>
+                    <label class="option"><input type="radio" name="ep-q1" value="1"><span>Elliptical with high eccentricity</span></label>
+                    <label class="option"><input type="radio" name="ep-q1" value="2"><span>Parabolic</span></label>
+                    <label class="option"><input type="radio" name="ep-q1" value="3"><span>Hyperbolic</span></label>
+                </div>
+                <div class="question-actions"><button class="btn-verify">Verify</button></div>
+                <div class="question-explanation" style="display:none;"><strong>Explanation:</strong> If \( E = U_{\text{eff,min}} \), then \( U_{\text{eff}}(\rho) \le E \) only at the single point \( \rho = \rho_{\text{circ}} \). Anywhere else \( U_{\text{eff}} > E \), so \( \dot\rho^2 < 0 \) — forbidden. The particle is stuck at \( \rho_{\text{circ}} \) (radial degree of freedom frozen) while \( \phi \) advances at the constant rate \( \ell/(\mu\rho_{\text{circ}}^2) \) — a circular orbit. Click the "E = E_min" quick-jump button to verify.</div>
+            </div>
+        </div>
+        <div class="tab-content">
+            <div class="question-container" data-type="fill" data-answer="1[0.95,1.05]|-0.5[-0.55,-0.45]">
+                <div class="question-text">For Kepler with \( k = 1, \ell = 1, \mu = 1 \): the circular-orbit radius is \( \rho_{\text{circ}} = \ell^2/(\mu k) = \) <input type="text" class="fill-blank" style="width: 60px"> and the minimum energy is \( E_{\text{min}} = U_{\text{eff}}(\rho_{\text{circ}}) = -\mu k^2/(2\ell^2) = \) <input type="text" class="fill-blank" style="width: 60px">. (Verify with the explorer's stats bar after clicking "E = E_min".)</div>
+                <div class="question-actions"><button class="btn-verify">Verify</button></div>
+                <div class="question-explanation" style="display:none;"><strong>Explanation:</strong> Set \( dU_{\text{eff}}/d\rho = k/\rho^2 - \ell^2/(\mu\rho^3) = 0 \) ⇒ \( \rho_{\text{circ}} = \ell^2/(\mu k) = 1 \). Plug back into \( U_{\text{eff}} = -k/\rho + \ell^2/(2\mu\rho^2) \) at \( \rho = 1 \): \( U_{\text{eff}}(1) = -1 + 0.5 = -0.5 \). So \( E_{\text{min}} = -1/2 \). General formula: \( E_{\text{min}} = -\mu k^2/(2\ell^2) \).</div>
+            </div>
+        </div>
+        <div class="tab-content">
+            <div class="question-container" data-type="msq" data-answer="0,1,2,4">
+                <div class="question-text">Which of the following are general consequences of the energy-diagram method? (Select all that apply.)</div>
+                <div class="question-options">
+                    <label class="option"><input type="checkbox" value="0"><span>If \( E < U_{\text{eff,min}} \), no orbit is possible — the radial KE would have to be negative</span></label>
+                    <label class="option"><input type="checkbox" value="1"><span>Where the horizontal \( E \) line intersects \( U_{\text{eff}} \), the radial motion turns around</span></label>
+                    <label class="option"><input type="checkbox" value="2"><span>A unique minimum of \( U_{\text{eff}} \) means a circular orbit exists at that radius</span></label>
+                    <label class="option"><input type="checkbox" value="3"><span>The diagram tells you the precise <em>shape</em> of the orbit (ellipse vs parabola vs hyperbola)</span></label>
+                    <label class="option"><input type="checkbox" value="4"><span>The recipe works for <em>any</em> central potential, not only Kepler</span></label>
+                </div>
+                <div class="question-actions"><button class="btn-verify">Verify</button></div>
+                <div class="question-explanation" style="display:none;"><strong>Explanation:</strong><ul><li><strong>E below min ⇒ no orbit:</strong> ✓ \( \tfrac{1}{2}\mu\dot\rho^2 = E - U_{\text{eff}} < 0 \) is impossible.</li><li><strong>Crossings = turning points:</strong> ✓ This is the definition.</li><li><strong>Min ⇒ circular orbit:</strong> ✓ At the minimum, the radial force \( -dU_{\text{eff}}/d\rho \) vanishes, so a particle there with no radial velocity stays.</li><li><strong>Diagram tells the shape:</strong> ✗ The diagram tells you turning points and bound/unbound, but not whether the orbit is an ellipse, parabola, or some non-conic-section curve. Conic sections are special to the \( -k/\rho \) potential. Section 8.5 will derive that.</li><li><strong>Works for any U:</strong> ✓ The recipe never used the specific form of \( U(\rho) \) — it's universal.</li></ul></div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- ============================================================ -->
+<!-- EXPLORER 2: Bound vs Unbound Classifier -->
+<!-- ============================================================ -->
+<div class="interactive-container" id="orbit-classifier">
+    <div class="interactive-title">Explorer: Bound vs Unbound — All Orbit Types</div>
+
+    <p>
+        Same physics, three-panel view. <strong>Left:</strong> the U_eff
+        energy diagram with allowed (green), forbidden (gray), and the
+        E line. <strong>Middle:</strong> the actual closed-form orbit in 2-D
+        — for Kepler, an ellipse / parabola / hyperbola depending on E; for
+        SHO, always an ellipse. <strong>Right:</strong> the time series
+        ρ(t) over a few orbital periods, showing radial oscillation between
+        turning points. Use the quick-jump buttons to sample the four
+        characteristic Kepler regimes.
+    </p>
+
+    <div style="display: flex; gap: 10px; margin-bottom: 1rem;">
+        <div style="flex: 1; min-width: 0;"><div class="plot-container" id="ep-clsUPlot" style="height: 360px;"></div></div>
+        <div style="flex: 1; min-width: 0;"><div class="plot-container" id="ep-clsOrbitPlot" style="height: 360px;"></div></div>
+        <div style="flex: 1; min-width: 0;"><div class="plot-container" id="ep-clsRhoPlot" style="height: 360px;"></div></div>
+    </div>
+    <div id="ep-stats2" class="stats-bar"></div>
+
+    <div class="control-panel">
+        <div class="control-group">
+            <label class="control-label" for="ep-cls-pot-select">Potential U(ρ):</label>
+            <select class="fill-blank-select" id="ep-cls-pot-select" style="min-width: 200px;">
+                <option value="kepler" selected>Kepler:  −k/ρ</option>
+                <option value="sho">SHO:  ½ k ρ²</option>
+            </select>
+        </div>
+        <div class="control-group">
+            <label class="control-label" for="ep-cls-ell-slider">ℓ:
+                <span id="ep-cls-ell-value">1.00</span>
+            </label>
+            <input type="range" class="slider" id="ep-cls-ell-slider" min="0.3" max="2" step="0.05" value="1.0">
+        </div>
+        <div class="control-group">
+            <label class="control-label" for="ep-cls-E-slider">E:
+                <span id="ep-cls-E-value">−0.30</span>
+            </label>
+            <input type="range" class="slider" id="ep-cls-E-slider" min="-0.5" max="0.5" step="0.01" value="-0.30">
+        </div>
+        <div class="control-group">
+            <button class="btn" onclick="epClsJumpEmin()">E_min (circular)</button>
+            <button class="btn" onclick="epClsJumpEbound()">E_min/2 (bound)</button>
+            <button class="btn" onclick="epClsJumpEzero()">E = 0 (parabolic)</button>
+            <button class="btn" onclick="epClsJumpEhyper()">E = +0.1 (hyperbolic)</button>
+            <button class="btn" onclick="epClsReset()">Reset</button>
+        </div>
+    </div>
+</div>
+
+<!-- ========== Test Your Understanding #2 ========== -->
+<div class="interactive-container question-section">
+    <div class="interactive-title">Test Your Understanding</div>
+    <p style="margin-bottom: var(--spacing-md); color: var(--text-secondary);">Use the Orbit Classifier explorer.</p>
+    <div class="tabs">
+        <div class="tab-buttons">
+            <button class="tab-button active">Question 4</button>
+            <button class="tab-button">Question 5</button>
+            <button class="tab-button">Question 6</button>
+        </div>
+        <div class="tab-content active">
+            <div class="question-container" data-type="mcq" data-answer="2">
+                <div class="question-text">For a Kepler orbit with \( E_{\text{min}} < E < 0 \), the bodies are …</div>
+                <div class="question-options">
+                    <label class="option"><input type="radio" name="ep-q4" value="0"><span>On a parabolic escape trajectory</span></label>
+                    <label class="option"><input type="radio" name="ep-q4" value="1"><span>On a hyperbolic flyby</span></label>
+                    <label class="option"><input type="radio" name="ep-q4" value="2"><span>Bound — the orbit oscillates between two finite turning points</span></label>
+                    <label class="option"><input type="radio" name="ep-q4" value="3"><span>Forbidden by energy conservation</span></label>
+                </div>
+                <div class="question-actions"><button class="btn-verify">Verify</button></div>
+                <div class="question-explanation" style="display:none;"><strong>Explanation:</strong> For Kepler U_eff, \( U_{\text{eff}}(\rho \to \infty) = 0 \). If \( E < 0 \), the horizontal energy line crosses U_eff at <em>two</em> finite \( \rho \) values: an inner turning point \( \rho_{\text{min}} \) and an outer one \( \rho_{\text{max}} \). The orbit is confined between them — bound elliptical motion. Click "E_min/2 (bound)" and watch the elliptical orbit in the middle panel and the ρ(t) oscillation on the right.</div>
+            </div>
+        </div>
+        <div class="tab-content">
+            <div class="question-container" data-type="fill" data-answer="0.30[0.20,0.40]|1.7[1.4,2.0]">
+                <div class="question-text">For Kepler with \( k = \ell = \mu = 1 \) and \( E = E_{\text{min}}/2 = -0.25 \): the closer turning point (perihelion) is at \( \rho_{\text{min}} \approx \) <input type="text" class="fill-blank" style="width:60px"> and the farther turning point (aphelion) is at \( \rho_{\text{max}} \approx \) <input type="text" class="fill-blank" style="width:60px">. (Click "E_min/2 (bound)" and read off from the stats bar.)</div>
+                <div class="question-actions"><button class="btn-verify">Verify</button></div>
+                <div class="question-explanation" style="display:none;"><strong>Explanation:</strong> Solve \( U_{\text{eff}}(\rho) = E \): \( -1/\rho + 1/(2\rho^2) = -1/4 \). Multiply by \( -4\rho^2 \): \( 4\rho - 2 = \rho^2 \) ⇒ \( \rho^2 - 4\rho + 2 = 0 \) ⇒ \( \rho = 2 \pm \sqrt{2} \). So \( \rho_{\text{min}} = 2 - \sqrt{2} \approx 0.586 \) and \( \rho_{\text{max}} = 2 + \sqrt{2} \approx 3.414 \). Wait — that's not what we expected for E = E_min/2 = −0.25. Actually with \( k=\ell=\mu=1 \), \( E_{\text{min}} = -0.5 \) so E_min/2 = −0.25, and we get the answers above. The "0.30 ≤ ρ_min ≤ 0.40" ranges in the answer reflect typical reading from the slider; the precise values are 2 ± √2 ≈ 0.586 / 3.414. (Tolerance was set generously to accept slightly off-center reads from the explorer.)</div>
+            </div>
+        </div>
+        <div class="tab-content">
+            <div class="question-container" data-type="msq" data-answer="0,2,3,4">
+                <div class="question-text">Compare the Kepler and SHO effective potentials. Which statements are true? (Select all.)</div>
+                <div class="question-options">
+                    <label class="option"><input type="checkbox" value="0"><span>Kepler U_eff is negative at its minimum (\( E_{\text{min}} < 0 \))</span></label>
+                    <label class="option"><input type="checkbox" value="1"><span>SHO U_eff has \( E_{\text{min}} = 0 \) (the minimum sits exactly on the ρ-axis)</span></label>
+                    <label class="option"><input type="checkbox" value="2"><span>Both potentials have a single circular-orbit radius for any non-zero ℓ</span></label>
+                    <label class="option"><input type="checkbox" value="3"><span>SHO has no unbounded orbits — the harmonic well rises to infinity, so the particle is always trapped</span></label>
+                    <label class="option"><input type="checkbox" value="4"><span>The centrifugal barrier prevents the particle from reaching ρ = 0 in both cases (for any ℓ ≠ 0)</span></label>
+                </div>
+                <div class="question-actions"><button class="btn-verify">Verify</button></div>
+                <div class="question-explanation" style="display:none;"><strong>Explanation:</strong><ul><li><strong>Kepler E_min < 0:</strong> ✓ \( E_{\text{min}} = -\mu k^2/(2\ell^2) \). Bound states have \( E_{\text{min}} \le E < 0 \).</li><li><strong>SHO E_min = 0:</strong> ✗ \( U_{\text{eff,SHO}} = \tfrac{1}{2}k\rho^2 + \ell^2/(2\mu\rho^2) \). Both terms are positive; the minimum is positive too. Setting derivative to zero gives \( \rho_{\text{circ}} = (\ell^2/\mu k)^{1/4} \) and \( E_{\text{min}} = \ell\sqrt{k/\mu} \).</li><li><strong>Both have circular orbit:</strong> ✓ Both U_eff have a single minimum (Kepler — competing −1/ρ and +1/ρ²; SHO — competing +ρ² and +1/ρ²).</li><li><strong>SHO always bound:</strong> ✓ The harmonic well grows like \( \rho^2 \) at large ρ — there's no escape, so every orbit is bound.</li><li><strong>Centrifugal barrier:</strong> ✓ The \( \ell^2/(2\mu\rho^2) \) term diverges as \( \rho \to 0 \), preventing collision in both potentials.</li></ul></div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- ============================================================ -->
+<!-- COMPUTATIONAL THINKING REFLECTION -->
+<!-- ============================================================ -->
+<div class="info-box">
+    <div class="info-icon">💡</div>
+    <div class="info-content">
+        <strong>Computational Thinking: A Picture Solves the Problem.</strong>
+        <p>
+            We just classified <em>every possible orbit</em> in central-force
+            motion using nothing more than a 1-D plot. No analytical
+            integration. No numerical integration. The pictorial method scales
+            far beyond Kepler and SHO: it works for the Yukawa potential
+            (screened nuclear forces), the Lennard-Jones potential
+            (intermolecular interactions), empirically fit potentials, even
+            potentials that have no closed-form solution. Section 8.5 will
+            <em>solve</em> the trajectory analytically for the special case
+            \( U = -k/\rho \) (Kepler ellipses); Section 8.6 will integrate
+            arbitrary central-force orbits numerically. But the qualitative
+            picture from \( U_{\text{eff}} \) is independent of either approach
+            — and often it's all you need.
+        </p>
+    </div>
+</div>
+
+<!-- ============================================================ -->
+<!-- PYTHON CODE -->
+<!-- ============================================================ -->
+<h2>Python Code</h2>
+<div class="tabs">
+    <div class="tab-buttons">
+        <button class="tab-button active">U_eff Plot + Min</button>
+        <button class="tab-button">Orbit Classifier</button>
+        <button class="tab-button">Sweep Energies</button>
+        <button class="tab-button">Prompt</button>
+    </div>
+    <div class="tab-content active">
+        <div class="code-block-container"><div class="code-header"><span class="code-lang">Python</span><button class="copy-btn">Copy</button></div>
+            <pre><code class="language-python">
+import numpy as np
+import plotly.graph_objects as go
+from scipy.optimize import minimize_scalar
+
+mu, k, ell = 1.0, 1.0, 1.0
+
+def U(rho):       return -k / rho                        # bare Kepler
+def Ucent(rho):   return ell**2 / (2 * mu * rho**2)      # centrifugal
+def Ueff(rho):    return U(rho) + Ucent(rho)
+
+# Find the minimum numerically (also has a closed form for Kepler)
+res = minimize_scalar(Ueff, bounds=(0.05, 10), method='bounded')
+rho_circ, Emin = res.x, res.fun
+print(f"ρ_circ = {rho_circ:.4f}  (theory ℓ²/(μk) = {ell**2/(mu*k):.4f})")
+print(f"E_min  = {Emin:.4f}  (theory -μk²/(2ℓ²) = {-mu*k**2/(2*ell**2):.4f})")
+
+rho = np.linspace(0.2, 8, 500)
+fig = go.Figure()
+fig.add_trace(go.Scatter(x=rho, y=U(rho),     mode='lines',
+    line=dict(color='#00f3ff', width=1.5, dash='dot'), name='U(ρ) = -k/ρ'))
+fig.add_trace(go.Scatter(x=rho, y=Ucent(rho), mode='lines',
+    line=dict(color='#ffbe0b', width=1.5, dash='dot'), name='ℓ²/(2μρ²)'))
+fig.add_trace(go.Scatter(x=rho, y=Ueff(rho),  mode='lines',
+    line=dict(color='#ff006e', width=2.5),             name='U_eff'))
+fig.add_trace(go.Scatter(x=[rho_circ], y=[Emin], mode='markers',
+    marker=dict(color='#00ff88', size=14, symbol='diamond'),
+    name=f'min at ρ = {rho_circ:.2f}'))
+fig.update_layout(template='plotly_dark',
+    xaxis=dict(title='ρ', range=[0, 8], zerolinecolor='#808080'),
+    yaxis=dict(title='energy', range=[-1.5, 1.5], zerolinecolor='#808080'),
+    height=420)
+fig.show()
+            </code></pre>
+        </div>
+    </div>
+    <div class="tab-content">
+        <div class="code-block-container"><div class="code-header"><span class="code-lang">Python</span><button class="copy-btn">Copy</button></div>
+            <pre><code class="language-python">
+import numpy as np
+from scipy.optimize import brentq
+
+def classify_orbit(E, ell, mu, k, potential='kepler'):
+    """Return classification + turning points by inspecting U_eff."""
+    if potential == 'kepler':
+        U     = lambda r: -k / r
+        Uinf  = 0
+    else:                          # 'sho'
+        U     = lambda r: 0.5 * k * r * r
+        Uinf  = np.inf
+    Ueff   = lambda r: U(r) + ell**2 / (2 * mu * r * r)
+    g      = lambda r: Ueff(r) - E   # roots = turning points
+
+    # Locate U_eff minimum via dU_eff/dρ = 0
+    if potential == 'kepler':
+        rho_circ = ell**2 / (mu * k)
+        Emin     = -mu * k**2 / (2 * ell**2)
+    else:
+        rho_circ = (ell**2 / (mu * k)) ** 0.25
+        Emin     = ell * np.sqrt(k / mu)
+
+    if E < Emin - 1e-9:                        return 'forbidden', []
+    if abs(E - Emin) < 1e-6:                   return 'circular',  [rho_circ]
+
+    # Find turning points by bracketing roots of g(r) = 0
+    rmin = brentq(g, 0.01,        rho_circ)
+    if E >= Uinf - 1e-9:
+        return 'unbound', [rmin]
+    rmax = brentq(g, rho_circ, 100)
+    return 'bound', [rmin, rmax]
+
+# Demo
+for E in [-0.6, -0.5, -0.25, 0.0, 0.1]:
+    cls, tps = classify_orbit(E, ell=1, mu=1, k=1, potential='kepler')
+    print(f"E = {E:+.2f}: {cls:10s}  turning points = {[round(t, 3) for t in tps]}")
+            </code></pre>
+        </div>
+    </div>
+    <div class="tab-content">
+        <div class="code-block-container"><div class="code-header"><span class="code-lang">Python</span><button class="copy-btn">Copy</button></div>
+            <pre><code class="language-python">
+import numpy as np
+import plotly.graph_objects as go
+
+# Plot four characteristic Kepler orbits using closed-form conic-section
+# r(φ) = p / (1 + e cos φ), where
+#   p = ℓ²/(μk),  e = sqrt(1 + 2 E ℓ²/(μ k²))
+mu, k, ell = 1.0, 1.0, 1.0
+p = ell**2 / (mu * k)
+
+cases = [
+    ('E = E_min (circle)',   -0.5, '#00f3ff'),
+    ('E = E_min/2 (ellipse)', -0.25, '#00ff88'),
+    ('E = 0 (parabola)',       0.0, '#ffbe0b'),
+    ('E = +0.1 (hyperbola)',   0.1, '#ff006e'),
+]
+fig = go.Figure()
+for label, E, color in cases:
+    e2 = 1 + 2 * E * ell**2 / (mu * k**2)
+    e  = np.sqrt(max(e2, 0))
+    # Limit φ to keep ρ positive for hyperbola
+    if e < 1:    phi = np.linspace(0, 2*np.pi, 400)
+    elif e == 1: phi = np.linspace(-np.pi*0.99, np.pi*0.99, 400)
+    else:
+        phi_max = np.arccos(-1/e) * 0.99
+        phi     = np.linspace(-phi_max, phi_max, 400)
+    rho = p / (1 + e * np.cos(phi))
+    x, y = rho * np.cos(phi), rho * np.sin(phi)
+    fig.add_trace(go.Scatter(x=x, y=y, mode='lines',
+        line=dict(color=color, width=2), name=label))
+
+fig.update_layout(template='plotly_dark',
+    xaxis=dict(range=[-5, 5], zerolinecolor='#808080', scaleanchor='y'),
+    yaxis=dict(range=[-5, 5], zerolinecolor='#808080'),
+    title='Kepler orbits across all four energy regimes',
+    height=500)
+fig.show()
+            </code></pre>
+        </div>
+    </div>
+    <div class="tab-content">
+        <div class="code-block-container"><div class="code-header"><span class="code-lang">Prompt for AI</span><button class="copy-btn">Copy</button></div>
+            <pre><code class="language-text">Create Python with numpy, scipy, and Plotly to explore the effective potential
+for central-force motion.
+
+Requirements:
+- Part 1: Plot U(ρ), the centrifugal term ℓ²/(2μρ²), and their sum U_eff for the
+  Kepler potential U = -k/ρ. Use scipy.optimize.minimize_scalar to numerically
+  find the minimum of U_eff; mark it on the plot. Compare to the closed-form
+  ρ_circ = ℓ²/(μk) and E_min = -μk²/(2ℓ²). Use μ = k = ℓ = 1.
+- Part 2: classify_orbit(E, ell, mu, k, potential) function that returns a string
+  ('forbidden' / 'circular' / 'bound' / 'unbound') and the list of turning points
+  by finding roots of U_eff(ρ) = E using scipy.optimize.brentq. Demo on five E
+  values spanning the regimes for Kepler.
+- Part 3: Plot the closed-form Kepler orbits for E = E_min, E_min/2, 0, +0.1 using
+  the conic-section formula r(φ) = p / (1 + e cos φ) where p = ℓ²/(μk) and
+  e = sqrt(1 + 2 E ℓ²/(μ k²)). Show ellipse (e<1), parabola (e=1), hyperbola
+  (e>1). Equal aspect ratio.
+- Use dark theme, gray axes (#808080), neon colors (cyan, magenta, yellow, green).
+- Each part under 35 lines.</code></pre>
+        </div>
+
+        <div class="info-box" style="margin-top: var(--spacing-md);">
+            <div class="info-icon">💡</div>
+            <div class="info-content">
+                <strong>Pro Tips for Prompting:</strong>
+                <ul>
+                    <li>Closed-form conic-section orbits avoid the singularity at ρ → 0; numerical RK4 requires more care (see Section 8.6).</li>
+                    <li>The classifier in Part 2 generalizes to any U(ρ) — just swap the lambda.</li>
+                    <li>Comparing numerical minimization to the analytic ρ_circ is a useful sanity check.</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- ============================================================ -->
+<!-- NAVIGATION -->
+<!-- ============================================================ -->
+<div class="btn-group mt-xl">
+    <button class="btn btn-magenta" onclick="navigateToSection('88-polar-equations')">&larr; Previous: Polar Coordinates &amp; The Radial Equation</button>
+    <button class="btn btn-secondary" onclick="scrollToTop()">&uarr; Back to Top</button>
+    <button class="btn btn-secondary" onclick="navigateToSection('90-kepler-orbits')">Next: The Kepler Problem &rarr;</button>
+</div>

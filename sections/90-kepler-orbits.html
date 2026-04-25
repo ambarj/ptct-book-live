@@ -1,0 +1,582 @@
+<!-- ============================================================
+     Section 8.5: The Kepler Problem — Planetary Orbits
+     Source: Lec 19 transcript § 4 (Kepler-specific
+             non-dimensionalization, eqns 6-9; trajectory
+             integral) + Lec 18 transcript § 5 (formal
+             trajectory integral) + § 8 (Kepler U_eff demo).
+     Concept: Solve trajectory integral for U = -k/ρ; orbit is
+              ρ(φ) = p/(1+e cos φ). Conic family + Kepler's
+              three laws.
+     Time: 22-25 minutes
+     Prerequisites: §§ 8.2, 8.3, 8.4; conic sections (HS);
+                    integration substitutions (Calc II).
+     ============================================================ -->
+
+<h1>The Kepler Problem: Planetary Orbits</h1>
+
+<p>
+    From a falling apple to the orbit of Mars: Newton's law of gravity says
+    \( \vec F = -GMm/r^2\,\hat r \), and the corresponding potential is
+    \( U(\rho) = -k/\rho \) with \( k = GMm \) (or \( k = Gm_1 m_2 \) for the
+    full two-body problem with reduced mass μ). This is the famous
+    <strong>Kepler problem</strong>. We have all the machinery to solve it
+    analytically: § 8.4 told us to plot the effective potential and read off
+    bound vs unbound; this section turns the formal trajectory integral into
+    a closed-form orbit shape \( \rho(\phi) \). The answer is a conic section
+    with the central body at one focus — and from it, Kepler's three
+    empirical laws fall out one by one.
+</p>
+
+<div class="info-box">
+    <div class="info-icon">💡</div>
+    <div class="info-content">
+        <strong>Learning Objectives:</strong>
+        <ul>
+            <li>Set up the Kepler trajectory integral and apply the substitution \( u = 1/\rho \) to obtain a closed-form orbit</li>
+            <li>Read the conic-section formula \( \rho(\phi) = p/(1 + e\cos\phi) \) and identify the semi-latus rectum \( p \) and eccentricity \( e \) in terms of physical constants of motion</li>
+            <li>Map energy E to orbit type: \( E = E_{\min} \) ↔ circle, \( E_{\min} < E < 0 \) ↔ ellipse, \( E = 0 \) ↔ parabola, \( E > 0 \) ↔ hyperbola</li>
+            <li>Derive Kepler's third law \( T^2 = 4\pi^2 \mu a^3/k \) by integrating the area-sweep equation over one orbital period</li>
+            <li>Recognize that Kepler's 1st law (closed conics) is special to the \( -1/\rho \) potential — Bertrand's theorem and Mercury's perihelion precession</li>
+        </ul>
+    </div>
+</div>
+
+<!-- ============================================================ -->
+<!-- THE TRAJECTORY INTEGRAL -->
+<!-- ============================================================ -->
+<h2>From Trajectory Integral to Conic Section</h2>
+
+<p>
+    Section 8.4 left us with a formal trajectory integral. With
+    \( U(\rho) = -k/\rho \),
+</p>
+
+<div class="equation-display">
+    $$ \phi = \int \frac{d\rho}{\rho^2\sqrt{\dfrac{2\mu}{\ell^2}\!\left(E - \dfrac{\ell^2}{2\mu\rho^2} + \dfrac{k}{\rho}\right)}} $$
+</div>
+
+<p>
+    The integrand looks fearsome until you make the substitution
+    \( u = 1/\rho \), so \( du = -d\rho/\rho^2 \). Then \( d\rho/\rho^2 = -du \),
+    and the expression inside the square root becomes a quadratic in u:
+</p>
+
+<div class="equation-display">
+    $$ \phi = -\int \frac{du}{\sqrt{\dfrac{2\mu E}{\ell^2} + \dfrac{2\mu k}{\ell^2}\,u - u^2}} $$
+    <p>
+        The integrand is \( -du/\sqrt{C + Bu - u^2} \), the canonical form
+        for an inverse-cosine integral. Completing the square:
+    </p>
+    $$ C + Bu - u^2 = -\left(u - \tfrac{B}{2}\right)^2 + \left(C + \tfrac{B^2}{4}\right) $$
+    <p>
+        and the integral evaluates (up to a phase choice) to
+        \( \phi = \arccos\left[(u - u_0)/A\right] \), where
+        \( u_0 = B/2 = \mu k/\ell^2 \) and
+        \( A = \sqrt{C + B^2/4} = \sqrt{\mu^2 k^2/\ell^4 + 2\mu E/\ell^2} \).
+    </p>
+</div>
+
+<p>
+    Inverting and rewriting in terms of \( \rho = 1/u \):
+</p>
+
+<div class="equation-display">
+    <p><strong>Conic-section orbit (Kepler problem):</strong></p>
+    $$ \boxed{\rho(\phi) = \frac{p}{1 + e\cos\phi}} $$
+    <p>where the <strong>semi-latus rectum</strong> and <strong>eccentricity</strong> are</p>
+    $$ p = \frac{\ell^2}{\mu k}, \qquad e = \sqrt{1 + \frac{2 E \ell^2}{\mu k^2}} $$
+</div>
+
+<div class="info-box">
+    <div class="info-icon">💡</div>
+    <div class="info-content">
+        <strong>Energy controls eccentricity; angular momentum controls size.</strong>
+        <p>
+            Two scalar constants of motion (E, ℓ) → an infinite-parameter
+            family of orbits. Notice that for \( E = E_{\min} = -\mu k^2/(2\ell^2) \),
+            the discriminant in \( e \) vanishes — \( e = 0 \) — and the
+            orbit is a <strong>circle</strong>. As \( E \) climbs toward
+            zero, \( e \) rises toward 1 — ever-more-elongated ellipses.
+            At \( E = 0 \), \( e = 1 \) — a <strong>parabola</strong>,
+            marginally unbound. For \( E > 0 \), \( e > 1 \) — a
+            <strong>hyperbola</strong>.
+        </p>
+    </div>
+</div>
+
+<!-- ============================================================ -->
+<!-- THE CONIC SECTION FAMILY -->
+<!-- ============================================================ -->
+<h2>The Conic Family: Circle → Ellipse → Parabola → Hyperbola</h2>
+
+<p>
+    With the central body at the origin (one focus of the conic):
+</p>
+
+<ul>
+    <li><strong>Circle (e = 0):</strong> ρ = p constant, every point at the same distance.</li>
+    <li><strong>Ellipse (0 &lt; e &lt; 1):</strong> bound; perihelion ρ_min = p/(1+e), aphelion ρ_max = p/(1−e); semi-major axis a = (ρ_min+ρ_max)/2 = p/(1−e²).</li>
+    <li><strong>Parabola (e = 1):</strong> marginally unbound; perihelion p/2; ρ → ∞ as φ → ±π.</li>
+    <li><strong>Hyperbola (e &gt; 1):</strong> unbound flyby; perihelion p/(1+e); allowed φ range bounded by \( |\cos\phi| < 1/e \), beyond which the formula gives ρ &lt; 0 (= the other branch of the hyperbola).</li>
+</ul>
+
+<div class="equation-display">
+    <p><strong>Bound orbit (ellipse):</strong></p>
+    $$ a = \frac{p}{1 - e^2} = \frac{k}{2|E|}, \qquad b = a\sqrt{1 - e^2} = \frac{\ell}{\sqrt{2\mu|E|}} $$
+    <p>
+        Semi-major axis depends only on energy; semi-minor depends on
+        both E and ℓ. Notice that orbits with the same E but different ℓ
+        share the same semi-major axis but have different shapes — same
+        period, different eccentricity.
+    </p>
+</div>
+
+<hr>
+
+<!-- ============================================================ -->
+<!-- EXPLORER 1: Conic Family -->
+<!-- ============================================================ -->
+<div class="interactive-container" id="conic-family">
+    <div class="interactive-title">Explorer: The Conic Family Across Energy Regimes</div>
+
+    <p>
+        Adjust the eccentricity \( e \) slider and watch the orbit morph
+        through the four characteristic shapes. The <strong>left panel</strong>
+        shows the orbit \( \rho(\phi) = p/(1+e\cos\phi) \) in the (x, y) plane
+        with the central mass at the origin (= one focus) and the second focus
+        marked. The <strong>right panel</strong> shows the corresponding
+        Kepler effective potential with the energy line — the same view as
+        § 8.4, but now linked directly to the orbit. Increasing \( e \) raises
+        the energy line; at \( e = 1 \) the line touches \( U_{\text{eff}}
+        \to 0 \) at infinity, marking the bound/unbound boundary.
+    </p>
+
+    <div class="dual-panel">
+        <div class="panel"><div class="plot-container" id="kp-orbitPlot" style="height: 440px;"></div></div>
+        <div class="panel"><div class="plot-container" id="kp-uPlot" style="height: 440px;"></div></div>
+    </div>
+    <div id="kp-stats1" class="stats-bar"></div>
+
+    <div class="control-panel">
+        <div class="control-group">
+            <label class="control-label" for="kp-ecc-slider">Eccentricity e:
+                <span id="kp-ecc-value">0.50</span>
+            </label>
+            <input type="range" class="slider" id="kp-ecc-slider" min="0" max="2.5" step="0.02" value="0.50">
+        </div>
+        <div class="control-group">
+            <label class="control-label" for="kp-ell-slider">Angular momentum ℓ:
+                <span id="kp-ell-value">1.00</span>
+            </label>
+            <input type="range" class="slider" id="kp-ell-slider" min="0.4" max="2" step="0.05" value="1.0">
+        </div>
+        <div class="control-group">
+            <label class="control-label" for="kp-k-slider">Strength k:
+                <span id="kp-k-value">1.00</span>
+            </label>
+            <input type="range" class="slider" id="kp-k-slider" min="0.4" max="2" step="0.05" value="1.0">
+        </div>
+        <div class="control-group">
+            <button class="btn" onclick="kpJumpCircle()">Circle (e=0)</button>
+            <button class="btn" onclick="kpJumpEllipse()">Ellipse (e=0.5)</button>
+            <button class="btn" onclick="kpJumpParabola()">Parabola (e=1)</button>
+            <button class="btn" onclick="kpJumpHyperbola()">Hyperbola (e=1.5)</button>
+            <button class="btn" onclick="kpConicReset()">Reset</button>
+        </div>
+    </div>
+</div>
+
+<!-- ========== Test Your Understanding #1 ========== -->
+<div class="interactive-container question-section">
+    <div class="interactive-title">Test Your Understanding</div>
+    <p style="margin-bottom: var(--spacing-md); color: var(--text-secondary);">Use the Conic Family explorer.</p>
+    <div class="tabs">
+        <div class="tab-buttons">
+            <button class="tab-button active">Question 1</button>
+            <button class="tab-button">Question 2</button>
+            <button class="tab-button">Question 3</button>
+        </div>
+        <div class="tab-content active">
+            <div class="question-container" data-type="mcq" data-answer="2">
+                <div class="question-text">Which orbit shape corresponds to total energy \( E = 0 \)?</div>
+                <div class="question-options">
+                    <label class="option"><input type="radio" name="kp-q1" value="0"><span>Circle</span></label>
+                    <label class="option"><input type="radio" name="kp-q1" value="1"><span>Ellipse</span></label>
+                    <label class="option"><input type="radio" name="kp-q1" value="2"><span>Parabola — the marginal escape trajectory, e = 1 exactly</span></label>
+                    <label class="option"><input type="radio" name="kp-q1" value="3"><span>Hyperbola</span></label>
+                </div>
+                <div class="question-actions"><button class="btn-verify">Verify</button></div>
+                <div class="question-explanation" style="display:none;"><strong>Explanation:</strong> \( e^2 = 1 + 2E\ell^2/(\mu k^2) \). Setting \( E = 0 \) gives \( e = 1 \) — a parabola. This is the boundary between bound (E < 0, e < 1, ellipse) and unbound (E > 0, e > 1, hyperbola). A parabolic comet has the minimum kinetic energy needed to escape the gravitational well — barely. Click "Parabola (e=1)" to see it.</div>
+            </div>
+        </div>
+        <div class="tab-content">
+            <div class="question-container" data-type="fill" data-answer="0.667[0.6,0.73]|2[1.85,2.15]|1.333[1.2,1.45]">
+                <div class="question-text">For an elliptical orbit with \( e = 0.5 \) and \( p = 1 \): perihelion \( \rho_{\min} = p/(1+e) = \) <input type="text" class="fill-blank" style="width: 60px">, aphelion \( \rho_{\max} = p/(1-e) = \) <input type="text" class="fill-blank" style="width: 60px">, semi-major axis \( a = (\rho_{\min}+\rho_{\max})/2 = \) <input type="text" class="fill-blank" style="width: 60px">. (Verify against the explorer's stats bar.)</div>
+                <div class="question-actions"><button class="btn-verify">Verify</button></div>
+                <div class="question-explanation" style="display:none;"><strong>Explanation:</strong> \( \rho_{\min} = 1/1.5 \approx 0.667 \), \( \rho_{\max} = 1/0.5 = 2 \), \( a = (0.667 + 2)/2 = 1.333 \). Cross-check: \( a = p/(1-e^2) = 1/0.75 \approx 1.333 \) ✓. Aphelion is 3× perihelion — a moderately eccentric orbit. Earth's orbit has \( e \approx 0.0167 \) (nearly circular); Halley's comet has \( e \approx 0.967 \) (extremely elongated).</div>
+            </div>
+        </div>
+        <div class="tab-content">
+            <div class="question-container" data-type="msq" data-answer="0,1,2">
+                <div class="question-text">Which statements about Kepler-problem orbits are true? (Select all.)</div>
+                <div class="question-options">
+                    <label class="option"><input type="checkbox" value="0"><span>The Sun (or central mass) sits at one focus of the conic, not at the center</span></label>
+                    <label class="option"><input type="checkbox" value="1"><span>A circle is the special case e = 0 of an ellipse — the foci coincide</span></label>
+                    <label class="option"><input type="checkbox" value="2"><span>Parabolic and hyperbolic orbits are unbound — the body escapes to infinity</span></label>
+                    <label class="option"><input type="checkbox" value="3"><span>Any attractive central potential gives elliptical bound orbits</span></label>
+                    <label class="option"><input type="checkbox" value="4"><span>The eccentricity depends only on energy, not on angular momentum</span></label>
+                </div>
+                <div class="question-actions"><button class="btn-verify">Verify</button></div>
+                <div class="question-explanation" style="display:none;"><strong>Explanation:</strong><ul><li><strong>Sun at focus:</strong> ✓ Kepler's 1st law. The geometric center of the ellipse is offset from the Sun by \( ae \).</li><li><strong>Circle = e=0 ellipse:</strong> ✓ Foci collapse to a single point at the center.</li><li><strong>Parabola/hyperbola unbound:</strong> ✓ One branch extends to infinity.</li><li><strong>Any attractive potential ⇒ ellipses:</strong> ✗ Only \( -k/\rho \) and \( +\tfrac{1}{2}k\rho^2 \) give closed orbits — Bertrand's theorem. Other attractive potentials (Yukawa, screened-Coulomb, etc.) give precessing rosettes, not closed ellipses.</li><li><strong>e depends only on E:</strong> ✗ \( e^2 = 1 + 2E\ell^2/(\mu k^2) \) — depends on both. Same E but different ℓ ⇒ different shapes (with same a but different b).</li></ul></div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- ============================================================ -->
+<!-- KEPLER'S THREE LAWS -->
+<!-- ============================================================ -->
+<h2>Kepler's Three Laws</h2>
+
+<p>
+    Kepler announced his three laws of planetary motion between 1609 and
+    1619 — empirical patterns extracted from Tycho Brahe's painstaking
+    observations of Mars. Newton later derived all three from his law of
+    gravity and his laws of motion. We have done two of them already; the
+    third now falls out from the area-sweep equation:
+</p>
+
+<ol>
+    <li><strong>Kepler's 1st law:</strong> Each planet's orbit is an ellipse with the Sun at one focus. ✓ Just derived above for \( E < 0 \).</li>
+    <li><strong>Kepler's 2nd law:</strong> The line from the Sun to the planet sweeps equal areas in equal times. ✓ Proved in § 8.2 from \( \ell \) conservation: \( dA/dt = \ell/(2\mu) \) is constant.</li>
+    <li><strong>Kepler's 3rd law:</strong> The square of the period is proportional to the cube of the semi-major axis: \( T^2 \propto a^3 \).</li>
+</ol>
+
+<p>
+    The 3rd law follows from integrating the 2nd over one period. The total
+    area enclosed by an ellipse is \( A = \pi a b \). Since \( dA/dt \) is
+    constant, the period is \( T = A/(dA/dt) = 2\pi\mu ab/\ell \). Squaring
+    and using \( b^2 = a^2(1-e^2) = ap \) (with \( p = \ell^2/(\mu k) \)),
+    the angular momentum cancels:
+</p>
+
+<div class="equation-display">
+    <p><strong>Kepler's third law (modern form):</strong></p>
+    $$ \boxed{T^2 = \frac{4\pi^2 \mu}{k}\,a^3} $$
+    <p>
+        For a planet around the Sun (\( \mu \approx m_{\text{planet}} \),
+        \( k = G M_\odot m_{\text{planet}} \)) the planetary mass cancels:
+    </p>
+    $$ T^2 = \frac{4\pi^2}{G M_\odot}\,a^3 $$
+    <p>
+        — the constant of proportionality is the same for every planet in
+        the solar system. That's exactly the empirical pattern Kepler
+        observed: T²/a³ is a universal constant.
+    </p>
+</div>
+
+<hr>
+
+<!-- ============================================================ -->
+<!-- EXPLORER 2: Kepler's 3rd Law Verifier -->
+<!-- ============================================================ -->
+<div class="interactive-container" id="keplers-third">
+    <div class="interactive-title">Explorer: Kepler's Third Law Verifier</div>
+
+    <p>
+        Pick a semi-major axis \( a \) and an eccentricity \( e \) for a
+        bound orbit. The <strong>left panel</strong> draws the orbit
+        (with the central mass at one focus). Click "<strong>Add this
+        orbit</strong>" and the analytic period \( T = 2\pi\sqrt{\mu a^3/k} \)
+        is added to the right panel — a log–log plot of \( T \) vs \( a \)
+        with the theoretical line \( T \propto a^{3/2} \) overlaid. Sweep a
+        few orbits and watch every point land precisely on the line. Slope
+        \( = 3/2 \) on log–log axes is Kepler's 3rd law in disguise.
+    </p>
+
+    <div class="dual-panel">
+        <div class="panel"><div class="plot-container" id="kp-3rdOrbitPlot" style="height: 420px;"></div></div>
+        <div class="panel"><div class="plot-container" id="kp-3rdLawPlot" style="height: 420px;"></div></div>
+    </div>
+    <div id="kp-stats2" class="stats-bar"></div>
+
+    <div class="control-panel">
+        <div class="control-group">
+            <label class="control-label" for="kp-a-slider">Semi-major axis a:
+                <span id="kp-a-value">1.00</span>
+            </label>
+            <input type="range" class="slider" id="kp-a-slider" min="0.3" max="5" step="0.05" value="1.0">
+        </div>
+        <div class="control-group">
+            <label class="control-label" for="kp-3rd-ecc-slider">Eccentricity e:
+                <span id="kp-3rd-ecc-value">0.30</span>
+            </label>
+            <input type="range" class="slider" id="kp-3rd-ecc-slider" min="0" max="0.95" step="0.02" value="0.30">
+        </div>
+        <div class="control-group">
+            <label class="control-label" for="kp-3rd-k-slider">k = GM·μ:
+                <span id="kp-3rd-k-value">1.00</span>
+            </label>
+            <input type="range" class="slider" id="kp-3rd-k-slider" min="0.3" max="3" step="0.1" value="1.0">
+        </div>
+        <div class="control-group">
+            <button class="btn" onclick="kp3rdAdd()">Add this orbit</button>
+            <button class="btn" onclick="kp3rdClear()">Clear measurements</button>
+            <button class="btn" onclick="kp3rdReset()">Reset</button>
+        </div>
+    </div>
+</div>
+
+<!-- ========== Test Your Understanding #2 ========== -->
+<div class="interactive-container question-section">
+    <div class="interactive-title">Test Your Understanding</div>
+    <p style="margin-bottom: var(--spacing-md); color: var(--text-secondary);">Use the Kepler 3rd Law Verifier.</p>
+    <div class="tabs">
+        <div class="tab-buttons">
+            <button class="tab-button active">Question 4</button>
+            <button class="tab-button">Question 5</button>
+            <button class="tab-button">Question 6</button>
+        </div>
+        <div class="tab-content active">
+            <div class="question-container" data-type="mcq" data-answer="2">
+                <div class="question-text">On a log–log plot of orbital period \( T \) vs semi-major axis \( a \), Kepler's 3rd law gives a straight line of slope …</div>
+                <div class="question-options">
+                    <label class="option"><input type="radio" name="kp-q4" value="0"><span>1 — \( T \) is linear in \( a \)</span></label>
+                    <label class="option"><input type="radio" name="kp-q4" value="1"><span>2 — \( T \) goes like \( a^2 \)</span></label>
+                    <label class="option"><input type="radio" name="kp-q4" value="2"><span>3/2 — because \( T^2 \propto a^3 \)</span></label>
+                    <label class="option"><input type="radio" name="kp-q4" value="3"><span>3 — because the law involves cubes</span></label>
+                </div>
+                <div class="question-actions"><button class="btn-verify">Verify</button></div>
+                <div class="question-explanation" style="display:none;"><strong>Explanation:</strong> \( T = 2\pi\sqrt{\mu/k}\,a^{3/2} \), so \( \log T = \log(2\pi\sqrt{\mu/k}) + \tfrac{3}{2}\log a \). The slope on log-log axes is exactly 3/2. Doubling the semi-major axis multiplies the period by \( 2^{3/2} \approx 2.83 \). Click "Add this orbit" for several different a values and watch the points land on the slope-3/2 line.</div>
+            </div>
+        </div>
+        <div class="tab-content">
+            <div class="question-container" data-type="fill" data-answer="1.881[1.8,2.0]">
+                <div class="question-text">Earth's orbit: \( a = 1.000 \) AU, \( T = 1.000 \) yr. Mars: \( a = 1.524 \) AU. Predict Mars's orbital period using Kepler's 3rd law: \( T_{\text{Mars}} = (1.524)^{3/2} \approx \) <input type="text" class="fill-blank" style="width: 70px"> yr. (The actual value is 1.881 yr — Kepler's law is essentially exact.)</div>
+                <div class="question-actions"><button class="btn-verify">Verify</button></div>
+                <div class="question-explanation" style="display:none;"><strong>Explanation:</strong> \( T_{\text{Mars}}/T_{\text{Earth}} = (a_{\text{Mars}}/a_{\text{Earth}})^{3/2} = 1.524^{1.5} = 1.881 \). Mars takes 1.881 Earth years per orbit. The same calculation works for Jupiter (a = 5.20 AU ⇒ T = 11.86 yr), Saturn (a = 9.58 AU ⇒ T = 29.65 yr), and every other planet — same constant of proportionality \( 4\pi^2/(GM_\odot) \).</div>
+            </div>
+        </div>
+        <div class="tab-content">
+            <div class="question-container" data-type="msq" data-answer="0,1,2,3,4">
+                <div class="question-text">Which statements about Kepler's three laws and the solar system are true? (Select all.)</div>
+                <div class="question-options">
+                    <label class="option"><input type="checkbox" value="0"><span>The constant of proportionality \( 4\pi^2/(GM_\odot) \) in the 3rd law is essentially the same for every solar-system planet because each planet has mass much less than the Sun</span></label>
+                    <label class="option"><input type="checkbox" value="1"><span>The 2nd law (equal areas) is exact for any central force, not just gravity</span></label>
+                    <label class="option"><input type="checkbox" value="2"><span>Kepler discovered the laws empirically (~1609–1619) before Newton derived them from gravity (1687)</span></label>
+                    <label class="option"><input type="checkbox" value="3"><span>Mercury's orbit shows a tiny perihelion precession that Newton's theory cannot explain — it's a signature of Einstein's general relativity</span></label>
+                    <label class="option"><input type="checkbox" value="4"><span>Binary stars also obey Kepler's 3rd law, with \( M \) replaced by \( m_1 + m_2 \) — it's how astronomers weigh stars</span></label>
+                </div>
+                <div class="question-actions"><button class="btn-verify">Verify</button></div>
+                <div class="question-explanation" style="display:none;"><strong>Explanation:</strong><ul><li><strong>Constant ≈ universal:</strong> ✓ Strictly the constant is \( 4\pi^2/(G(M_\odot+m_p)) \), but \( m_p/M_\odot < 10^{-3} \) for every planet, so the correction is < 0.1%.</li><li><strong>Law 2 universal:</strong> ✓ Follows from \( \ell \) conservation, which holds for any central force.</li><li><strong>Historical order:</strong> ✓ Kepler 1609/1619; Newton's <em>Principia</em> 1687.</li><li><strong>Mercury precession:</strong> ✓ ~43"/century unexplained perihelion advance — explained quantitatively by GR in 1915.</li><li><strong>Binary stars:</strong> ✓ This is exactly how stellar masses are measured. The two-body Kepler problem with reduced mass μ gives \( T^2 = 4\pi^2 a^3/[G(m_1+m_2)] \).</li></ul></div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- ============================================================ -->
+<!-- BERTRAND'S THEOREM REFLECTION -->
+<!-- ============================================================ -->
+<h2>Why Is 1/ρ So Special?</h2>
+
+<div class="info-box">
+    <div class="info-icon">💡</div>
+    <div class="info-content">
+        <strong>Bertrand's Theorem.</strong>
+        <p>
+            For <em>any</em> central force, ℓ-conservation guarantees Kepler's
+            2nd law. But Kepler's 1st law — orbits close exactly into
+            stationary ellipses, never precessing — is special. <strong>Bertrand's
+            theorem</strong> (Joseph Bertrand, 1873) states that only two
+            central potentials produce closed orbits for <em>all</em> bounded
+            initial conditions:
+        </p>
+        <ul>
+            <li>The <strong>Kepler potential</strong> \( U \propto -1/\rho \) (inverse-square attractive force) — closed ellipses.</li>
+            <li>The <strong>3D harmonic oscillator</strong> \( U \propto \rho^2 \) (linear restoring force) — closed ellipses centered on the origin.</li>
+        </ul>
+        <p>
+            Any other attractive potential — Yukawa (\( -e^{-\rho/r_0}/\rho \)),
+            Lennard-Jones, even \( U \propto -1/\rho^{1.01} \) — produces
+            <strong>precessing rosettes</strong>: orbits close to ellipses but
+            with the perihelion slowly rotating. Mercury's perihelion advances
+            by about 5600 arc-seconds per century (most due to other planets,
+            but ~43"/century unexplained by Newton). Einstein's general
+            relativity, which effectively modifies the gravitational potential
+            with a small \( -1/\rho^3 \) correction, predicted exactly that
+            extra 43"/century — one of GR's first triumphs in 1915.
+        </p>
+    </div>
+</div>
+
+<!-- ============================================================ -->
+<!-- PYTHON CODE -->
+<!-- ============================================================ -->
+<h2>Python Code</h2>
+<div class="tabs">
+    <div class="tab-buttons">
+        <button class="tab-button active">Conic Family</button>
+        <button class="tab-button">3rd Law Verification</button>
+        <button class="tab-button">Kepler vs Yukawa</button>
+        <button class="tab-button">Prompt</button>
+    </div>
+    <div class="tab-content active">
+        <div class="code-block-container"><div class="code-header"><span class="code-lang">Python</span><button class="copy-btn">Copy</button></div>
+            <pre><code class="language-python">
+import numpy as np
+import plotly.graph_objects as go
+
+# Plot the four canonical Kepler orbit types using ρ(φ) = p/(1+e cos φ)
+mu, k, ell = 1.0, 1.0, 1.0
+p = ell**2 / (mu * k)
+
+cases = [
+    ('Circle  (e = 0)',    0.00, '#00f3ff'),
+    ('Ellipse (e = 0.5)',  0.50, '#00ff88'),
+    ('Parabola (e = 1)',   1.00, '#ffbe0b'),
+    ('Hyperbola (e = 1.5)', 1.50, '#ff006e'),
+]
+fig = go.Figure()
+for label, e, color in cases:
+    if e < 1:           phi = np.linspace(0, 2*np.pi, 400)
+    elif e == 1:        phi = np.linspace(-np.pi*0.97, np.pi*0.97, 400)
+    else:
+        phi_max = np.arccos(-1/e) * 0.97
+        phi     = np.linspace(-phi_max, phi_max, 400)
+    rho = p / (1 + e * np.cos(phi))
+    x, y = rho*np.cos(phi), rho*np.sin(phi)
+    fig.add_trace(go.Scatter(x=x, y=y, mode='lines',
+        line=dict(color=color, width=2), name=label))
+fig.add_trace(go.Scatter(x=[0], y=[0], mode='markers',
+    marker=dict(color='#ffbe0b', size=12, symbol='star'), name='Sun (focus)'))
+fig.update_layout(template='plotly_dark',
+    xaxis=dict(range=[-5, 5], zerolinecolor='#808080', scaleanchor='y'),
+    yaxis=dict(range=[-5, 5], zerolinecolor='#808080'),
+    title='The Kepler conic family',
+    height=500)
+fig.show()
+            </code></pre>
+        </div>
+    </div>
+    <div class="tab-content">
+        <div class="code-block-container"><div class="code-header"><span class="code-lang">Python</span><button class="copy-btn">Copy</button></div>
+            <pre><code class="language-python">
+import numpy as np
+import plotly.graph_objects as go
+
+# Kepler's 3rd law: T = 2π √(μ/k) · a^(3/2). Verify across many orbits.
+mu, k = 1.0, 1.0
+a_vals = np.array([0.5, 0.8, 1.0, 1.5, 2.0, 3.0, 5.0, 8.0])
+T_vals = 2 * np.pi * np.sqrt(mu / k) * a_vals**1.5
+
+fig = go.Figure()
+fig.add_trace(go.Scatter(x=a_vals, y=T_vals, mode='markers',
+    marker=dict(color='#00f3ff', size=10), name='measured'))
+a_fit = np.logspace(np.log10(0.3), np.log10(10), 100)
+fig.add_trace(go.Scatter(x=a_fit, y=2*np.pi*np.sqrt(mu/k)*a_fit**1.5,
+    mode='lines', line=dict(color='#ff006e', width=2, dash='dash'),
+    name='theory T ∝ a^(3/2)'))
+fig.update_layout(template='plotly_dark',
+    xaxis=dict(title='a (semi-major axis)', type='log',
+               zerolinecolor='#808080', range=[np.log10(0.3), np.log10(10)]),
+    yaxis=dict(title='T (period)',           type='log',
+               zerolinecolor='#808080'),
+    title="Kepler's 3rd law on log-log axes (slope = 3/2)",
+    height=420)
+fig.show()
+
+# Real-world: predict Mars period from Earth
+T_mars = 1.524**1.5
+print(f"Predicted T_Mars = {T_mars:.3f} yr  (actual = 1.881 yr)")
+            </code></pre>
+        </div>
+    </div>
+    <div class="tab-content">
+        <div class="code-block-container"><div class="code-header"><span class="code-lang">Python</span><button class="copy-btn">Copy</button></div>
+            <pre><code class="language-python">
+import numpy as np
+import plotly.graph_objects as go
+
+# Compare Kepler (closes) vs Yukawa (precesses): RK4 in Cartesian.
+def make_F(potential):
+    def F(r):
+        rmag = np.sqrt(r @ r)
+        if potential == 'kepler':   return -r / rmag**3
+        if potential == 'yukawa':   # U = -exp(-r/μ)/r, with μ = 5
+            mu_y = 5
+            return -r * np.exp(-rmag/mu_y) * (1/rmag**3 + 1/(mu_y*rmag**2))
+    return F
+
+def rk4(F, s, h, N):
+    def rhs(s): return np.concatenate([s[2:], F(s[:2])])
+    out = np.zeros((N, 4)); s = s.copy()
+    for i in range(N):
+        out[i] = s
+        k1 = rhs(s); k2 = rhs(s + 0.5*h*k1)
+        k3 = rhs(s + 0.5*h*k2); k4 = rhs(s + h*k3)
+        s = s + (h/6)*(k1 + 2*k2 + 2*k3 + k4)
+    return out
+
+s0 = np.array([1.0, 0.0, 0.0, 0.85])
+trK = rk4(make_F('kepler'), s0, 0.02, 3000)
+trY = rk4(make_F('yukawa'), s0, 0.02, 3000)
+
+fig = go.Figure()
+fig.add_trace(go.Scatter(x=trK[:,0], y=trK[:,1], mode='lines',
+    line=dict(color='#00f3ff', width=1.5), name='Kepler (closes)'))
+fig.add_trace(go.Scatter(x=trY[:,0], y=trY[:,1], mode='lines',
+    line=dict(color='#ff006e', width=1.5), name='Yukawa (precesses)'))
+fig.update_layout(template='plotly_dark',
+    xaxis=dict(range=[-3, 3], zerolinecolor='#808080', scaleanchor='y'),
+    yaxis=dict(range=[-3, 3], zerolinecolor='#808080'),
+    title='Bertrand: only 1/ρ closes; everything else precesses',
+    height=500)
+fig.show()
+            </code></pre>
+        </div>
+    </div>
+    <div class="tab-content">
+        <div class="code-block-container"><div class="code-header"><span class="code-lang">Prompt for AI</span><button class="copy-btn">Copy</button></div>
+            <pre><code class="language-text">Create Python with numpy and Plotly to demonstrate the Kepler problem.
+
+Requirements:
+- Part 1: Plot four canonical Kepler orbit types using the closed-form
+  ρ(φ) = p/(1 + e cos φ) with e = 0, 0.5, 1, 1.5. p = ℓ²/(μk) with
+  μ = k = ℓ = 1. For ellipse: full 2π. For parabola: φ ∈ (-π·0.97, π·0.97).
+  For hyperbola: |φ| < arccos(-1/e). Mark the central body (focus) at the
+  origin. Equal aspect ratio.
+- Part 2: Verify Kepler's 3rd law T = 2π√(μ/k) · a^(3/2) numerically by
+  computing T for many a values from the analytical formula. Plot on log-log
+  axes — should be a straight line of slope 3/2. Overlay the theory curve.
+  Then use the law to predict Mars's period from Earth's (a_Mars = 1.524 AU,
+  T_Earth = 1 yr); compare to actual 1.881 yr.
+- Part 3: Compare Kepler (-1/r) vs Yukawa (-exp(-r/μ_y)/r with μ_y = 5)
+  orbits, both integrated with RK4 in Cartesian from the same initial
+  conditions. Show that Kepler closes after one orbit while Yukawa
+  precesses (illustrating Bertrand's theorem).
+- Use dark theme, gray axes (#808080), neon colors.
+- Each part under 35 lines.</code></pre>
+        </div>
+
+        <div class="info-box" style="margin-top: var(--spacing-md);">
+            <div class="info-icon">💡</div>
+            <div class="info-content">
+                <strong>Pro Tips for Prompting:</strong>
+                <ul>
+                    <li>For hyperbolic orbits, clip φ at \( \pm\arccos(-1/e) \) to avoid the formula returning negative ρ on the other branch.</li>
+                    <li>Comparing Kepler to Yukawa is the simplest visual proof of Bertrand's theorem — and it sets up Section 8.7's "other potentials" theme.</li>
+                    <li>Kepler's 3rd law is a spectacular example of universality — the same a^(3/2) scaling holds from Mercury to Pluto to extrasolar binary stars.</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- ============================================================ -->
+<!-- NAVIGATION -->
+<!-- ============================================================ -->
+<div class="btn-group mt-xl">
+    <button class="btn btn-magenta" onclick="navigateToSection('89-effective-potential')">&larr; Previous: The Effective Potential</button>
+    <button class="btn btn-secondary" onclick="scrollToTop()">&uarr; Back to Top</button>
+    <button class="btn btn-secondary" onclick="navigateToSection('91-orbit-integration')">Next: Numerical Integration of Orbits &rarr;</button>
+</div>

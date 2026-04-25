@@ -1,0 +1,582 @@
+<!-- ============================================================
+     Section 8.6: Numerical Integration of Orbits
+     Source: Lec 19 transcript § 5 (RK4 Mathematica code,
+             page 7), with Cartesian state-vector reformulation
+             to avoid the √-at-turning-points pitfall in the
+             original (t, ϕ, ρ) implementation.
+     Concept: Apply RK4 (Ch 4) to the two-body Kepler problem;
+              validate against Section 8.5's analytical conics;
+              use E and ℓ conservation as sanity check.
+     Time: 22-25 minutes
+     Prerequisites: § 8.5 (analytical conic shapes); § 8.2
+                    (conservation as numerical check); Ch 4
+                    (RK4 mechanics).
+     ============================================================ -->
+
+<h1>Numerical Integration of Orbits</h1>
+
+<p>
+    Section 8.5 told us what Kepler orbits <em>should</em> look like —
+    closed ellipses for \( E < 0 \), parabolas at \( E = 0 \), hyperbolas for
+    \( E > 0 \). Now we'll build a numerical orbit-launcher and watch the
+    same physics emerge from RK4 (the workhorse from Chapter 4) applied to
+    Newton's equations directly. The Section 8.5 analytical formulas are our
+    <strong>ground truth</strong>; the conservation laws from Section 8.2
+    (constant \( E \) and \( \ell \)) are our <strong>built-in sanity
+    check</strong>. By the end you'll have a tool that integrates any
+    central-force orbit — and the confidence that the numerics agree with
+    theory wherever theory exists.
+</p>
+
+<div class="info-box">
+    <div class="info-icon">💡</div>
+    <div class="info-content">
+        <strong>Learning Objectives:</strong>
+        <ul>
+            <li>Implement RK4 in Cartesian \( (x, y, v_x, v_y) \) for the two-body Kepler problem</li>
+            <li>Set up two-body initial conditions: position and velocity at perihelion or any starting point</li>
+            <li>Validate numerical orbits against the analytical conic-section result \( \rho(\phi) = p/(1+e\cos\phi) \) from Section 8.5</li>
+            <li>Use conservation of \( E \) and \( \ell \) as a built-in numerical sanity check — drift = error</li>
+            <li>Recognize when RK4 in Cartesian struggles (high eccentricity, very long integrations) and what alternatives exist (symplectic integrators)</li>
+        </ul>
+    </div>
+</div>
+
+<!-- ============================================================ -->
+<!-- WHY CARTESIAN -->
+<!-- ============================================================ -->
+<h2>Why Cartesian Instead of \( (\rho, \phi) \)?</h2>
+
+<p>
+    A natural first instinct is to integrate the dimensionless Kepler problem
+    in the state vector \( (t, \phi, \rho) \) directly — using the polar
+    machinery from Section 8.3 with right-hand side
+</p>
+
+<div class="equation-display">
+    $$ \frac{dt}{dt} = 1, \qquad \frac{d\phi}{dt} = \frac{1}{\rho^2}, \qquad \frac{d\rho}{dt} = \sqrt{2\!\left(E - \frac{1}{2\rho^2} + \frac{1}{\rho}\right)} $$
+</div>
+
+<p>
+    This looks elegant — it exploits the angular-momentum reduction
+    explicitly. But it has a hidden pitfall: the square root in
+    \( d\rho/dt \) goes <em>imaginary</em> at turning points (where
+    \( E = U_{\text{eff}}(\rho) \)) because the radicand passes through zero
+    with the wrong sign on the way down. A naive integrator silently fails
+    there. There's a fix (track the sign of \( \dot\rho \) manually and flip
+    when it changes), but it adds complication.
+</p>
+
+<p>
+    The robust alternative is Cartesian: integrate \( (x, y, v_x, v_y) \) as
+    a 4-D ODE system using Newton's law of gravity directly, with no sign
+    ambiguity:
+</p>
+
+<div class="equation-display">
+    <p><strong>Cartesian equations of motion (Kepler, μ = k = 1):</strong></p>
+    $$ \ddot x = -\frac{x}{(x^2+y^2)^{3/2}}, \qquad \ddot y = -\frac{y}{(x^2+y^2)^{3/2}} $$
+    <p><strong>State-vector form for RK4:</strong></p>
+    $$ \vec s = (x, y, v_x, v_y), \qquad \frac{d\vec s}{dt} = (v_x,\;v_y,\;\ddot x,\;\ddot y) $$
+</div>
+
+<p>
+    Initial conditions are also more intuitive in Cartesian: just specify a
+    starting position and a starting velocity. No need to compute angular
+    momentum first.
+</p>
+
+<!-- ============================================================ -->
+<!-- INITIAL CONDITIONS -->
+<!-- ============================================================ -->
+<h2>Setting Up Initial Conditions</h2>
+
+<p>
+    The cleanest setup launches the planet from <strong>perihelion</strong>
+    (closest approach to the central body), with velocity perpendicular to
+    the radius vector:
+</p>
+
+<div class="equation-display">
+    $$ \vec r(0) = (r_0, 0), \qquad \vec v(0) = (0, v_0) $$
+    <p>
+        Then the constants of motion at \( t = 0 \) are
+    </p>
+    $$ E = \tfrac{1}{2}v_0^2 - \frac{k}{r_0}, \qquad \ell = r_0\,v_0 $$
+    <p>
+        and the predicted orbit (from Section 8.5) has
+    </p>
+    $$ p = \frac{\ell^2}{\mu k}, \qquad e = \sqrt{1 + \frac{2 E\,\ell^2}{\mu k^2}} $$
+</div>
+
+<div class="warning-box">
+    <div class="warning-icon">⚠️</div>
+    <div class="warning-content">
+        <strong>Pitfall: choosing the right launch velocity.</strong>
+        <p>
+            For a circular orbit at radius \( r_0 \), set \( v_0 = \sqrt{k/r_0} \)
+            (the circular-orbit velocity). Smaller \( v_0 \) ⇒ tiny ellipse
+            (perihelion at \( r_0 \), aphelion smaller). Larger ⇒ ellipse
+            extending outward. At \( v_0 = \sqrt{2k/r_0} \) the energy
+            \( E = 0 \) — escape velocity, parabolic orbit. Above that,
+            hyperbolic flyby. With \( k = 1, r_0 = 1 \): \( v_{\text{circ}} = 1 \),
+            \( v_{\text{esc}} = \sqrt{2} \approx 1.414 \).
+        </p>
+    </div>
+</div>
+
+<hr>
+
+<!-- ============================================================ -->
+<!-- EXPLORER 1: Live Orbit Launcher -->
+<!-- ============================================================ -->
+<div class="interactive-container" id="orbit-launcher">
+    <div class="interactive-title">Explorer: Live Orbit Launcher</div>
+
+    <p>
+        Set the initial position \( (x_0, 0) \) and velocity
+        \( (v_{x0}, v_{y0}) \), then click <strong>Launch</strong>. RK4
+        integrates the equations of motion in real time, drawing the
+        trajectory on the left. The right panel monitors total energy
+        \( E(t) \) and angular momentum \( \ell(t) \) — both should stay
+        constant (within numerical precision). Watch how a tiny tweak in
+        \( v_{y0} \) takes you from circle to ellipse to parabolic escape
+        to hyperbolic flyby — exactly as Section 8.5 predicted.
+    </p>
+
+    <div class="dual-panel">
+        <div class="panel"><div class="plot-container" id="oi-orbitPlot" style="height: 440px;"></div></div>
+        <div class="panel"><div class="plot-container" id="oi-conservPlot" style="height: 440px;"></div></div>
+    </div>
+    <div id="oi-stats1" class="stats-bar"></div>
+
+    <div class="control-panel">
+        <div class="control-group">
+            <label class="control-label" for="oi-r0-slider">Initial r₀:
+                <span id="oi-r0-value">1.00</span>
+            </label>
+            <input type="range" class="slider" id="oi-r0-slider" min="0.5" max="2" step="0.05" value="1.0">
+        </div>
+        <div class="control-group">
+            <label class="control-label" for="oi-vx0-slider">Initial v_{x0}:
+                <span id="oi-vx0-value">0.00</span>
+            </label>
+            <input type="range" class="slider" id="oi-vx0-slider" min="-0.5" max="0.5" step="0.02" value="0.0">
+        </div>
+        <div class="control-group">
+            <label class="control-label" for="oi-vy0-slider">Initial v_{y0}:
+                <span id="oi-vy0-value">1.00</span>
+            </label>
+            <input type="range" class="slider" id="oi-vy0-slider" min="0.3" max="1.6" step="0.02" value="1.0">
+        </div>
+        <div class="control-group">
+            <label class="control-label" for="oi-h-slider">Step size h:
+                <span id="oi-h-value">0.020</span>
+            </label>
+            <input type="range" class="slider" id="oi-h-slider" min="-3" max="-0.7" step="0.1" value="-1.7">
+        </div>
+        <div class="control-group">
+            <button class="btn" onclick="oiLaunch()" id="oi-launch-btn">Launch</button>
+            <button class="btn" onclick="oiStop()">Stop</button>
+            <button class="btn" onclick="oiReset()">Reset</button>
+        </div>
+        <div class="control-group">
+            <button class="btn" onclick="oiJumpCircle()">Circle (v=1.0)</button>
+            <button class="btn" onclick="oiJumpEllipse()">Ellipse (v=1.2)</button>
+            <button class="btn" onclick="oiJumpParabola()">Parabolic (v=√2)</button>
+            <button class="btn" onclick="oiJumpHyper()">Hyperbolic (v=1.5)</button>
+        </div>
+    </div>
+</div>
+
+<!-- ========== Test Your Understanding #1 ========== -->
+<div class="interactive-container question-section">
+    <div class="interactive-title">Test Your Understanding</div>
+    <p style="margin-bottom: var(--spacing-md); color: var(--text-secondary);">Use the Live Orbit Launcher.</p>
+    <div class="tabs">
+        <div class="tab-buttons">
+            <button class="tab-button active">Question 1</button>
+            <button class="tab-button">Question 2</button>
+            <button class="tab-button">Question 3</button>
+        </div>
+        <div class="tab-content active">
+            <div class="question-container" data-type="fill" data-answer="1[0.95,1.05]">
+                <div class="question-text">For Kepler with \( k = 1 \) and starting at \( r_0 = 1 \), what initial \( v_{y0} \) produces a perfect circular orbit? \( v_{y0} = \sqrt{k/r_0} = \) <input type="text" class="fill-blank" style="width: 50px"> (Click "Circle (v=1.0)" to confirm.)</div>
+                <div class="question-actions"><button class="btn-verify">Verify</button></div>
+                <div class="question-explanation" style="display:none;"><strong>Explanation:</strong> Circular-orbit condition: centripetal acceleration \( v^2/r \) equals gravitational acceleration \( k/r^2 \). Solving: \( v_{\text{circ}} = \sqrt{k/r} \). With \( k = 1, r = 1 \), \( v_{\text{circ}} = 1 \). The orbit is a perfect circle of radius 1, period \( T = 2\pi \).</div>
+            </div>
+        </div>
+        <div class="tab-content">
+            <div class="question-container" data-type="fill" data-answer="-0.5[-0.55,-0.45]|1[0.95,1.05]">
+                <div class="question-text">For \( r_0 = 1, v_{x0} = 0, v_{y0} = 1 \) (the circular-orbit launch): compute the conserved quantities. \( E = \tfrac{1}{2}v_0^2 - k/r_0 = \) <input type="text" class="fill-blank" style="width: 50px"> and \( \ell = r_0\,v_0 = \) <input type="text" class="fill-blank" style="width: 50px">. (These should match what Section 8.5 calls \( E_{\min} \) and the angular momentum that gives \( \rho_{\text{circ}} = 1 \).)</div>
+                <div class="question-actions"><button class="btn-verify">Verify</button></div>
+                <div class="question-explanation" style="display:none;"><strong>Explanation:</strong> \( E = \tfrac{1}{2}(1)^2 - 1/1 = -1/2 \). \( \ell = (1)(1) = 1 \). Cross-check from Section 8.5: \( E_{\min} = -\mu k^2/(2\ell^2) = -1/2 \) ✓; \( \rho_{\text{circ}} = \ell^2/(\mu k) = 1 \) ✓. The launcher started us at exactly \( E_{\min} \), which is precisely the condition for a circular orbit at \( r_0 = 1 \).</div>
+            </div>
+        </div>
+        <div class="tab-content">
+            <div class="question-container" data-type="msq" data-answer="0,1,2,3">
+                <div class="question-text">Which statements about RK4 orbit integration are true? (Select all.)</div>
+                <div class="question-options">
+                    <label class="option"><input type="checkbox" value="0"><span>Drift in \( E(t) \) or \( \ell(t) \) is a numerical artifact, not real physics</span></label>
+                    <label class="option"><input type="checkbox" value="1"><span>Halving the step size \( h \) reduces RK4 error by ~16× (since RK4 is 4th-order)</span></label>
+                    <label class="option"><input type="checkbox" value="2"><span>The numerical orbit can be cross-checked against the analytical Section 8.5 conic to detect bugs</span></label>
+                    <label class="option"><input type="checkbox" value="3"><span>For very long integrations (millions of orbits), symplectic integrators (Verlet, leapfrog) are preferred over RK4 because they avoid secular energy drift</span></label>
+                    <label class="option"><input type="checkbox" value="4"><span>RK4 conserves energy exactly</span></label>
+                </div>
+                <div class="question-actions"><button class="btn-verify">Verify</button></div>
+                <div class="question-explanation" style="display:none;"><strong>Explanation:</strong><ul><li><strong>Drift = numerical artifact:</strong> ✓ Physics is exactly conservative; integrator approximation introduces drift.</li><li><strong>RK4 is 4th order:</strong> ✓ Per-step error is \( O(h^5) \), accumulated error is \( O(h^4) \). Halving h ⇒ 1/16 the error.</li><li><strong>Cross-check against 8.5:</strong> ✓ Strong validation strategy. If your RK4 disagrees with the analytical conic at the same (E, ℓ), there's a bug somewhere.</li><li><strong>Symplectic for long runs:</strong> ✓ Symplectic integrators preserve a "shadow" Hamiltonian whose value oscillates around the true E (no secular drift). For multi-Gyr planetary integrations this is essential.</li><li><strong>RK4 conserves energy exactly:</strong> ✗ It doesn't. Energy drifts (slowly) over time. Only special integrators (symplectic, conservative) preserve the constants of motion exactly.</li></ul></div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- ============================================================ -->
+<!-- VALIDATING AGAINST CONIC -->
+<!-- ============================================================ -->
+<h2>Validating Against the Closed-Form Conic</h2>
+
+<p>
+    Numerical integration is only as good as the validation behind it. We
+    have a beautiful test: the same initial conditions \( (r_0, v_{x0}, v_{y0}) \)
+    determine \( (E, \ell) \), which determine the analytical conic
+    \( \rho(\phi) = p/(1+e\cos\phi) \). Plot the analytical curve on top of
+    the numerical orbit — they should agree to many decimals over a single
+    orbit.
+</p>
+
+<div class="equation-display">
+    <p><strong>From initial conditions to predicted conic:</strong></p>
+    $$ E = \tfrac{1}{2}(v_{x0}^2 + v_{y0}^2) - \frac{k}{r_0}, \qquad \ell = r_0 v_{y0} - 0\cdot v_{x0} = r_0 v_{y0} $$
+    $$ p = \frac{\ell^2}{\mu k}, \qquad e = \sqrt{1 + \frac{2 E \ell^2}{\mu k^2}} $$
+    <p><strong>Predicted semi-major axis (for bound orbits):</strong></p>
+    $$ a = \frac{k}{2|E|} \quad \text{(for } E < 0\text{)} $$
+</div>
+
+<p>
+    Section 8.5 gave us the formulas; this section uses them as a yardstick.
+    Below, the explorer plots both curves and reports the maximum radial
+    discrepancy as a percentage of the orbit's semi-major axis.
+</p>
+
+<hr>
+
+<!-- ============================================================ -->
+<!-- EXPLORER 2: Numerical vs Analytical -->
+<!-- ============================================================ -->
+<div class="interactive-container" id="num-vs-analytic">
+    <div class="interactive-title">Explorer: Numerical vs Analytical Comparison</div>
+
+    <p>
+        Same initial conditions, two different methods. The
+        <strong>left panel</strong> overlays the RK4 numerical orbit (cyan
+        line) on the closed-form analytical conic (magenta dashed) from
+        Section 8.5. The <strong>right panel</strong> shows the radial
+        error \( |\Delta r|/a \) over time. Compare RK4 to plain Euler —
+        Euler drifts visibly within a single orbit; RK4 stays glued to the
+        analytical curve.
+    </p>
+
+    <div class="dual-panel">
+        <div class="panel"><div class="plot-container" id="oi-cmpOrbitPlot" style="height: 420px;"></div></div>
+        <div class="panel"><div class="plot-container" id="oi-cmpErrPlot" style="height: 420px;"></div></div>
+    </div>
+    <div id="oi-stats2" class="stats-bar"></div>
+
+    <div class="control-panel">
+        <div class="control-group">
+            <label class="control-label" for="oi-cmp-r0-slider">r₀:
+                <span id="oi-cmp-r0-value">1.00</span>
+            </label>
+            <input type="range" class="slider" id="oi-cmp-r0-slider" min="0.5" max="2" step="0.05" value="1.0">
+        </div>
+        <div class="control-group">
+            <label class="control-label" for="oi-cmp-vy0-slider">v_{y0}:
+                <span id="oi-cmp-vy0-value">1.20</span>
+            </label>
+            <input type="range" class="slider" id="oi-cmp-vy0-slider" min="0.5" max="1.35" step="0.02" value="1.2">
+        </div>
+        <div class="control-group">
+            <label class="control-label" for="oi-cmp-h-slider">log₁₀(h):
+                <span id="oi-cmp-h-value">−1.7</span>
+            </label>
+            <input type="range" class="slider" id="oi-cmp-h-slider" min="-3" max="-0.7" step="0.1" value="-1.7">
+        </div>
+        <div class="control-group">
+            <label class="control-label" for="oi-cmp-int-select">Integrator:</label>
+            <select class="fill-blank-select" id="oi-cmp-int-select" style="min-width: 120px;">
+                <option value="rk4" selected>RK4</option>
+                <option value="euler">Euler</option>
+            </select>
+        </div>
+        <div class="control-group">
+            <button class="btn" onclick="oiCmpRun()">Compare</button>
+            <button class="btn" onclick="oiCmpReset()">Reset</button>
+        </div>
+    </div>
+</div>
+
+<!-- ========== Test Your Understanding #2 ========== -->
+<div class="interactive-container question-section">
+    <div class="interactive-title">Test Your Understanding</div>
+    <p style="margin-bottom: var(--spacing-md); color: var(--text-secondary);">Use the Numerical vs Analytical explorer.</p>
+    <div class="tabs">
+        <div class="tab-buttons">
+            <button class="tab-button active">Question 4</button>
+            <button class="tab-button">Question 5</button>
+            <button class="tab-button">Question 6</button>
+        </div>
+        <div class="tab-content active">
+            <div class="question-container" data-type="mcq" data-answer="2">
+                <div class="question-text">If you halve the step size \( h \) for an RK4 integration, the maximum integration error roughly …</div>
+                <div class="question-options">
+                    <label class="option"><input type="radio" name="oi-q4" value="0"><span>Stays the same — h doesn't matter for RK4</span></label>
+                    <label class="option"><input type="radio" name="oi-q4" value="1"><span>Halves — RK4 is first-order in h</span></label>
+                    <label class="option"><input type="radio" name="oi-q4" value="2"><span>Drops by ~16× — RK4 has accumulated error \( O(h^4) \)</span></label>
+                    <label class="option"><input type="radio" name="oi-q4" value="3"><span>Squares — error scales as \( h^2 \)</span></label>
+                </div>
+                <div class="question-actions"><button class="btn-verify">Verify</button></div>
+                <div class="question-explanation" style="display:none;"><strong>Explanation:</strong> RK4 has local (per-step) truncation error \( O(h^5) \) and global (accumulated over fixed time) error \( O(h^4) \). Halving \( h \) gives \( 1/2^4 = 1/16 \) the error. Plain Euler is \( O(h) \) — halving \( h \) just halves the error. This is a huge gap: to get the same accuracy as RK4 with \( h = 0.01 \), Euler would need \( h \sim 10^{-9} \) — a billion times more steps.</div>
+            </div>
+        </div>
+        <div class="tab-content">
+            <div class="question-container" data-type="fill" data-answer="75[70,80]">
+                <div class="question-text">Halley's comet has a semi-major axis \( a = 17.8 \) AU. Using Kepler's 3rd law (Section 8.5) in solar-system units (where \( T^2 = a^3 \) with \( T \) in years and \( a \) in AU), predict its orbital period: \( T = a^{3/2} = \) <input type="text" class="fill-blank" style="width: 60px"> yr. (RK4 in those units gives essentially the same answer if you integrate long enough.)</div>
+                <div class="question-actions"><button class="btn-verify">Verify</button></div>
+                <div class="question-explanation" style="display:none;"><strong>Explanation:</strong> \( T = 17.8^{1.5} \approx 75.1 \) yr. Halley's comet returns roughly every 75–76 years (last seen 1986; next predicted 2061). For RK4, the high eccentricity (\( e \approx 0.967 \)) means the comet spends most of its time near aphelion (slow) and zips through perihelion (fast). Fixed-step RK4 has trouble at perihelion because of the rapid velocity change — adaptive step-size methods are preferred for high-eccentricity orbits.</div>
+            </div>
+        </div>
+        <div class="tab-content">
+            <div class="question-container" data-type="msq" data-answer="0,1,2">
+                <div class="question-text">When does fixed-step RK4 in Cartesian struggle? (Select all.)</div>
+                <div class="question-options">
+                    <label class="option"><input type="checkbox" value="0"><span>At very high eccentricity — large velocity spike at perihelion overwhelms the fixed step size</span></label>
+                    <label class="option"><input type="checkbox" value="1"><span>For collisions or near-collisions when \( r \to 0 \) — the \( 1/r^3 \) force diverges</span></label>
+                    <label class="option"><input type="checkbox" value="2"><span>For very long-term integrations (millions of orbits) — secular drift accumulates</span></label>
+                    <label class="option"><input type="checkbox" value="3"><span>For circular orbits — RK4 can't handle them</span></label>
+                    <label class="option"><input type="checkbox" value="4"><span>When you want machine-precision accuracy — h smaller is always better, no downside</span></label>
+                </div>
+                <div class="question-actions"><button class="btn-verify">Verify</button></div>
+                <div class="question-explanation" style="display:none;"><strong>Explanation:</strong><ul><li><strong>High eccentricity:</strong> ✓ At perihelion, \( v \) can be enormous, and \( h \) needs to be small enough to resolve it — but a small \( h \) is wasteful at aphelion where motion is slow. <strong>Adaptive step-size</strong> methods solve this.</li><li><strong>Collisions:</strong> ✓ Force \( \propto 1/r^3 \) → ∞ as \( r \to 0 \). Numerical singularities. Fixed-step RK4 will crash; need regularization (Levi-Civita or Kustaanheimo-Stiefel transforms).</li><li><strong>Long-term drift:</strong> ✓ RK4's energy drifts at rate \( O(h^4) \) per orbit. Over millions of orbits, drift can accumulate to noticeable levels. Symplectic integrators have bounded oscillating error instead of secular drift.</li><li><strong>Circular orbits:</strong> ✗ Circular orbits are the <em>easiest</em> case. RK4 handles them with negligible drift.</li><li><strong>Smaller h is always better:</strong> ✗ Truncation error decreases as \( h \) shrinks, but <strong>roundoff error</strong> grows because you need more steps. Eventually, going smaller hurts. There's an optimal \( h \) (typically near \( 10^{-3} \) for double-precision physics integrations).</li></ul></div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- ============================================================ -->
+<!-- BEYOND KEPLER -->
+<!-- ============================================================ -->
+<h2>Beyond Kepler: A Universal Tool</h2>
+
+<div class="info-box">
+    <div class="info-icon">💡</div>
+    <div class="info-content">
+        <strong>Forward Reference: the integrator generalizes.</strong>
+        <p>
+            Replace the Kepler force \( -k\vec r/r^3 \) with <em>any</em>
+            central force, and the same RK4 code integrates the orbit.
+            Section 8.7 will use this to explore non-Kepler potentials —
+            Yukawa (\( -e^{-\rho/\rho_0}/\rho \), gives precessing rosettes),
+            harmonic oscillator (\( +k\rho \), gives ellipses centered on
+            the origin not at a focus). The numerical integrator is the
+            <strong>universal tool</strong>; analytical solutions like
+            Section 8.5's conic family are the rare and beautiful
+            exception. For most central potentials in real physics —
+            screened Coulomb in plasmas, intermolecular Lennard-Jones,
+            even relativistic corrections — numerics is the only path
+            forward.
+        </p>
+    </div>
+</div>
+
+<!-- ============================================================ -->
+<!-- PYTHON CODE -->
+<!-- ============================================================ -->
+<h2>Python Code</h2>
+<div class="tabs">
+    <div class="tab-buttons">
+        <button class="tab-button active">RK4 + Conservation</button>
+        <button class="tab-button">Validate vs Conic</button>
+        <button class="tab-button">Convergence Study</button>
+        <button class="tab-button">Prompt</button>
+    </div>
+    <div class="tab-content active">
+        <div class="code-block-container"><div class="code-header"><span class="code-lang">Python</span><button class="copy-btn">Copy</button></div>
+            <pre><code class="language-python">
+import numpy as np
+import plotly.graph_objects as go
+from plotly.subplots import make_subplots
+
+# Cartesian RK4 for two-body Kepler with k = μ = 1
+def F(s):  # s = [x, y, vx, vy]
+    r3 = (s[0]*s[0] + s[1]*s[1]) ** 1.5
+    return np.array([s[2], s[3], -s[0]/r3, -s[1]/r3])
+
+def rk4_step(s, h):
+    k1 = F(s)
+    k2 = F(s + 0.5*h*k1)
+    k3 = F(s + 0.5*h*k2)
+    k4 = F(s + h*k3)
+    return s + (h/6)*(k1 + 2*k2 + 2*k3 + k4)
+
+# Initial conditions: launch from perihelion
+r0, vy0 = 1.0, 1.2
+s = np.array([r0, 0.0, 0.0, vy0])
+h, N = 0.02, 1500
+traj = np.zeros((N, 4))
+for i in range(N):
+    traj[i] = s; s = rk4_step(s, h)
+
+x, y, vx, vy = traj[:,0], traj[:,1], traj[:,2], traj[:,3]
+r = np.sqrt(x*x + y*y)
+E = 0.5*(vx*vx + vy*vy) - 1/r
+L = x*vy - y*vx
+
+print(f"E_initial = {E[0]:.6f}, max drift |ΔE/E| = {np.max(np.abs((E - E[0])/E[0])):.2e}")
+print(f"L_initial = {L[0]:.6f}, max drift |ΔL/L| = {np.max(np.abs((L - L[0])/L[0])):.2e}")
+
+fig = make_subplots(rows=1, cols=2, subplot_titles=['Orbit', 'Conservation'])
+fig.add_trace(go.Scatter(x=x, y=y, mode='lines',
+    line=dict(color='#00f3ff', width=2), name='orbit'), row=1, col=1)
+t = np.arange(N) * h
+fig.add_trace(go.Scatter(x=t, y=(E-E[0])/E[0], mode='lines',
+    line=dict(color='#ff006e', width=1.5), name='ΔE/E'), row=1, col=2)
+fig.add_trace(go.Scatter(x=t, y=(L-L[0])/L[0], mode='lines',
+    line=dict(color='#ffbe0b', width=1.5), name='ΔL/L'), row=1, col=2)
+fig.update_layout(template='plotly_dark', height=400)
+fig.show()
+            </code></pre>
+        </div>
+    </div>
+    <div class="tab-content">
+        <div class="code-block-container"><div class="code-header"><span class="code-lang">Python</span><button class="copy-btn">Copy</button></div>
+            <pre><code class="language-python">
+import numpy as np
+import plotly.graph_objects as go
+
+# Validate RK4 orbit against Section 8.5's analytical conic.
+# Same r0, vy0 as previous tab.
+mu, k = 1.0, 1.0
+r0, vy0 = 1.0, 1.2
+E = 0.5 * vy0**2 - k/r0
+L = r0 * vy0
+p = L**2 / (mu * k)
+e = np.sqrt(1 + 2 * E * L**2 / (mu * k**2))
+print(f"E = {E:.4f}, L = {L:.4f}, p = {p:.4f}, e = {e:.4f}")
+
+# Analytical conic ρ(φ) = p/(1 + e cos φ)
+phi = np.linspace(0, 2*np.pi, 400)
+rho_anal = p / (1 + e * np.cos(phi))
+x_anal = rho_anal * np.cos(phi)
+y_anal = rho_anal * np.sin(phi)
+
+# RK4 orbit (re-using F from previous tab; assume traj computed)
+# from previous tab: traj has shape (N, 4)
+
+fig = go.Figure()
+fig.add_trace(go.Scatter(x=traj[:,0], y=traj[:,1], mode='lines',
+    line=dict(color='#00f3ff', width=2), name='RK4'))
+fig.add_trace(go.Scatter(x=x_anal, y=y_anal, mode='lines',
+    line=dict(color='#ff006e', width=2, dash='dash'), name='analytical conic'))
+fig.update_layout(template='plotly_dark',
+    xaxis=dict(range=[-3, 3], scaleanchor='y', zerolinecolor='#808080'),
+    yaxis=dict(range=[-3, 3], zerolinecolor='#808080'),
+    height=500)
+fig.show()
+            </code></pre>
+        </div>
+    </div>
+    <div class="tab-content">
+        <div class="code-block-container"><div class="code-header"><span class="code-lang">Python</span><button class="copy-btn">Copy</button></div>
+            <pre><code class="language-python">
+import numpy as np
+import plotly.graph_objects as go
+
+# Convergence study: max |ΔE/E| over one orbit vs step size h, RK4 vs Euler.
+def F(s):
+    r3 = (s[0]*s[0] + s[1]*s[1]) ** 1.5
+    return np.array([s[2], s[3], -s[0]/r3, -s[1]/r3])
+
+def rk4_step(s, h):
+    k1 = F(s); k2 = F(s + 0.5*h*k1); k3 = F(s + 0.5*h*k2); k4 = F(s + h*k3)
+    return s + (h/6)*(k1 + 2*k2 + 2*k3 + k4)
+
+def euler_step(s, h):
+    return s + h * F(s)
+
+def integrate(stepper, s0, h, T):
+    N = int(T / h)
+    s = s0.copy(); E0 = 0.5*(s[2]**2 + s[3]**2) - 1/np.sqrt(s[0]**2 + s[1]**2)
+    max_err = 0
+    for _ in range(N):
+        s = stepper(s, h)
+        E = 0.5*(s[2]**2 + s[3]**2) - 1/np.sqrt(s[0]**2 + s[1]**2)
+        max_err = max(max_err, abs((E - E0)/E0))
+    return max_err
+
+s0 = np.array([1.0, 0.0, 0.0, 1.0])  # circular orbit, T = 2π
+hs = np.logspace(-3, -0.5, 12)
+err_rk4   = [integrate(rk4_step,   s0, h, 2*np.pi) for h in hs]
+err_euler = [integrate(euler_step, s0, h, 2*np.pi) for h in hs]
+
+fig = go.Figure()
+fig.add_trace(go.Scatter(x=hs, y=err_rk4, mode='markers+lines',
+    marker=dict(color='#00f3ff', size=8), name='RK4 (slope ≈ 4)'))
+fig.add_trace(go.Scatter(x=hs, y=err_euler, mode='markers+lines',
+    marker=dict(color='#ff006e', size=8), name='Euler (slope ≈ 1)'))
+# Reference lines
+fig.add_trace(go.Scatter(x=hs, y=err_rk4[0]*(hs/hs[0])**4, mode='lines',
+    line=dict(color='#00f3ff', dash='dash', width=1), showlegend=False))
+fig.add_trace(go.Scatter(x=hs, y=err_euler[0]*(hs/hs[0]), mode='lines',
+    line=dict(color='#ff006e', dash='dash', width=1), showlegend=False))
+fig.update_layout(template='plotly_dark',
+    xaxis=dict(title='h', type='log', zerolinecolor='#808080'),
+    yaxis=dict(title='max |ΔE/E|', type='log', zerolinecolor='#808080'),
+    title='RK4 (h⁴) vs Euler (h¹) convergence',
+    height=420)
+fig.show()
+            </code></pre>
+        </div>
+    </div>
+    <div class="tab-content">
+        <div class="code-block-container"><div class="code-header"><span class="code-lang">Prompt for AI</span><button class="copy-btn">Copy</button></div>
+            <pre><code class="language-text">Create Python with numpy and Plotly to numerically integrate two-body Kepler orbits.
+
+Requirements:
+- Part 1: RK4 integrator in Cartesian state s = [x, y, vx, vy] for the two-body
+  Kepler problem with k = μ = 1. Force F(s) returns ds/dt. Launch from
+  (r0=1, 0) with velocity (0, vy0=1.2). Integrate 1500 steps with h = 0.02.
+  Plot orbit (cyan) and energy/angular-momentum drift (ΔE/E and ΔL/L) vs time.
+  Print initial values and max relative drifts.
+- Part 2: Validate against the analytical Section 8.5 conic. Compute p and e
+  from initial (E, ℓ). Overlay analytical ρ(φ) = p/(1+e cos φ) on the RK4
+  orbit. They should sit on top of each other.
+- Part 3: Convergence study. Sweep h from 10⁻³ to 10⁻⁰·⁵ (12 values).
+  For each h, integrate one orbit (T = 2π for circular case) with RK4 and Euler.
+  Track max |ΔE/E|. Plot on log-log axes; overlay reference slope lines (RK4: h⁴,
+  Euler: h¹). Confirm RK4 has slope ~4, Euler ~1.
+- Use dark theme, gray axes (#808080), neon colors.
+- Each part under 35 lines.</code></pre>
+        </div>
+
+        <div class="info-box" style="margin-top: var(--spacing-md);">
+            <div class="info-icon">💡</div>
+            <div class="info-content">
+                <strong>Pro Tips for Prompting:</strong>
+                <ul>
+                    <li>Asking the AI to <em>print</em> the drift magnitudes makes the numerical accuracy concrete.</li>
+                    <li>The analytical-vs-numerical overlay is a powerful sanity check — if the AI's RK4 doesn't match, there's a bug.</li>
+                    <li>Convergence studies are the gold-standard validation for any numerical method. Always include one.</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- ============================================================ -->
+<!-- NAVIGATION -->
+<!-- ============================================================ -->
+<div class="btn-group mt-xl">
+    <button class="btn btn-magenta" onclick="navigateToSection('90-kepler-orbits')">&larr; Previous: The Kepler Problem</button>
+    <button class="btn btn-secondary" onclick="scrollToTop()">&uarr; Back to Top</button>
+    <button class="btn btn-secondary" onclick="navigateToSection('92-other-potentials')">Next: Other Central Potentials &rarr;</button>
+</div>
