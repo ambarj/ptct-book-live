@@ -126,7 +126,16 @@ function updateDivergencePlot() {
     const xMax = 6;
     const step = 0.005; // Fine step for smooth curves
     const gap = 0.02;   // Small gap to get close to poles
-    const yClip = 50;   // Allow larger values to show asymptotic behavior
+
+    // Between close poles the middle branch bottoms out at |f| = 4/d²
+    // (d = pole separation), which can exceed a fixed y-range and make
+    // the branch vanish entirely. Grow the visible range with 1/d² up
+    // to a cap, and clamp curve values instead of dropping them so the
+    // branch arms always reach the edge of the plot.
+    const d = pole2 - pole1;
+    const midPeak = d > 1e-6 ? 4 / (d * d) : Infinity;
+    const yLim = Math.min(Math.max(30, midPeak * 1.3), 200);
+    const yClip = yLim * 1.5;
 
     // Create separate arrays for each continuous region
     const leftX = [], leftY = [];
@@ -134,17 +143,16 @@ function updateDivergencePlot() {
     const rightX = [], rightY = [];
 
     for (let xi = xMin; xi <= xMax; xi += step) {
-        const yi = 1 / ((xi - a) * (xi - b));
+        let yi = 1 / ((xi - a) * (xi - b));
 
         // Skip points too close to poles
         if (Math.abs(xi - pole1) < gap || Math.abs(xi - pole2) < gap) {
             continue;
         }
 
-        // Clip extreme values
-        if (Math.abs(yi) > yClip) {
-            continue;
-        }
+        // Clamp extreme values so branches run off the top/bottom of the
+        // plot instead of silently disappearing
+        yi = Math.max(-yClip, Math.min(yClip, yi));
 
         // Assign to appropriate region
         if (xi < pole1 - gap) {
@@ -187,16 +195,29 @@ function updateDivergencePlot() {
         {
             type: 'line',
             x0: a, x1: a,
-            y0: -30, y1: 30,
+            y0: -yLim, y1: yLim,
             line: { color: '#ff00ff', width: 2, dash: 'dash' }
         },
         {
             type: 'line',
             x0: b, x1: b,
-            y0: -30, y1: 30,
+            y0: -yLim, y1: yLim,
             line: { color: '#ff00ff', width: 2, dash: 'dash' }
         }
     ];
+
+    // If the poles are so close that even the enlarged range can't show
+    // the middle branch, say so instead of leaving a mysterious gap
+    const annotations = [];
+    if (isFinite(midPeak) && midPeak > yLim && d > 2 * gap) {
+        annotations.push({
+            x: (pole1 + pole2) / 2,
+            y: -yLim * 0.85,
+            text: 'poles very close:<br>middle branch below view',
+            showarrow: false,
+            font: { color: '#ffff00', size: 11 }
+        });
+    }
 
     const layout = {
         title: {
@@ -213,13 +234,14 @@ function updateDivergencePlot() {
         },
         yaxis: {
             title: 'f(x)',
-            range: [-30, 30],
+            range: [-yLim, yLim],
             zeroline: true,
             zerolinewidth: 2,
             zerolinecolor: '#808080',
             gridcolor: '#2a2f4a'
         },
         shapes: shapes,
+        annotations: annotations,
         showlegend: false
     };
 
@@ -255,14 +277,14 @@ function updateExtremaPlot() {
     if (a !== 0) {
         extremumX = -b / (2 * a);
         extremumY = a * extremumX * extremumX + b * extremumX + c;
-        const extremumType = a > 0 ? 'Minimum' : 'Maximum';
-        extremumInfo = `${extremumType} at (${extremumX.toFixed(2)}, ${extremumY.toFixed(2)})`;
+        const extremumType = a > 0 ? 'minimum' : 'maximum';
+        extremumInfo = `f(x) has its ${extremumType} at (${extremumX.toFixed(2)}, ${extremumY.toFixed(2)})`;
     }
 
     document.getElementById('extrema-info').textContent = extremumInfo;
 
     // Generate plot data
-    const x = range(-6, 8, 0.05);
+    const x = range(-6, 6, 0.05);
     const y = x.map(xi => a * xi * xi + b * xi + c);
 
     const traces = [{
@@ -307,7 +329,7 @@ function updateExtremaPlot() {
         },
         xaxis: {
             title: 'x',
-            range: [-6, 8],
+            range: [-6, 6],
             zeroline: true,
             zerolinewidth: 2,
             zerolinecolor: '#808080',
@@ -471,7 +493,7 @@ function updateCompletePlot() {
             funcLabel = 'f(x) = (x² - 4)/(x - 3)';
             zeros = [-2, 2];
             divergences = [3];
-            extremaInfo = 'Local max ≈ (-0.6, 1.3), Local min ≈ (6.6, 13.3)';
+            extremaInfo = 'Local max ≈ (0.76, 1.53), Local min ≈ (5.24, 10.47)';
             asymptoteInfo = 'Oblique: y = x + 3';
             yFunc = (x) => Math.abs(x - 3) < gap ? null : (x * x - 4) / (x - 3);
             shapes.push(

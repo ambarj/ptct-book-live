@@ -164,12 +164,9 @@
         for (var lh = 0; lh >= -4; lh -= 0.2) logH.push(lh);
         var hVals = logH.map(function(lh) { return Math.pow(10, lh); });
 
-        var eulerErrs = [], rk2Errs = [];
-
-        for (var i = 0; i < hVals.length; i++) {
-            var hv = hVals[i];
+        // Final-time errors of both methods at step size hv
+        function errsAt(hv) {
             var errE, errR;
-
             if (eqKey === 'sho') {
                 var sE = eulerSys(fSHO, [1, 0], T, hv);
                 var sR = rk2Sys(fSHO, [1, 0], T, hv);
@@ -186,8 +183,14 @@
                 errE = Math.abs(sE.Y[sE.Y.length - 1][0] - dampedExact(T));
                 errR = Math.abs(sR.Y[sR.Y.length - 1][0] - dampedExact(T));
             }
-            eulerErrs.push(errE > 0 ? errE : 1e-16);
-            rk2Errs.push(errR > 0 ? errR : 1e-16);
+            return [errE > 0 ? errE : 1e-16, errR > 0 ? errR : 1e-16];
+        }
+
+        var eulerErrs = [], rk2Errs = [];
+        for (var i = 0; i < hVals.length; i++) {
+            var pair = errsAt(hVals[i]);
+            eulerErrs.push(pair[0]);
+            rk2Errs.push(pair[1]);
         }
 
         // Compute slopes
@@ -220,20 +223,20 @@
             legend: { x: 0.05, y: 0.95, bgcolor: 'rgba(0,0,0,0.5)' }
         }), { responsive: true });
 
-        // Right: halving-h improvement bars
+        // Right: halving-h improvement bars — computed from genuine (h, h/2)
+        // run pairs. (The log-scan above is spaced by 10^0.2 ≈ 0.63, so
+        // consecutive scan points are NOT halvings and their ratios never
+        // approach the 2×/4× targets.)
         var halvingH = [], eulerRatios = [], rk2Ratios = [];
-        for (var i = 1; i < hVals.length; i++) {
-            if (Math.abs(hVals[i] / hVals[i - 1] - 0.5) < 0.2) {
-                halvingH.push(hVals[i - 1].toExponential(1));
-                eulerRatios.push(eulerErrs[i - 1] / eulerErrs[i]);
-                rk2Ratios.push(rk2Errs[i - 1] / rk2Errs[i]);
+        [0.4, 0.2, 0.1, 0.05, 0.02].forEach(function(hv) {
+            var e1 = errsAt(hv);
+            var e2 = errsAt(hv / 2);
+            if (e1[0] > 1e-14 && e2[0] > 1e-14 && e1[1] > 1e-14 && e2[1] > 1e-14) {
+                halvingH.push(hv.toString());
+                eulerRatios.push(e1[0] / e2[0]);
+                rk2Ratios.push(e1[1] / e2[1]);
             }
-        }
-        // Take last 8 for readability
-        var nShow = Math.min(8, halvingH.length);
-        halvingH = halvingH.slice(-nShow);
-        eulerRatios = eulerRatios.slice(-nShow);
-        rk2Ratios = rk2Ratios.slice(-nShow);
+        });
 
         Plotly.newPlot('impEuler-halvingPlot', [
             { x: halvingH, y: eulerRatios, type: 'bar', name: 'Euler ratio',

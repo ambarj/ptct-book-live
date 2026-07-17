@@ -499,11 +499,11 @@
         </div>
 
         <div class="tab-content">
-            <div class="question-container" data-type="fill" data-answer="stable spiral">
+            <div class="question-container" data-type="fill" data-answer="unstable spiral">
                 <div class="question-text">
                     Select <strong>Van der Pol</strong> at the origin. The Jacobian shows
-                    \( \tau < 0 \) and the eigenvalues are complex with negative real part.
-                    The fixed point is a
+                    \( \tau = \mu = 0.5 > 0 \) and the eigenvalues are complex with positive
+                    real part. The fixed point is a
                     <select class="fill-blank-select">
                         <option value=""></option>
                         <option value="center">center</option>
@@ -517,11 +517,14 @@
                 </div>
                 <div class="question-explanation" style="display:none;">
                     <strong>Explanation:</strong>
-                    The Van der Pol oscillator at the origin (with small &mu;) has complex
-                    eigenvalues with negative real part when \( \mu < 0 \), giving a
-                    <strong>stable spiral</strong>. For \( \mu > 0 \), the real part flips
-                    positive → unstable spiral (leading to a limit cycle). The sign of &mu;
-                    controls stability.
+                    With \( \mu = 0.5 \), the Jacobian at the origin is
+                    \( \begin{pmatrix} 0 & 1 \\ -1 & 0.5 \end{pmatrix} \):
+                    \( \tau = 0.5 > 0 \), \( \Delta = 1 \), \( \tau^2 - 4\Delta < 0 \) —
+                    complex eigenvalues with positive real part, an
+                    <strong>unstable spiral</strong>. Trajectories wind outward from the origin
+                    toward the famous Van der Pol limit cycle. (For \( \mu < 0 \) the real part
+                    flips negative and the spiral becomes stable — the sign of &mu; controls
+                    stability.)
                 </div>
             </div>
         </div>

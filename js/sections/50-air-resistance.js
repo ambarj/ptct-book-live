@@ -66,7 +66,12 @@
         var y = [1, V0];
         for (var i = 0; i < N; i++) {
             y = rk4Step(y, i * h, h, alpha, beta);
-            if (y[0] > Xthresh) return true;
+            // Turned around → bound. Crossing Xthresh alone is NOT escape:
+            // barely-bound trajectories coast past any fixed distance before
+            // falling back. Require the local escape speed v² ≥ 2/x once far
+            // away, where drag (∝ e^{-β(X-1)}, β ≥ 0.5) is negligible.
+            if (y[1] <= 0) return false;
+            if (y[0] > Xthresh && y[1] * y[1] >= 2 / y[0]) return true;
             if (y[0] < 0.01) return false;
         }
         return false;
@@ -164,13 +169,15 @@
     // ============================================================
     // EXPLORER 2: Escape Threshold with Drag (Bisection)
     // ============================================================
-    var bisState = { lo: 1.0, hi: 4.0, step: 0, history: [], alpha: 1.0, beta: 1.0 };
+    var bisState = { lo: 1.0, hi: 5.0, step: 0, history: [], alpha: 1.0, beta: 1.0 };
 
     function resetBisState() {
         var alpha = parseFloat(document.getElementById('ar-alpha2-slider').value);
         var beta = parseFloat(document.getElementById('ar-beta2-slider').value);
-        bisState = { lo: 1.0, hi: 4.0, step: 0, history: [], alpha: alpha, beta: beta };
-        bisState.history.push({ step: 0, lo: 1.0, hi: 4.0, mid: 2.5 });
+        // hi = 5.0: v_esc(α=3, β=1) ≈ 4.05, so a 4.0 bracket would never
+        // contain the root at heavy drag
+        bisState = { lo: 1.0, hi: 5.0, step: 0, history: [], alpha: alpha, beta: beta };
+        bisState.history.push({ step: 0, lo: 1.0, hi: 5.0, mid: 3.0 });
     }
 
     function doBisStep() {

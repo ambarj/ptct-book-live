@@ -192,7 +192,7 @@
         </div>
 
         <div class="tab-content">
-            <div class="question-container" data-type="fill" data-answer="saddle">
+            <div class="question-container" data-type="fill" data-answer="saddle|saddle point">
                 <div class="question-text">
                     Select "Saddle Point". Notice that streamlines approach along one axis but
                     escape along the perpendicular axis.<br><br>
@@ -271,7 +271,7 @@
     Don't worry about the math yet - let's build visual intuition first.
 </p>
 
-<div class="interactive-container">
+<div class="interactive-container" id="fixed-point-classifier">
     <div class="interactive-title">Interactive: Fixed Point Classifier</div>
 
     <p style="margin-bottom: var(--spacing-md); color: var(--text-secondary);">
@@ -494,7 +494,7 @@
     is zero even though there's active flow all around.
 </p>
 
-<div class="interactive-container">
+<div class="interactive-container" id="flow-pattern-builder">
     <div class="interactive-title">Interactive: Flow Pattern Builder</div>
 
     <p style="margin-bottom: var(--spacing-md); color: var(--text-secondary);">
@@ -543,7 +543,8 @@
     <p>
         Where streamlines meet or diverge, the flow velocity is zero. These <strong>stagnation points</strong>
         are critical in aerodynamics (where air splits around a wing), fluid mixing, and many other applications.
-        In the dipole configuration, notice the stagnation point exactly between the source and sink!
+        In the two-sources configuration, notice the stagnation point exactly midway between them — the two
+        outflows collide head-on and cancel!
     </p>
 </div>
 
@@ -565,20 +566,20 @@
         <div class="tab-content active">
             <div class="question-container" data-type="mcq" data-answer="1">
                 <div class="question-text">
-                    Select "Dipole" configuration. Where is the stagnation point located?
+                    Select "Two Sources" configuration. Where is the stagnation point located?
                 </div>
                 <div class="question-options">
                     <label class="option">
                         <input type="radio" name="q4-3-1" value="0">
-                        <span>At the source location</span>
+                        <span>At one of the source locations</span>
                     </label>
                     <label class="option">
                         <input type="radio" name="q4-3-1" value="1">
-                        <span>Exactly midway between source and sink</span>
+                        <span>Exactly midway between the two sources</span>
                     </label>
                     <label class="option">
                         <input type="radio" name="q4-3-1" value="2">
-                        <span>At the sink location</span>
+                        <span>Directly above each source</span>
                     </label>
                     <label class="option">
                         <input type="radio" name="q4-3-1" value="3">
@@ -588,10 +589,11 @@
                 <div class="question-explanation" style="display: none;">
                     <div class="question-explanation-title">Explanation</div>
                     <div class="question-explanation-text">
-                        In a dipole with equal-strength source and sink, the outward flow from the source
-                        exactly cancels the inward flow to the sink at the midpoint. This creates a
-                        stagnation point where \( \vec{F} = 0 \). It's actually a saddle point - stable
-                        along the line connecting source and sink, unstable perpendicular to it.
+                        With two equal-strength sources, the outward flows collide head-on at the midpoint
+                        and cancel, creating a stagnation point where \( \vec{F} = 0 \). It's actually a
+                        saddle point — stable along the line connecting the sources, unstable perpendicular
+                        to it. Contrast this with the dipole (source + sink): between them the flows point
+                        the <em>same</em> way and reinforce, so a dipole has no stagnation point.
                     </div>
                 </div>
                 <div class="question-actions">

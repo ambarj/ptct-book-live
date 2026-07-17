@@ -139,7 +139,9 @@
         // Stats
         var regime = getRegime(w);
         var period = w > 0.25 ? (2 * Math.PI / Math.sqrt(w - 0.25)).toFixed(2) : 'N/A';
-        var decay = '2.00'; // decay time is always 2 (envelope e^(-t/2))
+        // Underdamped/critical envelope decays as e^(-t/2) → time constant 2.
+        // Overdamped: the slow root s = -(0.5 - √(0.25 - w)) dominates.
+        var decay = w >= 0.25 ? '2.00' : (1 / (0.5 - Math.sqrt(0.25 - w))).toFixed(2);
 
         var el;
         el = document.getElementById('lcr-regime');

@@ -198,7 +198,7 @@
         </div>
 
         <div class="tab-content">
-            <div class="question-container" data-type="fill" data-answer="1[0.8,1.2]">
+            <div class="question-container" data-type="fill" data-answer="2[1.7,2.3]">
                 <div class="question-text">
                     Set \( T = 5 \). Compare the max error at \( h = 0.1 \) vs \( h = 0.05 \).
                     The ratio (error at 0.1) / (error at 0.05) ≈
@@ -210,9 +210,10 @@
                 </div>
                 <div class="question-explanation" style="display:none;">
                     <strong>Explanation:</strong>
-                    For the test equation \( dy/dt = -y \), at \( t = 5 \): error at \( h=0.1 \) is about 0.004
-                    and at \( h=0.05 \) is about 0.002. The ratio is close to 2, but not exact because we measure
-                    global error which also depends on error propagation. The log-log slope should be near 1.
+                    For the test equation \( dy/dt = -y \), halving \( h \) from 0.1 to 0.05
+                    roughly halves the error (measured ratios land near 1.9&ndash;2.05 depending on
+                    whether you compare peak or final error). It is close to 2, but not exact, because
+                    the global error also depends on how errors propagate. The log-log slope should be near 1.
                 </div>
             </div>
         </div>
@@ -390,7 +391,7 @@
         </div>
 
         <div class="tab-content">
-            <div class="question-container" data-type="fill" data-answer="2|3">
+            <div class="question-container" data-type="fill" data-answer="2|2">
                 <div class="question-text">
                     Richardson extrapolation for Euler uses: \( y_{\text{better}} = \)
                     <input type="text" class="fill-blank" placeholder="?"> · y(h/2) −  y(h).
@@ -569,7 +570,7 @@
         </div>
 
         <div class="tab-content">
-            <div class="question-container" data-type="fill" data-answer="4">
+            <div class="question-container" data-type="fill" data-answer="16">
                 <div class="question-text">
                     For an \( O(h^p) \) method, halving the step size reduces the error by a factor of \( 2^p \).
                     For RK4 (\( p = 4 \)), halving \( h \) reduces error by a factor of

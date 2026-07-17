@@ -200,22 +200,23 @@
         </div>
 
         <div class="tab-content">
-            <div class="question-container" data-type="fill" data-answer="4[3.5,4.5]">
+            <div class="question-container" data-type="fill" data-answer="10[7,13]">
                 <div class="question-text">
-                    Set h = 0.10, T = 30 and note the improvement ratio. Then set h = 0.05, T = 30.
-                    The improvement ratio should be roughly similar, around
-                    <input type="text" class="fill-blank" placeholder="?">.
-                    This is because the error ratio scales as \( (h_{\text{Euler}}/h_{\text{RK2}})^{\text{order}} \),
-                    and for RK2, the extra order makes it consistently better.
+                    Set h = 0.10, T = 30 and note the improvement ratio (about 2×). Then set
+                    h = 0.05, T = 30. The ratio grows to roughly
+                    <input type="text" class="fill-blank" placeholder="?">×.
+                    RK2's advantage <em>increases</em> as h shrinks, because its error falls
+                    like \( h^2 \) while Euler's falls only like \( h \).
                 </div>
                 <div class="question-actions">
                     <button class="btn-verify">Verify</button>
                 </div>
                 <div class="question-explanation" style="display:none;">
                     <strong>Explanation:</strong>
-                    The improvement ratio varies with h and T, but at the same step size, RK2 is typically
-                    around 3-5× better than Euler for this system. The key insight is not the exact ratio
-                    at one h, but that when you halve h, RK2's error drops by 4× while Euler's drops by only 2×.
+                    The ratio of errors scales like \( h/h^2 = 1/h \): every halving of h roughly
+                    doubles RK2's advantage. Here it goes from about 2× at h = 0.10 to about 10× at
+                    h = 0.05. That is the practical meaning of "higher order": the smaller the step,
+                    the more you win.
                 </div>
             </div>
         </div>
@@ -475,7 +476,7 @@
     <div class="warning-content">
         <strong>RK2 isn't perfect either:</strong>
         <p>
-            RK2 doesn't <em>exactly</em> conserve energy — it oscillates around the true value.
+            RK2 doesn't <em>exactly</em> conserve energy — a tiny drift (of order \( h^4 \) per step for the SHO) remains.
             For truly long-time simulations (millions of orbits), you'd need <strong>symplectic integrators</strong>
             that preserve the Hamiltonian structure. But for most practical work, RK2 (and especially RK4)
             are excellent choices.
@@ -538,7 +539,7 @@
                 <div class="question-options">
                     <label class="option">
                         <input type="checkbox" value="0">
-                        <span>RK2's energy oscillates around 1 without systematic drift</span>
+                        <span>RK2's energy stays very close to 1 — its drift is far smaller than Euler's</span>
                     </label>
                     <label class="option">
                         <input type="checkbox" value="1">
@@ -559,10 +560,10 @@
                 <div class="question-explanation" style="display:none;">
                     <strong>Explanation:</strong>
                     <ul>
-                        <li>✓ RK2 oscillates around E = 1 — no net energy gain or loss over many periods.</li>
+                        <li>✓ RK2's energy hugs E = 1: for the SHO it drifts upward only by a factor \( (1 + h^4/4) \) per step — about +1.3% over 50 time units at h = 0.1, versus Euler's runaway growth.</li>
                         <li>✗ RK2 does NOT exactly conserve energy. Exact conservation requires symplectic methods.</li>
                         <li>✓ As h shrinks, the oscillation amplitude shrinks too — proportional to \( h^2 \).</li>
-                        <li>✗ RK2 neither systematically gains nor loses energy — it oscillates symmetrically.</li>
+                        <li>✗ RK2 does not damp the oscillator — its tiny residual drift is upward, not downward.</li>
                     </ul>
                 </div>
             </div>

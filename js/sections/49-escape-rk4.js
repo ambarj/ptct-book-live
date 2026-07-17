@@ -67,7 +67,12 @@
                 y[0] + (h / 6) * (k1[0] + 2 * k2[0] + 2 * k3[0] + k4[0]),
                 y[1] + (h / 6) * (k1[1] + 2 * k2[1] + 2 * k3[1] + k4[1])
             ];
-            if (y[0] > Xthresh) return true;   // escaped
+            // Turned around → bound. Crossing Xthresh alone is NOT escape:
+            // barely-bound orbits (V0 just below √2) coast past any fixed
+            // distance before falling back, so also require the local
+            // escape speed v² ≥ 2/x once far away (E ≥ 0 ⟺ escape).
+            if (y[1] <= 0) return false;
+            if (y[0] > Xthresh && y[1] * y[1] >= 2 / y[0]) return true;
             if (y[0] < 0.01) return false;      // crashed
         }
         return false;

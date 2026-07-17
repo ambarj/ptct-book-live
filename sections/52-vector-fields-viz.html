@@ -503,8 +503,8 @@
         <div class="tab-content">
             <div class="question-container" data-type="fill" data-answer="source|unstable">
                 <div class="question-text">
-                    Compare the speed maps for different systems. Which system type shows the
-                    steepest speed increase away from the origin?
+                    Compare the arrows overlaid on the speed maps. For which system type do the
+                    velocity arrows point straight outward, away from the origin, everywhere?
                     <select class="fill-blank-select">
                         <option value=""></option>
                         <option value="center">Center (SHO)</option>
@@ -525,9 +525,11 @@
                 </div>
                 <div class="question-explanation" style="display:none;">
                     <strong>Explanation:</strong>
-                    The <strong>source</strong> (\( \dot{x} = x, \dot{y} = y \)) has speed
-                    \( |\mathbf{v}| = \sqrt{x^2 + y^2} = r \), which grows linearly with distance.
-                    All trajectories diverge from the origin — farther from the fixed point means
+                    The <strong>source</strong> (\( \dot{x} = x, \dot{y} = y \)) has velocity
+                    exactly parallel to the position vector, so every arrow points radially outward.
+                    (Its speed \( |\mathbf{v}| = r \) grows with distance — but so does the speed of
+                    the center and the saddle; what distinguishes the source is the <em>direction</em>
+                    of flow.) All trajectories diverge from the origin — farther from the fixed point means
                     faster motion. The center has the same speed formula but trajectories orbit
                     rather than escape.
                 </div>
@@ -551,7 +553,7 @@
                     </label>
                     <label class="option">
                         <input type="checkbox" value="2">
-                        <span>The speed pattern is not radially symmetric — it varies with direction</span>
+                        <span>The flow direction is not radially symmetric — inward along one axis, outward along the other</span>
                     </label>
                     <label class="option">
                         <input type="checkbox" value="3">
@@ -566,7 +568,7 @@
                     <ul>
                         <li><strong>Zero only at origin:</strong> TRUE. The fixed point is the only place where both \( \dot{x} = 0 \) and \( \dot{y} = 0 \).</li>
                         <li><strong>Uniform speed:</strong> FALSE. Speed varies from zero at the origin to large values far away.</li>
-                        <li><strong>Not radially symmetric:</strong> TRUE! For the saddle (\( \dot{x} = x, \dot{y} = -y \)), the speed is \( \sqrt{x^2 + y^2} \), which IS radially symmetric. But the <em>direction</em> of flow is not — trajectories converge along one axis and diverge along the other. The speed map itself is actually symmetric for this particular saddle.</li>
+                        <li><strong>Flow direction not radially symmetric:</strong> TRUE. For the saddle (\( \dot{x} = x, \dot{y} = -y \)), trajectories converge along the y-axis and diverge along the x-axis. (Curiously, the <em>speed</em> \( \sqrt{x^2+y^2} \) is radially symmetric for this particular saddle — it is the direction pattern that betrays the saddle.)</li>
                         <li><strong>Max at origin:</strong> FALSE. Speed is zero at the origin (it's the fixed point).</li>
                     </ul>
                 </div>

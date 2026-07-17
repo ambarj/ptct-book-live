@@ -258,10 +258,11 @@
             legend: { x: 0.4, y: 0.98, bgcolor: 'rgba(0,0,0,0.5)' }
         }), { responsive: true });
 
-        // Compute energy drift at t=10
+        // Compute energy drift at t=10 as a percentage of the INITIAL energy.
+        // Dividing by the exact (decayed, near-zero) energy instead makes the
+        // percentage explode for any reachable h and the readout unusable.
         var idxT10 = Math.min(Math.round(10 / h), sol.t.length - 1);
-        var drift = eRatio[idxT10] - eExact[idxT10];
-        var driftPct = (drift / eExact[Math.max(0, idxT10)] * 100);
+        var driftPct = (eRatio[idxT10] - eExact[idxT10]) * 100;
 
         var el;
         el = document.getElementById('dampMech-euler-h');

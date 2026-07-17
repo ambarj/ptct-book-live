@@ -286,12 +286,9 @@
         for (var lh = 0; lh >= -3; lh -= 0.15) logH.push(lh);
         var hVals = logH.map(function(lh) { return Math.pow(10, lh); });
 
-        var eErrs = [], rErrs = [], r4Errs = [];
-
-        for (var i = 0; i < hVals.length; i++) {
-            var hv = hVals[i];
+        // Final-time errors of all three methods at step size hv
+        function errsAt(hv) {
             var errE, errR, err4;
-
             if (eqKey === 'decay') {
                 var fDecay = function(t, y) { return -y; };
                 var ex = Math.exp(-T);
@@ -306,15 +303,22 @@
                 errR = Math.abs(rk2End(fSys, [1, 0], T, hv)[0] - ex);
                 err4 = Math.abs(rk4End(fSys, [1, 0], T, hv)[0] - ex);
             }
-            eErrs.push(errE > 0 ? errE : 1e-16);
-            rErrs.push(errR > 0 ? errR : 1e-16);
-            r4Errs.push(err4 > 0 ? err4 : 1e-16);
+            return [errE > 0 ? errE : 1e-16, errR > 0 ? errR : 1e-16, err4 > 0 ? err4 : 1e-16];
         }
 
-        // Slopes
+        var eErrs = [], rErrs = [], r4Errs = [];
+        for (var i = 0; i < hVals.length; i++) {
+            var trio = errsAt(hVals[i]);
+            eErrs.push(trio[0]);
+            rErrs.push(trio[1]);
+            r4Errs.push(trio[2]);
+        }
+
+        // Slopes. RK4 must be fitted over larger h: below h ≈ 0.03 its error
+        // (~1e-13) is round-off dominated and flattens the fitted slope.
         var sE = computeSlope(hVals, eErrs, 1e-3, 0.1);
         var sR = computeSlope(hVals, rErrs, 1e-3, 0.1);
-        var s4 = computeSlope(hVals, r4Errs, 1e-3, 0.1);
+        var s4 = computeSlope(hVals, r4Errs, 0.03, 0.3);
 
         // Left: convergence plot
         Plotly.newPlot('rk4-convPlot', [
@@ -340,21 +344,21 @@
             legend: { x: 0.05, y: 0.95, bgcolor: 'rgba(0,0,0,0.5)' }
         }), { responsive: true });
 
-        // Right: halving-h improvement bars
+        // Right: halving-h improvement bars — computed from genuine (h, h/2)
+        // run pairs. (Scan points above are spaced by 10^0.15, not halvings.)
+        // Keep h ≥ 0.05 so RK4's ratio isn't drowned by round-off noise.
         var halvingH = [], eulerR = [], rk2R = [], rk4R = [];
-        for (var i = 1; i < hVals.length; i++) {
-            if (Math.abs(hVals[i] / hVals[i - 1] - 0.5) < 0.3) {
-                halvingH.push(hVals[i - 1].toExponential(1));
-                eulerR.push(eErrs[i - 1] / eErrs[i]);
-                rk2R.push(rErrs[i - 1] / rErrs[i]);
-                rk4R.push(r4Errs[i - 1] / r4Errs[i]);
+        [0.4, 0.2, 0.1, 0.05].forEach(function(hv) {
+            var e1 = errsAt(hv);
+            var e2 = errsAt(hv / 2);
+            if (e1.every(function(v) { return v > 1e-13; }) &&
+                e2.every(function(v) { return v > 1e-13; })) {
+                halvingH.push(hv.toString());
+                eulerR.push(e1[0] / e2[0]);
+                rk2R.push(e1[1] / e2[1]);
+                rk4R.push(e1[2] / e2[2]);
             }
-        }
-        var nShow = Math.min(6, halvingH.length);
-        halvingH = halvingH.slice(-nShow);
-        eulerR = eulerR.slice(-nShow);
-        rk2R = rk2R.slice(-nShow);
-        rk4R = rk4R.slice(-nShow);
+        });
 
         Plotly.newPlot('rk4-halvingPlot', [
             { x: halvingH, y: eulerR, type: 'bar', name: 'Euler',

@@ -276,7 +276,7 @@
         <div class="tab-content active">
             <div class="question-container" data-type="mcq" data-answer="1">
                 <div class="question-text">
-                    Run 300 trials with N = 500. The variance reduction factor is about 20&times;.
+                    Suppose an importance sampler achieves a variance reduction factor of 20&times;. (For the peaked integrand with a well-matched proposal, the explorer can reach reductions of 1000&times; or more!)
                     What does this mean practically?
                 </div>
                 <div class="question-options">
@@ -572,7 +572,8 @@ import plotly.graph_objects as go
 
 # Integrand: peaked Gaussian
 f = lambda x: np.exp(-10*(x - 0.7)**2)
-true_val = np.sqrt(np.pi/10) * 0.5  # ≈ 0.280
+from scipy.special import erf
+true_val = 0.5*np.sqrt(np.pi/10)*(erf(np.sqrt(10)*0.3) + erf(np.sqrt(10)*0.7))  # ≈ 0.5096
 
 N = 5000
 

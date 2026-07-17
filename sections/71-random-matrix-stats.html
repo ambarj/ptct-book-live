@@ -202,9 +202,10 @@
                 <div class="question-explanation" style="display:none;">
                     <strong>Explanation:</strong>
                     For uniform entries in [-1, 1], the probability of \( \Delta < 0 \) is
-                    exactly \( \frac{1}{2} + \frac{\ln 2}{3} \approx 0.48 \) for the specific
-                    distribution of \( ad - bc \). In practice, you&rsquo;ll see about
-                    <strong>48&ndash;52%</strong> saddles.
+                    exactly \( \tfrac{1}{2} \) by symmetry: \( ad \) and \( bc \) are
+                    independent and identically distributed, so their difference
+                    \( \Delta = ad - bc \) is symmetric about zero — negative exactly half the
+                    time. In practice, you&rsquo;ll see about <strong>49&ndash;51%</strong> saddles.
                 </div>
             </div>
         </div>
@@ -337,7 +338,7 @@
         </div>
 
         <div class="tab-content">
-            <div class="question-container" data-type="msq" data-answer="1,2">
+            <div class="question-container" data-type="msq" data-answer="0,1,2">
                 <div class="question-text">
                     Which observations from the density map are true? (Select all)
                 </div>
@@ -365,7 +366,7 @@
                 <div class="question-explanation" style="display:none;">
                     <strong>Explanation:</strong>
                     <ul>
-                        <li><strong>Spiral &gt; node:</strong> ✗ Inside the parabola (spirals) is not necessarily larger than outside (nodes). It depends on the distribution shape.</li>
+                        <li><strong>Spiral &gt; node:</strong> ✓ Near the origin — where the density of (&tau;, &Delta;) points peaks — &tau;&sup2; is second-order small while 4&Delta; is first-order, so most &Delta; &gt; 0 points satisfy &tau;&sup2; &lt; 4&Delta;. Spirals (~32%) beat nodes (~18%). Check the bar chart!</li>
                         <li><strong>Half are saddles:</strong> ✓ About 50% have &Delta; &lt; 0.</li>
                         <li><strong>Symmetric in &tau;:</strong> ✓ Since a and d are drawn from symmetric distributions, &tau; = a + d is symmetric around 0.</li>
                         <li><strong>Centers common:</strong> ✗ Centers require &tau; = 0 exactly — a set of measure zero. They&rsquo;re infinitely rare among random matrices.</li>
@@ -439,7 +440,7 @@
                 <div class="question-options">
                     <label class="option">
                         <input type="radio" name="rm-q7" value="0">
-                        <span>Saddle &gt;&gt; Stable Node &asymp; Unstable Node &gt; Stable Spiral &asymp; Unstable Spiral</span>
+                        <span>Saddle &gt;&gt; Stable Spiral &asymp; Unstable Spiral &gt; Stable Node &asymp; Unstable Node</span>
                     </label>
                     <label class="option">
                         <input type="radio" name="rm-q7" value="1">
@@ -459,9 +460,10 @@
                 </div>
                 <div class="question-explanation" style="display:none;">
                     <strong>Explanation:</strong>
-                    Saddles dominate (~50%). The remaining ~50% splits between the &Delta; &gt; 0
-                    region. Nodes (outside the parabola) are more common than spirals (inside)
-                    because the parabola &tau;&sup2; = 4&Delta; carves out a relatively small region.
+                    Saddles dominate (~50%). Within the &Delta; &gt; 0 half, spirals (~16% each)
+                    beat nodes (~9% each): the (&tau;, &Delta;) density peaks near the origin, where
+                    &tau;&sup2; is second-order small while 4&Delta; is first-order — so most
+                    &Delta; &gt; 0 points fall <em>inside</em> the parabola &tau;&sup2; &lt; 4&Delta;.
                     Stable and unstable are symmetric (~equal shares within each type).
                 </div>
             </div>
@@ -504,7 +506,7 @@
         </div>
 
         <div class="tab-content">
-            <div class="question-container" data-type="fill" data-answer="node">
+            <div class="question-container" data-type="fill" data-answer="spiral">
                 <div class="question-text">
                     Among non-saddle matrices (&Delta; &gt; 0), is a random matrix more
                     likely to be a node or a spiral?
@@ -521,8 +523,10 @@
                 <div class="question-explanation" style="display:none;">
                     <strong>Explanation:</strong>
                     The parabola &tau;&sup2; = 4&Delta; separates nodes (outside) from spirals
-                    (inside). For random matrices, the region outside the parabola is larger than
-                    the region inside, making <strong>nodes</strong> more common than spirals.
+                    (inside). Random matrices concentrate near the origin of the (&tau;, &Delta;)
+                    plane, where &tau;&sup2; (second-order small) almost always loses to 4&Delta;
+                    (first-order) — so most &Delta; &gt; 0 samples land <em>inside</em> the parabola,
+                    making <strong>spirals</strong> more common than nodes (~32% vs ~18%).
                     Run the experiment and check the bar chart to verify.
                 </div>
             </div>

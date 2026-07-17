@@ -47,8 +47,9 @@
     Adjust the frequencies and phases to create different patterns.  The left
     panel shows the parametric curve \( (x(t), y(t)) \); the right panel shows
     the individual oscillations \( x(t) \) and \( y(t) \) in the time domain.
-    Start with \( \omega_x = 1 \), \( \omega_y = 2 \), \( \Delta\phi = 0 \)
-    to see a figure-8, then explore.
+    Start with \( \omega_x = 1 \), \( \omega_y = 2 \), and phase
+    \( \phi_y = 90^\circ \) to see a figure-8 &mdash; then set \( \phi_y = 0 \)
+    and watch it collapse into a parabola.
 </p>
 
 <div class="interactive-container" id="lissajous-generator">
@@ -175,7 +176,7 @@
         <div class="tab-content">
             <div class="question-container" data-type="mcq" data-answer="2">
                 <div class="question-text">
-                    Set &omega;<sub>x</sub> = 1, &omega;<sub>y</sub> = 2, &phi;<sub>y</sub> = 0.
+                    Set &omega;<sub>x</sub> = 1, &omega;<sub>y</sub> = 2, &phi;<sub>y</sub> = 90&deg;.
                     How many lobes does the figure have?
                 </div>
                 <div class="question-options">
@@ -203,10 +204,12 @@
                     <div class="question-explanation-title">Explanation</div>
                     <div class="question-explanation-text">
                         With \( \omega_y = 2\omega_x \), the \( y \)-oscillation completes
-                        two full cycles for every one \( x \)-cycle.  This creates a
-                        figure-8 with two lobes.  In general, the number of lobes
-                        in the \( y \)-direction equals the frequency ratio's numerator
-                        when expressed as a simple fraction.
+                        two full cycles for every one \( x \)-cycle.  At
+                        \( \phi_y = 90^\circ \) this traces a figure-8 with two lobes.
+                        (At \( \phi_y = 0 \) the same 1:2 ratio collapses onto the parabola
+                        \( y = 2x^2 - 1 \) &mdash; try it!)  In general, the number of lobes
+                        stacked in the \( y \)-direction equals \( \omega_y/\omega_x \)
+                        when the ratio is a simple fraction.
                     </div>
                 </div>
             </div>
@@ -214,7 +217,7 @@
 
         <!-- Q3: Fill -->
         <div class="tab-content">
-            <div class="question-container" data-type="fill" data-answer="3[2.8,3.2]">
+            <div class="question-container" data-type="fill" data-answer="2[1.8,2.2]">
                 <div class="question-text">
                     Set &omega;<sub>x</sub> = 2, &omega;<sub>y</sub> = 3.  Count the
                     number of times the curve touches the right edge (x = 1).
@@ -227,13 +230,13 @@
                 <div class="question-explanation" style="display: none;">
                     <div class="question-explanation-title">Explanation</div>
                     <div class="question-explanation-text">
-                        The curve touches \( x = 1 \) whenever \( \cos(\omega_x t) = 1 \),
-                        which happens at \( t = 0, 2\pi/\omega_x, 4\pi/\omega_x, \ldots \).
-                        In the time it takes the \( y \)-oscillation to complete 2 full cycles
-                        (\( T = 2 \times 2\pi/\omega_y = 4\pi/3 \)), the \( x \)-oscillation
-                        reaches its peak \( \omega_x / \omega_y \times 2 = 4/3 \times \ldots \)
-                        &mdash; actually, the simpler way: the curve touches the right edge
-                        \( \omega_y / \gcd = 3 \) times per period.  Count them in the figure!
+                        The curve touches \( x = 1 \) whenever \( \cos(\omega_x t) = 1 \).
+                        Over one closed period of the pattern that happens
+                        \( \omega_x/\gcd(\omega_x,\omega_y) = 2 \) times &mdash; so the
+                        right edge is touched <strong>2</strong> times.  (The top edge,
+                        by the same argument with \( y \), is touched
+                        \( \omega_y/\gcd = 3 \) times.)  Counting edge touches is the
+                        classic trick for reading a frequency ratio off an oscilloscope.
                     </div>
                 </div>
             </div>
@@ -276,8 +279,8 @@
                 <option value="line">Straight Line (1:1, &Delta;&phi;=0&deg;)</option>
                 <option value="circle" selected>Circle (1:1, &Delta;&phi;=90&deg;)</option>
                 <option value="ellipse">Ellipse (1:1, &Delta;&phi;=45&deg;)</option>
-                <option value="figure8">Figure-8 (1:2, &Delta;&phi;=0&deg;)</option>
-                <option value="bowtie">Bowtie (1:2, &Delta;&phi;=90&deg;)</option>
+                <option value="figure8">Figure-8 (1:2, &Delta;&phi;=90&deg;)</option>
+                <option value="bowtie">Parabola (1:2, &Delta;&phi;=0&deg;)</option>
                 <option value="trefoil">Trefoil (2:3, &Delta;&phi;=0&deg;)</option>
                 <option value="star">Star (3:4, &Delta;&phi;=0&deg;)</option>
             </select>
@@ -300,7 +303,7 @@
     <p>
         The frequency ratio determines the <strong>number of lobes</strong>:
         a 1:2 ratio gives 2 lobes (figure-8), a 2:3 ratio gives a trefoil with
-        3 tangent points on the right edge and 2 on the top.  The phase difference
+        2 tangent points on the right edge and 3 on the top.  The phase difference
         controls the <strong>orientation</strong> and <strong>openness</strong>
         of the figure.  At certain "magic" phases, the curve simplifies dramatically
         (e.g., a parabola-like shape at 1:2 with \( \Delta\phi = 0 \)).
@@ -444,7 +447,7 @@
                             <li><strong>True:</strong> A 3:4 ratio has more loops and crossings than
                                 a 1:2.  The number of crossings grows with the sum \( p + q \).</li>
                             <li><strong>True:</strong> Count the tangent points on the right edge
-                                (\( = \omega_y/\gcd \)) and top edge (\( = \omega_x/\gcd \)) to
+                                (\( = \omega_x/\gcd \)) and top edge (\( = \omega_y/\gcd \)) to
                                 read off the frequency ratio directly from the figure.</li>
                         </ul>
                     </div>
@@ -576,7 +579,7 @@
 
         <!-- Q8: Fill -->
         <div class="tab-content">
-            <div class="question-container" data-type="fill" data-answer="5[4.5,5.5]">
+            <div class="question-container" data-type="fill" data-answer="3[2.8,3.2]">
                 <div class="question-text">
                     For a frequency ratio of 5/3, how many cycles of the slower
                     oscillation are needed for the curve to close?
@@ -589,17 +592,13 @@
                 <div class="question-explanation" style="display: none;">
                     <div class="question-explanation-title">Explanation</div>
                     <div class="question-explanation-text">
-                        If \( \omega_x/\omega_y = 5/3 \), the fast oscillation (\( \omega_x \))
-                        completes 5 cycles while the slow one (\( \omega_y \)) completes 3.
-                        But the curve needs \( q \) cycles of the slow oscillation and \( p \) of
-                        the fast one, where \( p/q = 5/3 \) in lowest terms.  So you need
-                        \( q = 3 \) slow cycles... Wait &mdash; actually, the slider counts
-                        \( \omega_y \)-cycles, so you need \( p = 5 \) cycles.  Set the ratio to
-                        1.667 (5/3), cycles to 5, and check if it closes.  The rule:
-                        you need the <strong>denominator</strong> of the ratio in lowest terms
-                        cycles of the reference (\( \omega_y \)) oscillation &mdash; that's
-                        3 cycles.  But since our cycle counter tracks \( \omega_y \), we need
-                        5 for the \( x \)-oscillation.  Try it!
+                        With \( \omega_x/\omega_y = 5/3 \), the fast oscillation completes
+                        5 cycles in exactly the time the slow one completes 3 &mdash; and at
+                        that moment both are back at their starting values, so the curve
+                        closes.  You need <strong>3</strong> cycles of the slower
+                        oscillation (which is what the cycles slider counts).  Set the
+                        ratio to 1.667 (= 5/3) and cycles to 3 to check that the gap
+                        closes; at 2 cycles it visibly doesn't.
                     </div>
                 </div>
             </div>
@@ -786,9 +785,9 @@ Tasks:
    - Increase t_max to 100π and see the difference
 
 4. Pattern identification:
-   - Given a frequency ratio p:q, predict:
-     - Number of tangent points on right edge = q
-     - Number of tangent points on top edge = p
+   - Given a frequency ratio p:q (= ωx:ωy), predict:
+     - Number of tangent points on right edge = p
+     - Number of tangent points on top edge = q
    - Verify for several ratios
 
 Use plotly_dark template. Gray axes (#808080). Equal axis scales.</code></pre>

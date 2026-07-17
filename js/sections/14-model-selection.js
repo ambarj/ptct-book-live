@@ -94,6 +94,61 @@
         return { coeffs: coeffs, chi2: chi2, dof: n - p, errors: covDiag };
     }
 
+    // Weighted least squares over an arbitrary monomial basis:
+    // y = sum_k a_k * t^powers[k]. Used by the Parsimony Meter, whose model
+    // ladder must be anchored on the physical ct² term — a constant-anchored
+    // polynomial family can't represent the true signal at all and makes BIC
+    // pick 3 params no matter what.
+    function fitPowers(powers, ts, ys, ws) {
+        var n = ts.length, p = powers.length;
+        var M = [], v = [];
+        for (var i = 0; i < p; i++) {
+            M[i] = [];
+            for (var j = 0; j < p; j++) M[i][j] = 0;
+            v[i] = 0;
+        }
+        for (var k = 0; k < n; k++) {
+            var t = ts[k], w = ws[k], y = ys[k];
+            for (var i = 0; i < p; i++) {
+                var ti = Math.pow(t, powers[i]);
+                for (var j = 0; j < p; j++) M[i][j] += w * ti * Math.pow(t, powers[j]);
+                v[i] += w * y * ti;
+            }
+        }
+        var aug = [];
+        for (var i = 0; i < p; i++) {
+            aug[i] = M[i].slice();
+            aug[i][p] = v[i];
+        }
+        for (var col = 0; col < p; col++) {
+            var maxR = col, maxV = Math.abs(aug[col][col]);
+            for (var r = col + 1; r < p; r++) {
+                if (Math.abs(aug[r][col]) > maxV) { maxV = Math.abs(aug[r][col]); maxR = r; }
+            }
+            if (maxR !== col) { var tmp = aug[col]; aug[col] = aug[maxR]; aug[maxR] = tmp; }
+            if (Math.abs(aug[col][col]) < 1e-15) continue;
+            for (var r = col + 1; r < p; r++) {
+                var f = aug[r][col] / aug[col][col];
+                for (var c = col; c <= p; c++) aug[r][c] -= f * aug[col][c];
+            }
+        }
+        var coeffs = [];
+        for (var i = 0; i < p; i++) coeffs[i] = 0;
+        for (var i = p - 1; i >= 0; i--) {
+            var s = aug[i][p];
+            for (var j = i + 1; j < p; j++) s -= aug[i][j] * coeffs[j];
+            coeffs[i] = s / aug[i][i];
+        }
+        var chi2 = 0;
+        for (var k = 0; k < n; k++) {
+            var yfit = 0;
+            for (var j = 0; j < p; j++) yfit += coeffs[j] * Math.pow(ts[k], powers[j]);
+            var r = ys[k] - yfit;
+            chi2 += ws[k] * r * r;
+        }
+        return { coeffs: coeffs, chi2: chi2, dof: n - p };
+    }
+
     function invertMatrix(M, n) {
         // Augmented matrix [M | I]
         var A = [];
@@ -378,13 +433,15 @@
         var ws = [];
         for (var i = 0; i < N_TIMES; i++) ws[i] = 1 / (parsErrors[i] * parsErrors[i]);
 
-        // Fit models with 1-5 params
+        // Fit models with 1-5 params, anchored on the physical ct² term
+        // (matches the ladder used in section 13's automated fitting)
+        var POWER_SETS = [[2], [1, 2], [0, 1, 2], [0, 1, 2, 3], [0, 1, 2, 3, 4]];
         var fits = [];
-        for (var p = 1; p <= 5; p++) {
-            fits.push(fitPoly(p, TIMES, parsMeans, ws));
+        for (var p = 0; p < 5; p++) {
+            fits.push(fitPowers(POWER_SETS[p], TIMES, parsMeans, ws));
         }
 
-        var labels = ['1-param', '2-param', '3-param', '4-param', '5-param'];
+        var labels = ['1p: ct²', '2p: bt+ct²', '3p: a+bt+ct²', '4p: +dt³', '5p: +et⁴'];
 
         // LEFT: χ²/dof bars
         var chi2dofs = [], colors1 = [];

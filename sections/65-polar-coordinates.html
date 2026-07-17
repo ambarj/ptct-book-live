@@ -385,10 +385,12 @@
                     <strong>Explanation:</strong>
                     \( h(r) = r(1-r^2)(r^2-4) \) has zeros at \( r = 0, 1, 2 \). For \( r > 0 \),
                     there are <strong>two</strong> limit cycles: at \( r = 1 \) (where \( h \)
-                    goes from + to &minus;, so stable) and at \( r = 2 \) (where \( h \) goes
-                    from &minus; to +, so unstable). The unstable limit cycle acts as a
-                    &ldquo;watershed&rdquo; between trajectories attracted to r = 1 and those
-                    escaping to infinity.
+                    goes from &minus; to +, so <strong>unstable</strong>) and at \( r = 2 \)
+                    (where \( h \) goes from + to &minus;, so <strong>stable</strong>) &mdash;
+                    check the sign of \( h \) at r = 0.5, 1.5, 2.5 to confirm. The unstable
+                    cycle at r = 1 is the &ldquo;watershed&rdquo;: trajectories starting inside it
+                    collapse to the origin, while everything outside converges to the stable cycle
+                    at r = 2.
                 </div>
             </div>
         </div>
@@ -533,7 +535,7 @@
                     </label>
                     <label class="option">
                         <input type="checkbox" value="3">
-                        <span>Limit cycles appear as stable fixed points of the radial equation ṙ = h(r)</span>
+                        <span>Limit cycles appear as fixed points of the radial equation ṙ = h(r)</span>
                     </label>
                 </div>
                 <div class="question-actions">

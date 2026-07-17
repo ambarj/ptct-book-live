@@ -128,12 +128,21 @@ function verifyFill(container) {
     let allCorrect = true;
     blanks.forEach((blank, index) => {
         const userAnswer = blank.value.trim();
-        const correctAnswer = correctAnswers[index];
 
         blank.disabled = true;
 
-        // Check if answer is correct
-        if (isAnswerCorrect(userAnswer, correctAnswer)) {
+        // With a single blank, every |-separated piece is an accepted alternative
+        // (e.g. data-answer="dense|close|tight"). With multiple blanks, pieces map
+        // one-to-one to blanks in order.
+        let correct;
+        if (blanks.length === 1) {
+            correct = correctAnswers.some(ans => isAnswerCorrect(userAnswer, ans));
+        } else {
+            const correctAnswer = correctAnswers[index];
+            correct = correctAnswer !== undefined && isAnswerCorrect(userAnswer, correctAnswer);
+        }
+
+        if (correct) {
             blank.classList.add('correct');
         } else {
             blank.classList.add('incorrect');
@@ -148,7 +157,9 @@ function verifyFill(container) {
 // Supports text, exact numbers, and numerical ranges
 function isAnswerCorrect(userAnswer, correctAnswer) {
     // Check for numerical range format: "3.1415[3.1414,3.1416]"
-    const rangeMatch = correctAnswer.match(/^([\d.]+)\[([\d.]+),([\d.]+)\]$/);
+    // Supports negative numbers and scientific notation, e.g. "-1[-1.1,-0.9]", "2e-7[1.5e-7,2.5e-7]"
+    const num = '-?[\\d.]+(?:e-?\\d+)?';
+    const rangeMatch = correctAnswer.match(new RegExp(`^(${num})\\[(${num}),(${num})\\]$`, 'i'));
 
     if (rangeMatch) {
         // Numerical range answer

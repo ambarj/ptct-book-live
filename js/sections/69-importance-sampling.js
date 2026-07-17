@@ -27,7 +27,7 @@
     var integrands = {
         peaked: {
             f: function(x) { return Math.exp(-10 * (x - 0.7) * (x - 0.7)); },
-            a: 0, b: 1, trueVal: 0.280, label: 'e^(-10(x-0.7)²)',
+            a: 0, b: 1, trueVal: 0.5096, label: 'e^(-10(x-0.7)²)',
             pMu: 0.7, pSigma: 0.22
         },
         exponential: {
@@ -37,7 +37,7 @@
         },
         oscillatory: {
             f: function(x) { var c = Math.cos(50 * x); return c * c * Math.exp(-x); },
-            a: 0, b: 3, trueVal: 0.488, label: 'cos²(50x)·e^(-x)',
+            a: 0, b: 3, trueVal: 0.4749, label: 'cos²(50x)·e^(-x)',
             pMu: 0.5, pSigma: 0.8
         }
     };

@@ -175,6 +175,19 @@
 
         const yLand = -Math.tan(phi) * xLand + Gamma;
 
+        // Axis ranges depend only on Γ and φ (worst case over all launch
+        // angles), so moving the θ slider never rescales the plot and
+        // trajectories stay visually comparable
+        let xAxisMax = 2;
+        for (let deg = 5; deg <= 85; deg += 2) {
+            const th = deg * Math.PI / 180;
+            const a = -Gamma / (2 * Math.cos(th) * Math.cos(th));
+            const b = Math.tan(th) + Math.tan(phi);
+            xAxisMax = Math.max(xAxisMax, -b / a);
+        }
+        const yAxisMax = Gamma + 0.5 / Gamma;
+        const yAxisMin = Math.min(-0.3, -Math.tan(phi) * xAxisMax + Gamma - 0.3);
+
         // Generate trajectory
         const xTraj = [];
         const yTraj = [];
@@ -188,11 +201,11 @@
             yTraj.push(y);
         }
 
-        // Hill line
+        // Hill line spans the full (fixed) axis range
         const xHill = [];
         const yHill = [];
         for (let i = 0; i < 50; i++) {
-            const x = xMax * 1.1 * i / 49;
+            const x = xAxisMax * 1.1 * i / 49;
             xHill.push(x);
             yHill.push(-Math.tan(phi) * x + Gamma);
         }
@@ -235,9 +248,6 @@
             name: 'Launch'
         };
 
-        const yMax = Math.max(Gamma * 1.5, yLand + 0.5, 1);
-        const yMin = Math.min(-0.5, yLand - 0.3);
-
         const layout = {
             template: 'plotly_dark',
             paper_bgcolor: '#0a0e27',
@@ -245,18 +255,15 @@
             margin: { l: 60, r: 30, t: 30, b: 50 },
             xaxis: {
                 title: 'x̄ (dimensionless)',
-                range: [-0.3, xMax * 1.1],
+                range: [-0.3, xAxisMax * 1.1],
                 gridcolor: '#2a2f4a',
-                zerolinecolor: '#808080',
-                scaleanchor: 'y',
-                constrain: 'domain'
+                zerolinecolor: '#808080'
             },
             yaxis: {
                 title: 'ȳ (dimensionless)',
-                range: [yMin, yMax],
+                range: [yAxisMin, yAxisMax],
                 gridcolor: '#2a2f4a',
-                zerolinecolor: '#808080',
-                constrain: 'domain'
+                zerolinecolor: '#808080'
             },
             showlegend: true,
             legend: {
@@ -331,7 +338,7 @@
                 'Time': 'v/g',
                 'Velocity': 'v'
             },
-            dimensionless: 'x̄ = τ cos θ, ȳ = τ sin θ - ½τ²',
+            dimensionless: 'x̄″ = 0, ȳ″ = -1  (using τ = tg/v, x̄ = x/(v²/g))',
             plotData: function() {
                 const x = [];
                 const y = [];
@@ -346,12 +353,12 @@
         },
         falling: {
             title: 'Falling with Linear Drag',
-            equation: 'mẍ = mg - bv',
+            equation: 'mv̇ = mg - bv',
             variables: ['m (mass)', 'g (gravity)', 'b (drag coefficient)'],
             scales: {
                 'Velocity': 'v_term = mg/b',
                 'Time': 'm/b',
-                'Length': 'mg²/b² or m²g/b²'
+                'Length': 'm²g/b² = v_term · (m/b)'
             },
             dimensionless: 'V̇ = 1 - V  (using τ = bt/m, V = v/v_term)',
             plotData: function() {

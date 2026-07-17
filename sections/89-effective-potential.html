@@ -276,10 +276,10 @@
             </div>
         </div>
         <div class="tab-content">
-            <div class="question-container" data-type="fill" data-answer="0.30[0.20,0.40]|1.7[1.4,2.0]">
+            <div class="question-container" data-type="fill" data-answer="0.586[0.5,0.7]|3.414[3.2,3.6]">
                 <div class="question-text">For Kepler with \( k = \ell = \mu = 1 \) and \( E = E_{\text{min}}/2 = -0.25 \): the closer turning point (perihelion) is at \( \rho_{\text{min}} \approx \) <input type="text" class="fill-blank" style="width:60px"> and the farther turning point (aphelion) is at \( \rho_{\text{max}} \approx \) <input type="text" class="fill-blank" style="width:60px">. (Click "E_min/2 (bound)" and read off from the stats bar.)</div>
                 <div class="question-actions"><button class="btn-verify">Verify</button></div>
-                <div class="question-explanation" style="display:none;"><strong>Explanation:</strong> Solve \( U_{\text{eff}}(\rho) = E \): \( -1/\rho + 1/(2\rho^2) = -1/4 \). Multiply by \( -4\rho^2 \): \( 4\rho - 2 = \rho^2 \) ⇒ \( \rho^2 - 4\rho + 2 = 0 \) ⇒ \( \rho = 2 \pm \sqrt{2} \). So \( \rho_{\text{min}} = 2 - \sqrt{2} \approx 0.586 \) and \( \rho_{\text{max}} = 2 + \sqrt{2} \approx 3.414 \). Wait — that's not what we expected for E = E_min/2 = −0.25. Actually with \( k=\ell=\mu=1 \), \( E_{\text{min}} = -0.5 \) so E_min/2 = −0.25, and we get the answers above. The "0.30 ≤ ρ_min ≤ 0.40" ranges in the answer reflect typical reading from the slider; the precise values are 2 ± √2 ≈ 0.586 / 3.414. (Tolerance was set generously to accept slightly off-center reads from the explorer.)</div>
+                <div class="question-explanation" style="display:none;"><strong>Explanation:</strong> Solve \( U_{\text{eff}}(\rho) = E \): \( -1/\rho + 1/(2\rho^2) = -1/4 \). Multiply by \( -4\rho^2 \): \( 4\rho - 2 = \rho^2 \) ⇒ \( \rho^2 - 4\rho + 2 = 0 \) ⇒ \( \rho = 2 \pm \sqrt{2} \). So \( \rho_{\text{min}} = 2 - \sqrt{2} \approx 0.586 \) and \( \rho_{\text{max}} = 2 + \sqrt{2} \approx 3.414 \) — exactly what the stats bar reports. Geometrically these are the perihelion and aphelion of an ellipse with semi-major axis \( a = 2 \) and eccentricity \( e = \sqrt{2}/2 \).</div>
             </div>
         </div>
         <div class="tab-content">

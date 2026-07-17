@@ -303,7 +303,7 @@
         sho:         { a: 0,    b: 1,   c: -1,   d: 0 },
         dampedSHO:   { a: 0,    b: 1,   c: -1,   d: -0.5 },
         predatorPrey:{ a: 0,    b: -2,  c: 1,    d: 0 },
-        competition: { a: -1,   b: -2,  c: -0.5, d: -1 }
+        competition: { a: -1,   b: -2,  c: -1,   d: -1 }
     };
 
     function drawClassifier() {

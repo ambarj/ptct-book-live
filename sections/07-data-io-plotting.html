@@ -396,7 +396,7 @@
                         Try both in the explorer! With 100 points at 40% noise, the shape is visible but fuzzy.
                         With 10 points at 10% noise, the shape is much cleaner.
                         Reducing noise is generally more powerful because statistical averaging only reduces
-                        uncertainty as \( 1/\sqrt{N} \) &mdash; you need 16&times; more data to halve the noise.
+                        uncertainty as \( 1/\sqrt{N} \) &mdash; you need 4&times; more data to halve the noise, and 16&times; to cut it to a quarter (40% &rarr; 10%, as here).
                         But improving the apparatus cuts noise directly. In practice, you do both.
                     </div>
                 </div>
@@ -509,7 +509,7 @@
                         The exponential \( y = 10 \, e^{-0.3x} \) becomes a straight line on a semi-log plot.
                         Why? Taking the log: \( \ln y = \ln 10 - 0.3x \), which is linear in \( x \).
                         The slope of this line gives the decay constant (0.3), and the y-intercept gives
-                        the amplitude (ln 10 &asymp; 2.3). This is how physicists extract decay rates
+                        the amplitude 10 (in \( \ln y \) coordinates the intercept reads \( \ln 10 \approx 2.3 \)). This is how physicists extract decay rates
                         from experimental data.
                     </div>
                 </div>

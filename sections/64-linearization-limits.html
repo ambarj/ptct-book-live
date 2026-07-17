@@ -300,8 +300,8 @@
                 </div>
                 <div class="question-explanation" style="display:none;">
                     <strong>Explanation:</strong>
-                    The nonlinear term \( \epsilon r^2 \) adds a radial drift proportional to
-                    \( r^2 \). When \( \epsilon > 0 \), this drift is outward: trajectories
+                    The nonlinear term adds a radial drift \( \dot{r} = \epsilon r^3 \).
+                    When \( \epsilon > 0 \), this drift is outward: trajectories
                     spiral away from the origin. The Jacobian at the origin is unchanged
                     (still &lambda; = &plusmn;i&omega;), but the actual behavior is now an
                     <strong>unstable spiral</strong>. Linearization completely misses this.
@@ -310,7 +310,7 @@
         </div>
 
         <div class="tab-content">
-            <div class="question-container" data-type="fill" data-answer="stable spiral">
+            <div class="question-container" data-type="fill" data-answer="inward|stable spiral">
                 <div class="question-text">
                     Set \( \epsilon = -0.2 \). The trajectories now spiral
                     <select class="fill-blank-select">

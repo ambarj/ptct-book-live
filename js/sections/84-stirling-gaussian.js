@@ -62,7 +62,10 @@
             var s = stirling(n);
             exact.push(e);
             stirl.push(s);
-            relErr.push(e > 0 ? Math.abs(e - s) / e * 100 : 0);
+            // |ln(exact) − ln(Stirling)| IS the fractional error of N! itself
+            // (dividing by ln(N!) would give the error of the logarithm instead,
+            // which never matches the 1/(12N) reference line)
+            relErr.push(Math.abs(e - s) * 100);
         }
 
         Plotly.react('sg-factPlot', [

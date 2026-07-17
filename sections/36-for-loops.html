@@ -525,7 +525,7 @@
         <div class="tab-content">
             <div class="question-container" data-type="fill" data-answer="halves|doubles">
                 <div class="question-text">
-                    For the <strong>decay</strong> ODE (\(dx/dt = -2x\)), compare the final error at
+                    For the <strong>growth</strong> ODE (\(dx/dt = x\)), compare the final error at
                     \(h = 0.40\) vs.&nbsp;\(h = 0.20\). When you halve the step size, the error roughly:
                     <select class="fill-blank-select">
                         <option value=""></option>
@@ -549,7 +549,8 @@
                 </div>
                 <div class="question-explanation" style="display:none;">
                     <strong>Explanation:</strong>
-                    Euler&rsquo;s method is <em>first-order accurate</em>: halving \(h\) roughly halves the error.
+                    Euler&rsquo;s method is <em>first-order accurate</em>: halving \(h\) roughly halves the error
+                    (for the growth ODE the final errors are &asymp;9.8 vs &asymp;4.7 &mdash; a ratio of about 2).
                     But you need twice as many steps to cover the same time interval.
                     This accuracy&ndash;cost tradeoff is the central tension in all numerical methods.
                 </div>

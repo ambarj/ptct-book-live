@@ -17,10 +17,24 @@
 
             if (mag < 0.01) break;
 
-            x += dt * fx / mag;
-            y += dt * fy / mag;
+            // Midpoint step (normalized to constant arc length): forward
+            // Euler makes closed streamlines (vortex circles) spiral outward
+            const xm = x + 0.5 * dt * fx / mag;
+            const ym = y + 0.5 * dt * fy / mag;
+            const [fx2, fy2] = fieldFunc(xm, ym);
+            const mag2 = Math.sqrt(fx2 * fx2 + fy2 * fy2);
+            if (mag2 < 0.01) break;
+
+            x += dt * fx2 / mag2;
+            y += dt * fy2 / mag2;
 
             if (Math.abs(x) > bounds || Math.abs(y) > bounds) break;
+
+            // The step size is fixed at dt, so a particle that reaches an
+            // attractor (sink, spiral center) bounces back and forth across
+            // it forever. Detect the oscillation and stop there cleanly.
+            const n = pathX.length;
+            if (n >= 2 && Math.hypot(x - pathX[n - 2], y - pathY[n - 2]) < 0.5 * dt) break;
 
             pathX.push(x);
             pathY.push(y);
@@ -94,6 +108,17 @@
                 startPoints.push({ x: t, y: 3 });
                 startPoints.push({ x: t, y: -3 });
             }
+        } else if (flowType === 'vortex') {
+            // Vortex streamlines are concentric circles: vary the seed radius,
+            // otherwise every line traces the same single circle
+            for (let i = 0; i < numLines; i++) {
+                const angle = (2 * Math.PI * i) / numLines;
+                const radius = 0.4 + (2.8 * i) / Math.max(numLines - 1, 1);
+                startPoints.push({
+                    x: radius * Math.cos(angle),
+                    y: radius * Math.sin(angle)
+                });
+            }
         } else {
             // Circular starting points for radial/rotational flows
             for (let i = 0; i < numLines; i++) {
@@ -108,7 +133,7 @@
 
         // Trace streamlines
         startPoints.forEach((start, idx) => {
-            const path = traceStreamline(start.x, start.y, fieldFunc, 0.03, 600, 4);
+            const path = traceStreamline(start.x, start.y, fieldFunc, 0.03, 800, 4);
             const color = colors[idx % colors.length];
 
             traces.push({
@@ -135,7 +160,7 @@
                                 symbol: 'triangle-up',
                                 size: 8,
                                 color: color,
-                                angle: Math.atan2(dy, dx) * 180 / Math.PI - 90
+                                angle: 90 - Math.atan2(dy, dx) * 180 / Math.PI
                             },
                             showlegend: false,
                             hoverinfo: 'skip'
@@ -275,7 +300,7 @@
                         symbol: 'triangle-up',
                         size: 8,
                         color: colors[i],
-                        angle: Math.atan2(dy, dx) * 180 / Math.PI - 90
+                        angle: 90 - Math.atan2(dy, dx) * 180 / Math.PI
                     },
                     showlegend: false,
                     hoverinfo: 'skip'
@@ -391,63 +416,83 @@
         const config = configSelect.value;
         const separation = parseFloat(separationSlider.value);
 
-        // Define combined field based on configuration
+        // The separation slider has no effect on the co-located
+        // source + vortex combination, so grey it out there
+        separationSlider.disabled = (config === 'source-vortex');
+
+        // Point sources/sinks with a physical 1/r falloff (2D flux
+        // conservation). A unit-magnitude model would make the field
+        // exactly zero along the whole axis outside a dipole, producing
+        // spurious stagnation lines and wrong streamline shapes.
+        function pointFlow(x, y, x0, y0, s) {
+            const r2 = (x - x0) ** 2 + (y - y0) ** 2 || 0.0001;
+            return [s * (x - x0) / r2, s * (y - y0) / r2];
+        }
+
         function combinedField(x, y) {
             const d = separation / 2;
+            let pts;
 
             if (config === 'dipole') {
-                // Source at (-d, 0), Sink at (+d, 0)
-                const r1 = Math.sqrt((x + d) ** 2 + y ** 2) || 0.01;
-                const r2 = Math.sqrt((x - d) ** 2 + y ** 2) || 0.01;
-                const fx = (x + d) / r1 - (x - d) / r2;
-                const fy = y / r1 - y / r2;
-                return [fx, fy];
+                pts = [{ x: -d, y: 0, s: 1 }, { x: d, y: 0, s: -1 }];
             } else if (config === 'two-sources') {
-                const r1 = Math.sqrt((x + d) ** 2 + y ** 2) || 0.01;
-                const r2 = Math.sqrt((x - d) ** 2 + y ** 2) || 0.01;
-                return [(x + d) / r1 + (x - d) / r2, y / r1 + y / r2];
+                pts = [{ x: -d, y: 0, s: 1 }, { x: d, y: 0, s: 1 }];
             } else if (config === 'two-sinks') {
-                const r1 = Math.sqrt((x + d) ** 2 + y ** 2) || 0.01;
-                const r2 = Math.sqrt((x - d) ** 2 + y ** 2) || 0.01;
-                return [-(x + d) / r1 - (x - d) / r2, -y / r1 - y / r2];
+                pts = [{ x: -d, y: 0, s: -1 }, { x: d, y: 0, s: -1 }];
             } else if (config === 'quadrupole') {
-                // +/- at corners
-                const pts = [
+                pts = [
                     { x: -d, y: -d, s: 1 },
                     { x: d, y: -d, s: -1 },
                     { x: d, y: d, s: 1 },
                     { x: -d, y: d, s: -1 }
                 ];
-                let fx = 0, fy = 0;
-                pts.forEach(p => {
-                    const r = Math.sqrt((x - p.x) ** 2 + (y - p.y) ** 2) || 0.01;
-                    fx += p.s * (x - p.x) / r;
-                    fy += p.s * (y - p.y) / r;
-                });
-                return [fx, fy];
             } else if (config === 'source-vortex') {
                 const r = Math.sqrt(x ** 2 + y ** 2) || 0.01;
-                return [x / r - y / r, y / r + x / r];
+                return [(x - y) / r, (y + x) / r];
+            } else {
+                return [0, 0];
             }
 
-            return [0, 0];
+            let fx = 0, fy = 0;
+            pts.forEach(p => {
+                const [px, py] = pointFlow(x, y, p.x, p.y, p.s);
+                fx += px;
+                fy += py;
+            });
+            return [fx, fy];
         }
 
-        // Trace streamlines from boundary
         const traces = [];
         const colors = ['#00f3ff', '#ff00ff', '#ffff00', '#00ff9f', '#4ecdc4', '#a855f7'];
+        const d = separation / 2;
 
-        const startPoints = [];
-        for (let i = 0; i < 8; i++) {
-            const t = -3 + (6 * i) / 7;
-            startPoints.push({ x: t, y: 3.5 });
-            startPoints.push({ x: t, y: -3.5 });
-            startPoints.push({ x: 3.5, y: t });
-            startPoints.push({ x: -3.5, y: t });
-        }
+        // Seed streamlines from small rings around each source (traced
+        // forward, with the flow) and each sink (traced backward, against
+        // the flow). Boundary-only seeding misses the source→sink arcs
+        // entirely because boundary flow exits the plot immediately.
+        const reversedField = (x, y) => {
+            const [fx, fy] = combinedField(x, y);
+            return [-fx, -fy];
+        };
 
-        startPoints.forEach((start, idx) => {
-            const path = traceStreamline(start.x, start.y, combinedField, 0.02, 800, 4);
+        const markers = getConfigMarkers(config, d);
+        const seeds = [];
+        const linesPerPoint = 14;
+        markers.labels.forEach((label, k) => {
+            const isSource = label.indexOf('Source') !== -1;
+            for (let i = 0; i < linesPerPoint; i++) {
+                const angle = (2 * Math.PI * i) / linesPerPoint;
+                seeds.push({
+                    x: markers.x[k] + 0.12 * Math.cos(angle),
+                    y: markers.y[k] + 0.12 * Math.sin(angle),
+                    backward: !isSource
+                });
+            }
+        });
+
+        seeds.forEach((start, idx) => {
+            const path = traceStreamline(start.x, start.y,
+                start.backward ? reversedField : combinedField, 0.02, 900, 4.2);
             if (path.x.length > 5) {
                 traces.push({
                     x: path.x,
@@ -461,8 +506,6 @@
         });
 
         // Mark sources/sinks
-        const d = separation / 2;
-        const markers = getConfigMarkers(config, d);
         if (markers.x.length > 0) {
             traces.push({
                 x: markers.x,
@@ -553,23 +596,47 @@
     }
 
     function findStagnationPoints(field, config, d) {
-        const points = [];
+        // Grid-scan |F| for local minima, then refine each candidate with a
+        // shrinking local search. No hardcoded candidate list: this finds
+        // every zero in view (e.g. the two-sources midpoint) and correctly
+        // finds none for the dipole, where the flows never cancel.
+        const mag = (x, y) => {
+            const [fx, fy] = field(x, y);
+            return Math.sqrt(fx * fx + fy * fy);
+        };
 
-        // Check likely stagnation locations based on config
         const candidates = [];
-        if (config === 'dipole') {
-            candidates.push({ x: 0, y: 0 });
-        } else if (config === 'two-sources' || config === 'two-sinks') {
-            candidates.push({ x: 0, y: 0 });
-        } else if (config === 'quadrupole') {
-            candidates.push({ x: 0, y: 0 });
+        const step = 0.15;
+        for (let x = -3.6; x <= 3.6; x += step) {
+            for (let y = -3.6; y <= 3.6; y += step) {
+                const m = mag(x, y);
+                if (m < 0.4 &&
+                    m <= mag(x + step, y) && m <= mag(x - step, y) &&
+                    m <= mag(x, y + step) && m <= mag(x, y - step)) {
+                    candidates.push({ x, y });
+                }
+            }
         }
 
+        // Refine each candidate by nested grid search
+        const points = [];
         candidates.forEach(c => {
-            const [fx, fy] = field(c.x, c.y);
-            const mag = Math.sqrt(fx * fx + fy * fy);
-            if (mag < 0.5) {
-                points.push(c);
+            let cx = c.x, cy = c.y, h = step;
+            for (let iter = 0; iter < 6; iter++) {
+                let best = { x: cx, y: cy, m: mag(cx, cy) };
+                for (let i = -2; i <= 2; i++) {
+                    for (let j = -2; j <= 2; j++) {
+                        const m = mag(cx + i * h / 2, cy + j * h / 2);
+                        if (m < best.m) best = { x: cx + i * h / 2, y: cy + j * h / 2, m };
+                    }
+                }
+                cx = best.x;
+                cy = best.y;
+                h /= 2;
+            }
+            if (mag(cx, cy) < 0.05 &&
+                !points.some(p => Math.hypot(p.x - cx, p.y - cy) < 0.3)) {
+                points.push({ x: cx, y: cy });
             }
         });
 

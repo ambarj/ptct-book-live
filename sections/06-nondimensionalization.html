@@ -326,7 +326,7 @@
     </p>
 </div>
 
-<div class="interactive-container">
+<div class="interactive-container" id="projectile-landing-hill">
     <div class="interactive-title">Interactive: Projectile Landing on Hill</div>
 
     <div class="control-panel">
@@ -503,7 +503,7 @@
         </div>
 
         <div class="tab-content">
-            <div class="question-container" data-type="fill" data-answer="45[40,50]">
+            <div class="question-container" data-type="fill" data-answer="35[32,38]">
                 <div class="question-text">
                     Set \( \Gamma = 0.3 \) and \( \phi = 20° \). Experiment with \( \theta \) to find
                     the launch angle that maximizes the landing distance (x-coordinate of magenta dot).
@@ -513,9 +513,12 @@
                 <div class="question-explanation" style="display: none;">
                     <div class="question-explanation-title">Explanation</div>
                     <div class="question-explanation-text">
-                        For \( \Gamma = 0.3 \) and \( \phi = 20° \), the optimal launch angle is around 45°.
-                        This is close to the classic result for flat ground (45°) because the hill slope
-                        is relatively gentle. For steeper hills, the optimal angle shifts!
+                        The optimal launch angle is about 35° — noticeably less than the flat-ground
+                        answer of 45°! Because the hill falls away below the launch point, the projectile
+                        gains extra flight time, and a flatter launch converts that time into horizontal
+                        distance. Working through the algebra gives \( \theta_{\text{opt}} = 45° - \phi/2 \),
+                        independent of \( \Gamma \): for \( \phi = 20° \), that is 35°. The steeper the
+                        hill, the flatter the optimal launch.
                     </div>
                 </div>
                 <div class="question-actions">
@@ -535,7 +538,7 @@
     and see how we identify the characteristic scales.
 </p>
 
-<div class="interactive-container">
+<div class="interactive-container" id="natural-scales-explorer">
     <div class="interactive-title">Interactive: Finding Natural Scales</div>
 
     <div class="control-panel">

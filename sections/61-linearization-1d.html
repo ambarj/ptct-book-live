@@ -352,7 +352,7 @@
                 </div>
                 <div class="question-explanation" style="display:none;">
                     <strong>Explanation:</strong>
-                    Wait &mdash; let&rsquo;s recheck. \( f'(x) = 1 - 3x^2 \).
+                    Compute \( f'(x) = 1 - 3x^2 \) at each fixed point.
                     At \( x = -1 \): \( f'(-1) = 1 - 3 = -2 < 0 \) → <strong>stable</strong>.
                     At \( x = 0 \): \( f'(0) = 1 > 0 \) → <strong>unstable</strong>.
                     At \( x = +1 \): \( f'(1) = -2 < 0 \) → <strong>stable</strong>.
@@ -511,7 +511,7 @@
         </div>
 
         <div class="tab-content">
-            <div class="question-container" data-type="fill" data-answer="0.5[0.3,0.7]">
+            <div class="question-container" data-type="fill" data-answer="2.5[1.5,3.5]">
                 <div class="question-text">
                     Select <strong>Sine (near x = 0)</strong>. The linearized system is
                     \( \dot{y} = y \) (since \( \sin'(0) = 1 \)). Set the deviation to 0.3.
@@ -527,9 +527,11 @@
                     <strong>Explanation:</strong>
                     The sine system has \( f(x) = \sin(x) \approx x - x^3/6 + \cdots \). Near
                     \( x = 0 \), the cubic correction is small but grows as \( x \) increases.
-                    The linearized exponential \( e^t \) matches well until the trajectory reaches
-                    \( x \approx 1 \) where \( \sin(x) \) bends away from \( x \). This happens
-                    around \( t \approx 0.5 \) for \( y_0 = 0.3 \).
+                    The linearized \( 0.3\,e^t \) tracks the exact solution until the trajectory
+                    nears \( x \approx 1 \) (at \( t = \ln(1/0.3) \approx 1.2 \)), where
+                    \( \sin(x) \) bends away from \( x \); the exact solution then saturates
+                    toward \( \pi \) while the exponential keeps growing. On the plot the two
+                    curves visibly separate around \( t \approx 2\text{–}3 \).
                 </div>
             </div>
         </div>

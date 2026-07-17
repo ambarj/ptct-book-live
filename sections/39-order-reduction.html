@@ -461,10 +461,21 @@
                 <div class="question-text">
                     The simple harmonic oscillator \(\ddot{x} = -\omega^2 x\) reduces to:
                     <br><br>
-                    \(dx/dt = \) <input type="text" class="fill-blank" placeholder="?">
+                    \(dx/dt = \) <select class="fill-blank-select">
+                        <option value=""></option>
+                        <option value="v">v</option>
+                        <option value="x">x</option>
+                        <option value="-omega^2*x">&minus;&omega;&sup2;x</option>
+                        <option value="-omega^2*v">&minus;&omega;&sup2;v</option>
+                    </select>
                     <br>
-                    \(dv/dt = \) <input type="text" class="fill-blank" placeholder="?">
-                    <br><em>(Use v for velocity and x for position.)</em>
+                    \(dv/dt = \) <select class="fill-blank-select">
+                        <option value=""></option>
+                        <option value="v">v</option>
+                        <option value="x">x</option>
+                        <option value="-omega^2*x">&minus;&omega;&sup2;x</option>
+                        <option value="-omega^2*v">&minus;&omega;&sup2;v</option>
+                    </select>
                 </div>
                 <div class="question-actions">
                     <button class="btn-verify">Verify</button>

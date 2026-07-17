@@ -116,10 +116,14 @@ function updatePlot(elementId, data, layout = {}) {
 }
 
 // Helper: Generate range array
+// Index-based stepping avoids floating-point drift (e.g. hitting 2.0000000000000004
+// instead of 2), and a non-positive step returns [] instead of looping forever.
 function range(start, end, step = 1) {
+    if (step <= 0) return [];
     const arr = [];
-    for (let i = start; i <= end; i += step) {
-        arr.push(i);
+    const n = Math.floor((end - start) / step + 1e-9);
+    for (let i = 0; i <= n; i++) {
+        arr.push(parseFloat((start + i * step).toFixed(10)));
     }
     return arr;
 }

@@ -976,5 +976,390 @@
     "page": "65-polar-coordinates",
     "anchor": "center-resolver",
     "description": "Center Resolver — resolve spiral vs center via polar analysis"
+  },
+  "MCCC8F": {
+    "page": "66-monte-carlo-intro",
+    "anchor": "dart-board-pi",
+    "description": "Dart Board π Estimator — throw random darts and watch π emerge"
+  },
+  "MCAD1C": {
+    "page": "66-monte-carlo-intro",
+    "anchor": "curse-dimensionality",
+    "description": "Curse of Dimensionality — grid (n^d) vs Monte Carlo (constant N)"
+  },
+  "MC0DEE": {
+    "page": "66-monte-carlo-intro",
+    "anchor": "convergence-watcher",
+    "description": "Convergence Watcher — running estimate with ±1σ band shrinking as 1/√N"
+  },
+  "MC3571": {
+    "page": "67-mc-integration",
+    "anchor": "visual-integrator",
+    "description": "Visual MC Integrator — hit-or-miss vs sample mean side by side"
+  },
+  "MC5D25": {
+    "page": "67-mc-integration",
+    "anchor": "method-comparison",
+    "description": "Method Comparison — error vs N for both methods on the same integral"
+  },
+  "MCCB59": {
+    "page": "67-mc-integration",
+    "anchor": "multi-integrator",
+    "description": "Integrate Anything — sample-mean estimates for four functions at once"
+  },
+  "MC644A": {
+    "page": "68-mc-error-scaling",
+    "anchor": "error-scaling-verifier",
+    "description": "Error Scaling Verifier — log-log fit confirms slope ≈ -1/2"
+  },
+  "MC58C0": {
+    "page": "68-mc-error-scaling",
+    "anchor": "mc-vs-quadrature",
+    "description": "MC vs Trapezoidal — head-to-head log-log error comparison"
+  },
+  "MCB459": {
+    "page": "68-mc-error-scaling",
+    "anchor": "dimensional-crossover",
+    "description": "Dimensional Crossover — grid cost explodes while MC stays flat"
+  },
+  "MC55F2": {
+    "page": "69-importance-sampling",
+    "anchor": "uniform-vs-importance",
+    "description": "Uniform vs Importance — sample locations and convergence side by side"
+  },
+  "MCDBF7": {
+    "page": "69-importance-sampling",
+    "anchor": "variance-reduction",
+    "description": "Variance Reduction — histograms of estimates show width shrinking"
+  },
+  "MCF7D1": {
+    "page": "69-importance-sampling",
+    "anchor": "design-proposal",
+    "description": "Design Proposal — tune Gaussian center/width and watch variance respond"
+  },
+  "MC8BD5": {
+    "page": "70-monte-carlo-pi",
+    "anchor": "large-scale-pi",
+    "description": "Large-Scale π — throw up to 500K darts and watch the running estimate tighten"
+  },
+  "MCB98D": {
+    "page": "70-monte-carlo-pi",
+    "anchor": "estimate-distribution",
+    "description": "Distribution of π Estimates — histogram converges to predicted Gaussian"
+  },
+  "MCB60C": {
+    "page": "70-monte-carlo-pi",
+    "anchor": "hypersphere-volume",
+    "description": "Hypersphere Volume — V_d peaks at d≈5 then collapses; hit rate dies"
+  },
+  "MC3E5A": {
+    "page": "71-random-matrix-stats",
+    "anchor": "random-matrix-generator",
+    "description": "Random Matrix Classifier — running fractions of saddle/node/spiral converge"
+  },
+  "MC8F8C": {
+    "page": "71-random-matrix-stats",
+    "anchor": "tau-delta-density",
+    "description": "τ-Δ Density Map — 2D density of random matrices in the (τ,Δ) plane"
+  },
+  "MCC152": {
+    "page": "71-random-matrix-stats",
+    "anchor": "probability-calculator",
+    "description": "Probability Calculator — large-N probabilities with 1/√N convergence"
+  },
+  "MC43E1": {
+    "page": "72-ising-model-intro",
+    "anchor": "spin-chain-visualizer",
+    "description": "Spin Chain — click spins to flip them and watch energy update"
+  },
+  "MC96AE": {
+    "page": "72-ising-model-intro",
+    "anchor": "temperature-explorer",
+    "description": "Temperature Explorer — Boltzmann weights of all configs vs T"
+  },
+  "MC898F": {
+    "page": "72-ising-model-intro",
+    "anchor": "brute-force-limit",
+    "description": "Brute-Force Limit — 2^N enumeration is infeasible for large N"
+  },
+  "MC973A": {
+    "page": "73-metropolis-algorithm",
+    "anchor": "step-by-step-metropolis",
+    "description": "Step-by-step Metropolis — propose, compute ΔE, accept/reject live"
+  },
+  "MC8E26": {
+    "page": "73-metropolis-algorithm",
+    "anchor": "equilibration-watcher",
+    "description": "Equilibration Watcher — energy time series shows burn-in then plateau"
+  },
+  "MC489C": {
+    "page": "73-metropolis-algorithm",
+    "anchor": "temperature-sweep",
+    "description": "Temperature Sweep — Metropolis ⟨E⟩/N vs T compared to exact"
+  },
+  "MC8EB1": {
+    "page": "74-ising-simulation",
+    "anchor": "full-simulation",
+    "description": "Full Simulation — production Metropolis at any T, equilibration in real time"
+  },
+  "MCBCC7": {
+    "page": "74-ising-simulation",
+    "anchor": "mc-vs-exact",
+    "description": "MC vs Exact — temperature sweep validates against -tanh(βJ)"
+  },
+  "MC6281": {
+    "page": "74-ising-simulation",
+    "anchor": "autocorrelation-explorer",
+    "description": "Autocorrelation — measure τ_int and the corrected error bar"
+  },
+  "MC6A4D": {
+    "page": "75-mc-applications",
+    "anchor": "application-gallery",
+    "description": "Application Gallery — diffusion / finance / Buffon / percolation"
+  },
+  "MC6004": {
+    "page": "75-mc-applications",
+    "anchor": "random-walk-lab",
+    "description": "Random Walk Lab — verify diffusion law √⟨r²⟩ = √N"
+  },
+  "MC1118": {
+    "page": "75-mc-applications",
+    "anchor": "chapter-toolkit",
+    "description": "Chapter 6 Toolkit — recap of every technique with mini-demo"
+  },
+  "RWAFE7": {
+    "page": "76-drunkards-walk",
+    "anchor": "single-walker",
+    "description": "Single Drunkard — step one move at a time, watch the trajectory unfold"
+  },
+  "RWA9A4": {
+    "page": "76-drunkards-walk",
+    "anchor": "many-walkers",
+    "description": "Many Walkers — ensemble of 50–200 walks tracing out the √N cone"
+  },
+  "RW4E9A": {
+    "page": "76-drunkards-walk",
+    "anchor": "biased-walk",
+    "description": "Biased Walk — slide p away from 1/2, watch the cone tilt with drift"
+  },
+  "RW5D56": {
+    "page": "77-walk-statistics",
+    "anchor": "ensemble-statistics",
+    "description": "Ensemble Statistics — verify ⟨x⟩ = 0 and ⟨x²⟩ = N from a 1000-walker ensemble"
+  },
+  "RW4DC2": {
+    "page": "77-walk-statistics",
+    "anchor": "variance-growth",
+    "description": "Variance Growth — ⟨x²⟩ vs N is a straight line through the origin"
+  },
+  "RW0868": {
+    "page": "77-walk-statistics",
+    "anchor": "sqrt-n-vs-n",
+    "description": "Diffusive vs Ballistic — √N vs N gap widens forever"
+  },
+  "RW0744": {
+    "page": "78-binomial-distribution",
+    "anchor": "binomial-visualizer",
+    "description": "Binomial Visualizer — exact P(N, m) for N from 4 to 100, slider for p"
+  },
+  "RW1A3E": {
+    "page": "78-binomial-distribution",
+    "anchor": "n-evolution",
+    "description": "Discrete to Bell — slide N and watch the binomial morph into a Gaussian"
+  },
+  "RW449E": {
+    "page": "78-binomial-distribution",
+    "anchor": "sim-vs-theory",
+    "description": "Sim vs Theory — empirical histogram converges onto the binomial bars as 1/√(walks)"
+  },
+  "RW6B15": {
+    "page": "79-biased-walks",
+    "anchor": "drift-vs-diffusion",
+    "description": "Drift vs Diffusion — slide p, watch drift line tilt while spread continues as √N"
+  },
+  "RW0664": {
+    "page": "79-biased-walks",
+    "anchor": "snr-explorer",
+    "description": "SNR Explorer — read off detection threshold for each bias value"
+  },
+  "RW0C70": {
+    "page": "79-biased-walks",
+    "anchor": "physics-applications",
+    "description": "Physics Applications — charged particle, sedimentation, membrane transport"
+  },
+  "RW0FFC": {
+    "page": "80-continuum-limit",
+    "anchor": "discrete-to-continuous",
+    "description": "Discrete to Continuous — refinement at fixed D collapses to smooth Gaussian"
+  },
+  "RW7A60": {
+    "page": "80-continuum-limit",
+    "anchor": "continuum-parameters",
+    "description": "Continuum Parameters — different (a, τ) with same D yield identical macro behavior"
+  },
+  "RW6D20": {
+    "page": "80-continuum-limit",
+    "anchor": "diffusion-calculator",
+    "description": "Diffusion Calculator — vary D and watch the Gaussian width σ = √(2DT)"
+  },
+  "RWF524": {
+    "page": "81-diffusion-equation",
+    "anchor": "gaussian-spreading",
+    "description": "Gaussian Spreading — watch the fundamental solution broaden as √t while conserving area"
+  },
+  "RW3F61": {
+    "page": "81-diffusion-equation",
+    "anchor": "width-tracker",
+    "description": "Width Tracker — verify σ(t) = √(2Dt) by direct measurement at multiple times"
+  },
+  "RW23E7": {
+    "page": "81-diffusion-equation",
+    "anchor": "different-ics",
+    "description": "Different Initial Conditions — step, double peak, pulse all smooth out under diffusion"
+  },
+  "RW75AC": {
+    "page": "82-diffusion-higher-d",
+    "anchor": "diffusion-2d",
+    "description": "2D Diffusion — heatmap of circular Gaussian cloud spreading from a point source"
+  },
+  "RW7D5B": {
+    "page": "82-diffusion-higher-d",
+    "anchor": "dim-comparison",
+    "description": "Dimension Comparison — radial profiles in 1D/2D/3D; peak shifts to larger r as d grows"
+  },
+  "RWD2ED": {
+    "page": "82-diffusion-higher-d",
+    "anchor": "walk-cloud-2d",
+    "description": "2D Walk Cloud — random walkers in 2D converge to circular Gaussian"
+  },
+  "RW0375": {
+    "page": "83-walk-simulations",
+    "anchor": "ensemble-histogram",
+    "description": "Ensemble Histogram — generate walks, build histogram, overlay binomial/Gaussian"
+  },
+  "RW7406": {
+    "page": "83-walk-simulations",
+    "anchor": "moment-tracker",
+    "description": "Moment Tracker — measure ⟨x²⟩ vs N with MC error shrinking as 1/√(N_walks)"
+  },
+  "RW8639": {
+    "page": "83-walk-simulations",
+    "anchor": "convergence-movie",
+    "description": "Convergence Movie — running mean of first-passage times refuses to converge"
+  },
+  "RW3D04": {
+    "page": "83-walk-simulations",
+    "anchor": "biased-walk",
+    "description": "Biased Walk Simulation — verify drift Nm(p−q) and Var 4Npq numerically"
+  },
+  "RWA235": {
+    "page": "84-stirling-gaussian",
+    "anchor": "stirling-checker",
+    "description": "Stirling Checker — compare exact ln N! with Stirling; see error fall as 1/(12N)"
+  },
+  "RW15AE": {
+    "page": "84-stirling-gaussian",
+    "anchor": "binomial-gaussian-morpher",
+    "description": "Binomial→Gaussian Morpher — discrete spikes smooth into a Gaussian as N grows"
+  },
+  "RWDEDF": {
+    "page": "84-stirling-gaussian",
+    "anchor": "approximation-quality",
+    "description": "Approximation Quality — worst-case |binomial − Gaussian| error vs N"
+  },
+  "RW20AB": {
+    "page": "85-diffusion-applications",
+    "anchor": "parameter-explorer",
+    "description": "Parameter Explorer — switch domain (heat/ink/dopant/finance), same Gaussian solution"
+  },
+  "RWFB4E": {
+    "page": "85-diffusion-applications",
+    "anchor": "scaling-estimator",
+    "description": "Scaling Estimator — calculator for ℓ ~ √(2Dt); solve for any missing variable"
+  },
+  "RW6E7E": {
+    "page": "85-diffusion-applications",
+    "anchor": "heat-vs-mass",
+    "description": "Heat vs Mass — same equation, vastly different D, vastly different timescales"
+  },
+  "CF3832": {
+    "page": "86-two-body-reduction",
+    "anchor": "two-body-animator",
+    "description": "Two-Body Animator — watch two masses orbit their common CM, then switch to the CM frame"
+  },
+  "CF6F49": {
+    "page": "86-two-body-reduction",
+    "anchor": "reduced-mass-calc",
+    "description": "Reduced Mass Calculator — μ across canonical systems (Sun-Earth, Earth-Moon, hydrogen, binaries)"
+  },
+  "CFE5B3": {
+    "page": "87-conservation-laws",
+    "anchor": "planar-motion",
+    "description": "Planar Motion — watch the L vector pin the orbit to its plane regardless of initial conditions"
+  },
+  "CF4E3D": {
+    "page": "87-conservation-laws",
+    "anchor": "conservation-tracker",
+    "description": "Conservation Tracker — Euler vs RK4 energy/L drift over many orbital periods"
+  },
+  "CFFD44": {
+    "page": "88-polar-equations",
+    "anchor": "polar-decomp",
+    "description": "Polar Decomposition — watch velocity split into radial ρ̇ρ̂ + tangential ρφ̇φ̂ components"
+  },
+  "CF8E88": {
+    "page": "88-polar-equations",
+    "anchor": "centrifugal-barrier",
+    "description": "Centrifugal Barrier — see ℓ²/(2μρ²) grow at small ρ; for large ℓ it dominates the attractive well"
+  },
+  "CF228B": {
+    "page": "89-effective-potential",
+    "anchor": "ueff-diagram",
+    "description": "U_eff Diagram — plot effective potential, drag E line, read turning points / forbidden / circular orbit"
+  },
+  "CF9CC7": {
+    "page": "89-effective-potential",
+    "anchor": "orbit-classifier",
+    "description": "Orbit Classifier — sweep E from E_min through 0; watch circle → ellipse → parabola → hyperbola"
+  },
+  "CF5B26": {
+    "page": "90-kepler-orbits",
+    "anchor": "conic-family",
+    "description": "Conic Family — sweep e from 0 through 2; circle → ellipse → parabola → hyperbola"
+  },
+  "CFFA30": {
+    "page": "90-kepler-orbits",
+    "anchor": "keplers-third",
+    "description": "Kepler's Third Law — log-log plot T² vs a³ for the planets, all on the predicted line"
+  },
+  "CF0EEF": {
+    "page": "91-orbit-integration",
+    "anchor": "orbit-launcher",
+    "description": "Orbit Launcher — Cartesian RK4 with live launch; analytical conic overlay for comparison"
+  },
+  "CF5EE9": {
+    "page": "91-orbit-integration",
+    "anchor": "num-vs-analytic",
+    "description": "Numerical vs Analytic — observe h⁴ convergence scaling and conservation diagnostics"
+  },
+  "CFA4B5": {
+    "page": "92-other-potentials",
+    "anchor": "potential-zoo",
+    "description": "Potential Zoo — switch between Coulomb-rep, harmonic, Yukawa, Lennard-Jones; see U_eff change"
+  },
+  "CFEA1A": {
+    "page": "92-other-potentials",
+    "anchor": "bertrand-demo",
+    "description": "Bertrand Demo — perturb 1/ρ → 1/ρ^(1+ε); watch closed orbits become rosettes"
+  },
+  "RWFD9B": {
+    "page": "83-walk-simulations",
+    "anchor": "first-passage-time",
+    "description": "First-Passage Time Explorer — sample first-return times and feel the heavy tail before any derivation"
+  },
+  "VTEDCC": {
+    "page": "06-nondimensionalization",
+    "anchor": "projectile-landing-hill",
+    "description": "Projectile Landing on Hill — vary θ, φ, Γ and watch the trajectory land on the slope"
   }
 }

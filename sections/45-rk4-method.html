@@ -163,8 +163,8 @@
                 </div>
                 <div class="question-explanation" style="display:none;">
                     <strong>Explanation:</strong>
-                    At h = 0.20, RK4's error is typically \( 10^{-5} \) to \( 10^{-7} \) — far below
-                    what the eye can detect. The magenta RK4 curve lies directly on the gray dashed
+                    At h = 0.20, RK4's error is around \( 10^{-3} \) to \( 10^{-4} \) — far below
+                    what the eye can detect on the plot. The magenta RK4 curve lies directly on the gray dashed
                     exact solution. This is the power of fourth-order convergence: even a modest step
                     size gives excellent accuracy.
                 </div>
@@ -215,8 +215,8 @@
                     <strong>Explanation:</strong>
                     Each method's error follows its convergence order: Euler \( \propto h \),
                     RK2 \( \propto h^2 \), RK4 \( \propto h^4 \). At h = 0.20:
-                    Euler error ~ 0.2, RK2 error ~ 0.04, RK4 error ~ 0.0016.
-                    Each jump is dramatic — RK4 is typically thousands of times more accurate than Euler.
+                    Euler error ~ 200 (over T = 50 Euler blows up on the SHO!), RK2 error ~ 0.07, RK4 error ~ 3×10⁻⁴.
+                    Each jump is dramatic — RK4 is typically thousands of times more accurate than RK2, let alone Euler.
                 </div>
             </div>
         </div>

@@ -43,7 +43,8 @@
 <h3>Linear Functions</h3>
 
 <p>
-    The simplest non-trivial function: \( f(x) = 2x - 5 \)
+    The general form of a linear function is \( f(x) = mx + b \), where \( m \) is the slope
+    and \( b \) is the y-intercept. Let's start with a specific example: \( f(x) = 2x - 5 \).
 </p>
 
 <div class="interactive-container" id="linear-explorer">
@@ -279,7 +280,7 @@
 
         <div class="control-group">
             <label class="control-label">
-                b (shifts left/right):
+                b (moves the vertex):
                 <span class="control-label-value">0.00</span>
             </label>
             <input type="range" class="slider" id="b-slider" min="-5" max="5" step="0.5" value="0">
@@ -478,11 +479,7 @@
                 X Range (0 to):
                 <span class="control-label-value">5.00</span>
             </label>
-            <input type="range" class="slider" id="range-slider" min="0" max="5" step="0.1" value="5">
-        </div>
-
-        <div class="btn-group">
-            <button class="btn" onclick="updateGrowthPlot()">Update Plot</button>
+            <input type="range" class="slider" id="range-slider" min="0.5" max="5" step="0.1" value="5">
         </div>
     </div>
 </div>

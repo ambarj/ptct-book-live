@@ -531,6 +531,17 @@
         // Gradient grid
         if (showGrid) {
             const step = 0.6;
+
+            // First pass: find the largest gradient magnitude so arrow
+            // lengths can encode |∇f| (long arrow = steep, short = flat)
+            let maxMag = 0.01;
+            for (let gx = -range + 0.3; gx <= range - 0.3; gx += step) {
+                for (let gy = -range + 0.3; gy <= range - 0.3; gy += step) {
+                    const [gfx, gfy] = gradFunc(gx, gy);
+                    maxMag = Math.max(maxMag, Math.sqrt(gfx*gfx + gfy*gfy));
+                }
+            }
+
             for (let gx = -range + 0.3; gx <= range - 0.3; gx += step) {
                 for (let gy = -range + 0.3; gy <= range - 0.3; gy += step) {
                     const [gfx, gfy] = gradFunc(gx, gy);
@@ -538,7 +549,7 @@
 
                     if (mag < 0.01) continue;
 
-                    const scale = 0.25;
+                    const scale = 0.08 + 0.30 * (mag / maxMag);
                     const dx = scale * gfx / mag;
                     const dy = scale * gfy / mag;
 
@@ -563,7 +574,7 @@
                             symbol: 'triangle-up',
                             size: 6,
                             color: '#ff00ff',
-                            angle: Math.atan2(gfy, gfx) * 180 / Math.PI - 90
+                            angle: 90 - Math.atan2(gfy, gfx) * 180 / Math.PI
                         },
                         showlegend: false,
                         hoverinfo: 'skip'
@@ -619,7 +630,15 @@
             return;
         }
 
-        const scale = 0.5;
+        // Match the grid convention: arrow length encodes |∇f|
+        let maxMag = 0.01;
+        for (let gx = -2.7; gx <= 2.7; gx += 0.6) {
+            for (let gy = -2.7; gy <= 2.7; gy += 0.6) {
+                const [mx, my] = gradFunc(gx, gy);
+                maxMag = Math.max(maxMag, Math.sqrt(mx*mx + my*my));
+            }
+        }
+        const scale = 0.15 + 0.55 * Math.min(mag / maxMag, 1);
         const dx = scale * gfx / mag;
         const dy = scale * gfy / mag;
 
@@ -642,7 +661,7 @@
                     symbol: 'triangle-up',
                     size: 12,
                     color: '#00f3ff',
-                    angle: Math.atan2(gfy, gfx) * 180 / Math.PI - 90
+                    angle: 90 - Math.atan2(gfy, gfx) * 180 / Math.PI
                 },
                 showlegend: false,
                 hoverinfo: 'skip'

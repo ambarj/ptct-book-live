@@ -88,6 +88,7 @@ function plotQuadratic() {
         y: y,
         type: 'scatter',
         mode: 'lines',
+        name: 'f(x)',
         line: { color: '#00f3ff', width: 2 },
         showlegend: false
     };

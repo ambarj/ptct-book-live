@@ -335,7 +335,7 @@
                     <label class="option"><input type="radio" name="oi-q4" value="3"><span>Squares — error scales as \( h^2 \)</span></label>
                 </div>
                 <div class="question-actions"><button class="btn-verify">Verify</button></div>
-                <div class="question-explanation" style="display:none;"><strong>Explanation:</strong> RK4 has local (per-step) truncation error \( O(h^5) \) and global (accumulated over fixed time) error \( O(h^4) \). Halving \( h \) gives \( 1/2^4 = 1/16 \) the error. Plain Euler is \( O(h) \) — halving \( h \) just halves the error. This is a huge gap: to get the same accuracy as RK4 with \( h = 0.01 \), Euler would need \( h \sim 10^{-9} \) — a billion times more steps.</div>
+                <div class="question-explanation" style="display:none;"><strong>Explanation:</strong> RK4 has local (per-step) truncation error \( O(h^5) \) and global (accumulated over fixed time) error \( O(h^4) \). Halving \( h \) gives \( 1/2^4 = 1/16 \) the error. Plain Euler is \( O(h) \) — halving \( h \) just halves the error. This is a huge gap: to get the same accuracy as RK4 with \( h = 0.01 \), Euler would need \( h \sim 10^{-8} \) — a million times more steps.</div>
             </div>
         </div>
         <div class="tab-content">

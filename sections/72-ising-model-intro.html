@@ -141,7 +141,7 @@
         </div>
 
         <div class="tab-content">
-            <div class="question-container" data-type="fill" data-answer="-7[-7.5,-6.5]">
+            <div class="question-container" data-type="fill" data-answer="-5[-5.5,-4.5]">
                 <div class="question-text">
                     With N = 10 and all spins up, flip <strong>one</strong> spin in the middle.
                     The new energy is \( E = \)
@@ -153,13 +153,12 @@
                 </div>
                 <div class="question-explanation" style="display:none;">
                     <strong>Explanation:</strong>
-                    Flipping one interior spin changes 2 pairs from aligned (\( -J \) each) to
-                    anti-aligned (\( +J \) each). Energy change: \( \Delta E = 2 \times 2J = 4J \).
-                    New energy: \( -9J + 4J = -5J \). Wait &mdash; let me recount. With the flipped
-                    spin, 7 pairs are still aligned (\( -7J \)) and 2 are anti-aligned (\( +2J \)),
-                    giving \( E = -7J + 2J = -5J \). The answer is \( -5J \). Actually the energy
-                    is \( -(N-1-2\times2)J = -5J \) for 2 broken bonds... Let me just say: try it
-                    in the explorer and read the energy display!
+                    Flipping one interior spin changes its 2 bonds from aligned (\( -J \) each)
+                    to anti-aligned (\( +J \) each), so \( \Delta E = +4J \). Starting from the
+                    all-up chain (\( E = -9J \) for N = 10 spins, 9 bonds), the new energy is
+                    \( -9J + 4J = -5J \). Equivalently: 7 bonds remain aligned (\( -7J \)) and
+                    2 are broken (\( +2J \)), so \( E = -5J \). Try it in the explorer and read
+                    the energy display!
                 </div>
             </div>
         </div>
@@ -326,7 +325,7 @@
         </div>
 
         <div class="tab-content">
-            <div class="question-container" data-type="msq" data-answer="0,2">
+            <div class="question-container" data-type="msq" data-answer="0,1,2">
                 <div class="question-text">
                     Which statements about temperature in the Ising model are true? (Select all)
                 </div>
@@ -355,7 +354,7 @@
                     <strong>Explanation:</strong>
                     <ul>
                         <li><strong>Low T → order:</strong> ✓ Boltzmann weights exponentially favor low-energy (ordered) states.</li>
-                        <li><strong>Z decreases with T:</strong> ✗ Z generally increases with T (more states become accessible).</li>
+                        <li><strong>Z decreases with T:</strong> ✓ Here every state has \( E \le 0 \), so \( dZ/dT = Z\langle E \rangle / k_B T^2 < 0 \): Z falls from \( \sim e^{(N-1)J/k_BT} \) at low T toward \( 2^N \) as \( T \to \infty \). (The familiar "Z grows with T" intuition holds only when energies are positive.)</li>
                         <li><strong>⟨E⟩ increases with T:</strong> ✓ Higher T means more disordered states contribute, raising the average energy toward zero.</li>
                         <li><strong>Ground state probability = 1:</strong> ✗ Only exactly at T = 0. For any finite T, excited states have nonzero probability.</li>
                     </ul>

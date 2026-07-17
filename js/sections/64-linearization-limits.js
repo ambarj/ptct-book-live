@@ -142,7 +142,7 @@
         document.getElementById('lf-stats2').innerHTML=
             '<span><strong>'+type+'</strong> (ε = '+eps.toFixed(2)+', ω = '+omega.toFixed(1)+')</span>'+
             '<span>Jacobian at origin: [[0, −'+omega.toFixed(1)+'], ['+omega.toFixed(1)+', 0]] — always λ = ±'+omega.toFixed(1)+'i</span>'+
-            '<span>'+(Math.abs(eps)<0.01?'Pure center — closed orbits':'Nonlinear term ε·r² '+
+            '<span>'+(Math.abs(eps)<0.01?'Pure center — closed orbits':'Nonlinear drift ṙ = ε·r³ '+
                 (eps>0?'pushes outward → unstable':'pulls inward → stable'))+'</span>';
     }
 

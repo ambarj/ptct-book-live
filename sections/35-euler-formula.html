@@ -270,8 +270,8 @@
         <div class="tab-content active">
             <div class="question-container" data-type="mcq" data-answer="2">
                 <div class="question-text">
-                    Look at the error values for \(h = 0.5\) and \(h = 0.2\).
-                    When you reduce \(h\) by a factor of 2.5, the error decreases by
+                    Look at the error values for \(h = 0.2\) and \(h = 0.05\).
+                    When you reduce \(h\) by a factor of 4, the error decreases by
                     roughly:
                 </div>
                 <div class="question-options">
@@ -281,15 +281,15 @@
                     </label>
                     <label class="option">
                         <input type="radio" name="q-ef-4" value="1">
-                        <span>A factor of 6.25 (the square of 2.5)</span>
+                        <span>A factor of 16 (the square of 4)</span>
                     </label>
                     <label class="option">
                         <input type="radio" name="q-ef-4" value="2">
-                        <span>A factor of about 2&ndash;3</span>
+                        <span>A factor of about 3&ndash;4</span>
                     </label>
                     <label class="option">
                         <input type="radio" name="q-ef-4" value="3">
-                        <span>Exactly 2.5</span>
+                        <span>Exactly 100</span>
                     </label>
                 </div>
                 <div class="question-actions">
@@ -298,9 +298,11 @@
                 <div class="question-explanation" style="display:none;">
                     <strong>Explanation:</strong>
                     For Euler&rsquo;s method the global error is proportional to \(h\),
-                    so cutting \(h\) by 2.5&times; should cut the error by roughly
-                    2&ndash;3&times;.  (It&rsquo;s not <em>exactly</em> 2.5 because the
-                    error constant depends on the equation, but the scaling is linear.)
+                    so cutting \(h\) by 4&times; should cut the error by roughly
+                    3&ndash;4&times;.  (It&rsquo;s not <em>exactly</em> 4 because the
+                    error constant depends on the equation.  And avoid comparing against
+                    \(h = 0.5\) here: for \(dx/dt = -2x\) that step size makes
+                    \(1 - 2h = 0\), a fluke that lands Euler exactly on zero!)
                     Compare the numbers in the stats bar to verify.
                 </div>
             </div>
@@ -508,7 +510,7 @@
                     an equilibrium) but drifts noticeably from the true curve.  The
                     nonlinearity of \(\sin(x)\) means errors compound differently
                     than for the linear \(-2x\) case.  Reducing \(h\) brings it
-                    back in line &mdash; try \(h = 0.05\) to see!
+                    back in line &mdash; try \(h = 0.04\) to see!
                 </div>
             </div>
         </div>

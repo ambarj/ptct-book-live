@@ -340,13 +340,13 @@
                     <strong>Explanation:</strong>
                     For target error ε: Euler needs N ~ 1/ε evaluations, RK4 needs N ~ 1/ε<sup>1/4</sup> × 4.
                     The ratio is (1/ε) / (4/ε<sup>1/4</sup>) = ε<sup>−3/4</sup>/4, which grows as ε → 0.
-                    At ε = 10⁻⁴: ratio ~ 250. At ε = 10⁻⁸: ratio ~ 60,000. The advantage is unbounded.
+                    At ε = 10⁻⁴: ratio ~ 250. At ε = 10⁻⁸: ratio ~ 250,000. The advantage is unbounded.
                 </div>
             </div>
         </div>
 
         <div class="tab-content">
-            <div class="question-container" data-type="msq" data-answer="0,3">
+            <div class="question-container" data-type="msq" data-answer="0,2,3">
                 <div class="question-text">
                     Which statements about the scaling laws are correct? (Select all that apply)
                 </div>
@@ -376,7 +376,7 @@
                     <ul>
                         <li>✓ The slopes are a property of the method's convergence order — universal across smooth ODEs.</li>
                         <li>✗ At very coarse accuracy (large h), all methods are similarly bad. RK4's advantage is asymptotic — it dominates at moderate to high accuracy.</li>
-                        <li>✗ Changing T shifts the lines up/down (changes the constant multiplier) but the slopes do stay the same. However, the answer is nuanced — at very large T, error accumulation patterns can differ, so we mark this false to be safe.</li>
+                        <li>✓ Changing T shifts the curves vertically (it changes the error constant) but leaves the slopes unchanged — the slopes are set by the convergence order, not by how long you integrate. Verify with the T-slider!</li>
                         <li>✓ At extremely small h (below ~10⁻⁸ for double precision), roundoff error from floating-point arithmetic begins to dominate, and further reducing h actually <em>increases</em> the total error.</li>
                     </ul>
                 </div>

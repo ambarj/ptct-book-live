@@ -7,6 +7,8 @@
     // Vector Field Definitions
     // ============================================================
 
+    // Unit-magnitude directions, used for drawing arrows and tracing
+    // field lines (tracing needs bounded speeds near the origin)
     const fieldDefinitions = {
         uniform: (x, y, strength) => [strength, 0],
         source: (x, y, strength) => {
@@ -24,8 +26,84 @@
         saddle: (x, y, strength) => [strength * x, -strength * y]
     };
 
-    // Store field line traces
+    // Physical field strength at each point, used for color-coding:
+    // point sources/sinks/vortices fall off as 1/r in 2D
+    const fieldMagnitudes = {
+        uniform: (x, y, s) => s,
+        source: (x, y, s) => s / Math.max(Math.sqrt(x*x + y*y), 0.2),
+        sink: (x, y, s) => s / Math.max(Math.sqrt(x*x + y*y), 0.2),
+        vortex: (x, y, s) => s / Math.max(Math.sqrt(x*x + y*y), 0.2),
+        saddle: (x, y, s) => s * Math.sqrt(x*x + y*y)
+    };
+
+    // Build one shaft trace + one arrowhead trace (colored by |F|) for a
+    // whole grid of arrows. Two traces instead of two per arrow keeps
+    // slider redraws fast.
+    function buildArrowTraces(dirFunc, magFunc, gridRange, step, opts) {
+        const shaftX = [], shaftY = [];
+        const headX = [], headY = [], headAngle = [], headMag = [];
+
+        for (let x = -gridRange; x <= gridRange; x += step) {
+            for (let y = -gridRange; y <= gridRange; y += step) {
+                const [fx, fy] = dirFunc(x, y);
+                const dirMag = Math.sqrt(fx*fx + fy*fy);
+                if (dirMag < 0.01) continue;
+
+                const scale = opts.arrowScale || 0.25;
+                const dx = scale * fx / dirMag;
+                const dy = scale * fy / dirMag;
+
+                shaftX.push(x, x + dx * 0.7, null);
+                shaftY.push(y, y + dy * 0.7, null);
+                headX.push(x + dx);
+                headY.push(y + dy);
+                headAngle.push(90 - Math.atan2(fy, fx) * 180 / Math.PI);
+                headMag.push(magFunc(x, y));
+            }
+        }
+
+        // Robust color scale: cap at the 95th percentile so the few huge
+        // values right next to a singularity don't wash out the palette
+        const sorted = [...headMag].sort((p, q) => p - q);
+        const cmax = sorted[Math.floor(0.95 * (sorted.length - 1))] || 1;
+        const clamped = headMag.map(m => Math.min(m, cmax));
+
+        return [{
+            x: shaftX,
+            y: shaftY,
+            mode: 'lines',
+            line: { color: 'rgba(0, 243, 255, 0.45)', width: 1.5 },
+            showlegend: false,
+            hoverinfo: 'skip'
+        }, {
+            x: headX,
+            y: headY,
+            mode: 'markers',
+            marker: {
+                symbol: 'triangle-up',
+                size: opts.headSize || 8,
+                color: clamped,
+                colorscale: 'Viridis',
+                cmin: 0,
+                cmax: cmax,
+                angle: headAngle,
+                showscale: !!opts.colorbar,
+                colorbar: opts.colorbar ? {
+                    title: { text: '|F|', font: { color: '#a0a8d0', size: 12 } },
+                    tickfont: { color: '#a0a8d0', size: 10 },
+                    thickness: 12,
+                    len: 0.75,
+                    outlinewidth: 0
+                } : undefined
+            },
+            showlegend: false,
+            hoverinfo: 'skip'
+        }];
+    }
+
+    // Store field line traces and the click points that created them
     let fieldLineTraces = [];
+    let fieldLineStarts = [];
 
     // ============================================================
     // Explorer 1: Vector Field Visualizer
@@ -43,64 +121,24 @@
         const density = parseInt(densityEl.value);
 
         const fieldFunc = fieldDefinitions[fieldType];
-        if (!fieldFunc) return;
+        const magFunc = fieldMagnitudes[fieldType];
+        if (!fieldFunc || !magFunc) return;
 
         const range = 3;
         const step = (2 * range) / density;
 
-        // Generate arrow traces
-        const traces = [];
-
-        for (let x = -range; x <= range; x += step) {
-            for (let y = -range; y <= range; y += step) {
-                const [fx, fy] = fieldFunc(x, y, strength);
-                const mag = Math.sqrt(fx*fx + fy*fy);
-
-                if (mag > 0.01) {
-                    const scale = 0.25;
-                    const dx = scale * fx / mag;
-                    const dy = scale * fy / mag;
-
-                    // Color based on magnitude
-                    const intensity = Math.min(mag / 3, 1);
-                    const r = Math.floor(255 * intensity);
-                    const g = Math.floor(243 * (1 - intensity * 0.3));
-                    const b = 255;
-                    const color = `rgb(${r}, ${g}, ${b})`;
-
-                    // Arrow line
-                    traces.push({
-                        x: [x, x + dx * 0.7],
-                        y: [y, y + dy * 0.7],
-                        mode: 'lines',
-                        line: { color: color, width: 2 },
-                        showlegend: false,
-                        hoverinfo: 'skip'
-                    });
-
-                    // Arrowhead
-                    traces.push({
-                        x: [x + dx],
-                        y: [y + dy],
-                        mode: 'markers',
-                        marker: {
-                            symbol: 'triangle-up',
-                            size: 8,
-                            color: color,
-                            angle: Math.atan2(fy, fx) * 180 / Math.PI - 90
-                        },
-                        showlegend: false,
-                        hoverinfo: 'skip'
-                    });
-                }
-            }
-        }
+        const traces = buildArrowTraces(
+            (x, y) => fieldFunc(x, y, strength),
+            (x, y) => magFunc(x, y, strength),
+            range, step,
+            { arrowScale: 0.25, headSize: 8, colorbar: true }
+        );
 
         const titles = {
             uniform: 'Uniform Flow: F = (1, 0)',
-            source: 'Source: F = (x, y) / r',
-            sink: 'Sink: F = -(x, y) / r',
-            vortex: 'Vortex: F = (-y, x) / r',
+            source: 'Source: strength falls off as 1/r',
+            sink: 'Sink: strength falls off as 1/r',
+            vortex: 'Vortex: strength falls off as 1/r',
             saddle: 'Saddle: F = (x, -y)'
         };
 
@@ -220,119 +258,151 @@
             createPlot('field-line-plot', traces, layout);
         }
 
-        // Set up click handler after plot is created
+        // Set up click handler after plot is created. Plotly's own
+        // plotly_click only fires on data points, so listen on the div
+        // and convert pixel coordinates to data coordinates ourselves.
         setTimeout(function() {
             const plotDiv = document.getElementById('field-line-plot');
-            if (plotDiv && plotDiv.on) {
-                // Remove existing handler first
-                plotDiv.removeAllListeners && plotDiv.removeAllListeners('plotly_click');
-                plotDiv.on('plotly_click', function(data) {
-                    if (data.points && data.points[0]) {
-                        traceFieldLine(data.points[0].x, data.points[0].y);
-                    }
+            if (plotDiv && !plotDiv._traceClickBound) {
+                plotDiv._traceClickBound = true;
+                plotDiv.addEventListener('click', function(e) {
+                    if (e.target.closest('.modebar')) return;
+                    const fl = plotDiv._fullLayout;
+                    if (!fl || !fl.xaxis || !fl.xaxis.p2d) return;
+                    const rect = plotDiv.getBoundingClientRect();
+                    const x = fl.xaxis.p2d(e.clientX - rect.left - fl.xaxis._offset);
+                    const y = fl.yaxis.p2d(e.clientY - rect.top - fl.yaxis._offset);
+                    if (x < -4 || x > 4 || y < -4 || y > 4 || isNaN(x) || isNaN(y)) return;
+                    traceFieldLine(x, y);
                 });
             }
         }, 100);
     }
 
-    function traceFieldLine(x0, y0) {
+    // Integrate one field line from (x0, y0) and return its plot traces.
+    // Uses a midpoint step so closed lines (vortex) stay closed instead of
+    // spiraling outward like forward Euler does.
+    function computeFieldLine(x0, y0, color) {
         const fieldTypeEl = document.getElementById('trace-field-select');
         const durationEl = document.getElementById('duration-slider');
-        if (!fieldTypeEl || !durationEl) return;
+        if (!fieldTypeEl || !durationEl) return [];
 
         const fieldType = fieldTypeEl.value;
         const duration = parseFloat(durationEl.value);
         const fieldFunc = fieldDefinitions[fieldType];
-        if (!fieldFunc) return;
+        if (!fieldFunc) return [];
 
         const dt = 0.02;
         const steps = Math.floor(duration / dt);
 
-        // Trace forward
-        let x = x0, y = y0;
-        const pathX = [x], pathY = [y];
-
-        for (let i = 0; i < steps; i++) {
-            const [fx, fy] = fieldFunc(x, y, 1);
-            const mag = Math.sqrt(fx*fx + fy*fy);
-
-            if (mag < 0.01) break;
-
-            x += dt * fx;
-            y += dt * fy;
-
-            if (Math.abs(x) > 5 || Math.abs(y) > 5) break;
-
-            pathX.push(x);
-            pathY.push(y);
-        }
-
-        // Trace backward for some field types
-        if (fieldType === 'saddle' || fieldType === 'uniform') {
-            x = x0;
-            y = y0;
-            const backX = [], backY = [];
-
+        function integrate(sign) {
+            let x = x0, y = y0;
+            const px = [], py = [];
             for (let i = 0; i < steps; i++) {
-                const [fx, fy] = fieldFunc(x, y, 1);
-                const mag = Math.sqrt(fx*fx + fy*fy);
-
-                if (mag < 0.01) break;
-
-                x -= dt * fx;
-                y -= dt * fy;
-
+                const [fx1, fy1] = fieldFunc(x, y, 1);
+                const mag1 = Math.sqrt(fx1*fx1 + fy1*fy1);
+                if (mag1 < 0.01) break;
+                const xm = x + sign * 0.5 * dt * fx1;
+                const ym = y + sign * 0.5 * dt * fy1;
+                const [fx2, fy2] = fieldFunc(xm, ym, 1);
+                x += sign * dt * fx2;
+                y += sign * dt * fy2;
                 if (Math.abs(x) > 5 || Math.abs(y) > 5) break;
-
-                backX.unshift(x);
-                backY.unshift(y);
+                // Sinks converge on the origin: stop instead of jittering there
+                if (fieldType !== 'uniform' && Math.sqrt(x*x + y*y) < 0.05) {
+                    px.push(x); py.push(y);
+                    break;
+                }
+                px.push(x);
+                py.push(y);
             }
-
-            pathX.unshift(...backX);
-            pathY.unshift(...backY);
+            return [px, py];
         }
 
-        // Random color
-        const colors = ['#ff00ff', '#ffff00', '#00ff9f', '#ff6b6b', '#4ecdc4', '#a855f7'];
-        const color = colors[fieldLineTraces.length % colors.length];
+        const [fwdX, fwdY] = integrate(1);
+        let pathX = [x0, ...fwdX];
+        let pathY = [y0, ...fwdY];
 
-        // Add traces
-        fieldLineTraces.push({
+        // Trace backward too, so the line shows where the flow came from
+        if (fieldType === 'saddle' || fieldType === 'uniform') {
+            const [backX, backY] = integrate(-1);
+            pathX = [...backX.reverse(), ...pathX];
+            pathY = [...backY.reverse(), ...pathY];
+        }
+
+        const traces = [{
             x: pathX,
             y: pathY,
             mode: 'lines',
             line: { color: color, width: 2.5 },
             showlegend: false,
             hoverinfo: 'skip'
-        });
-
-        fieldLineTraces.push({
+        }, {
             x: [x0],
             y: [y0],
             mode: 'markers',
             marker: { color: color, size: 10, symbol: 'circle' },
             showlegend: false,
             hoverinfo: 'skip'
-        });
+        }];
 
+        // Direction arrowheads along the path (every ~1.2 units of arc length)
+        const arrowX = [], arrowY = [], arrowAngle = [];
+        let acc = 0;
+        for (let i = 1; i < pathX.length; i++) {
+            acc += Math.hypot(pathX[i] - pathX[i-1], pathY[i] - pathY[i-1]);
+            if (acc >= 1.2) {
+                acc = 0;
+                const [fx, fy] = fieldFunc(pathX[i], pathY[i], 1);
+                if (Math.hypot(fx, fy) > 0.01) {
+                    arrowX.push(pathX[i]);
+                    arrowY.push(pathY[i]);
+                    arrowAngle.push(90 - Math.atan2(fy, fx) * 180 / Math.PI);
+                }
+            }
+        }
+        if (arrowX.length > 0) {
+            traces.push({
+                x: arrowX,
+                y: arrowY,
+                mode: 'markers',
+                marker: { symbol: 'triangle-up', size: 9, color: color, angle: arrowAngle },
+                showlegend: false,
+                hoverinfo: 'skip'
+            });
+        }
+
+        return traces;
+    }
+
+    // Rebuild every stored field line (used after a new click, a duration
+    // change, or a field change so all lines reflect the current settings)
+    function rebuildFieldLines() {
+        const colors = ['#ff00ff', '#ffff00', '#00ff9f', '#ff6b6b', '#4ecdc4', '#a855f7'];
+        fieldLineTraces = [];
+        fieldLineStarts.forEach(function(pt, i) {
+            fieldLineTraces.push(...computeFieldLine(pt[0], pt[1], colors[i % colors.length]));
+        });
         plotFieldLineExplorer();
+    }
+
+    function traceFieldLine(x0, y0) {
+        fieldLineStarts.push([x0, y0]);
+        rebuildFieldLines();
     }
 
     window.clearFieldLines = function() {
         fieldLineTraces = [];
+        fieldLineStarts = [];
         plotFieldLineExplorer();
     };
 
     window.traceMultipleLines = function() {
-        fieldLineTraces = [];
-        const startingPoints = [
+        fieldLineStarts = [
             [-2, 0], [2, 0], [0, 2], [0, -2],
             [-2, 2], [2, 2], [-2, -2], [2, -2]
         ];
-
-        startingPoints.forEach(function(pt) {
-            traceFieldLine(pt[0], pt[1]);
-        });
+        rebuildFieldLines();
     };
 
     // ============================================================
@@ -350,59 +420,27 @@
         const radialStrength = parseFloat(radialEl.value);
         const vortexStrength = parseFloat(vortexEl.value);
 
-        // Generate arrows
-        const traces = [];
+        // Combined field with physical 1/r falloff for the point
+        // components, so combinations like uniform + vortex have a real
+        // stagnation point that moves with the sliders
+        function combined(x, y) {
+            const r = Math.max(Math.sqrt(x*x + y*y), 0.2);
+            const fx = uniformStrength + (radialStrength * x - vortexStrength * y) / (r * r);
+            const fy = (radialStrength * y + vortexStrength * x) / (r * r);
+            return [fx, fy];
+        }
+
         const range = 3;
         const step = 0.5;
-
-        for (let x = -range; x <= range; x += step) {
-            for (let y = -range; y <= range; y += step) {
-                const r = Math.sqrt(x*x + y*y) || 0.01;
-
-                // Combined field
-                let fx = uniformStrength;
-                let fy = 0;
-                fx += radialStrength * x / r;
-                fy += radialStrength * y / r;
-                fx += -vortexStrength * y / r;
-                fy += vortexStrength * x / r;
-
-                const mag = Math.sqrt(fx*fx + fy*fy);
-
-                if (mag > 0.01) {
-                    const scale = 0.2;
-                    const normMag = Math.min(mag, 3);
-                    const dx = scale * fx / mag * (0.5 + 0.5 * normMag / 3);
-                    const dy = scale * fy / mag * (0.5 + 0.5 * normMag / 3);
-
-                    const intensity = Math.min(mag / 3, 1);
-                    const color = `hsl(${180 - intensity * 60}, 100%, ${50 + intensity * 20}%)`;
-
-                    traces.push({
-                        x: [x, x + dx * 0.7],
-                        y: [y, y + dy * 0.7],
-                        mode: 'lines',
-                        line: { color: color, width: 2 },
-                        showlegend: false,
-                        hoverinfo: 'skip'
-                    });
-
-                    traces.push({
-                        x: [x + dx],
-                        y: [y + dy],
-                        mode: 'markers',
-                        marker: {
-                            symbol: 'triangle-up',
-                            size: 7,
-                            color: color,
-                            angle: Math.atan2(fy, fx) * 180 / Math.PI - 90
-                        },
-                        showlegend: false,
-                        hoverinfo: 'skip'
-                    });
-                }
-            }
-        }
+        const traces = buildArrowTraces(
+            combined,
+            (x, y) => {
+                const [fx, fy] = combined(x, y);
+                return Math.sqrt(fx*fx + fy*fy);
+            },
+            range, step,
+            { arrowScale: 0.2, headSize: 7, colorbar: true }
+        );
 
         // Build title
         let titleParts = [];
@@ -523,6 +561,7 @@
 
         // Reset field line traces for fresh start
         fieldLineTraces = [];
+        fieldLineStarts = [];
 
         // Initialize all plots
         plotVectorField();
@@ -561,6 +600,7 @@
         if (traceFieldSelect) {
             traceFieldSelect.onchange = function() {
                 fieldLineTraces = [];
+                fieldLineStarts = [];
                 plotFieldLineExplorer();
             };
         }
@@ -569,6 +609,7 @@
             durationSlider.oninput = function() {
                 const val = document.getElementById('duration-value');
                 if (val) val.textContent = parseFloat(this.value).toFixed(1);
+                if (fieldLineStarts.length > 0) rebuildFieldLines();
             };
         }
 

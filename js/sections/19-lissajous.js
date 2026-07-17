@@ -106,8 +106,8 @@
         line:     {wx:1, wy:1, phiX:0, phiY:0,         label:'Straight Line (1:1, \u0394\u03C6=0\u00B0)'},
         circle:   {wx:1, wy:1, phiX:0, phiY:Math.PI/2, label:'Circle (1:1, \u0394\u03C6=90\u00B0)'},
         ellipse:  {wx:1, wy:1, phiX:0, phiY:Math.PI/4, label:'Ellipse (1:1, \u0394\u03C6=45\u00B0)'},
-        figure8:  {wx:1, wy:2, phiX:0, phiY:0,         label:'Figure-8 (1:2, \u0394\u03C6=0\u00B0)'},
-        bowtie:   {wx:1, wy:2, phiX:0, phiY:Math.PI/2, label:'Bowtie (1:2, \u0394\u03C6=90\u00B0)'},
+        figure8:  {wx:1, wy:2, phiX:0, phiY:Math.PI/2, label:'Figure-8 (1:2, \u0394\u03C6=90\u00B0)'},
+        bowtie:   {wx:1, wy:2, phiX:0, phiY:0,         label:'Parabola (1:2, \u0394\u03C6=0\u00B0)'},
         trefoil:  {wx:2, wy:3, phiX:0, phiY:0,         label:'Trefoil (2:3, \u0394\u03C6=0\u00B0)'},
         star:     {wx:3, wy:4, phiX:0, phiY:0,         label:'Star (3:4, \u0394\u03C6=0\u00B0)'}
     };

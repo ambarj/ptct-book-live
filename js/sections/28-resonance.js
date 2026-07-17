@@ -296,13 +296,14 @@
 
         var statsDiv = document.getElementById('rs-qf-stats');
         if (statsDiv) {
-            var energyRatio = 2 * Math.PI * Q;
+            // Q = 2\u03C0 \u00D7 (energy stored)/(energy lost per cycle), i.e. the
+            // stored energy is Q times the energy lost per RADIAN
             statsDiv.innerHTML =
                 '<span>\u03C9\u2080 = <strong>'+omega0.toFixed(1)+'</strong></span>'+
                 '<span>\u03B3 = <strong>'+gamma.toFixed(2)+'</strong></span>'+
                 '<span>Q = <strong>'+Q.toFixed(1)+'</strong></span>'+
                 '<span>A<sub>peak</sub> \u2248 F\u2080/(2m\u03B3\u03C9\u2080) = <strong>'+Ap.toFixed(2)+'</strong></span>'+
-                '<span>2\u03C0Q = <strong>'+energyRatio.toFixed(0)+'</strong> (energy stored / energy lost per cycle)</span>';
+                '<span>energy stored / energy lost per radian = Q = <strong>'+Q.toFixed(1)+'</strong></span>';
         }
     }
 

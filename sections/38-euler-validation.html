@@ -171,7 +171,7 @@
                 <div class="question-options">
                     <label class="option">
                         <input type="radio" name="q-ev-3" value="0">
-                        <span>An oscillating pattern with growing amplitude</span>
+                        <span>An oscillating rise-and-fall pattern, largest near \(t \approx \pi\)</span>
                     </label>
                     <label class="option">
                         <input type="radio" name="q-ev-3" value="1">
@@ -188,9 +188,12 @@
                 <div class="question-explanation" style="display:none;">
                     <strong>Explanation:</strong>
                     The forcing function \(\cos(t)\) oscillates, so the local truncation error
-                    oscillates too. But errors accumulate over time, so the envelope of the
-                    oscillating error grows. The error is largest near the peaks and troughs of
-                    the sine curve where the curvature (second derivative) is highest.
+                    oscillates too. Because \(dx/dt = \cos t\) doesn&rsquo;t depend on \(x\),
+                    the errors do <em>not</em> compound &mdash; they add up to
+                    \(\tfrac{h}{2}(1-\cos t)\), a bounded hump that peaks near
+                    \(t \approx \pi\) and returns toward zero near \(t \approx 2\pi\).
+                    The error is largest where the curvature (second derivative) of the solution
+                    is highest.
                 </div>
             </div>
         </div>
@@ -242,8 +245,10 @@
 <div class="info-box">
     <div class="info-box-title">Key Insight: The Halving Test</div>
     <p>
-        Look at the final error values above. When you halve \(h\) (from 0.50 to 0.25, or
-        0.10 to 0.05), the final error also roughly halves. This is the signature of a
+        Look at the final error values above. When you halve \(h\) (from 0.10 to 0.05),
+        the final error also roughly halves. (Don&rsquo;t use the 0.50 &rarr; 0.25 pair for this
+        test: \(h = 0.5\) makes \(1 - 2h = 0\) for the decay equation &mdash; a fluke that
+        breaks the pattern.) This is the signature of a
         <strong>first-order</strong> method: error \(\sim O(h)\). Euler&rsquo;s method is
         first-order accurate.
     </p>
@@ -272,8 +277,8 @@
         <div class="tab-content active">
             <div class="question-container" data-type="fill" data-answer="2[1.5,2.5]">
                 <div class="question-text">
-                    For the <strong>decay</strong> ODE, divide the final error at \(h = 0.50\) by the
-                    final error at \(h = 0.25\). This ratio is approximately:
+                    For the <strong>decay</strong> ODE, divide the final error at \(h = 0.10\) by the
+                    final error at \(h = 0.05\). This ratio is approximately:
                     <br><br>
                     Error ratio \(\approx\) <input type="text" class="fill-blank" placeholder="?">
                     <br><em>(This confirms the method is first-order: halving \(h\) halves the error.)</em>
@@ -327,7 +332,7 @@
 
         <!-- Q6: Fill -->
         <div class="tab-content">
-            <div class="question-container" data-type="fill" data-answer="10|100">
+            <div class="question-container" data-type="fill" data-answer="10|10">
                 <div class="question-text">
                     To achieve 10&times; smaller error with Euler&rsquo;s method,
                     you need to use a step size that is <input type="text" class="fill-blank" placeholder="?">&times;

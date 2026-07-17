@@ -582,26 +582,26 @@
         <div class="tab-content">
             <div class="question-container" data-type="mcq" data-answer="1">
                 <div class="question-text">
-                    The stats bar shows \( 2\pi Q \) as "energy stored / energy
-                    lost per cycle."  For Q = 5, this ratio is about 31.
-                    What does this tell you physically?
+                    The stats bar shows that Q equals the ratio of stored energy to
+                    energy lost <em>per radian</em> of oscillation.  For Q = 5, what
+                    does this tell you physically?
                 </div>
                 <div class="question-options">
                     <label class="option">
                         <input type="radio" name="rs-q9" value="0">
-                        <span>The system loses all its energy in 31 cycles</span>
+                        <span>The system loses all its energy in exactly 5 cycles</span>
                     </label>
                     <label class="option">
                         <input type="radio" name="rs-q9" value="1">
-                        <span>At any moment, the system stores 31 times more energy than it loses per cycle</span>
+                        <span>At any moment, the energy dissipated per radian of oscillation is about 1/5 of the stored energy</span>
                     </label>
                     <label class="option">
                         <input type="radio" name="rs-q9" value="2">
-                        <span>The system amplifies energy by a factor of 31</span>
+                        <span>The system amplifies energy by a factor of 5</span>
                     </label>
                     <label class="option">
                         <input type="radio" name="rs-q9" value="3">
-                        <span>The system requires 31 cycles to reach steady state</span>
+                        <span>The system requires 5 cycles to reach steady state</span>
                     </label>
                 </div>
                 <div class="question-actions">
@@ -610,13 +610,14 @@
                 <div class="question-explanation" style="display: none;">
                     <div class="question-explanation-title">Explanation</div>
                     <div class="question-explanation-text">
-                        The ratio \( 2\pi Q \) compares stored energy to dissipated
-                        energy <em>per cycle</em>.  At steady state, energy input per
-                        cycle equals energy dissipated per cycle, and the stored energy
-                        is \( 2\pi Q \) times larger than either.  This means only a
-                        small fraction (\( 1/(2\pi Q) \approx 3\% \)) of the stored
-                        energy is lost each cycle &mdash; the rest keeps sloshing back
-                        and forth.
+                        Q compares stored energy to dissipation:
+                        \( Q = 2\pi \times \frac{\text{energy stored}}{\text{energy lost per cycle}} \),
+                        which is the same as stored energy divided by energy lost per
+                        <em>radian</em>.  So Q = 5 means roughly 1/5 of the energy drains
+                        away per radian &mdash; quite lossy!  A high-Q system (say Q = 50)
+                        loses only \( 2\pi/Q \approx 13\% \) per cycle, so the energy
+                        sloshes back and forth many times before dying out.  That is also
+                        why high-Q resonance peaks are tall and narrow.
                     </div>
                 </div>
             </div>
@@ -760,7 +761,7 @@ Use Plotly dark theme, gray axes (#808080), fixed ranges.</code></pre>
         </div>
         <div class="exercise-card-content">
             In the Damping Controls explorer, find three values of \( \gamma \)
-            that give Q = 2, Q = 10, and Q = 50 (with \( \omega_0 = 3.0 \)).
+            that give Q = 2, Q = 10, and Q = 25 (with \( \omega_0 = 3.0 \)).
             For each, record the peak amplitude and the bandwidth \( \Delta\omega \).
             Verify that \( Q \approx \omega_0 / \Delta\omega \) in each case.
             How does halving \( \gamma \) affect the peak amplitude?
