@@ -237,7 +237,8 @@
         <div class="tab-content active">
             <div class="question-container" data-type="mcq" data-answer="2">
                 <div class="question-text">
-                    If your error bars represent ±1 standard error, what fraction of them should
+                    If your error bars represent ±1 standard error (one &sigma; of the mean's
+                    sampling distribution), what fraction of them should
                     contain the true value (on average)?
                 </div>
                 <div class="question-options">
@@ -597,7 +598,18 @@ fig.show()
 import numpy as np
 import plotly.graph_objects as go
 
-# --- Assume data, means, stds, errors from Tab 1 ---
+# Regenerate the dataset (same as Tab 1) so this script runs standalone
+g_true = 9.8
+times = np.arange(1, 11)
+d_true = 0.5 * g_true * times**2
+N_trials, noise_pct = 10, 0.20
+rng = np.random.default_rng(42)
+data = np.zeros((len(times), N_trials))
+for i, t in enumerate(times):
+    data[i, :] = d_true[i] + rng.normal(0, noise_pct * d_true[i], N_trials)
+means = data.mean(axis=1)
+stds = data.std(axis=1, ddof=1)
+errors = stds / np.sqrt(N_trials - 1)
 
 # Weighted least-squares fit for g
 # Model: d = (g/2) * t^2  =>  g = 2d/t^2

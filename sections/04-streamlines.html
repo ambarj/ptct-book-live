@@ -778,6 +778,20 @@ fig.show()</code></pre>
             <pre><code class="language-python">import numpy as np
 import plotly.graph_objects as go
 
+# Streamline tracer (same as the previous tab) so this runs standalone
+def trace_streamline(x0, y0, field_func, dt=0.02, steps=500):
+    x, y = [x0], [y0]
+    for _ in range(steps):
+        fx, fy = field_func(x[-1], y[-1])
+        mag = np.sqrt(fx**2 + fy**2)
+        if mag &lt; 0.01:
+            break
+        x.append(x[-1] + dt * fx / mag)
+        y.append(y[-1] + dt * fy / mag)
+        if abs(x[-1]) &gt; 5 or abs(y[-1]) &gt; 5:
+            break
+    return x, y
+
 def make_linear_field(radial, rotation):
     """Create a linear field with given radial and rotational components."""
     def field(x, y):
@@ -790,11 +804,11 @@ def make_linear_field(radial, rotation):
 
 def classify_fixed_point(radial, rotation):
     """Classify based on eigenvalue structure."""
-    if abs(rotation) < 0.01:
-        return "Stable Node" if radial < 0 else "Unstable Node"
-    elif abs(radial) < 0.01:
+    if abs(rotation) &lt; 0.01:
+        return "Stable Node" if radial &lt; 0 else "Unstable Node"
+    elif abs(radial) &lt; 0.01:
         return "Center"
-    elif radial < 0:
+    elif radial &lt; 0:
         return "Stable Spiral"
     else:
         return "Unstable Spiral"
@@ -831,6 +845,20 @@ fig.show()</code></pre>
             </div>
             <pre><code class="language-python">import numpy as np
 import plotly.graph_objects as go
+
+# Streamline tracer (same as the earlier tab) so this runs standalone
+def trace_streamline(x0, y0, field_func, dt=0.02, steps=500):
+    x, y = [x0], [y0]
+    for _ in range(steps):
+        fx, fy = field_func(x[-1], y[-1])
+        mag = np.sqrt(fx**2 + fy**2)
+        if mag &lt; 0.01:
+            break
+        x.append(x[-1] + dt * fx / mag)
+        y.append(y[-1] + dt * fy / mag)
+        if abs(x[-1]) &gt; 5 or abs(y[-1]) &gt; 5:
+            break
+    return x, y
 
 def dipole_field(x, y, separation=2):
     """Dipole: source at (-d/2, 0), sink at (+d/2, 0)."""

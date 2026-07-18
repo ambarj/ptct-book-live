@@ -453,6 +453,23 @@ print(f"RK4    ΔE/E max: {np.max(np.abs((E(rk) - E(rk)[0])/E(rk)[0])):.2e}")
 import numpy as np
 import plotly.graph_objects as go
 
+# Recompute the RK4 Kepler trajectory (same as the previous tab) so this runs standalone
+def F(r):
+    return -r / (r @ r) ** 1.5
+
+def rk4_step(s, h):
+    def rhs(s):
+        return np.concatenate([s[2:], F(s[:2])])
+    k1 = rhs(s); k2 = rhs(s + 0.5*h*k1)
+    k3 = rhs(s + 0.5*h*k2); k4 = rhs(s + h*k3)
+    return s + (h/6)*(k1 + 2*k2 + 2*k3 + k4)
+
+s0 = np.array([1.0, 0.0, 0.0, 0.9])
+h, N = 0.05, 1000
+rk = np.zeros((N, 4)); s = s0.copy()
+for kk in range(N):
+    rk[kk] = s; s = rk4_step(s, h)
+
 # Verify Kepler's 2nd law: dA/dt = ℓ/(2μ) is constant.
 # Sweep an elliptical orbit; compute area swept per unit time numerically.
 

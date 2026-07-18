@@ -474,7 +474,8 @@
                     The weighted best-fit should be near 4.9 (the true value).  At 30% noise
                     it fluctuates, but weighting by \( 1/\sigma_i^2 \) typically gives a
                     value closer to the truth than the unweighted version, because it
-                    down-weights the noisy late-time points.
+                    down-weights the noisy late-time points.  (Because of that fluctuation,
+                    any answer within roughly &plusmn;30% of 4.9 is accepted here.)
                 </div>
             </div>
         </div>
@@ -610,7 +611,18 @@ fig.show()
 import numpy as np
 import plotly.graph_objects as go
 
-# Using means and errors from Tab 1...
+# Regenerate the dataset (same as Tab 1) so this script runs standalone
+g_true = 9.8
+times = np.arange(1, 11)
+d_true = 0.5 * g_true * times**2
+rng = np.random.default_rng(42)
+N_trials, noise_pct = 5, 0.15
+data = np.array([d_true + rng.normal(0, noise_pct * d_true)
+                 for _ in range(N_trials)])
+means = data.mean(axis=0)
+stds = data.std(axis=0, ddof=1)
+errors = stds / np.sqrt(N_trials - 1)
+
 # Model: d = a + c * t^2 (offset + quadratic)
 a_range = np.linspace(-20, 20, 100)
 c_range = np.linspace(3.0, 7.0, 100)

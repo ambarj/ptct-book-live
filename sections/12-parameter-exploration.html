@@ -346,12 +346,30 @@
 
         <!-- Q5: Fill -->
         <div class="tab-content">
-            <div class="question-container" data-type="fill" data-answer="0[0,0]|0.0[0,0]">
+            <div class="question-container" data-type="mcq" data-answer="1">
                 <div class="question-text">
-                    Sweep \( b \) with \( a = 0, c = 4.9 \).  The minimum of the parabola
-                    should be near the true value \( b_{\text{true}} \).  What is this true value?
-                    <br><br>
-                    \( b_{\text{true}} = \) <input type="text" class="fill-blank" placeholder="value">
+                    Sweep \( b \) with \( a = 0, c = 4.9 \): the minimum sits near
+                    \( b = 0 \), as it should.  Now set <strong>Fixed c = 4.0</strong> (too small)
+                    and sweep \( b \) again.  The minimum moves to a clearly <em>positive</em>
+                    \( b \), and the minimum &chi;&sup2; is much larger.  What is the lesson?
+                </div>
+                <div class="question-options">
+                    <label class="option">
+                        <input type="radio" name="pe-q5" value="0">
+                        <span>The data really do contain an initial velocity</span>
+                    </label>
+                    <label class="option">
+                        <input type="radio" name="pe-q5" value="1">
+                        <span>When another parameter is wrong, the swept one compensates: the \( b\,t \) term partially absorbs the missing \( 0.9\,t^2 \) growth &mdash; so a 1D sweep can mislead unless the other parameters are already right</span>
+                    </label>
+                    <label class="option">
+                        <input type="radio" name="pe-q5" value="2">
+                        <span>The &chi;&sup2; function no longer has a unique minimum</span>
+                    </label>
+                    <label class="option">
+                        <input type="radio" name="pe-q5" value="3">
+                        <span>Changing c alters the measured data points themselves</span>
+                    </label>
                 </div>
                 <div class="question-actions">
                     <button class="btn-verify">Verify</button>
@@ -359,10 +377,13 @@
                 <div class="question-explanation" style="display: none;">
                     <div class="question-explanation-title">Explanation</div>
                     <div class="question-explanation-text">
-                        The Galileo model is \( d = \frac{1}{2}g\,t^2 \) with zero initial velocity,
-                        so \( b_{\text{true}} = 0 \).  The sweep minimum should be near zero, though
-                        noise may shift it slightly.  A nonzero best-fit \( b \) would suggest the
-                        ball had some initial velocity &mdash; which our simulation doesn't include.
+                        With \( c \) pinned at 4.0, the model is missing \( \approx 0.9\,t^2 \)
+                        of growth, and the sweep does its best with the tools it has: a positive
+                        \( b\,t \) partially mimics the missing quadratic.  The best-fit
+                        \( b \) is <em>biased</em>, not because the ball had initial velocity, but
+                        because the parameters are coupled.  This is exactly why one-parameter-at-a-time
+                        exploration must be <em>iterated</em> (fix, sweep, re-fix, re-sweep) &mdash;
+                        the coordinate-descent explorer below does precisely that.
                     </div>
                 </div>
             </div>
@@ -415,10 +436,14 @@
 
 <p>
     Here's a strategy that actually works: optimise one parameter at a time.
-    Fix \( a \) and \( b \), find the best \( c \).  Then fix \( a \) and \( c \),
-    find the best \( b \).  Then fix \( b \) and \( c \), find the best \( a \).
-    Repeat.  This is <strong>coordinate descent</strong> &mdash; simple but effective.
-    Click "Step" to perform one round, or "Auto-Run" to watch it converge.
+    Hold \( a \) and \( b \) fixed and find the best \( c \); then hold
+    \( a \) and \( c \), find the best \( b \); then \( b \) and \( c \),
+    best \( a \).  Repeat.  This is <strong>coordinate descent</strong> &mdash;
+    simple but effective.  The explorer runs this freeze-and-optimise cycle
+    <em>for you</em>: the sliders below only set the <strong>starting point</strong>;
+    each click of "Step" then performs one full round automatically, and
+    "Auto-Run" loops it until convergence.  Watch the history panel to see the
+    parameters take turns moving.
 </p>
 
 <div class="interactive-container" id="iterative-search">
@@ -663,6 +688,16 @@ fig.show()</code></pre>
                 <button class="copy-btn">Copy</button>
             </div>
             <pre><code class="language-python">import numpy as np
+
+# Regenerate the dataset (same as Tab 1) so this script runs standalone
+g_true = 9.8
+times = np.arange(1, 11)
+d_true = 0.5 * g_true * times**2
+rng = np.random.default_rng(42)
+data = np.array([d_true + rng.normal(0, 0.15 * d_true)
+                 for _ in range(5)])
+means = data.mean(axis=0)
+errors = data.std(axis=0, ddof=1) / np.sqrt(4)
 
 def chi2(a, b, c, means, errors, times):
     model = a + b * times + c * times**2

@@ -369,7 +369,7 @@ from scipy.special import comb
 for N in [10, 50, 200]:
     m = np.arange(-N, N+1, 2)
     k = (m + N) // 2
-    binom = np.array([comb(N, ki, exact=True) * 2**(-N) / 2 for ki in k])
+    binom = np.array([comb(N, ki, exact=True) * 2.0**(-N) / 2 for ki in k])
     gauss = np.exp(-m**2 / (2*N)) / np.sqrt(2*np.pi*N)
 
     fig = go.Figure()
@@ -398,7 +398,7 @@ max_errs = []
 for N in Ns:
     m = np.arange(-N, N+1, 2)
     k = (m + N) // 2
-    binom = np.array([comb(N, ki, exact=True) * 2**(-N) / 2 for ki in k])
+    binom = np.array([comb(N, ki, exact=True) * 2.0**(-N) / 2 for ki in k])
     gauss = np.exp(-m**2 / (2*N)) / np.sqrt(2*np.pi*N)
     max_errs.append(np.max(np.abs(binom - gauss)))
 

@@ -453,6 +453,22 @@ fig.show()
 import numpy as np
 import plotly.graph_objects as go
 
+# Recompute the RK4 orbit (same as the previous tab) so this runs standalone
+def F(s):
+    r3 = (s[0]*s[0] + s[1]*s[1]) ** 1.5
+    return np.array([s[2], s[3], -s[0]/r3, -s[1]/r3])
+
+def rk4_step(s, h):
+    k1 = F(s); k2 = F(s + 0.5*h*k1)
+    k3 = F(s + 0.5*h*k2); k4 = F(s + h*k3)
+    return s + (h/6)*(k1 + 2*k2 + 2*k3 + k4)
+
+s = np.array([1.0, 0.0, 0.0, 1.2])
+h, N = 0.02, 1500
+traj = np.zeros((N, 4))
+for i in range(N):
+    traj[i] = s; s = rk4_step(s, h)
+
 # Validate RK4 orbit against Section 8.5's analytical conic.
 # Same r0, vy0 as previous tab.
 mu, k = 1.0, 1.0

@@ -241,7 +241,8 @@
     <p>
         Press <strong>Play</strong> to watch a dot trace the trajectory in both views simultaneously.
         The left panel shows phase space \( (x, y) \); the right shows \( x(t) \) and \( y(t) \)
-        with a vertical cursor marking the current time.
+        with a vertical cursor marking the current time.  Use the \( x_0, y_0 \) sliders to
+        launch the trajectory from a different starting point and watch <em>both</em> views change.
     </p>
 
     <div class="dual-panel">
@@ -259,6 +260,16 @@
                 <option value="stableSpiral">Stable Spiral</option>
                 <option value="saddle">Saddle Point</option>
             </select>
+        </div>
+        <div class="control-group">
+            <label class="control-label" for="ps-x0b-slider">Start x&#8320;:</label>
+            <input type="range" class="slider" id="ps-x0b-slider" min="-3" max="3" step="0.1" value="2">
+            <span id="ps-x0b-value" class="control-value">2.0</span>
+        </div>
+        <div class="control-group">
+            <label class="control-label" for="ps-y0b-slider">Start y&#8320;:</label>
+            <input type="range" class="slider" id="ps-y0b-slider" min="-3" max="3" step="0.1" value="0">
+            <span id="ps-y0b-value" class="control-value">0.0</span>
         </div>
         <div class="control-group">
             <label class="control-label" for="ps-time-slider">Time:</label>
@@ -300,21 +311,22 @@
         <div class="tab-content active">
             <div class="question-container" data-type="mcq" data-answer="1">
                 <div class="question-text">
-                    If a trajectory in phase space is a single stationary point (the dot never moves),
-                    what is the physical system doing?
+                    Press <strong>Play</strong> and pause at a moment when the cyan curve
+                    \( x(t) \) is crossing <em>zero</em> in the time panel.  At that same instant,
+                    where is the dot in the phase portrait?
                 </div>
                 <div class="question-options">
                     <label class="option">
                         <input type="radio" name="ps-q4" value="0">
-                        <span>Oscillating with zero amplitude</span>
+                        <span>At the origin (0, 0)</span>
                     </label>
                     <label class="option">
                         <input type="radio" name="ps-q4" value="1">
-                        <span>Sitting at a fixed point — in equilibrium</span>
+                        <span>Somewhere on the vertical axis (x = 0), still moving</span>
                     </label>
                     <label class="option">
                         <input type="radio" name="ps-q4" value="2">
-                        <span>Moving at constant velocity</span>
+                        <span>At its farthest point from the origin</span>
                     </label>
                 </div>
                 <div class="question-actions">
@@ -322,9 +334,12 @@
                 </div>
                 <div class="question-explanation" style="display:none;">
                     <strong>Explanation:</strong>
-                    A stationary point means \( \dot{x} = 0 \) and \( \dot{y} = 0 \) — both
-                    variables are constant. The system is at equilibrium (a <em>fixed point</em>).
-                    Try setting \( x_0 = 0, y_0 = 0 \) in the Center system to see this.
+                    The two panels show the <em>same instant</em> from two viewpoints: when
+                    \( x(t) = 0 \) in the time panel, the phase-space dot must lie on the
+                    vertical axis \( x = 0 \). It is <em>not</em> at the origin, because the
+                    second variable \( y \) (the magenta curve) is at its extreme just then —
+                    the dot crosses the axis at full speed. Reading one panel from the other,
+                    in both directions, is exactly the skill this explorer builds.
                 </div>
             </div>
         </div>

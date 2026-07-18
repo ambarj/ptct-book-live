@@ -614,6 +614,24 @@ print(f'Exact: ⟨E⟩/N = {-np.tanh(1/T):.3f} J')
 import numpy as np
 import plotly.graph_objects as go
 
+# Metropolis sampler (same as the previous tab) so this runs standalone
+def metropolis_ising_1d(N, T, n_steps, J=1):
+    spins = np.random.choice([-1, 1], N)
+    E = -J * np.sum(spins[:-1] * spins[1:])
+    energies = [E]
+    accepted = 0
+    for step in range(n_steps):
+        i = np.random.randint(N)
+        dE = 0
+        if i &gt; 0:   dE += 2 * J * spins[i] * spins[i-1]
+        if i &lt; N-1: dE += 2 * J * spins[i] * spins[i+1]
+        if dE &lt;= 0 or np.random.random() &lt; np.exp(-dE / T):
+            spins[i] *= -1
+            E += dE
+            accepted += 1
+        energies.append(E)
+    return energies, accepted / n_steps, spins
+
 N, n_steps = 50, 5000
 Ts = np.linspace(0.2, 5, 25)
 mc_E, mc_acc, exact_E = [], [], []

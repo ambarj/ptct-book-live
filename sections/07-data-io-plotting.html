@@ -97,25 +97,27 @@
         <div class="tab-content active">
             <div class="question-container" data-type="mcq" data-answer="1">
                 <div class="question-text">
-                    Set the function to <strong>Sine</strong> and use only <strong>5 sample points</strong>.
-                    What do you see?
+                    Set the function to <strong>Sine</strong> and slide down to
+                    <strong>5 sample points</strong>.  Notice that the few dots could easily be
+                    mistaken for a completely different function &mdash; a straight-ish trend or a
+                    much slower wave.  What general sampling principle does this illustrate?
                 </div>
                 <div class="question-options">
                     <label class="option">
                         <input type="radio" name="dio-q1" value="0">
-                        <span>A smooth sine wave</span>
+                        <span>Noisy measurements always hide the underlying shape</span>
                     </label>
                     <label class="option">
                         <input type="radio" name="dio-q1" value="1">
-                        <span>A few scattered dots &mdash; the sine shape is barely recognizable</span>
+                        <span>Undersampling: with fewer than ~2 points per oscillation, a fast wave can masquerade as a slower trend (aliasing)</span>
                     </label>
                     <label class="option">
                         <input type="radio" name="dio-q1" value="2">
-                        <span>A perfect straight line</span>
+                        <span>Discrete data can never represent a continuous function</span>
                     </label>
                     <label class="option">
                         <input type="radio" name="dio-q1" value="3">
-                        <span>A parabola</span>
+                        <span>The sine function itself changes when it is sampled</span>
                     </label>
                 </div>
                 <div class="question-actions">
@@ -124,10 +126,13 @@
                 <div class="question-explanation" style="display: none;">
                     <div class="question-explanation-title">Explanation</div>
                     <div class="question-explanation-text">
-                        With only 5 points spread over the range [0, 10], the sine wave's oscillations
-                        are barely captured. The dots jump up and down but don't clearly trace out a smooth wave.
-                        This is a fundamental limitation of discrete sampling &mdash; you need enough points
-                        to capture the function's features.
+                        With only 5 points over [0, 10], each oscillation of the sine is sampled
+                        fewer than twice &mdash; below that rate the samples are consistent with many
+                        different curves, including much slower ones. This impersonation of a slower
+                        signal is called <strong>aliasing</strong>, and it is why experiments must sample
+                        faster than the fastest feature they hope to capture (step N upward and watch
+                        the true wave emerge). There is no noise here at all &mdash; undersampling alone
+                        destroys the shape.
                     </div>
                 </div>
             </div>

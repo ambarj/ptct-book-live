@@ -402,6 +402,30 @@ import numpy as np
 import plotly.graph_objects as go
 from plotly.subplots import make_subplots
 
+# Force factory and RK4 integrator (same as the first tab) so this runs standalone
+def make_F(potential, **p):
+    if potential == 'kepler':
+        return lambda r: -p['k'] * r / (r @ r) ** 1.5
+    if potential == 'harmonic':
+        return lambda r: -p['K'] * r
+    if potential == 'yukawa':
+        def F_y(r):
+            rmag = np.sqrt(r @ r)
+            return -p['k'] * r * np.exp(-rmag/p['r0']) * (
+                1/rmag**3 + 1/(p['r0']*rmag**2))
+        return F_y
+    if potential == 'power101':
+        return lambda r: -1.01 * p['k'] * r / (r @ r) ** (2.01/2 + 1)
+
+def rk4(F, s, h, N):
+    rhs = lambda s: np.concatenate([s[2:], F(s[:2])])
+    out = np.zeros((N, 4)); out[0] = s
+    for i in range(1, N):
+        k1 = rhs(out[i-1]); k2 = rhs(out[i-1] + 0.5*h*k1)
+        k3 = rhs(out[i-1] + 0.5*h*k2); k4 = rhs(out[i-1] + h*k3)
+        out[i] = out[i-1] + (h/6)*(k1 + 2*k2 + 2*k3 + k4)
+    return out
+
 # Same s0, four different potentials — Bertrand's theorem in 4 panels.
 s0 = np.array([1.0, 0.0, 0.0, 0.95])
 h, N = 0.02, 3000
@@ -437,11 +461,35 @@ fig.show()
             <pre><code class="language-python">
 import numpy as np
 
+# Force factory and RK4 integrator (same as the first tab) so this runs standalone
+def make_F(potential, **p):
+    if potential == 'kepler':
+        return lambda r: -p['k'] * r / (r @ r) ** 1.5
+    if potential == 'harmonic':
+        return lambda r: -p['K'] * r
+    if potential == 'yukawa':
+        def F_y(r):
+            rmag = np.sqrt(r @ r)
+            return -p['k'] * r * np.exp(-rmag/p['r0']) * (
+                1/rmag**3 + 1/(p['r0']*rmag**2))
+        return F_y
+    if potential == 'power101':
+        return lambda r: -1.01 * p['k'] * r / (r @ r) ** (2.01/2 + 1)
+
+def rk4(F, s, h, N):
+    rhs = lambda s: np.concatenate([s[2:], F(s[:2])])
+    out = np.zeros((N, 4)); out[0] = s
+    for i in range(1, N):
+        k1 = rhs(out[i-1]); k2 = rhs(out[i-1] + 0.5*h*k1)
+        k3 = rhs(out[i-1] + 0.5*h*k2); k4 = rhs(out[i-1] + h*k3)
+        out[i] = out[i-1] + (h/6)*(k1 + 2*k2 + 2*k3 + k4)
+    return out
+
 # Quantify precession: angle between successive perihelia.
 def perihelion_angles(traj):
     r = np.sqrt(traj[:,0]**2 + traj[:,1]**2)
     # local minima of r
-    mins = (r[1:-1] < r[:-2]) & (r[1:-1] < r[2:])
+    mins = (r[1:-1] &lt; r[:-2]) &amp; (r[1:-1] &lt; r[2:])
     idx = np.where(mins)[0] + 1
     angles = np.arctan2(traj[idx, 1], traj[idx, 0])
     return idx, angles
@@ -456,10 +504,10 @@ for label, pot, params in [
     ('Power-1.01', 'power101', {'k': 1.0})]:
     traj = rk4(make_F(pot, **params), s0, h, N)
     _, ang = perihelion_angles(traj)
-    if len(ang) >= 2:
+    if len(ang) &gt;= 2:
         # Convert successive angle differences mod 2π
         d = np.diff(np.unwrap(ang))
-        precess_per_orbit = (d.mean() - 2*np.pi if d.mean() > np.pi else d.mean()) * 180/np.pi
+        precess_per_orbit = (d.mean() - 2*np.pi if d.mean() &gt; np.pi else d.mean()) * 180/np.pi
         print(f'{label:12s}: {len(ang)} perihelia, precession ≈ {precess_per_orbit:+.2f}° / orbit')
     else:
         print(f'{label:12s}: only {len(ang)} perihelion seen — extend integration')

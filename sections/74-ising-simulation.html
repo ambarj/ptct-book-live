@@ -602,12 +602,29 @@ fig.show()
 import numpy as np
 import plotly.graph_objects as go
 
+# Metropolis sampler (same as the previous tab) so this runs standalone
+def metropolis_1d(N, T, n_steps):
+    spins = np.random.choice([-1, 1], N)
+    E = -np.sum(spins[:-1] * spins[1:])
+    energies, mags = [], []
+    for _ in range(n_steps):
+        i = np.random.randint(N)
+        dE = 0
+        if i &gt; 0:   dE += 2 * spins[i] * spins[i-1]
+        if i &lt; N-1: dE += 2 * spins[i] * spins[i+1]
+        if dE &lt;= 0 or np.random.random() &lt; np.exp(-dE/T):
+            spins[i] *= -1
+            E += dE
+        energies.append(E)
+        mags.append(np.abs(np.sum(spins)) / N)
+    return np.array(energies), np.array(mags)
+
 def autocorrelation(data, max_lag=200):
     """Compute normalized autocorrelation function."""
     n = len(data)
     mean = np.mean(data)
     var = np.var(data)
-    if var < 1e-10: return np.zeros(max_lag)
+    if var &lt; 1e-10: return np.zeros(max_lag)
     C = np.zeros(max_lag)
     for k in range(max_lag):
         C[k] = np.mean((data[:n-k] - mean) * (data[k:] - mean)) / var

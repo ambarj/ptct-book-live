@@ -207,7 +207,11 @@
 
     function computeExplorer2() {
         var sysKey = document.getElementById('ps-system2').value;
-        sol2 = rk4Solve(sysKey, 2, 0, Tmax2, Nsteps2);
+        var x0El = document.getElementById('ps-x0b-slider');
+        var y0El = document.getElementById('ps-y0b-slider');
+        var x0 = x0El ? parseFloat(x0El.value) : 2;
+        var y0 = y0El ? parseFloat(y0El.value) : 0;
+        sol2 = rk4Solve(sysKey, x0, y0, Tmax2, Nsteps2);
         animIdx = 0;
         var slider = document.getElementById('ps-time-slider');
         slider.max = sol2.t.length - 1;
@@ -269,7 +273,10 @@
                 name: 'y(t)'
             },
             {
-                x: [sol2.X[idx]], y: [sol2.Y[idx]],
+                // Cursor dots ride the two curves at the current time —
+                // NOT at the phase-space point (X, Y), which lives on
+                // different axes and would float as a stray marker here
+                x: [tcur, tcur], y: [sol2.X[idx], sol2.Y[idx]],
                 type: 'scatter', mode: 'markers',
                 marker: { color: '#ffbe0b', size: 10 },
                 hoverinfo: 'none', showlegend: false
@@ -396,6 +403,10 @@
     window.psTimeReset = function() {
         stopAnimation();
         document.getElementById('ps-system2').value = 'center';
+        var x0El = document.getElementById('ps-x0b-slider');
+        var y0El = document.getElementById('ps-y0b-slider');
+        if (x0El) { x0El.value = 2; document.getElementById('ps-x0b-value').textContent = '2.0'; }
+        if (y0El) { y0El.value = 0; document.getElementById('ps-y0b-value').textContent = '0.0'; }
         computeExplorer2();
         drawExplorer2(0);
     };
@@ -454,6 +465,16 @@
             stopAnimation();
             computeExplorer2();
             drawExplorer2(0);
+        });
+        ['x0b', 'y0b'].forEach(function(key) {
+            var el = document.getElementById('ps-' + key + '-slider');
+            if (el) el.addEventListener('input', function() {
+                var lab = document.getElementById('ps-' + key + '-value');
+                if (lab) lab.textContent = parseFloat(this.value).toFixed(1);
+                stopAnimation();
+                computeExplorer2();
+                drawExplorer2(0);
+            });
         });
         if (tSlider) tSlider.addEventListener('input', function() {
             stopAnimation();

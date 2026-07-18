@@ -400,6 +400,28 @@ fig.show()
 import numpy as np
 import plotly.graph_objects as go
 
+# Recompute the two-body trajectory (same as the previous tab) so this runs standalone
+G = 1.0
+
+def rhs(state):
+    x1, y1, vx1, vy1, x2, y2, vx2, vy2 = state
+    dx, dy = x2 - x1, y2 - y1
+    r3 = (dx*dx + dy*dy) ** 1.5
+    fx, fy = G * dx / r3, G * dy / r3
+    return np.array([vx1, vy1,  0.3*fx,  0.3*fy,
+                     vx2, vy2, -1.0*fx, -1.0*fy])
+
+def rk4_step(s, h):
+    k1 = rhs(s); k2 = rhs(s + 0.5*h*k1)
+    k3 = rhs(s + 0.5*h*k2); k4 = rhs(s + h*k3)
+    return s + (h/6) * (k1 + 2*k2 + 2*k3 + k4)
+
+s = np.array([-0.3/1.3, 0, 0, -0.7, 1.0/1.3, 0, 0, 0.7/0.3])
+h, N = 0.02, 1500
+traj = np.zeros((N, 8))
+for kk in range(N):
+    traj[kk] = s; s = rk4_step(s, h)
+
 # Verify the reduction: from full trajectory above, compute R(t) and r(t)
 # Check (i) R drifts uniformly, (ii) r obeys μ r̈ = f(r)
 
@@ -407,7 +429,6 @@ m1, m2 = 1.0, 0.3
 mu = m1*m2/(m1+m2)
 M  = m1 + m2
 
-# Assume traj from previous tab is available
 # R = (m1 r1 + m2 r2)/M
 Rx = (m1*traj[:,0] + m2*traj[:,4]) / M
 Ry = (m1*traj[:,1] + m2*traj[:,5]) / M
@@ -431,7 +452,7 @@ fig.update_layout(template='plotly_dark',
 fig.show()
 
 print(f"μ = {mu:.4f},  μ/m₁ = {mu/m1:.4f},  μ/m₂ = {mu/m2:.4f}")
-print(f"Expected: μ < min(m₁, m₂) = {min(m1, m2)}")
+print(f"Expected: μ &lt; min(m₁, m₂) = {min(m1, m2)}")
             </code></pre>
         </div>
     </div>
