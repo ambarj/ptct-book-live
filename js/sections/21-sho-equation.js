@@ -66,6 +66,7 @@
 
         var statsDiv = document.getElementById('sh-ode-stats');
         if (statsDiv) {
+            var T = 2 * Math.PI / omega;
             statsDiv.innerHTML =
                 '<span>\u03C9 = <strong>'+omega.toFixed(1)+' rad/s</strong></span>'+
                 '<span>A = <strong>'+A.toFixed(1)+'</strong></span>'+

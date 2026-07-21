@@ -57,7 +57,7 @@
         document.getElementById('nondim-length-value').textContent = l.toFixed(1);
         document.getElementById('nondim-gravity-value').textContent = g.toFixed(1);
 
-        // Energy scale
+        // Energy scale (displayed as the dimensional plot's title)
         const E_scale = m * g * l;
 
         // Generate data
@@ -88,6 +88,10 @@
             paper_bgcolor: '#0a0e27',
             plot_bgcolor: '#151934',
             margin: { l: 60, r: 30, t: 30, b: 50 },
+            title: {
+                text: 'energy scale mgℓ = ' + E_scale.toFixed(1) + ' J',
+                font: { size: 12, color: '#a0a8d0' }
+            },
             xaxis: {
                 title: 'θ (degrees)',
                 range: [-180, 180],
@@ -96,7 +100,12 @@
             },
             yaxis: {
                 title: 'V (Joules)',
-                range: [0, E_scale * 2.2],
+                // FIXED range: if this axis rescaled with mgℓ the dimensional
+                // curve would always fill the same fraction of the plot and
+                // look identical to the dimensionless one — hiding the whole
+                // point. With fixed axes, changing m, ℓ, or g visibly grows or
+                // shrinks V(θ) while the dimensionless panel never moves.
+                range: [0, 100],
                 gridcolor: '#2a2f4a',
                 zerolinecolor: '#808080'
             },
@@ -160,57 +169,56 @@
         const theta = thetaDeg * Math.PI / 180;
         const phi = phiDeg * Math.PI / 180;
 
-        // Trajectory: y = -Γx²/(2cos²θ) + x·tanθ + Γ
-        // Hill: y = -x·tanφ + Γ
-        // Intersection: solve for x
+        // Non-dimensionalized with the HILL HEIGHT h as the length scale
+        // (x̄ = x/h, ȳ = y/h), so the terrain is anchored: launch always at
+        // (0, 1), hill base always at (cot φ, 0), flat ground ȳ = 0 beyond.
+        // Γ = gh/v² enters only through the trajectory's curvature:
+        //   Trajectory: ȳ = 1 + x̄·tanθ − Γ x̄²/(2cos²θ)
+        //   Hill face:  ȳ = 1 − x̄·tanφ   (0 ≤ x̄ ≤ cot φ), then ground ȳ = 0
+        const tanT = Math.tan(theta);
+        const tanP = Math.tan(phi);
+        const cos2 = Math.cos(theta) * Math.cos(theta);
+        const xBase = tanP > 1e-10 ? 1 / tanP : Infinity;
 
-        const A = -Gamma / (2 * Math.cos(theta) * Math.cos(theta));
-        const B = Math.tan(theta) + Math.tan(phi);
-
-        let xLand = 0;
-        if (Math.abs(A) > 1e-10) {
-            xLand = -B / A;
+        // Landing: try the hill face first, else the flat ground
+        let xLand = 2 * cos2 * (tanT + tanP) / Gamma;
+        let yLand, regime;
+        if (xLand <= xBase) {
+            yLand = 1 - xLand * tanP;
+            regime = 'hill face';
+        } else {
+            xLand = (cos2 / Gamma) * (tanT + Math.sqrt(tanT * tanT + 2 * Gamma / cos2));
+            yLand = 0;
+            regime = 'flat ground';
         }
-        xLand = Math.max(0, xLand);
 
-        const yLand = -Math.tan(phi) * xLand + Gamma;
+        // Fixed axes: with the terrain anchored and Γ ≥ 0.2 every
+        // trajectory (apex ≤ 1 + 1/(2Γ) ≤ 3.5, landing ≤ ~6) stays in frame
+        const xAxisMax = 6.5;
+        const yAxisMax = 3.6;
 
-        // Axis ranges depend only on Γ and φ (worst case over all launch
-        // angles), so moving the θ slider never rescales the plot and
-        // trajectories stay visually comparable
-        let xAxisMax = 2;
-        for (let deg = 5; deg <= 85; deg += 2) {
-            const th = deg * Math.PI / 180;
-            const a = -Gamma / (2 * Math.cos(th) * Math.cos(th));
-            const b = Math.tan(th) + Math.tan(phi);
-            xAxisMax = Math.max(xAxisMax, -b / a);
-        }
-        const yAxisMax = Gamma + 0.5 / Gamma;
-        const yAxisMin = Math.min(-0.3, -Math.tan(phi) * xAxisMax + Gamma - 0.3);
-
-        // Generate trajectory
+        // Trajectory drawn from launch to the landing point
         const xTraj = [];
         const yTraj = [];
-        const nPoints = 100;
-        const xMax = Math.max(xLand * 1.2, 2);
-
+        const nPoints = 120;
         for (let i = 0; i < nPoints; i++) {
-            const x = xMax * i / (nPoints - 1);
-            const y = A * x * x + Math.tan(theta) * x + Gamma;
+            const x = xLand * i / (nPoints - 1);
+            yTraj.push(1 + tanT * x - Gamma * x * x / (2 * cos2));
             xTraj.push(x);
-            yTraj.push(y);
         }
 
-        // Hill line spans the full (fixed) axis range
-        const xHill = [];
-        const yHill = [];
-        for (let i = 0; i < 50; i++) {
-            const x = xAxisMax * 1.1 * i / 49;
-            xHill.push(x);
-            yHill.push(-Math.tan(phi) * x + Gamma);
+        // Terrain polyline: hill face down to its base, then flat ground —
+        // one continuous yellow line
+        const xTerr = [0];
+        const yTerr = [1];
+        if (xBase < xAxisMax) {
+            xTerr.push(xBase, xAxisMax);
+            yTerr.push(0, 0);
+        } else {
+            xTerr.push(xAxisMax);
+            yTerr.push(1 - xAxisMax * tanP);
         }
 
-        // Traces
         const traceTrajectory = {
             x: xTraj,
             y: yTraj,
@@ -220,13 +228,13 @@
             name: 'Trajectory'
         };
 
-        const traceHill = {
-            x: xHill,
-            y: yHill,
+        const traceTerrain = {
+            x: xTerr,
+            y: yTerr,
             type: 'scatter',
             mode: 'lines',
             line: { color: '#ffff00', width: 2 },
-            name: 'Hill'
+            name: 'Hill & ground'
         };
 
         const traceLanding = {
@@ -238,10 +246,10 @@
             name: 'Landing'
         };
 
-        // Start point
+        // Launch is anchored at (0, 1) = the hilltop, one hill-height up
         const traceStart = {
             x: [0],
-            y: [Gamma],
+            y: [1],
             type: 'scatter',
             mode: 'markers',
             marker: { color: '#00ff9f', size: 10, symbol: 'circle' },
@@ -254,30 +262,39 @@
             plot_bgcolor: '#151934',
             margin: { l: 60, r: 30, t: 30, b: 50 },
             xaxis: {
-                title: 'x̄ (dimensionless)',
-                range: [-0.3, xAxisMax * 1.1],
+                title: 'x̄ = x/h',
+                range: [-0.2, xAxisMax],
                 gridcolor: '#2a2f4a',
                 zerolinecolor: '#808080'
             },
             yaxis: {
-                title: 'ȳ (dimensionless)',
-                range: [yAxisMin, yAxisMax],
+                title: 'ȳ = y/h',
+                range: [-0.15, yAxisMax],
                 gridcolor: '#2a2f4a',
                 zerolinecolor: '#808080'
             },
             showlegend: true,
             legend: {
-                x: 0.02,
+                x: 0.98,
+                xanchor: 'right',
                 y: 0.98,
                 bgcolor: 'rgba(10, 14, 39, 0.8)'
             }
         };
 
         Plotly.react('nondim-projectile-plot',
-            [traceTrajectory, traceHill, traceStart, traceLanding],
+            [traceTrajectory, traceTerrain, traceStart, traceLanding],
             layout,
             { responsive: true }
         );
+
+        const statsDiv = document.getElementById('nondim-projectile-stats');
+        if (statsDiv) {
+            statsDiv.innerHTML =
+                '<span>landing x̄ = <strong>' + xLand.toFixed(3) + '</strong></span>' +
+                '<span>lands on: <strong>' + regime + '</strong></span>' +
+                '<span>launch speed V = v/√(gh) = 1/√Γ = <strong>' + (1 / Math.sqrt(Gamma)).toFixed(2) + '</strong></span>';
+        }
     }
 
     // ========================================

@@ -308,8 +308,9 @@
 <h2>Explorer 2: Projectile on a Hill</h2>
 
 <p>
-    A more complex example: A projectile is launched from height \( h \) above a hill with slope angle \( \phi \).
-    It's launched at angle \( \theta \) with speed \( v \). Where does it land on the hill?
+    A more complex example: a projectile is launched from the top of a hill of height \( h \),
+    whose face slopes down at angle \( \phi \) to flat ground. It's launched at angle
+    \( \theta \) with speed \( v \). Where does it land?
 </p>
 
 <p>
@@ -351,7 +352,7 @@
                 Γ = gh/v²:
                 <span class="control-label-value" id="nondim-gamma-value">0.30</span>
             </label>
-            <input type="range" class="slider" id="nondim-gamma-slider" min="0.05" max="1.5" step="0.01" value="0.3">
+            <input type="range" class="slider" id="nondim-gamma-slider" min="0.2" max="1.5" step="0.01" value="0.3">
         </div>
 
         <div class="btn-group">
@@ -361,14 +362,23 @@
 
     <div class="plot-container" id="nondim-projectile-plot"></div>
 
+    <div id="nondim-projectile-stats"
+         style="display: flex; justify-content: center; gap: 1.5rem; padding: 8px 0; font-size: 0.85rem; color: #c8c8e0; flex-wrap: wrap;"></div>
+
     <div class="info-box" style="margin-top: var(--spacing-md);">
         <div class="info-box-title">Reading the Plot</div>
         <p>
-            <strong>Cyan curve:</strong> Projectile trajectory in dimensionless coordinates \( (\bar{x}, \bar{y}) \)
-            where lengths are scaled by \( v^2/g \).<br>
-            <strong>Yellow line:</strong> The hill surface.<br>
-            <strong>Magenta dot:</strong> Landing point where trajectory meets hill.<br>
-            Try increasing \( \Gamma \)—what happens to the range?
+            <strong>Cyan curve:</strong> Projectile trajectory in dimensionless coordinates
+            \( (\bar{x}, \bar{y}) = (x/h,\, y/h) \) — every length is measured in units of the
+            hill height \( h \), so the terrain never moves.<br>
+            <strong>Yellow line:</strong> The terrain — the hill face runs from the launch point
+            \( (0, 1) \) down to its base at \( (\cot\phi, 0) \), then continues as flat ground
+            at \( \bar{y} = 0 \).<br>
+            <strong>Magenta dot:</strong> Landing point (on the slope, or on the ground beyond it).<br>
+            Each slider now does one job: \( \phi \) reshapes the hill, \( \theta \) aims the
+            launch, and \( \Gamma = gh/v^2 \) sets how far the throw reaches. Try decreasing
+            \( \Gamma \) (a faster launch)—when does the projectile first clear the hill and
+            land on the flat ground?
         </p>
     </div>
 </div>
@@ -503,22 +513,31 @@
         </div>
 
         <div class="tab-content">
-            <div class="question-container" data-type="fill" data-answer="35[32,38]">
+            <div class="question-container" data-type="fill" data-answer="30[27,33]">
                 <div class="question-text">
-                    Set \( \Gamma = 0.3 \) and \( \phi = 20° \). Experiment with \( \theta \) to find
-                    the launch angle that maximizes the landing distance (x-coordinate of magenta dot).
+                    Set \( \phi = 30° \) and \( \Gamma = 1.2 \) (a tall hill and a modest launch
+                    speed, so every throw lands on the slope). Experiment with \( \theta \) to find
+                    the launch angle that maximizes the landing distance — watch the "landing x̄"
+                    readout under the plot.
                     <br><br>
                     Optimal launch angle ≈ <input type="text" class="fill-blank" style="width: 80px;"> °
                 </div>
                 <div class="question-explanation" style="display: none;">
                     <div class="question-explanation-title">Explanation</div>
                     <div class="question-explanation-text">
-                        The optimal launch angle is about 35° — noticeably less than the flat-ground
-                        answer of 45°! Because the hill falls away below the launch point, the projectile
-                        gains extra flight time, and a flatter launch converts that time into horizontal
-                        distance. Working through the algebra gives \( \theta_{\text{opt}} = 45° - \phi/2 \),
-                        independent of \( \Gamma \): for \( \phi = 20° \), that is 35°. The steeper the
-                        hill, the flatter the optimal launch.
+                        On the slope the optimum is \( \theta_{\text{opt}} = 45° - \phi/2 \),
+                        independent of \( \Gamma \) — for \( \phi = 30° \) that is
+                        <strong>30°</strong> (landing x̄ ≈ 1.44). It is <em>less</em> than the
+                        flat-ground 45° because the hill falls away below the launch point: the
+                        projectile gains flight time, and a flatter launch converts that time into
+                        distance. (Maximizing \( \bar{x} = 2\cos^2\theta\,(\tan\theta +
+                        \tan\phi)/\Gamma \) gives \( \tan 2\theta = \cot\phi \).)
+                        <br><br>
+                        Now lower \( \Gamma \) to 0.3 and set \( \phi = 20° \): the projectile
+                        clears the hill and lands on the flat ground, and the optimum shifts to the
+                        launch-from-height value \( \theta_{\text{opt}} =
+                        \arctan\!\big(1/\sqrt{1+2\Gamma}\big) \approx 38° \). Two regimes,
+                        two optima — the magenta dot tells you which rule is in charge.
                     </div>
                 </div>
                 <div class="question-actions">
@@ -794,59 +813,51 @@ fig.show()</code></pre>
             <pre><code class="language-python">import numpy as np
 import plotly.graph_objects as go
 
-def projectile_on_hill(theta_deg, phi_deg, Gamma, n_points=100):
+def projectile_on_hill(theta_deg, phi_deg, Gamma, n_points=120):
     """
-    Compute dimensionless trajectory and find landing point.
+    Dimensionless projectile over a hill, using the HILL HEIGHT h
+    as the length scale: xbar = x/h, ybar = y/h.
 
-    Parameters:
-        theta_deg: Launch angle (degrees)
-        phi_deg: Hill slope angle (degrees)
-        Gamma: Dimensionless parameter gh/v²
-        n_points: Number of trajectory points
+    Launch point (0, 1); hill face ybar = 1 - xbar*tan(phi) down to its
+    base at xbar = cot(phi); flat ground ybar = 0 beyond.
 
-    Returns:
-        x_traj, y_traj: Trajectory coordinates (dimensionless)
-        x_land, y_land: Landing point
+    Trajectory: ybar = 1 + xbar*tan(theta) - Gamma*xbar^2/(2 cos^2 theta)
+    with Gamma = g*h/v^2 (potential-to-kinetic energy ratio).
+
+    Returns trajectory, terrain polyline, landing point, and regime.
     """
     theta = np.radians(theta_deg)
     phi = np.radians(phi_deg)
+    tan_t, tan_p = np.tan(theta), np.tan(phi)
+    cos2 = np.cos(theta)**2
+    x_base = 1/tan_p if tan_p > 1e-10 else np.inf
 
-    # Trajectory: y = -Γx²/(2cos²θ) + x·tanθ + Γ
-    # Hill: y = -x·tanφ + Γ
-    # (using Γ as dimensionless starting height)
-
-    # Find landing x by solving intersection
-    # -Γx²/(2cos²θ) + x·tanθ + Γ = -x·tanφ + Γ
-    # -Γx²/(2cos²θ) + x(tanθ + tanφ) = 0
-    # x(-Γx/(2cos²θ) + tanθ + tanφ) = 0
-
-    A = -Gamma / (2 * np.cos(theta)**2)
-    B = np.tan(theta) + np.tan(phi)
-
-    if abs(A) < 1e-10:
-        x_land = 0
+    # Landing: try the hill face first, else the flat ground
+    x_land = 2*cos2*(tan_t + tan_p) / Gamma
+    if x_land <= x_base:
+        y_land, regime = 1 - x_land*tan_p, 'hill face'
     else:
-        x_land = -B / A  # x = 0 or x = -B/A
+        x_land = cos2/Gamma * (tan_t + np.sqrt(tan_t**2 + 2*Gamma/cos2))
+        y_land, regime = 0.0, 'flat ground'
 
-    x_land = max(0, x_land)  # Must be positive
+    x_traj = np.linspace(0, x_land, n_points)
+    y_traj = 1 + tan_t*x_traj - Gamma*x_traj**2/(2*cos2)
 
-    # Generate trajectory
-    x_traj = np.linspace(0, x_land * 1.1, n_points)
-    y_traj = A * x_traj**2 + np.tan(theta) * x_traj + Gamma
+    # Terrain: hilltop -> base -> flat ground (one polyline)
+    x_max = max(6.5, x_land*1.1)
+    if x_base < x_max:
+        x_terr, y_terr = [0, x_base, x_max], [1, 0, 0]
+    else:
+        x_terr, y_terr = [0, x_max], [1, 1 - x_max*tan_p]
 
-    # Hill line
-    x_hill = np.linspace(0, x_land * 1.2, 50)
-    y_hill = -np.tan(phi) * x_hill + Gamma
-
-    # Landing point
-    y_land = -np.tan(phi) * x_land + Gamma
-
-    return x_traj, y_traj, x_hill, y_hill, x_land, y_land
+    return x_traj, y_traj, x_terr, y_terr, x_land, y_land, regime
 
 # Example parameters
-theta, phi, Gamma = 45, 20, 0.3
+theta, phi, Gamma = 30, 30, 1.2
 
-x_traj, y_traj, x_hill, y_hill, x_land, y_land = projectile_on_hill(theta, phi, Gamma)
+x_traj, y_traj, x_terr, y_terr, x_land, y_land, regime = \
+    projectile_on_hill(theta, phi, Gamma)
+print(f"lands on {regime} at xbar = {x_land:.3f}")
 
 fig = go.Figure()
 
@@ -857,11 +868,11 @@ fig.add_trace(go.Scatter(
     name='Trajectory'
 ))
 
-# Hill
+# Terrain (hill face + flat ground, one yellow line)
 fig.add_trace(go.Scatter(
-    x=x_hill, y=y_hill, mode='lines',
+    x=x_terr, y=y_terr, mode='lines',
     line=dict(color='#ffff00', width=2),
-    name='Hill'
+    name='Hill & ground'
 ))
 
 # Landing point
@@ -874,10 +885,8 @@ fig.add_trace(go.Scatter(
 fig.update_layout(
     template='plotly_dark',
     title=f'Projectile on Hill: θ={theta}°, φ={phi}°, Γ={Gamma}',
-    xaxis=dict(title='x̄ (dimensionless)', gridcolor='#2a2f4a',
-               scaleanchor='y', range=[-0.5, max(x_land*1.3, 2)]),
-    yaxis=dict(title='ȳ (dimensionless)', gridcolor='#2a2f4a',
-               range=[-0.5, Gamma*1.5]),
+    xaxis=dict(title='x̄ = x/h', gridcolor='#2a2f4a', range=[-0.2, 6.5]),
+    yaxis=dict(title='ȳ = y/h', gridcolor='#2a2f4a', range=[-0.15, 3.6]),
 )
 
 fig.show()</code></pre>
