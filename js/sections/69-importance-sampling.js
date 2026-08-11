@@ -266,7 +266,7 @@
             xaxis: axStyle(null, ''), yaxis: Object.assign(axStyle(null, 'Variance'), { type: 'log' }),
             height: 400,
             annotations: [{ x: 0.5, y: 0.5, text: (ratio > 1 ? ratio.toFixed(0) + '× reduction' : (1/ratio).toFixed(0) + '× WORSE'),
-                font: { color: ratio > 1 ? '#00ff88' : '#ff006e', size: 16 }, showarrow: false, xref: 'paper', yref: 'paper' }]
+                font: { color: '#ffbe0b', size: 16 }, showarrow: false, xref: 'paper', yref: 'paper' }]
         }), { responsive: true });
 
         document.getElementById('is-stats3').innerHTML =

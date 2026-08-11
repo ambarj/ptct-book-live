@@ -86,6 +86,10 @@
 
     function updateFPSelect(selectId, fps) {
         var sel = document.getElementById(selectId);
+        // Repopulating resets the browser's selection to index 0, which
+        // silently discarded the user's choice on every redraw — remember
+        // it and restore (clamped) after rebuilding the options
+        var prev = parseInt(sel.value);
         sel.innerHTML = '';
         for (var i=0; i<fps.length; i++) {
             var o = document.createElement('option');
@@ -93,6 +97,7 @@
             o.textContent = '('+fps[i][0].toFixed(1)+', '+fps[i][1].toFixed(1)+') '+fps[i][2];
             sel.appendChild(o);
         }
+        sel.value = Math.min(isNaN(prev) ? 0 : prev, Math.max(fps.length - 1, 0));
     }
 
     // ===============================================================

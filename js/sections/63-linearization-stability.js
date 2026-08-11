@@ -91,12 +91,17 @@
     sysDefs.glycolysis.fps = [[0.5, 0.5/(0.5+0.25), 'Steady state']];
 
     function updateFPSelect(id, fps) {
-        var sel=document.getElementById(id); sel.innerHTML='';
+        var sel=document.getElementById(id);
+        // Preserve the user's selection across redraws (repopulating the
+        // options otherwise resets it to index 0 every time)
+        var prev=parseInt(sel.value);
+        sel.innerHTML='';
         for(var i=0;i<fps.length;i++){
             var o=document.createElement('option');o.value=i;
             o.textContent='('+fps[i][0].toFixed(2)+', '+fps[i][1].toFixed(2)+') '+fps[i][2];
             sel.appendChild(o);
         }
+        sel.value=Math.min(isNaN(prev)?0:prev, Math.max(fps.length-1,0));
     }
 
     function drawPhasePortrait(plotId, sys, fpIdx, height) {

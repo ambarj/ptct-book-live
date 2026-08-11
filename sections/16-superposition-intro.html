@@ -174,12 +174,13 @@
 
         <!-- Q2: Fill -->
         <div class="tab-content">
-            <div class="question-container" data-type="fill" data-answer="2[1.8,2.2]">
+            <div class="question-container" data-type="fill" data-answer="120[110,130]">
                 <div class="question-text">
-                    With A<sub>1</sub> = 1, A<sub>2</sub> = 1, and &Delta;&phi; = 0, the
-                    resultant amplitude A is:
+                    With A<sub>1</sub> = 1 and A<sub>2</sub> = 1, sweep &Delta;&phi; to find
+                    the phase difference at which the resultant amplitude is exactly A = 1
+                    &mdash; no bigger than either wave alone.
                     <br><br>
-                    A = <input type="text" class="fill-blank" placeholder="value">
+                    &Delta;&phi; &asymp; <input type="text" class="fill-blank" placeholder="degrees">&deg;
                 </div>
                 <div class="question-actions">
                     <button class="btn-verify">Verify</button>
@@ -187,10 +188,11 @@
                 <div class="question-explanation" style="display: none;">
                     <div class="question-explanation-title">Explanation</div>
                     <div class="question-explanation-text">
-                        When two waves are in phase (\( \Delta\phi = 0 \)), their amplitudes
-                        simply add: \( A = A_1 + A_2 = 1 + 1 = 2 \).  This is
-                        <strong>constructive interference</strong>.  The formula gives
-                        \( A^2 = 1 + 1 + 2\cos(0) = 4 \), so \( A = 2 \).
+                        Solve \( A^2 = 1 + 1 + 2\cos\Delta\phi = 1 \):
+                        \( \cos\Delta\phi = -\tfrac{1}{2} \), so \( \Delta\phi = 120° \).
+                        A striking landmark: at 120&deg; two unit waves conspire to produce&hellip;
+                        exactly a unit wave again.  (Three unit waves at mutual 120&deg; cancel
+                        completely &mdash; the principle behind three-phase electrical power.)
                     </div>
                 </div>
             </div>
@@ -198,12 +200,14 @@
 
         <!-- Q3: Fill -->
         <div class="tab-content">
-            <div class="question-container" data-type="fill" data-answer="1.41[1.3,1.5]">
+            <div class="question-container" data-type="fill" data-answer="240[220,260]">
                 <div class="question-text">
-                    With A<sub>1</sub> = 1, A<sub>2</sub> = 1, and &Delta;&phi; = 90&deg;,
-                    the resultant amplitude A is approximately:
+                    Sweep &Delta;&phi; through a full circle with A<sub>1</sub> =
+                    A<sub>2</sub> = 1.  Over what total range of &Delta;&phi; (in degrees,
+                    out of 360&deg;) is the resultant <em>larger</em> than either individual
+                    wave (A &gt; 1)?
                     <br><br>
-                    A &asymp; <input type="text" class="fill-blank" placeholder="value">
+                    Range &asymp; <input type="text" class="fill-blank" placeholder="degrees">&deg;
                 </div>
                 <div class="question-actions">
                     <button class="btn-verify">Verify</button>
@@ -211,10 +215,12 @@
                 <div class="question-explanation" style="display: none;">
                     <div class="question-explanation-title">Explanation</div>
                     <div class="question-explanation-text">
-                        \( A^2 = 1 + 1 + 2\cos(90°) = 2 + 0 = 2 \), so
-                        \( A = \sqrt{2} \approx 1.41 \).  At 90&deg; phase difference,
-                        there's neither constructive nor destructive interference &mdash;
-                        the result is between the two extremes.
+                        \( A > 1 \) requires \( 2 + 2\cos\Delta\phi > 1 \), i.e.
+                        \( \cos\Delta\phi > -\tfrac{1}{2} \): true for
+                        \( |\Delta\phi| < 120° \), a total of <strong>240&deg;</strong> &mdash;
+                        two-thirds of all phases.  Superposition is biased toward reinforcement:
+                        at a random phase the odds are 2:1 the waves help each other.
+                        (At exactly 90&deg;, \( A = \sqrt{2} \approx 1.41 \), already above 1.)
                     </div>
                 </div>
             </div>
@@ -567,12 +573,13 @@
 
         <!-- Q8: Fill -->
         <div class="tab-content">
-            <div class="question-container" data-type="fill" data-answer="1.27[1.2,1.35]">
+            <div class="question-container" data-type="fill" data-answer="3[2.7,3.3]">
                 <div class="question-text">
-                    The fundamental harmonic amplitude for a unit square wave is
-                    \( 4/\pi \approx \):
+                    Build the best square wave using only the 1&omega; and 3&omega;
+                    sliders.  The Fourier recipe fixes their ratio:
+                    amplitude(1&omega;) / amplitude(3&omega;) =
                     <br><br>
-                    <input type="text" class="fill-blank" placeholder="value">
+                    <input type="text" class="fill-blank" placeholder="ratio">
                 </div>
                 <div class="question-actions">
                     <button class="btn-verify">Verify</button>
@@ -580,11 +587,12 @@
                 <div class="question-explanation" style="display: none;">
                     <div class="question-explanation-title">Explanation</div>
                     <div class="question-explanation-text">
-                        \( 4/\pi \approx 1.273 \).  The fundamental harmonic has a larger
-                        amplitude than the square wave itself because the higher harmonics
-                        subtract from it to create the flat tops and sharp corners.
-                        Set the 1&omega; slider to about 1.27 to see the best fundamental
-                        approximation.
+                        The square wave's Fourier series is
+                        \( \tfrac{4}{\pi}(\sin\omega t + \tfrac{1}{3}\sin 3\omega t +
+                        \tfrac{1}{5}\sin 5\omega t + \cdots) \): each odd harmonic enters with
+                        amplitude \( \propto 1/n \), so the 1&omega;:3&omega; ratio is exactly
+                        <strong>3</strong>.  Try 1.27 and 0.42 on the sliders (that is
+                        \( 4/\pi \) and \( 4/3\pi \)) and watch the flat tops emerge.
                     </div>
                 </div>
             </div>

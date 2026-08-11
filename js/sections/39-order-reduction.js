@@ -182,7 +182,8 @@
             if (xArr[i - 1] > 0 && xArr[i] <= 0) crossings.push(tArr[i]);
         }
         if (crossings.length >= 2) {
-            var T = 2 * (crossings[1] - crossings[0]);
+            // Downward zero crossings are already a full period apart
+            var T = crossings[1] - crossings[0];
             if (periodEl) periodEl.textContent = T.toFixed(3);
         } else {
             if (periodEl) periodEl.textContent = '—';
@@ -359,8 +360,9 @@
     function attachHandlers() {
         var eqSelect = document.getElementById('orderRed-eq-select');
         if (eqSelect) eqSelect.addEventListener('change', function() {
-            transformStep = 0;
-            renderTransform();
+            // Full reset re-arms the Show Steps button (it was left
+            // disabled with the label "Done!" after a completed run)
+            window.orderRedTransformReset();
         });
 
         var sysSelect = document.getElementById('orderRed-system-select');

@@ -57,13 +57,13 @@
     }
 
     // ===== Build matrix from τ, Δ =====
-    // Use A = [[τ/2, 1], [Δ - τ²/4, τ/2]] which has trace τ and det Δ
+    // Use A = [[τ/2, 1], [τ²/4 - Δ, τ/2]] which has trace τ and det Δ
     // This gives complex eigenvalues when τ²<4Δ (spirals) and real when τ²>4Δ
     function matFromTauDelta(tau, delta) {
         var half = tau / 2;
         return {
             a: half, b: 1,
-            c: delta - half * half, d: half
+            c: half * half - delta, d: half
         };
     }
 
@@ -74,7 +74,7 @@
         var disc = tau * tau - 4 * delta;
         if (Math.abs(disc) < 0.05 * Math.abs(delta) + 0.05) {
             if (Math.abs(tau) < 0.05) return 'Center (degenerate)';
-            return tau < 0 ? 'Stable Star Node' : 'Unstable Star Node';
+            return tau < 0 ? 'Stable Degenerate Node' : 'Unstable Degenerate Node';
         }
         if (disc > 0) {
             return tau < -0.01 ? 'Stable Node' : (tau > 0.01 ? 'Unstable Node' : 'Center (degenerate)');
@@ -164,8 +164,8 @@
         });
 
         var annotations = [
-            { x: -3, y: 4.2, text: 'Stable<br>Node', font: { color: '#00f3ff', size: 10 }, showarrow: false },
-            { x: 3, y: 4.2, text: 'Unstable<br>Node', font: { color: '#ff006e', size: 10 }, showarrow: false },
+            { x: -3.5, y: 1.2, text: 'Stable<br>Node', font: { color: '#00f3ff', size: 10 }, showarrow: false },
+            { x: 3.5, y: 1.2, text: 'Unstable<br>Node', font: { color: '#ff006e', size: 10 }, showarrow: false },
             { x: -1, y: 1.8, text: 'Stable<br>Spiral', font: { color: '#00f3ff', size: 10 }, showarrow: false },
             { x: 1, y: 1.8, text: 'Unstable<br>Spiral', font: { color: '#ff006e', size: 10 }, showarrow: false },
             { x: 0, y: -1.5, text: 'Saddle', font: { color: '#ff5722', size: 11 }, showarrow: false }
@@ -315,7 +315,15 @@
         var tau = a + d, delta = a * d - b * c;
 
         // τ-Δ map
-        drawTDMap('td-classMapPlot', tau, delta);
+        // Sliders allow (τ, Δ) outside the fixed map range: clamp the
+        // marker and say so (the stats bar still shows the true values)
+        var tp = Math.max(-4.3, Math.min(4.3, tau));
+        var dp = Math.max(-2.8, Math.min(4.8, delta));
+        drawTDMap('td-classMapPlot', tp, dp, (tp !== tau || dp !== delta) ? [
+            { x: tp, y: Math.min(dp + 0.4, 4.8),
+              text: 'off-scale: (' + tau.toFixed(1) + ', ' + delta.toFixed(1) + ')',
+              font: { color: '#ffbe0b', size: 10 }, showarrow: false }
+        ] : null);
 
         // Phase portrait using actual matrix (not canonical form)
         var f = function(x, y) { return a * x + b * y; };

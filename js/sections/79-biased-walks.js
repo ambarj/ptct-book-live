@@ -41,13 +41,13 @@
         for (var w = 0; w < 8; w++) {
             var pos = [0], x = 0;
             for (var s = 0; s < maxN; s++) { x += Math.random() < p ? 1 : -1; pos.push(x); }
-            traces.push({ y: pos, type: 'scatter', mode: 'lines',
-                line: { color: colors[w % 5], width: 0.8, opacity: 0.4 }, showlegend: false });
+            traces.push({ y: pos, type: 'scatter', mode: 'lines', hoverinfo: 'skip', opacity: 0.4,
+                line: { color: colors[w % 5], width: 0.8 }, showlegend: false });
         }
 
         // Zero line
         traces.push({ x: [0, maxN], y: [0, 0], type: 'scatter', mode: 'lines',
-            line: { color: '#808080', width: 1, dash: 'dot' }, showlegend: false });
+            line: { color: '#808080', width: 1, dash: 'dot' }, showlegend: false, hoverinfo: 'skip' });
 
         Plotly.react('bw-racePlot', traces, Object.assign({}, darkLayout, {
             xaxis: axStyle([0, maxN], 'Steps N'), yaxis: axStyle(null, 'Position'),
@@ -129,8 +129,8 @@
             var pos = [0], x = 0;
             for (var s = 0; s < sys.nSteps; s++) { x += Math.random() < sys.p ? 1 : -1; pos.push(x); }
             finals.push(x);
-            if (w < 10) trajTraces.push({ y: pos, type: 'scatter', mode: 'lines',
-                line: { color: colors[w % 5], width: 1, opacity: 0.5 }, showlegend: false });
+            if (w < 10) trajTraces.push({ y: pos, type: 'scatter', mode: 'lines', hoverinfo: 'skip', opacity: 0.5,
+                line: { color: colors[w % 5], width: 1 }, showlegend: false });
         }
 
         var drift = sys.nSteps * (2 * sys.p - 1);

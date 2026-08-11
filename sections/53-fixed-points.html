@@ -588,14 +588,14 @@ fig = go.Figure()
 # x-nullcline: dx/dt = y = 0 → horizontal line
 fig.add_trace(go.Contour(
     z=F, x=x, y=y,
-    contours=dict(start=0, end=0, coloring='lines'),
+    contours=dict(start=0, end=0, coloring='none'),
     line=dict(color='#00f3ff', width=3),
     showscale=False, name='ẋ = 0'))
 
 # y-nullcline: dy/dt = -sin(x) = 0 → vertical lines at nπ
 fig.add_trace(go.Contour(
     z=G, x=x, y=y,
-    contours=dict(start=0, end=0, coloring='lines'),
+    contours=dict(start=0, end=0, coloring='none'),
     line=dict(color='#ff006e', width=3),
     showscale=False, name='ẏ = 0'))
 

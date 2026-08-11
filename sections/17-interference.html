@@ -118,27 +118,27 @@
 
         <!-- Q1: MCQ -->
         <div class="tab-content active">
-            <div class="question-container" data-type="mcq" data-answer="1">
+            <div class="question-container" data-type="mcq" data-answer="0">
                 <div class="question-text">
-                    Set A<sub>1</sub> = 2 and A<sub>2</sub> = 1.  What is the minimum possible
-                    resultant amplitude as you sweep &Delta;&phi;?
+                    Set A<sub>1</sub> = 2 and A<sub>2</sub> = 1, and sweep &Delta;&phi; through a
+                    full circle.  Which amplitude can the resultant <em>never</em> reach?
                 </div>
                 <div class="question-options">
                     <label class="option">
                         <input type="radio" name="if-q1" value="0">
-                        <span>0</span>
+                        <span>0.5</span>
                     </label>
                     <label class="option">
                         <input type="radio" name="if-q1" value="1">
-                        <span>1</span>
+                        <span>1.5</span>
                     </label>
                     <label class="option">
                         <input type="radio" name="if-q1" value="2">
-                        <span>2</span>
+                        <span>2.2</span>
                     </label>
                     <label class="option">
                         <input type="radio" name="if-q1" value="3">
-                        <span>3</span>
+                        <span>3.0</span>
                     </label>
                 </div>
                 <div class="question-actions">
@@ -147,10 +147,13 @@
                 <div class="question-explanation" style="display: none;">
                     <div class="question-explanation-title">Explanation</div>
                     <div class="question-explanation-text">
-                        Maximum destructive interference gives \( A = |A_1 - A_2| = |2 - 1| = 1 \).
-                        Complete cancellation (\( A = 0 \)) only occurs when \( A_1 = A_2 \).
-                        With unequal amplitudes, the larger wave always "wins" &mdash; you
-                        can never fully cancel it.  Sweep to &Delta;&phi; = 180&deg; to see.
+                        The resultant is confined to the band
+                        \( |A_1 - A_2| \le A \le A_1 + A_2 \), i.e. \( 1 \le A \le 3 \)
+                        here.  Every value inside the band is reachable at some phase &mdash;
+                        1.5, 2.2, and 3.0 all occur &mdash; but 0.5 is <em>below the floor</em>:
+                        with unequal amplitudes the larger wave always survives, so complete
+                        (or near-complete) cancellation is impossible.  Sweep and watch A
+                        bottom out at exactly 1.
                     </div>
                 </div>
             </div>
@@ -158,11 +161,13 @@
 
         <!-- Q2: Fill -->
         <div class="tab-content">
-            <div class="question-container" data-type="fill" data-answer="3[2.9,3.1]">
+            <div class="question-container" data-type="fill" data-answer="104[95,115]">
                 <div class="question-text">
-                    With A<sub>1</sub> = 2 and A<sub>2</sub> = 1, the maximum resultant amplitude is:
+                    With A<sub>1</sub> = 2 and A<sub>2</sub> = 1, sweep to find the phase
+                    difference at which the resultant equals exactly 2 &mdash; the same as the
+                    stronger wave alone.
                     <br><br>
-                    A<sub>max</sub> = <input type="text" class="fill-blank" placeholder="value">
+                    &Delta;&phi; &asymp; <input type="text" class="fill-blank" placeholder="degrees">&deg;
                 </div>
                 <div class="question-actions">
                     <button class="btn-verify">Verify</button>
@@ -170,10 +175,13 @@
                 <div class="question-explanation" style="display: none;">
                     <div class="question-explanation-title">Explanation</div>
                     <div class="question-explanation-text">
-                        Maximum constructive interference: \( A = A_1 + A_2 = 2 + 1 = 3 \).
-                        This occurs at \( \Delta\phi = 0° \) (or \( 360° \)), when both
-                        waves peak at exactly the same time.  The formula gives
-                        \( A^2 = 4 + 1 + 2(2)(1)\cos(0) = 9 \), so \( A = 3 \).
+                        Set \( A^2 = 4 + 1 + 4\cos\Delta\phi = 4 \):
+                        \( \cos\Delta\phi = -\tfrac{1}{4} \), so
+                        \( \Delta\phi = \arccos(-0.25) \approx 104.5° \).  Past 90&deg; the
+                        weaker wave starts <em>hurting</em>: it takes about 104&deg; of phase slip
+                        before its harm exactly balances its help, leaving the pair no better than
+                        the strong wave alone.  (The old classic: at \( \Delta\phi = 0 \) the
+                        maximum is \( A_1 + A_2 = 3 \).)
                     </div>
                 </div>
             </div>
@@ -356,10 +364,11 @@
 
         <!-- Q5: Fill -->
         <div class="tab-content">
-            <div class="question-container" data-type="fill" data-answer="1.41[1.3,1.5]">
+            <div class="question-container" data-type="fill" data-answer="2.5[2.4,2.6]">
                 <div class="question-text">
-                    Set A<sub>1</sub> = 1, A<sub>2</sub> = 1, &Delta;&phi; = 90&deg;.  The phasors
-                    form a right angle.  What is the resultant amplitude?
+                    Set A<sub>1</sub> = 2, A<sub>2</sub> = 1.5, &Delta;&phi; = 90&deg;.  The
+                    phasors form a right angle &mdash; predict the resultant from the triangle
+                    <em>before</em> reading it off the diagram.
                     <br><br>
                     A = <input type="text" class="fill-blank" placeholder="value">
                 </div>
@@ -369,11 +378,11 @@
                 <div class="question-explanation" style="display: none;">
                     <div class="question-explanation-title">Explanation</div>
                     <div class="question-explanation-text">
-                        Two equal phasors at 90&deg; form a right triangle.  By Pythagoras,
-                        \( A = \sqrt{1^2 + 1^2} = \sqrt{2} \approx 1.41 \).  This is the
-                        same result you get from the formula with \( \cos(90°) = 0 \).
-                        The phasor diagram makes it visually obvious &mdash; it's just
-                        vector addition!
+                        At 90&deg; the phasors are perpendicular, so Pythagoras applies:
+                        \( A = \sqrt{2^2 + 1.5^2} = \sqrt{6.25} = 2.5 \) &mdash; a scaled 3-4-5
+                        right triangle hiding inside wave physics.  The diagram makes it visually
+                        obvious: interference is just vector addition, and 90&deg; is the case
+                        where neither vector helps nor fights along the other's direction.
                     </div>
                 </div>
             </div>

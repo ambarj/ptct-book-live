@@ -18,7 +18,32 @@
         };
     }
 
+    // Build cyan/magenta nullcline traces from the analytic segments
+    function nullclineTraces(sys, withNames) {
+        function polyline(segs) {
+            var xs = [], ys = [];
+            segs.forEach(function(s) {
+                xs.push(s.x[0], s.x[1], null);
+                ys.push(s.y[0], s.y[1], null);
+            });
+            return { xs: xs, ys: ys };
+        }
+        var fx = polyline(sys.nullX), gy = polyline(sys.nullY);
+        return [
+            { x: fx.xs, y: fx.ys, type: 'scatter', mode: 'lines',
+              line: { color: '#00f3ff', width: 3 },
+              name: 'ẋ = 0', hoverinfo: 'skip', showlegend: !!withNames },
+            { x: gy.xs, y: gy.ys, type: 'scatter', mode: 'lines',
+              line: { color: '#ff006e', width: 3 },
+              name: 'ẏ = 0', hoverinfo: 'skip', showlegend: !!withNames }
+        ];
+    }
+
     // ===== Nonlinear system library =====
+    // nullX / nullY: analytic ẋ=0 / ẏ=0 curves as straight-line segments.
+    // (Contour tracing broke at the self-intersections of these unions of
+    // lines, and Plotly's coloring:'lines' ignored line.color — so the
+    // promised cyan/magenta nullclines never appeared.)
     var systems = {
         pendulum: {
             name: 'Simple Pendulum',
@@ -26,6 +51,10 @@
             f: function(x, y) { return y; },
             g: function(x, y) { return -Math.sin(x); },
             xR: [-7, 7], yR: [-3, 3],
+            nullX: [ { x: [-7, 7], y: [0, 0] } ],
+            nullY: [-2, -1, 0, 1, 2].map(function(n) {
+                return { x: [n * Math.PI, n * Math.PI], y: [-3, 3] };
+            }),
             fps: [
                 { x: -2 * Math.PI, y: 0, label: 'Center' },
                 { x: -Math.PI,     y: 0, label: 'Saddle' },
@@ -40,6 +69,10 @@
             f: function(x, y) { return x * (3 - x - 2 * y); },
             g: function(x, y) { return y * (2 - x - y); },
             xR: [-0.5, 4.5], yR: [-0.5, 3.5],
+            nullX: [ { x: [0, 0], y: [-0.5, 3.5] },
+                     { x: [-0.5, 4.5], y: [1.75, -0.75] } ],   // x + 2y = 3
+            nullY: [ { x: [-0.5, 4.5], y: [0, 0] },
+                     { x: [-0.5, 4.5], y: [2.5, -2.5] } ],     // x + y = 2
             fps: [
                 { x: 0, y: 0, label: 'Unstable Node' },
                 { x: 3, y: 0, label: 'Stable Node' },
@@ -53,6 +86,10 @@
             f: function(x, y) { return x * (2 - y); },
             g: function(x, y) { return y * (-1 + x); },
             xR: [-0.5, 4.5], yR: [-0.5, 4.5],
+            nullX: [ { x: [0, 0], y: [-0.5, 4.5] },
+                     { x: [-0.5, 4.5], y: [2, 2] } ],
+            nullY: [ { x: [-0.5, 4.5], y: [0, 0] },
+                     { x: [1, 1], y: [-0.5, 4.5] } ],
             fps: [
                 { x: 0, y: 0, label: 'Saddle' },
                 { x: 1, y: 2, label: 'Center' }
@@ -132,23 +169,11 @@
     function updateExplorer1() {
         var key = document.getElementById('fp-system1').value;
         var sys = systems[key];
-        var grid = computeGrid(sys, 120, 120);
 
         // Nullcline traces
-        var fNull = {
-            z: grid.fGrid, x: grid.x, y: grid.y,
-            type: 'contour',
-            contours: { start: 0, end: 0, coloring: 'lines' },
-            line: { color: '#00f3ff', width: 3 },
-            showscale: false, name: 'ẋ = 0', hoverinfo: 'skip'
-        };
-        var gNull = {
-            z: grid.gGrid, x: grid.x, y: grid.y,
-            type: 'contour',
-            contours: { start: 0, end: 0, coloring: 'lines' },
-            line: { color: '#ff006e', width: 3 },
-            showscale: false, name: 'ẏ = 0', hoverinfo: 'skip'
-        };
+        var nulls = nullclineTraces(sys, true);
+        var fNull = nulls[0];
+        var gNull = nulls[1];
 
         // Streamlines
         var streams = streamTraces(sys, 4, 'rgba(150,150,150,0.3)');
@@ -188,23 +213,11 @@
     function updateExplorer2() {
         var key = document.getElementById('fp-system2').value;
         var sys = systems[key];
-        var grid = computeGrid(sys, 120, 120);
 
         // Nullcline traces
-        var fNull = {
-            z: grid.fGrid, x: grid.x, y: grid.y,
-            type: 'contour',
-            contours: { start: 0, end: 0, coloring: 'lines' },
-            line: { color: '#00f3ff', width: 3 },
-            showscale: false, hoverinfo: 'skip', showlegend: false
-        };
-        var gNull = {
-            z: grid.gGrid, x: grid.x, y: grid.y,
-            type: 'contour',
-            contours: { start: 0, end: 0, coloring: 'lines' },
-            line: { color: '#ff006e', width: 3 },
-            showscale: false, hoverinfo: 'skip', showlegend: false
-        };
+        var nulls = nullclineTraces(sys, false);
+        var fNull = nulls[0];
+        var gNull = nulls[1];
 
         // Sign-colored direction arrows
         var signData = { pp: { x: [], y: [] }, pn: { x: [], y: [] },
@@ -241,6 +254,21 @@
                 line: { color: signColors[sk], width: 1.5 },
                 name: signLabels[sk], hoverinfo: 'none'
             };
+        });
+        // Arrowheads at each segment tip (segments are x0,x1,null triplets)
+        ['pp', 'pn', 'np', 'nn'].forEach(function(sk) {
+            var hx = [], hy = [], ha = [];
+            var xs = signData[sk].x, ys = signData[sk].y;
+            for (var q = 0; q + 1 < xs.length; q += 3) {
+                hx.push(xs[q + 1]);
+                hy.push(ys[q + 1]);
+                ha.push(90 - Math.atan2(ys[q + 1] - ys[q], xs[q + 1] - xs[q]) * 180 / Math.PI);
+            }
+            arrowTraces.push({
+                x: hx, y: hy, type: 'scatter', mode: 'markers',
+                marker: { symbol: 'triangle-up', size: 6, color: signColors[sk], angle: ha },
+                hoverinfo: 'none', showlegend: false
+            });
         });
 
         // Fixed points
@@ -368,6 +396,15 @@
             var x0 = fp.x + eps * Math.cos(theta);
             var y0 = fp.y + eps * Math.sin(theta);
             var sol = rk4Traj(sys, x0, y0, 30, 3000);
+            // Truncate at the first exit from the displayed window (fp ± 2):
+            // long re-entering arcs otherwise draw misleading closed lenses
+            var pad = 2;
+            for (var q = 0; q < sol.X.length; q++) {
+                if (Math.abs(sol.X[q] - fp.x) > pad || Math.abs(sol.Y[q] - fp.y) > pad) {
+                    sol = { X: sol.X.slice(0, q + 1), Y: sol.Y.slice(0, q + 1) };
+                    break;
+                }
+            }
             stabTrajectories.push(sol);
         }
         drawExplorer3();

@@ -126,7 +126,7 @@
         for (var w = 0; w < 5; w++) {
             var pos = [0], x = 0;
             for (var s = 0; s < maxN; s++) { x += Math.random() < 0.5 ? 1 : -1; pos.push(Math.abs(x)); }
-            walkTraces.push({ y: pos, type: 'scatter', mode: 'lines',
+            walkTraces.push({ y: pos, type: 'scatter', mode: 'lines', hoverinfo: 'skip',
                 line: { color: 'rgba(0,243,255,0.3)', width: 1 }, showlegend: false });
         }
 

@@ -134,21 +134,26 @@
         </div>
 
         <div class="tab-content">
-            <div class="question-container" data-type="fill" data-answer="316[300,333]">
+            <div class="question-container" data-type="fill" data-answer="2.3[1.5,3.5]">
                 <div class="question-text">
-                    With N = 100,000, the expected error is \( 1/\sqrt{N} \approx \)
-                    <input type="text" class="fill-blank" style="width: 80px"> &times; 10<sup>&minus;5</sup>.
-                    (Compute &radic;100,000 &asymp; 316, so 1/&radic;N &asymp; 316 &times; 10<sup>&minus;5</sup> &asymp; 0.3%)
+                    Before you run: with N = 500,000 darts, <em>predict</em> the typical size of
+                    \( |\hat{\pi} - \pi| \), then click Run a few times and see how often you
+                    were right.  Typical error &asymp;
+                    <input type="text" class="fill-blank" style="width: 80px"> &times; 10<sup>&minus;3</sup>.
+                    <br><em>Hint: error &asymp; \( \sigma/\sqrt{N} \) with
+                    \( \sigma = 4\sqrt{p(1-p)} \), \( p = \pi/4 \).</em>
                 </div>
                 <div class="question-actions">
                     <button class="btn-verify">Verify</button>
                 </div>
                 <div class="question-explanation" style="display:none;">
                     <strong>Explanation:</strong>
-                    \( \sqrt{100{,}000} = \sqrt{10^5} = 10^{2.5} \approx 316 \). So
-                    \( 1/\sqrt{N} \approx 1/316 \approx 0.00316 \approx 316 \times 10^{-5} \).
-                    Multiplying by &sigma; &asymp; 1.6 gives error &asymp; 0.005, consistent with
-                    about 2&ndash;3 digits of accuracy.
+                    Each dart is a Bernoulli trial with \( p = \pi/4 \approx 0.785 \), so the
+                    estimator \( \hat{\pi} = 4 \times (\text{hits}/N) \) has
+                    \( \sigma = 4\sqrt{p(1-p)} \approx 1.64 \), giving typical error
+                    \( 1.64/\sqrt{500{,}000} \approx 2.3 \times 10^{-3} \).  About two runs in
+                    three should land within this band of &pi; &mdash; if all your runs sit much
+                    closer or much farther, run a few more and watch the statistics assert themselves.
                 </div>
             </div>
         </div>
@@ -156,7 +161,7 @@
         <div class="tab-content">
             <div class="question-container" data-type="mcq" data-answer="2">
                 <div class="question-text">
-                    The accuracy plot shows error vs N for multiple runs. What shape
+                    The accuracy plot shows the running error |estimate − π| as the run progresses. What shape
                     does the envelope follow?
                 </div>
                 <div class="question-options">

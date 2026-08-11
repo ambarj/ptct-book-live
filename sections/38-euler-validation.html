@@ -332,25 +332,27 @@
 
         <!-- Q6: Fill -->
         <div class="tab-content">
-            <div class="question-container" data-type="fill" data-answer="10|10">
+            <div class="question-container" data-type="fill" data-answer="3.5[2.8,4.2]|120[119,121]">
                 <div class="question-text">
-                    To achieve 10&times; smaller error with Euler&rsquo;s method,
-                    you need to use a step size that is <input type="text" class="fill-blank" placeholder="?">&times;
-                    smaller, which means <input type="text" class="fill-blank" placeholder="?">&times;
-                    more computation (steps).
-                    <br><em>(Since error \(\propto h\) and steps \(\propto 1/h\).)</em>
+                    For the <strong>decay</strong> ODE, read the final error at \(h = 0.05\)
+                    (&asymp; \(6.8\times10^{-4}\)). The explorer stops there &mdash; predict the
+                    final error at \(h = 0.025\): &asymp;
+                    <input type="text" class="fill-blank" placeholder="?"> &times; 10<sup>&minus;4</sup>.
+                    And how many steps would that run take (the interval is \(t \in [0, 3]\))?
+                    <input type="text" class="fill-blank" placeholder="?"> steps.
                 </div>
                 <div class="question-actions">
                     <button class="btn-verify">Verify</button>
                 </div>
                 <div class="question-explanation" style="display:none;">
                     <strong>Explanation:</strong>
-                    Error \(\propto h\), so 10&times; less error requires \(h/10\).
-                    Steps \(= t_{\max}/h\), so 10&times; smaller \(h\) means 10&times; more steps.
-                    But each step does the same work, so total cost scales as \(1/h\).
-                    For 10&times; less error you pay 10&times; in compute &mdash;
-                    but for 100&times; less error you pay 100&times;. This is why higher-order
-                    methods (RK4) are preferred in practice.
+                    First-order convergence: halving \(h\) halves the error, so predict
+                    &asymp; \(3.4\times10^{-4}\) (the directly computed value is
+                    \(3.6\times10^{-4}\) &mdash; the \(\propto h\) law is asymptotic, not
+                    exact). Steps \(= 3/0.025 = 120\), double the 60 at \(h = 0.05\): with a
+                    first-order method, accuracy and cost both scale linearly. For 10&times; less
+                    error you pay 10&times; in compute &mdash; which is why higher-order methods
+                    (RK4) are preferred in practice.
                 </div>
             </div>
         </div>

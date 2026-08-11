@@ -86,8 +86,15 @@
         var f = getF(sysKey, r);
         var fps = sys.fixedPoints(r);
 
-        // Update fixed point dropdown
+        // The cubic and sine systems have no parameter r — grey the slider
+        // out so it doesn't look broken when moving it does nothing
+        var rSlider = document.getElementById('lin-r-slider');
+        if (rSlider) rSlider.disabled = (sysKey === 'cubic' || sysKey === 'sine');
+
+        // Update fixed point dropdown, preserving the user's selection
+        // (repopulating resets the select to index 0 otherwise)
         var fpSelect = document.getElementById('lin-fpIdx-select');
+        var prevIdx = parseInt(fpSelect.value);
         fpSelect.innerHTML = '';
         for (var i = 0; i < fps.length; i++) {
             var opt = document.createElement('option');
@@ -95,6 +102,7 @@
             opt.textContent = 'x₀ = ' + fps[i].toFixed(2);
             fpSelect.appendChild(opt);
         }
+        fpSelect.value = Math.min(isNaN(prevIdx) ? 0 : prevIdx, Math.max(fps.length - 1, 0));
 
         var fpIdx = Math.min(parseInt(fpSelect.value) || 0, fps.length - 1);
         var x0 = fps[fpIdx];
@@ -145,7 +153,7 @@
         }), { responsive: true });
 
         // Phase line (right panel)
-        drawPhaseLine(f, fps, sys);
+        drawPhaseLine(f, fps, sys, r);
 
         // Stats
         if (fps.length > 0) {
@@ -160,7 +168,7 @@
         }
     }
 
-    function drawPhaseLine(f, fps, sys) {
+    function drawPhaseLine(f, fps, sys, r) {
         // Flow arrows on number line
         var traces = [];
         var nArr = 30;
@@ -190,7 +198,7 @@
         // Fixed points
         var fpColors = ['#ff006e', '#00ff88', '#ffbe0b', '#bb86fc'];
         for (var i = 0; i < fps.length; i++) {
-            var lam = sys.fp(fps[i]);
+            var lam = sys.fp(fps[i], r);
             traces.push({
                 x: [fps[i]], y: [0], type: 'scatter', mode: 'markers',
                 marker: { color: fpColors[i % 4], size: 14,
@@ -214,7 +222,7 @@
 
         var annotations = [];
         for (var i = 0; i < fps.length; i++) {
-            var lam = sys.fp(fps[i]);
+            var lam = sys.fp(fps[i], r);
             annotations.push({
                 x: fps[i], y: -0.4 * (sys.yRange[1] - sys.yRange[0]) / 2,
                 text: (lam < -0.01 ? '●' : '○') + ' x₀=' + fps[i].toFixed(1),
@@ -235,8 +243,13 @@
     // ===============================================================
     function drawFlow() {
         var sysKey = document.getElementById('lin-flow-system').value;
-        var x0 = parseFloat(document.getElementById('lin-x0-slider').value);
         var sys = systems[sysKey];
+        // Keep the x0 slider bounded to the current system's plotted range
+        // (otherwise x0 can sit outside the visible axes)
+        var x0Slider = document.getElementById('lin-x0-slider');
+        x0Slider.min = sys.xRange[0];
+        x0Slider.max = sys.xRange[1];
+        var x0 = Math.max(sys.xRange[0], Math.min(sys.xRange[1], parseFloat(x0Slider.value)));
         var f = getF(sysKey, 2.0);
 
         // f(x) plot with flow arrows
@@ -257,17 +270,30 @@
               name: 'x₀ = ' + x0.toFixed(1) }
         ];
 
-        // Fill positive/negative regions
-        var posX = [], posY = [], negX = [], negY = [];
-        for (var i = 0; i < xArr.length; i++) {
-            if (fArr[i] > 0) { posX.push(xArr[i]); posY.push(fArr[i]); }
-            else { negX.push(xArr[i]); negY.push(fArr[i]); }
+        // Direction arrows on the x-axis: point right where f > 0,
+        // left where f < 0 (skip points too close to a fixed point)
+        var arrX = [], arrSym = [];
+        var fps0 = sys.fixedPoints(2.0);
+        for (var i = 1; i <= 9; i++) {
+            var xa = sys.xRange[0] + i * (sys.xRange[1] - sys.xRange[0]) / 10;
+            var nearFP = fps0.some(function(p) {
+                return Math.abs(xa - p) < 0.06 * (sys.xRange[1] - sys.xRange[0]);
+            });
+            if (nearFP || Math.abs(f(xa)) < 1e-6) continue;
+            arrX.push(xa);
+            arrSym.push(f(xa) > 0 ? 'triangle-right' : 'triangle-left');
         }
+        flowTraces.push({
+            x: arrX, y: arrX.map(function() { return 0; }),
+            type: 'scatter', mode: 'markers',
+            marker: { symbol: arrSym, size: 11, color: '#ffbe0b' },
+            showlegend: false, hoverinfo: 'skip'
+        });
 
         // Fixed point markers
         var fps = sys.fixedPoints(2.0);
         for (var i = 0; i < fps.length; i++) {
-            var lam = sys.fp(fps[i]);
+            var lam = sys.fp(fps[i], 2.0);
             flowTraces.push({
                 x: [fps[i]], y: [0], type: 'scatter', mode: 'markers',
                 marker: { color: lam < -0.01 ? '#00ff88' : '#ff006e', size: 10,

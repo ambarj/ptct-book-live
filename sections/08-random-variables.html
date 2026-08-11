@@ -362,10 +362,12 @@
 
         <!-- Q6: Fill -->
         <div class="tab-content">
-            <div class="question-container" data-type="fill" data-answer="6[5.5,6.5]">
+            <div class="question-container" data-type="fill" data-answer="6[5,7]">
                 <div class="question-text">
-                    A single measurement has \( \sigma = 2 \). You sum \( N = 9 \) independent measurements.
-                    The standard deviation of the sum is \( \sigma_S = \sigma\sqrt{N} \):
+                    A single measurement has \( \sigma = 2 \).  If errors added like
+                    ordinary numbers, summing \( N = 9 \) measurements would give a spread
+                    of &plusmn;18.  Set N = 9 in the explorer and read off the
+                    <em>observed</em> standard deviation of the sum instead:
                     <br><br>
                     \( \sigma_S \) = <input type="text" class="fill-blank" placeholder="?">
                 </div>
@@ -522,12 +524,13 @@
 
         <!-- Q8: Fill -->
         <div class="tab-content">
-            <div class="question-container" data-type="fill" data-answer="0.2[0.15,0.25]">
+            <div class="question-container" data-type="fill" data-answer="400[350,450]">
                 <div class="question-text">
-                    If \( \sigma = 2 \) and \( N = 100 \), the standard deviation of the sample mean is
-                    \( \sigma_{\bar{X}} = \sigma/\sqrt{N} \):
+                    Design an experiment: you need to pin down a mean to within
+                    &plusmn;0.1, drawing from a distribution with \( \sigma = 2 \).
+                    How many measurements must you average?
                     <br><br>
-                    \( \sigma_{\bar{X}} \) = <input type="text" class="fill-blank" placeholder="?">
+                    N = <input type="text" class="fill-blank" placeholder="?">
                 </div>
                 <div class="question-actions">
                     <button class="btn-verify">Verify</button>
@@ -535,12 +538,12 @@
                 <div class="question-explanation" style="display: none;">
                     <div class="question-explanation-title">Explanation</div>
                     <div class="question-explanation-text">
-                        \( \sigma_{\bar{X}} = \sigma/\sqrt{N} = 2/\sqrt{100} = 2/10 = 0.2 \).
-                        From a distribution with \( \sigma = 2 \), averaging 100 measurements gives you
-                        a result that fluctuates by only &plusmn;0.2 around the true mean. That's 10&times;
-                        better than a single measurement. You can verify this in the explorer: set Gaussian
-                        with N = 100 and check the observed \( \sigma_{\bar{X}} \) in the stats readout.
-                    </div>
+                        Invert \( \sigma_{\bar{X}} = \sigma/\sqrt{N} \le 0.1 \):
+                        \( N \ge (\sigma/0.1)^2 = (2/0.1)^2 = 400 \).  Note the brutal
+                        economics of averaging: halving the uncertainty costs <em>four</em>
+                        times the data.  The explorer's slider stops at N = 100 (where
+                        \( \sigma_{\bar{X}} = 0.2 \)) &mdash; confirm the \( 1/\sqrt{N} \)
+                        trend there and extrapolate.</div>
                 </div>
             </div>
         </div>

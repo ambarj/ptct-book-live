@@ -525,11 +525,9 @@
                 </div>
                 <div class="question-explanation" style="display:none;">
                     <strong>Explanation:</strong>
-                    The <strong>source</strong> (\( \dot{x} = x, \dot{y} = y \)) has velocity
+                    The <strong>source</strong> (here \( \dot{x} = 2x, \dot{y} = 2y \)) has velocity
                     exactly parallel to the position vector, so every arrow points radially outward.
-                    (Its speed \( |\mathbf{v}| = r \) grows with distance — but so does the speed of
-                    the center and the saddle; what distinguishes the source is the <em>direction</em>
-                    of flow.) All trajectories diverge from the origin — farther from the fixed point means
+                    (Its speed \( |\mathbf{v}| = 2r \) grows with distance and its speed map is perfectly circular — the only preset whose map is; the others trace tilted or elongated ellipses.) All trajectories diverge from the origin — farther from the fixed point means
                     faster motion. The center has the same speed formula but trajectories orbit
                     rather than escape.
                 </div>
@@ -545,7 +543,7 @@
                 <div class="question-options">
                     <label class="option">
                         <input type="checkbox" value="0">
-                        <span>Speed is zero along both the x-axis and y-axis (at the origin only)</span>
+                        <span>Speed is zero at exactly one point — the origin, where both \( \dot{x} = 0 \) and \( \dot{y} = 0 \)</span>
                     </label>
                     <label class="option">
                         <input type="checkbox" value="1">
@@ -568,7 +566,7 @@
                     <ul>
                         <li><strong>Zero only at origin:</strong> TRUE. The fixed point is the only place where both \( \dot{x} = 0 \) and \( \dot{y} = 0 \).</li>
                         <li><strong>Uniform speed:</strong> FALSE. Speed varies from zero at the origin to large values far away.</li>
-                        <li><strong>Flow direction not radially symmetric:</strong> TRUE. For the saddle (\( \dot{x} = x, \dot{y} = -y \)), trajectories converge along the y-axis and diverge along the x-axis. (Curiously, the <em>speed</em> \( \sqrt{x^2+y^2} \) is radially symmetric for this particular saddle — it is the direction pattern that betrays the saddle.)</li>
+                        <li><strong>Flow direction not radially symmetric:</strong> TRUE. For the saddle (\( \dot{x} = x, \dot{y} = -y \)), trajectories converge along the y-axis and diverge along the x-axis. (Its speed map is a family of ellipses elongated along the y-axis — compare it with the source's perfectly circular map.)</li>
                         <li><strong>Max at origin:</strong> FALSE. Speed is zero at the origin (it's the fixed point).</li>
                     </ul>
                 </div>
@@ -684,8 +682,13 @@ def rk4_trajectory(x0, y0, dt=0.02, steps=500):
         xs.append(xc); ys.append(yc)
     return xs, ys
 
-# Launch from boundary
-for start in [(-4,i) for i in np.linspace(-3,3,5)]:
+# Launch from all four edges (left-edge-only starts exit
+# immediately for the saddle, leaving no visible streamlines)
+starts  = [(-4, t) for t in np.linspace(-3, 3, 5)]
+starts += [( 4, t) for t in np.linspace(-3, 3, 5)]
+starts += [( t, -4) for t in np.linspace(-3, 3, 5)]
+starts += [( t,  4) for t in np.linspace(-3, 3, 5)]
+for start in starts:
     sx, sy = rk4_trajectory(*start)
     fig.add_trace(go.Scatter(x=sx, y=sy, mode='lines',
         line=dict(color='white', width=1.5),

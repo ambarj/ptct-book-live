@@ -255,6 +255,8 @@
             thetaSHO.push(theta0Deg * Math.cos(t));
         }
 
+        // Plotly.react with no layout argument REPLACES the layout with the
+        // default (white) theme — always pass the dark layout explicitly
         Plotly.react('numMotiv-pendulum-plot', [
             {
                 x: sol.t, y: thetaDeg,
@@ -268,7 +270,12 @@
                 name: 'Small-angle approx',
                 line: { color: '#ff00ff', width: 2, dash: 'dash' }
             }
-        ]);
+        ], Object.assign({}, darkLayout, {
+            xaxis: axisStyle([0, tMax], 'Time (τ)'),
+            yaxis: axisStyle([-200, 200], 'Angle (degrees)'),
+            showlegend: true,
+            legend: { x: 0.01, y: 0.99, bgcolor: 'rgba(0,0,0,0.5)' }
+        }));
 
         // Update period curve marker
         var currentRatio = interpolateRatio(theta0Deg);
@@ -291,7 +298,12 @@
                 name: 'Current θ₀',
                 marker: { color: '#00f3ff', size: 12, symbol: 'star' }
             }
-        ]);
+        ], Object.assign({}, darkLayout, {
+            xaxis: axisStyle([0, 180], 'Initial angle θ₀ (degrees)'),
+            yaxis: axisStyle([0.95, 5], 'T / T_SHO'),
+            showlegend: true,
+            legend: { x: 0.01, y: 0.99, bgcolor: 'rgba(0,0,0,0.5)' }
+        }));
 
         updatePendulumStats(theta0Deg);
     }

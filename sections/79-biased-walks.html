@@ -535,7 +535,7 @@ fig.add_trace(go.Scatter(x=n, y=drift, mode='lines',
 for w in range(5):
     steps = np.where(np.random.random(N_max) < p, 1, -1)
     fig.add_trace(go.Scatter(y=np.cumsum(steps), mode='lines',
-        line=dict(color='#00f3ff', width=0.8, opacity=0.4), showlegend=False))
+        line=dict(color='#00f3ff', width=0.8), opacity=0.4, showlegend=False))
 
 fig.update_layout(template='plotly_dark',
     xaxis=dict(title='Steps N', zerolinecolor='#808080'),

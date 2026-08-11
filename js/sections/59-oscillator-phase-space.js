@@ -61,14 +61,19 @@
 
     // ===== τ-Δ map background =====
     function drawTDMap(plotId, tau, delta) {
+        // Slider extremes (b up to 8, m down to 0.5, k up to 8) can push
+        // (τ, Δ) beyond the default window: expand the axes to keep the
+        // pointer in view instead of letting it silently leave the plot
+        var tMin = Math.min(-8, tau - 1);
+        var dMax = Math.max(10, delta + 1);
         var nMap = 60;
         var tArr = [], dArr = [], z = [];
         for (var j = 0; j < nMap; j++) {
-            var dv = -2 + j * 12 / (nMap - 1);
+            var dv = -2 + j * (dMax + 2) / (nMap - 1);
             dArr.push(dv);
             var row = [];
             for (var i = 0; i < nMap; i++) {
-                var tv = -8 + i * 10 / (nMap - 1);
+                var tv = tMin + i * (2 - tMin) / (nMap - 1);
                 if (j === 0) tArr.push(tv);
                 if (dv < 0) row.push(0);
                 else if (tv * tv > 4 * dv) row.push(tv < 0 ? 1 : 2);
@@ -92,18 +97,18 @@
 
         // Parabola
         var pT = [], pD = [];
-        for (var t = -8; t <= 2; t += 0.05) { pT.push(t); pD.push(t * t / 4); }
+        for (var t = tMin; t <= 2; t += 0.05) { pT.push(t); pD.push(t * t / 4); }
         traces.push({ x: pT, y: pD, type: 'scatter', mode: 'lines',
             line: { color: 'rgba(255,255,255,0.6)', width: 2 },
             hoverinfo: 'skip', showlegend: false });
 
         // Δ=0 axis
-        traces.push({ x: [-8, 2], y: [0, 0], type: 'scatter', mode: 'lines',
+        traces.push({ x: [tMin, 2], y: [0, 0], type: 'scatter', mode: 'lines',
             line: { color: 'rgba(255,190,11,0.5)', width: 1.5, dash: 'dash' },
             hoverinfo: 'skip', showlegend: false });
 
         // τ=0 axis
-        traces.push({ x: [0, 0], y: [-2, 10], type: 'scatter', mode: 'lines',
+        traces.push({ x: [0, 0], y: [-2, dMax], type: 'scatter', mode: 'lines',
             line: { color: 'rgba(0,255,136,0.4)', width: 1.5, dash: 'dash' },
             hoverinfo: 'skip', showlegend: false });
 
@@ -119,11 +124,11 @@
             hoverinfo: 'skip', showlegend: false });
 
         Plotly.react(plotId, traces, Object.assign({}, darkLayout, {
-            xaxis: axStyle([-8, 2], 'τ = −b/m'),
-            yaxis: axStyle([-2, 10], 'Δ = k/m'),
+            xaxis: axStyle([tMin, 2], 'τ = −b/m'),
+            yaxis: axStyle([-2, dMax], 'Δ = k/m'),
             height: 400,
             annotations: [
-                { x: -5, y: 8, text: 'Stable<br>Node', font: { color: '#00f3ff', size: 10 }, showarrow: false },
+                { x: -6.5, y: 4, text: 'Stable<br>Node', font: { color: '#00f3ff', size: 10 }, showarrow: false },
                 { x: -2, y: 4, text: 'Stable<br>Spiral', font: { color: '#00f3ff', size: 10 }, showarrow: false },
                 { x: 0, y: -1, text: 'Saddle', font: { color: '#ff5722', size: 10 }, showarrow: false }
             ]

@@ -40,10 +40,10 @@
 
         // Trajectory
         Plotly.react('dw-trajPlot', [
-            { y: pos, type: 'scatter', mode: 'lines',
+            { y: pos, type: 'scatter', mode: 'lines', name: 'position',
               line: { color: '#00f3ff', width: 1.5 }, showlegend: false },
             { x: [0, pos.length], y: [0, 0], type: 'scatter', mode: 'lines',
-              line: { color: '#808080', width: 1, dash: 'dot' }, showlegend: false }
+              line: { color: '#808080', width: 1, dash: 'dot' }, showlegend: false, hoverinfo: 'skip' }
         ], Object.assign({}, darkLayout, {
             xaxis: axStyle([0, Math.max(pos.length, 20)], 'Step'),
             yaxis: axStyle(null, 'Position x'), height: 250
@@ -60,7 +60,7 @@
         } else {
             Plotly.react('dw-histPlot', [], Object.assign({}, darkLayout, {
                 xaxis: axStyle(null, ''), yaxis: axStyle(null, ''), height: 460,
-                annotations: [{ x: 0.5, y: 0.5, text: 'Complete walks to build histogram',
+                annotations: [{ x: 0.5, y: 0.5, text: 'Click "New Walk" to record this walk\u2019s final position here',
                     font: { color: '#aaa', size: 12 }, showarrow: false, xref: 'paper', yref: 'paper' }]
             }), { responsive: true });
         }
@@ -103,8 +103,8 @@
             for (var s = 0; s < nS; s++) { x += Math.random() < 0.5 ? 1 : -1; pos.push(x); }
             finals.push(x);
             if (w < showMax) {
-                trajTraces.push({ y: pos, type: 'scatter', mode: 'lines',
-                    line: { color: colors[w % 8], width: 0.8, opacity: 0.5 }, showlegend: false });
+                trajTraces.push({ y: pos, type: 'scatter', mode: 'lines', hoverinfo: 'skip', opacity: 0.5,
+                    line: { color: colors[w % 8], width: 0.8 }, showlegend: false });
             }
         }
 
@@ -116,7 +116,7 @@
         trajTraces.push({ x: envX, y: envUp, type: 'scatter', mode: 'lines',
             line: { color: 'white', width: 2, dash: 'dash' }, name: '±√N' });
         trajTraces.push({ x: envX, y: envDown, type: 'scatter', mode: 'lines',
-            line: { color: 'white', width: 2, dash: 'dash' }, showlegend: false });
+            line: { color: 'white', width: 2, dash: 'dash' }, showlegend: false, hoverinfo: 'skip' });
 
         Plotly.react('dw-manyTrajPlot', trajTraces, Object.assign({}, darkLayout, {
             xaxis: axStyle([0, nS], 'Step'), yaxis: axStyle(null, 'Position'),
@@ -151,8 +151,8 @@
             for (var s = 0; s < nS; s++) { x += Math.random() < p ? 1 : -1; pos.push(x); }
             finals.push(x);
             if (w < 15) {
-                trajTraces.push({ y: pos, type: 'scatter', mode: 'lines',
-                    line: { color: colors[w % 8], width: 1, opacity: 0.5 }, showlegend: false });
+                trajTraces.push({ y: pos, type: 'scatter', mode: 'lines', hoverinfo: 'skip', opacity: 0.5,
+                    line: { color: colors[w % 8], width: 1 }, showlegend: false });
             }
         }
 

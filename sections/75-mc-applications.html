@@ -620,9 +620,9 @@ Es = []
 for _ in range(5000):
     i = np.random.randint(N_spin)
     dE = 0
-    if i>0: dE += 2*spins[i]*spins[i-1]
-    if i<N_spin-1: dE += 2*spins[i]*spins[i+1]
-    if dE<=0 or np.random.random()<np.exp(-dE/T):
+    if i&gt;0: dE += 2*spins[i]*spins[i-1]
+    if i&lt;N_spin-1: dE += 2*spins[i]*spins[i+1]
+    if dE&lt;=0 or np.random.random()&lt;np.exp(-dE/T):
         spins[i]*=-1; E+=dE
     Es.append(E)
 print(f"   MC ⟨E⟩/N = {np.mean(Es[1000:])/N_spin:.3f}")

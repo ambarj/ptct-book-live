@@ -302,7 +302,7 @@
 
         <!-- Q4: MCQ -->
         <div class="tab-content active">
-            <div class="question-container" data-type="mcq" data-answer="2">
+            <div class="question-container" data-type="mcq" data-answer="1">
                 <div class="question-text">
                     As you increase the polynomial degree from 2 to 7, the training
                     &chi;&sup2;/dof:
@@ -327,10 +327,16 @@
                 <div class="question-explanation" style="display: none;">
                     <div class="question-explanation-title">Explanation</div>
                     <div class="question-explanation-text">
-                        Training &chi;&sup2; always decreases with more parameters.  With
-                        a high enough degree, the polynomial passes through (or very near)
-                        every training point, making &chi;&sup2; approach zero.  But this
-                        is a <em>bad</em> thing &mdash; the model has memorised the noise.
+                        A subtle one! The <em>raw</em> training &chi;&sup2; always decreases
+                        with more parameters &mdash; extra flexibility can only fit the data
+                        better.  But the explorer shows &chi;&sup2;/<strong>dof</strong>, and the
+                        degrees of freedom \( N - k \) shrink in step with every parameter you
+                        add.  The two effects nearly cancel: the ratio hovers around 1
+                        (watch it wobble in the 0.4&ndash;1.5 range from noise, with no
+                        systematic trend).  That is precisely why &chi;&sup2;/dof is a fair
+                        scorecard where raw &chi;&sup2; is not &mdash; and why training error
+                        alone cannot reveal overfitting.  Only the <em>test</em> error (red
+                        curve) exposes it.
                     </div>
                 </div>
             </div>

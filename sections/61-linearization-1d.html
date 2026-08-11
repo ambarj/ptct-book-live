@@ -70,7 +70,7 @@
         <div class="control-group">
             <label class="control-label" for="lin-system-select">System:</label>
             <select id="lin-system-select" class="control-select">
-                <option value="logistic">Logistic: ẋ = rx(1 − x/K)</option>
+                <option value="logistic">Logistic: ẋ = rx(1 − x/5)</option>
                 <option value="cubic">Cubic: ẋ = x − x³</option>
                 <option value="sine">Sine: ẋ = sin(x)</option>
                 <option value="quadratic">Quadratic: ẋ = r − x²</option>
@@ -125,7 +125,7 @@
         <div class="tab-content active">
             <div class="question-container" data-type="mcq" data-answer="1">
                 <div class="question-text">
-                    Select <strong>Logistic</strong> with r = 2, K = 5. The fixed point at
+                    Select <strong>Logistic</strong> with r = 2 (the carrying capacity is fixed at K = 5). The fixed point at
                     \( x_0 = 0 \) has \( f'(0) = r = 2 > 0 \). Is this fixed point
                     stable or unstable?
                 </div>
@@ -187,27 +187,28 @@
         </div>
 
         <div class="tab-content">
-            <div class="question-container" data-type="mcq" data-answer="0">
+            <div class="question-container" data-type="mcq" data-answer="1">
                 <div class="question-text">
-                    Select <strong>Cubic</strong> (\( \dot{x} = x - x^3 \)). How many fixed
-                    points does it have?
+                    Select <strong>Sine</strong> (\( \dot{x} = \sin x \)) and pick the fixed
+                    point at \( x_0 = \pi \) in the dropdown. The explorer reports
+                    \( \lambda = f'(\pi) \). What do you find, and what does it mean?
                 </div>
                 <div class="question-options">
                     <label class="option">
                         <input type="radio" name="lin-q3" value="0">
-                        <span>Three: \( x = 0, +1, -1 \)</span>
+                        <span>\( \lambda = +1 \): the fixed point is unstable</span>
                     </label>
                     <label class="option">
                         <input type="radio" name="lin-q3" value="1">
-                        <span>One: \( x = 0 \)</span>
+                        <span>\( \lambda = -1 \): the fixed point is stable</span>
                     </label>
                     <label class="option">
                         <input type="radio" name="lin-q3" value="2">
-                        <span>Two: \( x = +1, -1 \)</span>
+                        <span>\( \lambda = 0 \): linearization is inconclusive</span>
                     </label>
                     <label class="option">
                         <input type="radio" name="lin-q3" value="3">
-                        <span>Infinitely many</span>
+                        <span>\( \lambda = \pi \): the growth rate equals the position</span>
                     </label>
                 </div>
                 <div class="question-actions">
@@ -215,10 +216,11 @@
                 </div>
                 <div class="question-explanation" style="display:none;">
                     <strong>Explanation:</strong>
-                    \( f(x) = x - x^3 = x(1 - x^2) = x(1-x)(1+x) = 0 \) gives
-                    \( x = 0, +1, -1 \). Three fixed points! At \( x = 0 \): \( f'(0) = 1 > 0 \)
-                    (unstable). At \( x = \pm 1 \): \( f'(\pm 1) = 1 - 3 = -2 < 0 \) (stable).
-                    The origin repels; the two outer fixed points attract.
+                    \( f'(x) = \cos x \), so \( \lambda = \cos\pi = -1 < 0 \): the fixed
+                    point at \( x_0 = \pi \) is <strong>stable</strong> — nearby trajectories decay
+                    toward it like \( e^{-t} \). Contrast with \( x_0 = 0 \), where
+                    \( \lambda = \cos 0 = +1 \) and perturbations grow. The sine system alternates
+                    stable/unstable fixed points forever along the x-axis — check both in the explorer.
                 </div>
             </div>
         </div>
@@ -253,7 +255,7 @@
         <div class="control-group">
             <label class="control-label" for="lin-flow-system">System:</label>
             <select id="lin-flow-system" class="control-select">
-                <option value="logistic">Logistic: ẋ = rx(1 − x/K)</option>
+                <option value="logistic">Logistic: ẋ = rx(1 − x/5)</option>
                 <option value="cubic">Cubic: ẋ = x − x³</option>
                 <option value="sine">Sine: ẋ = sin(x)</option>
             </select>
@@ -263,7 +265,7 @@
                 <span id="lin-x0-value">0.2</span>
             </label>
             <input type="range" class="slider" id="lin-x0-slider"
-                   min="-2" max="6" step="0.1" value="0.2">
+                   min="-1" max="7" step="0.1" value="0.2">
         </div>
         <div class="control-group">
             <button class="btn" onclick="linFlowReset()">Reset</button>

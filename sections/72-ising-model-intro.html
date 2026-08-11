@@ -41,7 +41,10 @@
     <p>
         <strong>Thermal average:</strong>
         \( \langle A \rangle = \frac{1}{Z}\sum_{\text{configs}} A\, e^{-E/k_BT} \),
-        where \( Z = \sum e^{-E/k_BT} \) is the partition function.
+        where \( Z = \sum e^{-E/k_BT} \) is the partition function. The angle brackets
+        \( \langle A \rangle \) denote the <em>thermal average</em> of any measurable
+        quantity \( A \) (energy, magnetization, &hellip;): an average over every possible
+        spin configuration, each weighted by its Boltzmann factor.
     </p>
 </div>
 
@@ -376,6 +379,10 @@
         \( 2^{10} = 1{,}024 \), \( 2^{20} \approx 10^6 \), \( 2^{30} \approx 10^9 \).
         By \( N = 50 \), there are more configurations than atoms in the Earth.
         This is why we need Monte Carlo &mdash; which we&rsquo;ll build in the next section.
+        <strong>Left panel:</strong> for the current N and T, the bars count how many
+        configurations sit at each energy level, and the line shows that level&rsquo;s total
+        Boltzmann probability. <strong>Right panel:</strong> the \( 2^N \) explosion on a log
+        scale, with the marker tracking your current N.
     </p>
 
     <div class="dual-panel">

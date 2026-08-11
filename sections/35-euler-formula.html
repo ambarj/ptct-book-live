@@ -116,22 +116,24 @@
 
         <!-- Q1: Fill — hand calculation -->
         <div class="tab-content active">
-            <div class="question-container" data-type="fill" data-answer="0[-.01,.01]|-2[-2.1,-1.9]">
+            <div class="question-container" data-type="fill" data-answer="0.6[0.58,0.62]|0.36[0.34,0.38]">
                 <div class="question-text">
-                    For \(\dot{x} = -2x\) with \(x(0) = 1\) and \(h = 0.5\):
+                    Set \(h = 0.2\) with the slider. For \(\dot{x} = -2x\) with
+                    \(x(0) = 1\), compute the first two Euler values <em>by hand</em>:
                     <br><br>
-                    At step 0: \(t_0 =\) <input type="text" class="fill-blank" placeholder="?">
-                    and the slope \(f(x_0, t_0) = -2 \times 1 =\) <input type="text" class="fill-blank" placeholder="?">
+                    \(x_1 =\) <input type="text" class="fill-blank" placeholder="?">
+                    and \(x_2 =\) <input type="text" class="fill-blank" placeholder="?">.
+                    Then click Next Step twice and check against the table.
                 </div>
                 <div class="question-actions">
                     <button class="btn-verify">Verify</button>
                 </div>
                 <div class="question-explanation" style="display:none;">
                     <strong>Explanation:</strong>
-                    At \(t_0 = 0\), we have \(x_0 = 1\), so
-                    \(f(x_0, t_0) = -2 \times 1 = -2\).  This is the slope of
-                    the tangent line at the initial point.  Check the table in
-                    Explorer&nbsp;1 to confirm!
+                    \(x_1 = 1 + 0.2\times(-2\cdot 1) = 0.6\); then
+                    \(x_2 = 0.6 + 0.2\times(-2\cdot 0.6) = 0.36\).  Note the slope is
+                    re-evaluated at the <em>new</em> point at every step &mdash; that
+                    re-evaluation is the whole Euler recursion.
                 </div>
             </div>
         </div>

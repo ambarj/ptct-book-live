@@ -81,9 +81,9 @@
 
             var hmEst = visState.n > 0 ? (fn.b - fn.a) * fn.fMax * visState.hmHits / visState.n : 0;
             document.getElementById('mi-stats1').innerHTML =
-                '<span><strong>N = ' + visState.n + '</strong></span>' +
-                '<span>Hit-or-miss: ' + hmEst.toFixed(5) + '  |  Sample mean: ' + est.toFixed(5) + '</span>' +
-                '<span>True: ' + fn.trueVal.toFixed(5) + '  |  SM error: ±' + se.toFixed(5) + '</span>';
+                '<span><strong>N = ' + visState.n + '</strong>  |  True: ' + fn.trueVal.toFixed(5) + '</span>' +
+                '<span>Hit-or-miss: ' + hmEst.toFixed(5) + ' (|err| ' + Math.abs(hmEst - fn.trueVal).toFixed(5) + ')</span>' +
+                '<span>Sample mean: ' + est.toFixed(5) + ' (|err| ' + Math.abs(est - fn.trueVal).toFixed(5) + ', expected ±' + se.toFixed(5) + ')</span>';
         } else {
             Plotly.react('mi-sampleMeanPlot', [], Object.assign({}, darkLayout, {
                 xaxis: axStyle([0, 100], 'N'), yaxis: axStyle([0, 1], 'Estimate'),
@@ -178,8 +178,8 @@
               line: { color: 'rgba(255,255,255,0.3)', width: 1.5, dash: 'dot' },
               name: '1/√N reference' }
         ], Object.assign({}, darkLayout, {
-            xaxis: Object.assign(axStyle(null, 'N (samples)'), { type: 'log' }),
-            yaxis: Object.assign(axStyle(null, '|Error|'), { type: 'log' }),
+            xaxis: Object.assign(axStyle(null, 'N (samples, log scale)'), { type: 'log' }),
+            yaxis: Object.assign(axStyle(null, '|Error| (log scale)'), { type: 'log' }),
             height: 420,
             legend: { x: 0.55, y: 0.98, font: { color: '#aaa', size: 10 } }
         }), { responsive: true });

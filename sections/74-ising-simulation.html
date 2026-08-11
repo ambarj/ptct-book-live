@@ -301,10 +301,11 @@
         </div>
 
         <div class="tab-content">
-            <div class="question-container" data-type="fill" data-answer="-1[-1.05,-0.95]">
+            <div class="question-container" data-type="fill" data-answer="1.8[1.5,2.1]">
                 <div class="question-text">
-                    The exact energy per spin at T &rarr; 0 is
-                    \( \langle E \rangle / NJ \to \)
+                    Read from the sweep: at roughly what temperature does the energy curve cross
+                    \( \langle E \rangle / NJ = -0.5 \) &mdash; half-way between the ordered
+                    ground state and full disorder?  \( T/J \approx \)
                     <input type="text" class="fill-blank" style="width: 50px">.
                 </div>
                 <div class="question-actions">
@@ -312,8 +313,10 @@
                 </div>
                 <div class="question-explanation" style="display:none;">
                     <strong>Explanation:</strong>
-                    \( -\tanh(J/k_BT) \to -\tanh(\infty) = -1 \). At T = 0, all spins align:
-                    \( E = -(N-1)J \), so \( E/NJ = -(N-1)/N \to -1 \) for large N.
+                    Solve \( -\tanh(J/k_BT) = -0.5 \): \( T/J = 1/\operatorname{atanh}(0.5)
+                    \approx 1.82 \). Your MC points should cross the half-way line at the same
+                    temperature as the exact curve &mdash; a sharper validation than matching
+                    endpoints, because it probes the curve where it bends fastest.
                 </div>
             </div>
         </div>

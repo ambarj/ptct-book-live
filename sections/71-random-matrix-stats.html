@@ -193,19 +193,21 @@
         <div class="tab-content">
             <div class="question-container" data-type="fill" data-answer="50[45,55]">
                 <div class="question-text">
-                    Generate 10,000 matrices. The percentage of saddles is approximately
+                    Set R = 5 (entries drawn from [&minus;5, 5]) and generate 10,000 matrices.
+                    The percentage of saddles is approximately
                     <input type="text" class="fill-blank" style="width: 50px">%.
+                    Does the entry range change the fractions?
                 </div>
                 <div class="question-actions">
                     <button class="btn-verify">Verify</button>
                 </div>
                 <div class="question-explanation" style="display:none;">
                     <strong>Explanation:</strong>
-                    For uniform entries in [-1, 1], the probability of \( \Delta < 0 \) is
-                    exactly \( \tfrac{1}{2} \) by symmetry: \( ad \) and \( bc \) are
-                    independent and identically distributed, so their difference
-                    \( \Delta = ad - bc \) is symmetric about zero — negative exactly half the
-                    time. In practice, you&rsquo;ll see about <strong>49&ndash;51%</strong> saddles.
+                    Still 50% &mdash; and it always will be. Scaling every entry by R scales
+                    \( \tau \) by R and \( \Delta \) by R&sup2;, but a scale factor can never
+                    change the <em>sign</em> of \( \Delta = ad - bc \), and the saddle fraction is
+                    just \( P(\Delta < 0) = \tfrac{1}{2} \) by symmetry. All the type fractions are
+                    independent of R: the τ-Δ picture only stretches, never reshapes.
                 </div>
             </div>
         </div>

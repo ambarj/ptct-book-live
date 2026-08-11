@@ -164,11 +164,13 @@
 
         <!-- Q2: Fill -->
         <div class="tab-content">
-            <div class="question-container" data-type="fill" data-answer="3.14[2.9,3.4]">
+            <div class="question-container" data-type="fill" data-answer="4[3.8,4.2]">
                 <div class="question-text">
-                    Set &omega; = 2 rad/s.  What is the period T?
+                    You want the oscillator to complete one full cycle every 1.57 s
+                    (T = &pi;/2).  What &omega; do you need?  Predict first, then set the
+                    slider and check with the green period markers.
                     <br><br>
-                    T = <input type="text" class="fill-blank" placeholder="seconds"> s
+                    &omega; = <input type="text" class="fill-blank" placeholder="rad/s"> rad/s
                 </div>
                 <div class="question-actions">
                     <button class="btn-verify">Verify</button>
@@ -176,9 +178,10 @@
                 <div class="question-explanation" style="display: none;">
                     <div class="question-explanation-title">Explanation</div>
                     <div class="question-explanation-text">
-                        \( T = 2\pi/\omega = 2\pi/2 = \pi \approx 3.14 \) seconds.
-                        You can verify this on the plot: the green markers showing
-                        one complete period should be spaced about 3.14 seconds apart.
+                        Invert \( T = 2\pi/\omega \): \( \omega = 2\pi/T = 2\pi/(\pi/2) = 4 \)
+                        rad/s.  Set the slider to 4 and the green period markers land
+                        1.57 s apart.  Doubling &omega; halves T &mdash; frequency and period
+                        are reciprocal partners.
                     </div>
                 </div>
             </div>
@@ -186,26 +189,28 @@
 
         <!-- Q3: MCQ -->
         <div class="tab-content">
-            <div class="question-container" data-type="mcq" data-answer="1">
+            <div class="question-container" data-type="mcq" data-answer="2">
                 <div class="question-text">
-                    Set &phi; = 90&deg;.  What is x(0)?
+                    Find the phase &phi; that makes the motion <em>start</em> at the far
+                    negative turning point, x(0) = &minus;A.  (Set it, then confirm the
+                    yellow dot begins at the bottom of the swing.)
                 </div>
                 <div class="question-options">
                     <label class="option">
                         <input type="radio" name="os-q3" value="0">
-                        <span>x(0) = A</span>
+                        <span>&phi; = 0&deg;</span>
                     </label>
                     <label class="option">
                         <input type="radio" name="os-q3" value="1">
-                        <span>x(0) = 0</span>
+                        <span>&phi; = 90&deg;</span>
                     </label>
                     <label class="option">
                         <input type="radio" name="os-q3" value="2">
-                        <span>x(0) = -A</span>
+                        <span>&phi; = 180&deg;</span>
                     </label>
                     <label class="option">
                         <input type="radio" name="os-q3" value="3">
-                        <span>x(0) = A/2</span>
+                        <span>&phi; = 270&deg;</span>
                     </label>
                 </div>
                 <div class="question-actions">
@@ -214,11 +219,12 @@
                 <div class="question-explanation" style="display: none;">
                     <div class="question-explanation-title">Explanation</div>
                     <div class="question-explanation-text">
-                        \( x(0) = A\cos(\phi) = A\cos(90°) = 0 \).  At \( \phi = 90° \),
-                        the cosine starts at zero and heads negative &mdash; the object
-                        begins at equilibrium, moving in the negative direction.  This is
-                        the same as \( x(t) = -A\sin(\omega t) \).  Watch the yellow
-                        dot sit right on the x-axis at \( t = 0 \).
+                        \( x(0) = A\cos\phi = -A \) requires \( \cos\phi = -1 \), i.e.
+                        \( \phi = 180° \).  (Check the neighbors: 90&deg; starts at
+                        equilibrium moving backward, 270&deg; at equilibrium moving forward,
+                        0&deg; at the positive turning point.)  Phase is a <em>starting-position
+                        dial</em>: it slides the whole motion in time without changing its
+                        shape.
                     </div>
                 </div>
             </div>
@@ -531,11 +537,13 @@
 
         <!-- Q7: Fill -->
         <div class="tab-content active">
-            <div class="question-container" data-type="fill" data-answer="1.05[0.9,1.2]">
+            <div class="question-container" data-type="fill" data-answer="4[3.7,4.3]">
                 <div class="question-text">
-                    An oscillation has &omega; = 6 rad/s.  What is the period T?
+                    In a Pattern Matcher round you measure a mystery trace&rsquo;s period off
+                    the plot: successive peaks are 1.57 s apart.  What is its angular
+                    frequency?
                     <br><br>
-                    T = <input type="text" class="fill-blank" placeholder="seconds"> s
+                    &omega; = <input type="text" class="fill-blank" placeholder="rad/s"> rad/s
                 </div>
                 <div class="question-actions">
                     <button class="btn-verify">Verify</button>
@@ -543,9 +551,10 @@
                 <div class="question-explanation" style="display: none;">
                     <div class="question-explanation-title">Explanation</div>
                     <div class="question-explanation-text">
-                        \( T = 2\pi/\omega = 2\pi/6 \approx 1.047 \) s.  Set &omega; = 6
-                        in the Parameter Explorer and check that the green period markers
-                        are about 1 second apart.
+                        \( \omega = 2\pi/T = 2\pi/1.57 \approx 4 \) rad/s.  Measuring the
+                        peak-to-peak spacing and inverting is exactly how you extract
+                        &omega; from real data &mdash; the skill every Pattern Matcher round
+                        exercises.
                     </div>
                 </div>
             </div>

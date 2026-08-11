@@ -338,34 +338,37 @@
 
         <!-- Q5: Fill -->
         <div class="tab-content">
-            <div class="question-container" data-type="fill" data-answer="spiral inward|shrinks">
+            <div class="question-container" data-type="fill" data-answer="spiral outward|spiral inward">
                 <div class="question-text">
-                    Switch to the <strong>damped oscillator</strong> and set \(\gamma = 0.3\).
-                    The phase portrait now
+                    Select the <strong>damped oscillator</strong> with \(\gamma = 0.1\),
+                    \(\omega_0 = 2\). At \(h = 0.20\) the phase portrait will
                     <select class="fill-blank-select">
                         <option value=""></option>
-                        <option value="spiral inward">spirals inward</option>
-                        <option value="spiral outward">spirals outward</option>
-                        <option value="stays on a circle">stays on a circle</option>
+                        <option value="spiral inward">spiral inward</option>
+                        <option value="spiral outward">spiral outward</option>
+                        <option value="stays on a circle">stay on a circle</option>
                     </select>
-                    because energy
+                    &mdash; but at \(h = 0.01\) it will
                     <select class="fill-blank-select">
                         <option value=""></option>
-                        <option value="grows">grows</option>
-                        <option value="shrinks">shrinks</option>
-                        <option value="stays constant">stays constant</option>
-                    </select>
-                    due to friction.
+                        <option value="spiral inward">spiral inward</option>
+                        <option value="spiral outward">spiral outward</option>
+                        <option value="stays on a circle">stay on a circle</option>
+                    </select>.
+                    Try both, then explain which effect wins at each step size.
                 </div>
                 <div class="question-actions">
                     <button class="btn-verify">Verify</button>
                 </div>
                 <div class="question-explanation" style="display:none;">
                     <strong>Explanation:</strong>
-                    Damping removes energy from the system. The trajectory spirals inward toward
-                    the equilibrium point \((0, 0)\). Each orbit is smaller than the last because
-                    the amplitude decays as \(e^{-\gamma t}\). This is the same physics you explored
-                    in Chapter 3 Section 3.5, now seen through the numerical lens.
+                    Two effects compete: physical damping <em>removes</em> energy at a rate
+                    \(\sim 2\gamma h\) per step, while Euler&rsquo;s method <em>injects</em>
+                    energy at a rate \(\sim h^2\omega_0^2\) per step. At \(h = 0.20\),
+                    injection (0.16) beats damping (0.04) and the damped oscillator spirals
+                    <strong>outward</strong> &mdash; the numerics qualitatively reverse the physics!
+                    At \(h = 0.01\) damping wins and the trajectory spirals inward as it should.
+                    Moral: always check that your step size resolves the fastest timescale.
                 </div>
             </div>
         </div>

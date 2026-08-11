@@ -196,8 +196,8 @@
 
         // Region labels
         var annotations = [
-            {x:-3,y:5,text:'✓ Stable Node',font:{color:'#00ff88',size:10},showarrow:false},
-            {x:3,y:5,text:'✓ Unstable Node',font:{color:'#00ff88',size:10},showarrow:false},
+            {x:-4,y:2,text:'✓ Stable Node',font:{color:'#00ff88',size:10},showarrow:false},
+            {x:4,y:2,text:'✓ Unstable Node',font:{color:'#00ff88',size:10},showarrow:false},
             {x:-1.5,y:1.5,text:'✓ Stable Spiral',font:{color:'#00ff88',size:10},showarrow:false},
             {x:1.5,y:1.5,text:'✓ Unstable Spiral',font:{color:'#00ff88',size:10},showarrow:false},
             {x:0,y:-1.5,text:'✓ Saddle',font:{color:'#00ff88',size:10},showarrow:false},

@@ -301,6 +301,7 @@
 
     var cloudSnapshots = null;
     var cloudInitX = null, cloudInitY = null;
+    var cloudCx = null, cloudCy = null;   // user-chosen center (click-to-place)
     var CLOUD_STEPS = 500, CLOUD_PTS = 40;
 
     function computeCloud() {
@@ -309,12 +310,14 @@
         var cfg = cloudCfg[key];
         if (!cfg) return;
 
+        var ccx = cloudCx !== null ? cloudCx : cfg.cx;
+        var ccy = cloudCy !== null ? cloudCy : cfg.cy;
         var h = cfg.T / CLOUD_STEPS;
         var X = [], Y = [];
         for (var p = 0; p < CLOUD_PTS; p++) {
             var theta = p * 2 * Math.PI / CLOUD_PTS;
-            X.push(cfg.cx + cfg.r * Math.cos(theta));
-            Y.push(cfg.cy + cfg.r * Math.sin(theta));
+            X.push(ccx + cfg.r * Math.cos(theta));
+            Y.push(ccy + cfg.r * Math.sin(theta));
         }
         cloudInitX = X.slice();
         cloudInitY = Y.slice();
@@ -418,6 +421,7 @@
 
     window.tdCloudReset = function() {
         cloudSnapshots = null;
+        cloudCx = null; cloudCy = null;
         document.getElementById('td-cloud-time').value = 0;
         document.getElementById('td-cloud-time-value').textContent = '0.0';
         var key = document.getElementById('td-cloud-system').value;
@@ -471,6 +475,25 @@
             cloudSnapshots = null;
             window.tdCloudReset();
         });
+        // Click-to-place the cloud (native listener: plotly_click only
+        // fires on data points, never empty canvas)
+        var cp = document.getElementById('td-cloudPlot');
+        if (cp && !cp._cloudClickBound) {
+            cp._cloudClickBound = true;
+            cp.addEventListener('click', function(e) {
+                if (e.target.closest('.modebar')) return;
+                var fl = cp._fullLayout;
+                if (!fl || !fl.xaxis || !fl.xaxis.p2d) return;
+                var rect = cp.getBoundingClientRect();
+                var x = fl.xaxis.p2d(e.clientX - rect.left - fl.xaxis._offset);
+                var y = fl.yaxis.p2d(e.clientY - rect.top - fl.yaxis._offset);
+                var s = sys1[document.getElementById('td-cloud-system').value];
+                if (isNaN(x) || isNaN(y) ||
+                    x < s.xR[0] || x > s.xR[1] || y < s.yR[0] || y > s.yR[1]) return;
+                cloudCx = x; cloudCy = y;
+                window.tdDropCloud();
+            });
+        }
         document.getElementById('td-cloud-time').addEventListener('input', function() {
             var step = parseInt(this.value);
             var key = document.getElementById('td-cloud-system').value;

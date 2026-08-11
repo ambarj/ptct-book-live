@@ -3,13 +3,13 @@
 
     var darkLayout = {
         template: 'plotly_dark',
-        margin: { t: 30, r: 20, b: 45, l: 55 },
+        margin: { t: 30, r: 70, b: 55, l: 65 },
         paper_bgcolor: 'rgba(0,0,0,0)',
         plot_bgcolor: 'rgba(0,0,0,0)'
     };
 
     function axStyle(range, title) {
-        return { gridcolor: '#2a2f4a', zerolinecolor: '#808080', linecolor: '#808080', range: range, title: title || '' };
+        return { gridcolor: '#2a2f4a', zerolinecolor: '#808080', linecolor: '#808080', range: range, title: title || '', automargin: true };
     }
 
     function classify(tau, delta) {

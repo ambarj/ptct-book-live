@@ -99,6 +99,20 @@
                     line: { color: color || '#00f3ff', width: width || 1.5 },
                     hoverinfo: 'none', showlegend: false
                 });
+                // Direction arrowheads at 1/3 and 2/3 of the path
+                [Math.floor(sol.X.length / 3), Math.floor(2 * sol.X.length / 3)].forEach(function(ii) {
+                    if (ii > 0 && ii < sol.X.length - 1) {
+                        var adx = sol.X[ii + 1] - sol.X[ii], ady = sol.Y[ii + 1] - sol.Y[ii];
+                        if (adx === 0 && ady === 0) return;
+                        traces.push({
+                            x: [sol.X[ii]], y: [sol.Y[ii]],
+                            type: 'scatter', mode: 'markers',
+                            marker: { symbol: 'triangle-up', size: 8, color: color || '#00f3ff',
+                                      angle: 90 - Math.atan2(ady, adx) * 180 / Math.PI },
+                            hoverinfo: 'none', showlegend: false
+                        });
+                    }
+                });
             }
         }
         return traces;
@@ -243,9 +257,22 @@
     }
 
     // ===== EXPLORER 3: Speed Map =====
+    // Explorer-3-only matrices: every preset in the shared table has
+    // |v| ∝ r (perfectly radial speed), so all speed maps looked identical.
+    // These anisotropic versions keep each qualitative type but give each
+    // its own visibly different speed landscape (tilted/elongated ellipses).
+    var speedPresets = {
+        center:         { a: 0,    b: 2, c: -1, d: 0    },  // |v|² = x² + 4y²
+        saddle:         { a: 2,    b: 0, c: 0,  d: -1   },  // |v|² = 4x² + y²
+        stableSpiral:   { a: -0.2, b: 2, c: -1, d: -0.2 },  // tilted ellipses
+        unstableSpiral: { a: 0.2,  b: 2, c: -1, d: 0.2  },
+        source:         { a: 2,    b: 0, c: 0,  d: 2    },  // the only radial one
+        sink:           { a: -0.5, b: 0, c: 0,  d: -2   }   // 4:1 ellipses
+    };
+
     function updateExplorer3() {
         var key = document.getElementById('vf-system3').value;
-        var sys = presets[key];
+        var sys = speedPresets[key] || presets[key];
         var a = sys.a, b = sys.b, c = sys.c, d = sys.d;
 
         // Generate speed heatmap

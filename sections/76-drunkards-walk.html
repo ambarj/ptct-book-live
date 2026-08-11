@@ -169,7 +169,7 @@
             <div class="question-container" data-type="fill" data-answer="10[8,12]">
                 <div class="question-text">
                     After 100 unbiased steps, the typical distance from the origin is
-                    about \( \sqrt{N} = \sqrt{100} = \)
+                    about \( \sqrt{N} = \)
                     <input type="text" class="fill-blank" style="width: 50px">.
                     (Check the spread of the histogram)
                 </div>
@@ -582,7 +582,7 @@ colors = ['#00f3ff','#ff006e','#ffbe0b','#00ff88','#bb86fc']
 for w in range(min(n_walkers, 20)):
     fig.add_trace(go.Scatter(
         y=positions[w], mode='lines',
-        line=dict(color=colors[w % 5], width=0.8, opacity=0.5),
+        line=dict(color=colors[w % 5], width=0.8), opacity=0.5,
         showlegend=False), row=1, col=1)
 
 # ±√N envelope

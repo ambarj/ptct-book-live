@@ -31,7 +31,7 @@
 <div class="info-box">
     <div class="info-box-title">The Uniqueness Theorem</div>
     <p>
-        If \( f \) and \( g \) are smooth, then through every point \( (x_0, y_0) \) there passes
+        If the velocity components \( f \) and \( g \) in \( \dot{x} = f(x,y),\; \dot{y} = g(x,y) \) are smooth, then through every point \( (x_0, y_0) \) there passes
         <strong>exactly one</strong> trajectory. Two different trajectories can never intersect,
         merge, or cross. This seemingly simple fact has profound consequences: it means the
         phase portrait is a collection of non-intersecting curves that fill the entire plane.
@@ -310,23 +310,26 @@
         <div class="tab-content">
             <div class="question-container" data-type="fill" data-answer="stable">
                 <div class="question-text">
-                    The basin boundary (separatrix) consists of the
+                    A trajectory started <em>exactly on</em> the basin boundary will, as
+                    \( t \to \infty \),
                     <select class="fill-blank-select">
                         <option value=""></option>
-                        <option value="stable">stable</option>
-                        <option value="unstable">unstable</option>
-                    </select>
-                    manifold of the saddle point.
+                        <option value="stable">approach the saddle point</option>
+                        <option value="unstable">reach one of the two attractors</option>
+                    </select>.
+                    (Test it: launch from points just either side of the boundary and watch
+                    their fates split.)
                 </div>
                 <div class="question-actions">
                     <button class="btn-verify">Verify</button>
                 </div>
                 <div class="question-explanation" style="display:none;">
                     <strong>Explanation:</strong>
-                    The <strong>stable manifold</strong> of a saddle is the set of points that
-                    approach the saddle as \( t \to \infty \). These trajectories sit right on the
-                    boundary &mdash; they don&rsquo;t go to either attractor (they approach the saddle
-                    instead). Points on either side of this manifold diverge toward different attractors.
+                    The boundary <em>is</em> the <strong>stable manifold</strong> of the saddle:
+                    the set of points that approach the saddle as \( t \to \infty \). A trajectory
+                    on it never reaches either attractor &mdash; it rides the knife-edge into the saddle.
+                    Nudge the start a hair to either side and the trajectory peels off toward a
+                    different attractor. That knife-edge behavior is what makes it the basin boundary.
                 </div>
             </div>
         </div>
@@ -378,7 +381,9 @@
     <div class="interactive-title">Explorer: The No-Crossing Principle</div>
 
     <p>
-        Drop a cloud of nearby initial conditions and watch them evolve.
+        Drop a cloud of nearby initial conditions and watch them evolve —
+        click anywhere on the plot to place the cloud there, or press
+        &ldquo;Drop Cloud&rdquo; for the default spot.
         The blob stretches and deforms &mdash; but trajectories <strong>never cross</strong>.
         Near a saddle, the stretching is dramatic: the cloud elongates into a thin filament
         along the unstable direction.
