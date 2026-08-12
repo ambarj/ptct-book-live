@@ -117,7 +117,7 @@
             <div class="question-container" data-type="mcq" data-answer="2">
                 <div class="question-text">
                     With \( \gamma = 0.10 \), at what driving frequency does the bridge
-                    come <em>closest</em> to the danger threshold (amplitude &gt; 3)?
+                    come <em>closest</em> to the danger threshold?
                 </div>
                 <div class="question-options">
                     <label class="option"><input type="radio" name="rd-q1" value="0"><span>\( \omega_d = 1.0 \) rad/s &mdash; well below resonance</span></label>
@@ -451,20 +451,23 @@
         </div>
 
         <div class="tab-content">
-            <div class="question-container" data-type="fill" data-answer="0.70[0.50,0.90]">
+            <div class="question-container" data-type="fill" data-answer="25[23,27]">
                 <div class="question-text">
-                    Set \( \omega_0 = 3.50 \) and \( Q = 5 \).  The bandwidth is
-                    \( \Delta\omega = \omega_0 / Q = 3.50 / 5 = \) <input type="text" class="fill-blank" placeholder="?"> rad/s.
-                    Now increase Q to 25.  Does Station A&rsquo;s bar shrink significantly?
+                    Tuned to Station B (\( \omega_0 = 3.50 \)), what \( Q \) do you need to
+                    narrow the bandwidth to \( \Delta\omega = 0.14 \) rad/s so Station A
+                    essentially vanishes from the bar chart?
+                    Q = <input type="text" class="fill-blank" placeholder="?">
                 </div>
                 <div class="question-actions"><button class="btn-verify">Verify</button></div>
                 <div class="question-explanation" style="display:none;">
                     <strong>Explanation:</strong>
-                    \( \Delta\omega = 3.50 / 5 = 0.70 \) rad/s.  This bandwidth is wide
-                    enough that Station A (at 2.0 rad/s, only 1.5 away) still gets some
-                    response.  At Q = 25: \( \Delta\omega = 0.14 \), much narrower, and
-                    Station A&rsquo;s signal drops dramatically in the bar chart.
-                    High Q = sharp tuning = better selectivity.
+                    Invert \( \Delta\omega = \omega_0 / Q \): you need
+                    \( Q = \omega_0 / \Delta\omega = 3.50 / 0.14 = 25 \).  Set Q = 25 and
+                    watch Station A&rsquo;s bar (at 2.0 rad/s, a full 1.5 away from the
+                    peak) collapse &mdash; a 0.14 rad/s band centered on 3.50 leaves it
+                    far outside the passband.  This is exactly how a radio dial rejects
+                    everything but the station you want: crank Q up and the window around
+                    \( \omega_0 \) shrinks.
                 </div>
             </div>
         </div>

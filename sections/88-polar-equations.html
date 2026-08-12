@@ -154,16 +154,16 @@
             <button class="tab-button">Question 3</button>
         </div>
         <div class="tab-content active">
-            <div class="question-container" data-type="mcq" data-answer="0">
-                <div class="question-text">Set the trajectory to "Circle". What is \( \dot\rho \) over the whole orbit?</div>
+            <div class="question-container" data-type="mcq" data-answer="1">
+                <div class="question-text">Set the trajectory to "Ellipse". At which points of the orbit is \( \dot\rho = 0 \)?</div>
                 <div class="question-options">
-                    <label class="option"><input type="radio" name="pe-q1" value="0"><span>Exactly zero — radius stays constant on a circle</span></label>
-                    <label class="option"><input type="radio" name="pe-q1" value="1"><span>Equal to the orbital speed</span></label>
-                    <label class="option"><input type="radio" name="pe-q1" value="2"><span>Equal to \( \rho\dot\phi \)</span></label>
-                    <label class="option"><input type="radio" name="pe-q1" value="3"><span>Periodic, oscillating like a sine wave</span></label>
+                    <label class="option"><input type="radio" name="pe-q1" value="0"><span>Nowhere</span></label>
+                    <label class="option"><input type="radio" name="pe-q1" value="1"><span>Only at closest and farthest approach — the radial turning points</span></label>
+                    <label class="option"><input type="radio" name="pe-q1" value="2"><span>Everywhere</span></label>
+                    <label class="option"><input type="radio" name="pe-q1" value="3"><span>Where the speed is largest</span></label>
                 </div>
                 <div class="question-actions"><button class="btn-verify">Verify</button></div>
-                <div class="question-explanation" style="display:none;"><strong>Explanation:</strong> Circular means constant \( \rho \), so \( \dot\rho = 0 \). All of the velocity is in the tangential direction: \( |\vec v| = \rho\dot\phi \). Try the time slider — the polar-decomposition arrow points entirely in \( \hat\phi \), never along \( \hat\rho \).</div>
+                <div class="question-explanation" style="display:none;"><strong>Explanation:</strong> On an ellipse \( \rho \) grows and shrinks, so \( \dot\rho \) is generally nonzero — but it must pass through zero exactly where \( \rho \) reverses direction: perihelion (closest) and aphelion (farthest). Those are the <em>radial turning points</em>, where all the velocity is momentarily tangential (\( |\vec v| = \rho\dot\phi \)), just as on a circle. Scrub the time slider and watch the \( \hat\rho \) component of the arrow vanish at exactly two spots per orbit — nowhere else. (Note the speed is <em>largest</em> at perihelion, not zero-radial-only; that is a common trap.)</div>
             </div>
         </div>
         <div class="tab-content">

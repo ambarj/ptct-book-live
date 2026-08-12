@@ -314,12 +314,12 @@
 
         <!-- Q4: Fill -->
         <div class="tab-content active">
-            <div class="question-container" data-type="fill" data-answer="5.0[4.5,5.5]">
+            <div class="question-container" data-type="fill" data-answer="0.1[0.09,0.11]">
                 <div class="question-text">
-                    Set \( \gamma = 0.30 \).  The quality factor is
-                    \( Q = \omega_0 / (2\gamma) = 3.0 / (2 \times 0.30) \).  Calculate \( Q \):
+                    Find the \( \gamma \) that gives this resonator \( Q = 15 \)
+                    (\( \omega_0 = 3.0 \)), then confirm in the stats bar.
                     <br><br>
-                    Q = <input type="text" class="fill-blank" placeholder="value">
+                    &gamma; = <input type="text" class="fill-blank" placeholder="value">
                 </div>
                 <div class="question-actions">
                     <button class="btn-verify">Verify</button>
@@ -327,10 +327,12 @@
                 <div class="question-explanation" style="display: none;">
                     <div class="question-explanation-title">Explanation</div>
                     <div class="question-explanation-text">
-                        \( Q = 3.0 / 0.60 = 5.0 \).  Check the stats bar: it should
-                        show Q = 5.0 and the bandwidth \( \Delta\omega \approx 0.60 \).
-                        Verify: \( Q \approx \omega_0 / \Delta\omega = 3.0 / 0.60 = 5.0 \).
-                        The two definitions agree.
+                        Invert \( Q = \omega_0/(2\gamma) \): you need
+                        \( \gamma = \omega_0/(2Q) = 3.0/(2 \times 15) = 0.1 \).  Set the
+                        slider there and the stats bar should read Q = 15.  Notice the
+                        inverse-design logic: sharper resonators (high Q) demand
+                        ever-lighter damping &mdash; tripling Q from 5 to 15 means cutting
+                        \( \gamma \) to a third.
                     </div>
                 </div>
             </div>
@@ -554,12 +556,14 @@
 
         <!-- Q8: Fill -->
         <div class="tab-content">
-            <div class="question-container" data-type="fill" data-answer="0.60[0.50,0.70]">
+            <div class="question-container" data-type="fill" data-answer="0.3[0.27,0.33]">
                 <div class="question-text">
-                    At \( \omega_0 = 3.0, Q = 5 \), the bandwidth is
-                    \( \Delta\omega = \omega_0 / Q \).  Calculate \( \Delta\omega \):
+                    You need signals at \( \omega_d = 3.3 \) to fall below the
+                    half-power level.  Since \( \Delta\omega \approx 2\gamma \), what is
+                    the maximum allowed \( \gamma \)?  Verify with the yellow bandwidth
+                    markers.
                     <br><br>
-                    &Delta;&omega; = <input type="text" class="fill-blank" placeholder="rad/s"> rad/s
+                    &gamma; = <input type="text" class="fill-blank" placeholder="?">
                 </div>
                 <div class="question-actions">
                     <button class="btn-verify">Verify</button>
@@ -567,12 +571,14 @@
                 <div class="question-explanation" style="display: none;">
                     <div class="question-explanation-title">Explanation</div>
                     <div class="question-explanation-text">
-                        \( \Delta\omega = 3.0 / 5 = 0.60 \) rad/s.  This means the
-                        system responds strongly only within a band of width 0.60 rad/s
-                        centered on \( \omega_0 = 3.0 \).  Frequencies outside
-                        \( [2.70, 3.30] \) produce less than \( 1/\sqrt{2} \) of the
-                        peak amplitude.  Set \( \gamma = 0.30 \) (Q = 5) and verify
-                        from the yellow bandwidth markers in Explorer 2.
+                        The half-power points sit at \( \omega_0 \pm \gamma \) (the full
+                        width is \( \Delta\omega = 2\gamma \)).  For \( \omega_d = 3.3 \)
+                        to land right at the upper half-power edge you need
+                        \( \omega_0 + \gamma = 3.3 \), i.e. \( \gamma = 3.3 - 3.0 = 0.3 \).
+                        Set \( \gamma = 0.30 \) and the yellow bandwidth markers straddle
+                        \( [2.70, 3.30] \) &mdash; anything at or beyond 3.3 has dropped
+                        below \( 1/\sqrt{2} \) of the peak.  Push \( \gamma \) any higher
+                        and the band widens, letting 3.3 back in.
                     </div>
                 </div>
             </div>

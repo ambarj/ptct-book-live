@@ -277,11 +277,11 @@
     <div class="stats-bar">
         <div class="stat-item">
             <span class="stat-label">Bracket</span>
-            <span class="stat-value" id="ar-bracket2">[1.000, 4.000]</span>
+            <span class="stat-value" id="ar-bracket2">[1.0000, 5.0000]</span>
         </div>
         <div class="stat-item">
             <span class="stat-label">Midpoint V₀</span>
-            <span class="stat-value" id="ar-midV02">2.500</span>
+            <span class="stat-value" id="ar-midV02">3.0000</span>
         </div>
         <div class="stat-item">
             <span class="stat-label">Step</span>
@@ -301,7 +301,7 @@
     <div class="info-box">
         <div class="info-box-title">What to Try</div>
         <ul>
-            <li>Click "Auto" with α = 1, β = 1: the escape velocity converges to about 2.23 — nearly 58% higher than √2!</li>
+            <li>Click "Auto" with α = 1, β = 1: watch the bracket collapse onto the escape velocity — notice how much higher than √2 it lands, and check the v_esc / √2 ratio.</li>
             <li>Set α = 0, click Auto: should recover √2 exactly (no drag).</li>
             <li>Try α = 3 (heavy drag): escape velocity jumps to ~4. The atmosphere is a serious obstacle.</li>
             <li>After Auto, change α or β sliders — the bisection resets automatically for new parameters.</li>
@@ -325,40 +325,46 @@
         </div>
 
         <div class="tab-content active">
-            <div class="question-container" data-type="fill" data-answer="2.23[2.13,2.33]">
+            <div class="question-container" data-type="fill" data-answer="3.13[3.00,3.25]">
                 <div class="question-text">
-                    With α = 1, β = 1, the escape velocity is approximately V₀ ≈
-                    <input type="text" class="fill-blank" placeholder="?">
-                    (Run Auto and read the midpoint.)
+                    Set α = 2, β = 1 and run Auto. Read the midpoint V₀: the escape velocity is
+                    approximately v_esc ≈ <input type="text" class="fill-blank" placeholder="?">
                 </div>
                 <div class="question-actions">
                     <button class="btn-verify">Verify</button>
                 </div>
                 <div class="question-explanation" style="display:none;">
                     <strong>Explanation:</strong>
-                    With moderate drag (α = 1) and a moderately thick atmosphere (β = 1),
-                    the escape velocity rises from √2 ≈ 1.414 to about 2.23 — a ~58% increase.
-                    This is why rocket launches require so much fuel: overcoming air resistance
-                    is a significant part of the energy budget.
+                    Doubling the drag strength to α = 2 pushes the escape velocity up to about 3.13 —
+                    roughly 2.2× the vacuum value √2 ≈ 1.414 (check the v_esc / √2 readout).
+                    Compared with α = 1 (≈ 2.23), the extra drag costs you noticeably more launch
+                    speed, but the increase is <em>sub-linear</em>: doubling α does not double v_esc,
+                    because a faster launch clears the dense low atmosphere before drag can bleed off
+                    as much energy. That diminishing penalty is exactly the kind of result you can
+                    only get by running RK4 and bisecting — there is no closed-form formula for it.
                 </div>
             </div>
         </div>
 
         <div class="tab-content">
-            <div class="question-container" data-type="fill" data-answer="1.41[1.39,1.43]">
+            <div class="question-container" data-type="fill" data-answer="1.7[1.6,1.8]">
                 <div class="question-text">
-                    With α = 0 (no drag), the bisection should converge to V₀ ≈
+                    Keep β = 1 and sweep α upward, running Auto at each setting. Find the α
+                    (to the nearest 0.1) at which the escape velocity is exactly <em>double</em>
+                    the vacuum value — i.e. the v_esc / √2 readout reaches 2.0. α ≈
                     <input type="text" class="fill-blank" placeholder="?">
-                    (This validates that our solver reproduces the known vacuum result.)
                 </div>
                 <div class="question-actions">
                     <button class="btn-verify">Verify</button>
                 </div>
                 <div class="question-explanation" style="display:none;">
                     <strong>Explanation:</strong>
-                    With α = 0, the drag term vanishes and we're back to the vacuum problem.
-                    The bisection should converge to √2 ≈ 1.4142. This is the validation step —
-                    always test a solver on a known case before applying it to new problems.
+                    Double the vacuum escape speed means v_esc = 2√2 ≈ 2.83, i.e. a v_esc / √2
+                    ratio of 2.0. Watching that readout: at α = 1.6 the ratio is about 1.95 (just
+                    short), and at α = 1.7 it reaches about 2.02 (just over), so the crossing sits
+                    at α ≈ 1.7. Notice it takes drag as strong as α = 1.7 to merely double the
+                    launch requirement — the escape velocity grows steadily but gently with α, one
+                    of those quantitative trends that only the numerical solver can reveal.
                 </div>
             </div>
         </div>

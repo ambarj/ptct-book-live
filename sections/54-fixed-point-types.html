@@ -274,37 +274,24 @@
         </div>
 
         <div class="tab-content active">
-            <div class="question-container" data-type="mcq" data-answer="2">
+            <div class="question-container" data-type="fill" data-answer="1.0[0.9,1.1]">
                 <div class="question-text">
-                    In the &tau;-&Delta; plane, the dashed parabola \( \Delta = \tau^2/4 \) separates&hellip;
-                </div>
-                <div class="question-options">
-                    <label class="option">
-                        <input type="radio" name="ft-q4" value="0">
-                        <span>Stable from unstable systems</span>
-                    </label>
-                    <label class="option">
-                        <input type="radio" name="ft-q4" value="1">
-                        <span>Saddles from everything else</span>
-                    </label>
-                    <label class="option">
-                        <input type="radio" name="ft-q4" value="2">
-                        <span>Nodes from spirals (real vs complex eigenvalues)</span>
-                    </label>
-                    <label class="option">
-                        <input type="radio" name="ft-q4" value="3">
-                        <span>Centers from spirals</span>
-                    </label>
+                    Set \( \tau = 2.0 \). As you increase \( \Delta \) from 0.5 upward, at what value
+                    of \( \Delta \) does the portrait switch from a node to a spiral?
+                    \( \Delta = \) <input type="text" class="fill-blank" placeholder="?">
                 </div>
                 <div class="question-actions">
                     <button class="btn-verify">Verify</button>
                 </div>
                 <div class="question-explanation" style="display:none;">
                     <strong>Explanation:</strong>
-                    On the parabola, \( \tau^2 - 4\Delta = 0 \) &mdash; the discriminant vanishes.
-                    Above it (\( \Delta &gt; \tau^2/4 \)), eigenvalues are complex &rarr; <em>spirals</em>.
-                    Below it (\( \Delta &lt; \tau^2/4 \)), eigenvalues are real &rarr; <em>nodes</em> (or saddles if \( \Delta &lt; 0 \)).
-                    Move the sliders to cross the parabola and watch the portrait morph.
+                    A node becomes a spiral exactly when the eigenvalues go from real to complex,
+                    i.e. when the discriminant \( \tau^2 - 4\Delta \) changes sign. At \( \tau = 2 \)
+                    that crossing is \( \Delta = \tau^2/4 = 4/4 = 1.0 \). Below it the two real
+                    eigenvalues give a node; push \( \Delta \) above 1 and they merge into a
+                    complex-conjugate pair, so trajectories begin to swirl. That threshold is
+                    precisely the dashed parabola \( \Delta = \tau^2/4 \) — sliding across it is what
+                    morphs the portrait before your eyes.
                 </div>
             </div>
         </div>
@@ -312,9 +299,9 @@
         <div class="tab-content">
             <div class="question-container" data-type="fill" data-answer="stable spiral">
                 <div class="question-text">
-                    Set \( \tau = -1 \) and \( \Delta = 4 \) in the explorer. The discriminant is
-                    \( \tau^2 - 4\Delta = 1 - 16 = -15 &lt; 0 \) (complex eigenvalues) and \( \tau &lt; 0 \)
-                    (negative real part). This system is a
+                    Set \( \tau = -1 \) and \( \Delta = 4 \). Before looking at the right panel, use
+                    the discriminant \( \tau^2 - 4\Delta \) and the sign of \( \tau \) to predict the
+                    type, then verify. This system is a
                     <input type="text" class="fill-blank" placeholder="type name">.
                 </div>
                 <div class="question-actions">

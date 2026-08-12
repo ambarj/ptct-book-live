@@ -112,21 +112,23 @@
         </div>
 
         <div class="tab-content active">
-            <div class="question-container" data-type="fill" data-answer="25[22,28]">
+            <div class="question-container" data-type="fill" data-answer="2.16[2.0,2.3]">
                 <div class="question-text">
-                    At an altitude of 1 Earth radius (x = 2R from center), the gravitational
-                    acceleration is approximately what percentage of the surface value?
-                    <input type="text" class="fill-blank" placeholder="?"> %
+                    Use the altitude slider to find the altitude (in Earth radii) at which gravity
+                    has dropped to just 10% of its surface value.
+                    <input type="text" class="fill-blank" placeholder="?"> Earth radii
                 </div>
                 <div class="question-actions">
                     <button class="btn-verify">Verify</button>
                 </div>
                 <div class="question-explanation" style="display:none;">
                     <strong>Explanation:</strong>
-                    At distance \( x = 2R \): \( g(x) = g_0 R^2/x^2 = g_0/4 = 25\% \).
-                    Even at just one Earth radius above the surface (~6,370 km), gravity has dropped
-                    to a quarter of its surface value. This is why constant \( g \) fails for
-                    high-altitude problems.
+                    You need \( g(x)/g_0 = R^2/x^2 = 0.1 \), so \( x = R\sqrt{10} \approx 3.16R \) —
+                    an altitude of about \( 2.16 \) Earth radii. On the slider, altitude 2.1 reads
+                    about 10.4% and 2.2 reads about 9.8%, bracketing the answer. Notice how slowly
+                    gravity fades: even 2 Earth radii up (~13,000 km), you still feel a tenth of
+                    surface gravity. The inverse-square law has a long tail — which is exactly why
+                    escaping Earth takes so much speed.
                 </div>
             </div>
         </div>
@@ -315,21 +317,23 @@
         </div>
 
         <div class="tab-content active">
-            <div class="question-container" data-type="fill" data-answer="11.2[11.0,11.4]">
+            <div class="question-container" data-type="fill" data-answer="7.9[7.7,8.1]">
                 <div class="question-text">
-                    Earth's escape velocity is approximately
-                    <input type="text" class="fill-blank" placeholder="?"> km/s.
-                    (Slide v₀ until the classification changes from "Bound" to "Critical".)
+                    Find the launch speed v₀ at which the maximum height is exactly 1 Earth radius
+                    above the surface (turning point at x = 2R). Slide v₀ and watch the Max-height
+                    stat: v₀ = <input type="text" class="fill-blank" placeholder="?"> km/s.
                 </div>
                 <div class="question-actions">
                     <button class="btn-verify">Verify</button>
                 </div>
                 <div class="question-explanation" style="display:none;">
                     <strong>Explanation:</strong>
-                    \( v_{\text{esc}} = \sqrt{2gR} = \sqrt{2 \times 9.8 \times 6.37 \times 10^6}
-                    \approx 11{,}180 \) m/s ≈ 11.2 km/s. At this speed, the total mechanical energy
-                    is exactly zero — the projectile has just enough kinetic energy to overcome the
-                    gravitational potential well.
+                    Energy conservation from the surface to the turning point at \( x = 2R \) gives
+                    \( \tfrac{1}{2}v_0^2 - gR = -\tfrac{gR^2}{2R} \), so \( v_0 = \sqrt{gR}
+                    \approx \sqrt{9.8 \times 6.37 \times 10^6} \approx 7.9 \) km/s. Notice this is
+                    exactly \( v_{\text{esc}}/\sqrt{2} \): at \( 1/\sqrt{2} \) of escape speed you
+                    only climb one Earth radius, because kinetic energy scales with \( v_0^2 \),
+                    not \( v_0 \).
                 </div>
             </div>
         </div>
@@ -496,21 +500,24 @@
         </div>
 
         <div class="tab-content active">
-            <div class="question-container" data-type="fill" data-answer="2.4[2.2,2.6]">
+            <div class="question-container" data-type="fill" data-answer="25.5[24,27]">
                 <div class="question-text">
-                    The Moon's escape velocity is approximately
-                    <input type="text" class="fill-blank" placeholder="?"> km/s.
-                    (Select "Moon" from the dropdown.)
+                    Using the Custom sliders, design a body with Earth's escape velocity
+                    (11.2 km/s) but only a quarter of Earth's surface gravity, g = 2.45 m/s².
+                    What radius R (in 10⁶ m) do you need?
+                    <input type="text" class="fill-blank" placeholder="?"> ×10⁶ m
                 </div>
                 <div class="question-actions">
                     <button class="btn-verify">Verify</button>
                 </div>
                 <div class="question-explanation" style="display:none;">
                     <strong>Explanation:</strong>
-                    Moon: \( g = 1.62 \) m/s², \( R = 1.74 \times 10^6 \) m.
-                    \( v_{\text{esc}} = \sqrt{2 \times 1.62 \times 1.74 \times 10^6} \approx 2{,}380 \) m/s
-                    ≈ 2.4 km/s. This is about 1/5 of Earth's escape velocity — lunar escape is
-                    much easier, which is why the Apollo astronauts needed relatively little fuel to leave.
+                    From \( v_{\text{esc}} = \sqrt{2gR} \), we need
+                    \( R = v^2/2g = (11{,}200)^2 / (2 \times 2.45) \approx 25.6 \times 10^6 \) m —
+                    four times Earth's radius. That's the trade-off hidden in
+                    \( v_{\text{esc}} \propto \sqrt{gR} \): quarter the gravity and you need
+                    4× the radius to keep the same escape speed. Weak gravity acting over a
+                    much deeper well can be just as hard to climb out of.
                 </div>
             </div>
         </div>

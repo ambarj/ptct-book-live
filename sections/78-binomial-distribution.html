@@ -143,10 +143,10 @@
         </div>
 
         <div class="tab-content">
-            <div class="question-container" data-type="fill" data-answer="6[4,8]">
+            <div class="question-container" data-type="fill" data-answer="2[1.8,2.2]">
                 <div class="question-text">
-                    With N = 20, p = 0.5: the width (standard deviation) of the distribution
-                    is \( \sigma = 2\sqrt{Npq} = 2\sqrt{20 \times 0.25} \approx \)
+                    Increase N from 20 to 80. By what factor does the distribution&rsquo;s
+                    width grow? Predict, then verify.
                     <input type="text" class="fill-blank" style="width: 50px">.
                 </div>
                 <div class="question-actions">
@@ -154,9 +154,10 @@
                 </div>
                 <div class="question-explanation" style="display:none;">
                     <strong>Explanation:</strong>
-                    \( \sigma = 2\sqrt{Npq} = 2\sqrt{20 \times 0.5 \times 0.5} = 2\sqrt{5} \approx 4.47 \).
-                    Alternatively, since each step has variance 1: \( \sigma = \sqrt{N} = \sqrt{20} \approx 4.47 \).
-                    Most walkers end within about &plusmn;4&ndash;5 of the origin.
+                    The width scales as \( \sigma = \sqrt{N} \), so going from \( N = 20 \) to
+                    \( N = 80 \) multiplies it by \( \sqrt{80/20} = \sqrt{4} = 2 \). Quadrupling
+                    the steps only <strong>doubles</strong> the spread &mdash; the \( \sqrt{N} \)
+                    law again. Watch the histogram get twice as wide, not four times.
                 </div>
             </div>
         </div>
@@ -452,27 +453,21 @@
         </div>
 
         <div class="tab-content">
-            <div class="question-container" data-type="fill" data-answer="binomial">
+            <div class="question-container" data-type="fill" data-answer="0.08[0.07,0.09]">
                 <div class="question-text">
-                    The exact probability distribution of a random walk after N steps is the
-                    <select class="fill-blank-select">
-                        <option value=""></option>
-                        <option value="uniform">uniform</option>
-                        <option value="binomial">binomial</option>
-                        <option value="exponential">exponential</option>
-                        <option value="poisson">Poisson</option>
-                    </select>
-                    distribution.
+                    With N = 100, what is the probability of returning exactly to the origin,
+                    \( P(m = 0) \)? Read it off the theory curve.
+                    <input type="text" class="fill-blank" style="width: 60px">.
                 </div>
                 <div class="question-actions">
                     <button class="btn-verify">Verify</button>
                 </div>
                 <div class="question-explanation" style="display:none;">
                     <strong>Explanation:</strong>
-                    Each step is an independent Bernoulli trial (right with probability p, left
-                    with probability q). The total number of right steps follows the
-                    <strong>binomial</strong> distribution. The position \( m = 2n_R - N \) is
-                    a linear transformation of the binomial random variable.
+                    The peak of the Gaussian approximation is \( P(m = 0) \approx \sqrt{2/(\pi N)}
+                    = \sqrt{2/(100\pi)} \approx 0.08 \). Even the <em>most probable</em> position
+                    has under a 1-in-12 chance &mdash; the peak height falls as \( 1/\sqrt{N} \),
+                    so returning to exactly the origin gets rarer as the walk grows.
                 </div>
             </div>
         </div>

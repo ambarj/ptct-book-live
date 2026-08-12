@@ -117,20 +117,40 @@
         </div>
 
         <div class="tab-content active">
-            <div class="question-container" data-type="fill" data-answer="-0.5[-0.6,-0.4]">
+            <div class="question-container" data-type="mcq" data-answer="1">
                 <div class="question-text">
-                    Run the scaling test. On the log-log plot, the slope of error vs N is
-                    approximately <input type="text" class="fill-blank" style="width: 60px">.
-                    (This confirms the \( N^{-1/2} \) law.)
+                    Run the scaling test with <strong>1/(1+x)</strong>, then with
+                    <strong>sin(x)</strong>. What changes on the log-log plot?
+                </div>
+                <div class="question-options">
+                    <label class="option">
+                        <input type="radio" name="es-q1" value="0">
+                        <span>Both the slope and the vertical offset change</span>
+                    </label>
+                    <label class="option">
+                        <input type="radio" name="es-q1" value="1">
+                        <span>The slope stays &asymp; &minus;0.5; only the vertical offset &mdash; set by \( \sigma_f \) &mdash; shifts</span>
+                    </label>
+                    <label class="option">
+                        <input type="radio" name="es-q1" value="2">
+                        <span>The slope gets steeper for smoother functions</span>
+                    </label>
+                    <label class="option">
+                        <input type="radio" name="es-q1" value="3">
+                        <span>Nothing changes</span>
+                    </label>
                 </div>
                 <div class="question-actions">
                     <button class="btn-verify">Verify</button>
                 </div>
                 <div class="question-explanation" style="display:none;">
                     <strong>Explanation:</strong>
-                    On a log-log plot, \( \log(\epsilon) = \log(\sigma) - \frac{1}{2}\log(N) \).
-                    This is a line with slope <strong>&minus;1/2</strong>. The data points should
-                    scatter around this line, confirming the \( 1/\sqrt{N} \) scaling.
+                    The \( 1/\sqrt{N} \) law is universal: the log-log slope is always
+                    \( \approx -1/2 \) no matter which function you integrate. What differs is the
+                    constant in front &mdash; error \( = \sigma_f/\sqrt{N} \) &mdash; so a function
+                    with a larger spread \( \sigma_f \) rides higher on the plot (bigger vertical
+                    offset) while falling at the same rate. Smoothness does not steepen the line;
+                    only \( \sigma_f \) slides it up or down.
                 </div>
             </div>
         </div>
@@ -445,21 +465,23 @@
         </div>
 
         <div class="tab-content">
-            <div class="question-container" data-type="fill" data-answer="4[3,5]">
+            <div class="question-container" data-type="fill" data-answer="1000[500,2000]">
                 <div class="question-text">
-                    The crossover dimension where MC becomes competitive with trapezoidal
-                    rule is approximately d &asymp;
-                    <input type="text" class="fill-blank" style="width: 50px">.
+                    At 3-digit accuracy in \( d = 6 \), the grid needs roughly
+                    <input type="text" class="fill-blank" style="width: 70px">
+                    times more points than MC (read from the cost plot).
                 </div>
                 <div class="question-actions">
                     <button class="btn-verify">Verify</button>
                 </div>
                 <div class="question-explanation" style="display:none;">
                     <strong>Explanation:</strong>
-                    The trapezoidal rate in d dimensions is \( N^{-2/d} \). MC rate is \( N^{-1/2} \).
-                    They cross when \( 2/d = 1/2 \), i.e., <strong>d = 4</strong>. Above 4 dimensions,
-                    MC converges faster per sample. In practice, the crossover can be even lower
-                    due to the difficulty of constructing good grids in high dimensions.
+                    For 3 digits (\( \epsilon \sim 10^{-3} \)), MC needs
+                    \( N \sim (\sigma/\epsilon)^2 \sim 10^6 \) samples &mdash; independent of
+                    dimension. A trapezoidal grid in \( d = 6 \) needs \( n \) points per axis with
+                    \( n^{-2} \sim 10^{-3} \), so \( n \sim 32 \) and \( n^6 \sim 10^9 \) total
+                    points. The ratio \( 10^9/10^6 \approx 1000 \): the grid pays about a thousand
+                    times more, and that gap only widens as \( d \) grows.
                 </div>
             </div>
         </div>

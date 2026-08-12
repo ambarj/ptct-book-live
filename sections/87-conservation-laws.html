@@ -172,10 +172,16 @@
             </div>
         </div>
         <div class="tab-content">
-            <div class="question-container" data-type="fill" data-answer="L|xy">
-                <div class="question-text">The orbital plane is perpendicular to <input type="text" class="fill-blank" style="width: 60px"> (which vector? Use the symbol). If \( \vec L = \ell\hat z \), then the orbit lies in the <input type="text" class="fill-blank" style="width: 60px">-plane.</div>
+            <div class="question-container" data-type="mcq" data-answer="1">
+                <div class="question-text">Starting from the defaults \( \vec r_0 = (1, 0, 0.3) \), \( \vec v_0 = (0, 0.8, 0.2) \), predict what happens to the orbital plane if you halve all six sliders, then verify with the \( \vec L \) readout.</div>
+                <div class="question-options">
+                    <label class="option"><input type="radio" name="cl-q3" value="0"><span>The plane tilts toward the xy-plane</span></label>
+                    <label class="option"><input type="radio" name="cl-q3" value="1"><span>Nothing — \( \vec L \) shrinks 4× but keeps its direction, so the plane is identical</span></label>
+                    <label class="option"><input type="radio" name="cl-q3" value="2"><span>The plane flips over</span></label>
+                    <label class="option"><input type="radio" name="cl-q3" value="3"><span>The orbit leaves the plane</span></label>
+                </div>
                 <div class="question-actions"><button class="btn-verify">Verify</button></div>
-                <div class="question-explanation" style="display:none;"><strong>Explanation:</strong> Since \( \vec L = \vec r \times \vec p \) is the cross product of two vectors in the orbital plane, \( \vec L \) is perpendicular to that plane. If \( \vec L = \ell\hat z \), the orbit must lie in the plane perpendicular to \( \hat z \) — namely the \( xy \)-plane. Try aligning the initial conditions in the explorer so that \( \vec L \) points along z.</div>
+                <div class="question-explanation" style="display:none;"><strong>Explanation:</strong> Halving every component scales \( \vec r_0 \to \vec r_0/2 \) and \( \vec v_0 \to \vec v_0/2 \), so \( \vec L = \mu\,\vec r \times \vec v \) shrinks by \( \tfrac12 \times \tfrac12 = \tfrac14 \). But \( \vec L \)'s <em>direction</em> is unchanged — and the orbital plane is fixed by that direction alone, since the plane is always perpendicular to \( \vec L \). The magnitude readout drops to a quarter while the plane's tilt stays put: geometry set by direction, not length.</div>
             </div>
         </div>
     </div>
@@ -286,10 +292,10 @@
             </div>
         </div>
         <div class="tab-content">
-            <div class="question-container" data-type="fill" data-answer="2.0e-7[1.5e-7,2.5e-7]|2.7e40[2.4e40,3.0e40]">
-                <div class="question-text">For Earth orbiting the Sun (μ ≈ M_⊕ = 5.97 × 10²⁴ kg, ρ ≈ 1.50 × 10¹¹ m, period \( T = 1 \) yr ≈ 3.15 × 10⁷ s): the angular speed for a (nearly) circular orbit is \( \dot\phi = 2\pi/T \approx \) <input type="text" class="fill-blank" style="width: 70px"> rad/s; the magnitude of angular momentum is \( \ell = \mu\rho^2\dot\phi \approx \) <input type="text" class="fill-blank" style="width: 70px"> J·s. (Use scientific notation like 2.0e-7.)</div>
+            <div class="question-container" data-type="fill" data-answer="6.5[5.8,7.2]">
+                <div class="question-text">Earth's aphelion is 3.4% farther from the Sun than its perihelion. Since \( \ell = \mu\rho^2\dot\phi \) is conserved, by what percent is Earth's angular speed \( \dot\phi \) smaller at aphelion than at perihelion? <input type="text" class="fill-blank" style="width: 60px"> %.</div>
                 <div class="question-actions"><button class="btn-verify">Verify</button></div>
-                <div class="question-explanation" style="display:none;"><strong>Explanation:</strong> \( \dot\phi = 2\pi/(3.15 \times 10^7) \approx 1.99 \times 10^{-7} \) rad/s. Then \( \ell = (5.97 \times 10^{24})(1.50 \times 10^{11})^2(1.99 \times 10^{-7}) \approx 2.67 \times 10^{40} \) J·s. This is a <em>huge</em> number, and yet \( \ell/\hbar \approx 2.5 \times 10^{74} \) — the Earth has a quantum number of order \( 10^{74} \) for its orbital angular momentum, which is why the classical limit is so accurate for planets.</div>
+                <div class="question-explanation" style="display:none;"><strong>Explanation:</strong> Conservation of \( \ell = \mu\rho^2\dot\phi \) means \( \dot\phi \propto 1/\rho^2 \). If \( \rho_{\text{aph}} = 1.034\,\rho_{\text{per}} \), then \( \dot\phi_{\text{aph}}/\dot\phi_{\text{per}} = 1/1.034^2 = 0.935 \) — about 6.5% slower. This tiny eccentricity is exactly Kepler's second law at work: Earth loafs through aphelion (northern summer) and hurries through perihelion (northern winter). And the same \( \ell \) that governs this is astronomically large: \( \ell \approx 2.7 \times 10^{40} \) J·s, so \( \ell/\hbar \approx 2.5 \times 10^{74} \) — the Earth carries an orbital "quantum number" of order \( 10^{74} \), which is why the classical limit is flawless for planets.</div>
             </div>
         </div>
         <div class="tab-content">

@@ -153,22 +153,26 @@
         </div>
 
         <div class="tab-content">
-            <div class="question-container" data-type="fill" data-answer="0|1">
+            <div class="question-container" data-type="fill" data-answer="1[1,1]">
                 <div class="question-text">
-                    For the Center preset (\( a=0, b=1, c=-1, d=0 \)), compute:
-                    <br>Trace \( \tau = a + d \) = <input type="text" class="fill-blank" style="width:60px">
-                    <br>Determinant \( \Delta = ad - bc \) = <input type="text" class="fill-blank" style="width:60px">
-                    <br>(Check your answers against the stats bar.)
+                    Starting from the Center preset (\( a=0, b=1, c=-1, d=0 \)), turn it into a
+                    <em>saddle</em> with \( \Delta = -1 \) while keeping \( \tau = 0 \): hold
+                    \( a = d = 0 \) and \( b = 1 \). What must you set \( c \) to?
+                    <input type="text" class="fill-blank" style="width:60px">
+                    <br>(Watch the stats bar flip to "Type: Saddle" to confirm.)
                 </div>
                 <div class="question-actions">
                     <button class="btn-verify">Verify</button>
                 </div>
                 <div class="question-explanation" style="display:none;">
                     <strong>Explanation:</strong>
-                    \( \tau = a + d = 0 + 0 = 0 \) and
-                    \( \Delta = ad - bc = (0)(0) - (1)(-1) = 1 \).
-                    Positive determinant with zero trace gives purely imaginary eigenvalues
-                    \( \lambda = \pm i \) — a center with circular orbits.
+                    With \( a = d = 0 \), the trace stays \( \tau = a + d = 0 \), and the determinant
+                    is \( \Delta = ad - bc = -bc = -c \). To reach \( \Delta = -1 \) you need
+                    \( c = 1 \). A negative determinant forces real eigenvalues of opposite sign
+                    \( (\lambda = \pm 1) \) — one attracting direction, one repelling — so the stats
+                    bar reclassifies the origin as a saddle. The <em>sign</em> of \( \Delta \) alone
+                    decides saddle versus node/center, which is why flipping \( c \) from \( -1 \) to
+                    \( +1 \) transforms the entire phase portrait.
                 </div>
             </div>
         </div>

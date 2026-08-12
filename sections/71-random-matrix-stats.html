@@ -118,37 +118,23 @@
         </div>
 
         <div class="tab-content active">
-            <div class="question-container" data-type="mcq" data-answer="2">
+            <div class="question-container" data-type="fill" data-answer="16[13,19]">
                 <div class="question-text">
-                    Generate 10,000 matrices with R = 1. What fraction are saddles?
-                </div>
-                <div class="question-options">
-                    <label class="option">
-                        <input type="radio" name="rm-q1" value="0">
-                        <span>About 20% (equal share of 5 types)</span>
-                    </label>
-                    <label class="option">
-                        <input type="radio" name="rm-q1" value="1">
-                        <span>About 10% (rare)</span>
-                    </label>
-                    <label class="option">
-                        <input type="radio" name="rm-q1" value="2">
-                        <span>About 50% (half of all random matrices)</span>
-                    </label>
-                    <label class="option">
-                        <input type="radio" name="rm-q1" value="3">
-                        <span>About 90% (almost all)</span>
-                    </label>
+                    Generate 10,000 matrices. What percentage are stable spirals? &asymp;
+                    <input type="text" class="fill-blank" style="width: 60px">%
+                    (read the bar chart)
                 </div>
                 <div class="question-actions">
                     <button class="btn-verify">Verify</button>
                 </div>
                 <div class="question-explanation" style="display:none;">
                     <strong>Explanation:</strong>
-                    About <strong>50%</strong> of random matrices have \( \Delta = ad - bc < 0 \),
-                    making them saddles. This is because the product of two uniform random variables
-                    has a symmetric distribution around zero, and the difference of two such products
-                    is negative half the time.
+                    A stable spiral needs three conditions at once: a positive determinant
+                    (\( \Delta > 0 \)), complex eigenvalues (\( \tau^2 < 4\Delta \)), and a negative
+                    trace (\( \tau < 0 \)). Only about <strong>16%</strong> of random matrices clear
+                    all three hurdles. Roughly half are saddles from the start, and of the survivors
+                    only a slice spiral inward &mdash; which is why gentle oscillatory decay is the
+                    exception, not the rule, among random linear systems.
                 </div>
             </div>
         </div>

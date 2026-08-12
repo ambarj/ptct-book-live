@@ -146,26 +146,14 @@
             </div>
         </div>
 
-        <!-- Q2: MCQ -->
+        <!-- Q2: Fill -->
         <div class="tab-content">
-            <div class="question-container" data-type="mcq" data-answer="1">
+            <div class="question-container" data-type="fill" data-answer="0.71[0.6,0.8]">
                 <div class="question-text">
-                    Toggle <code>absolute_sigma</code> from ON to OFF.
-                    What happens to the parameter uncertainties?
-                </div>
-                <div class="question-options">
-                    <label class="option">
-                        <input type="radio" name="fu-q2" value="0">
-                        <span>They always increase</span>
-                    </label>
-                    <label class="option">
-                        <input type="radio" name="fu-q2" value="1">
-                        <span>They change &mdash; the covariance matrix is rescaled by &chi;&sup2;/dof</span>
-                    </label>
-                    <label class="option">
-                        <input type="radio" name="fu-q2" value="2">
-                        <span>They stay exactly the same</span>
-                    </label>
+                    The readout shows &chi;&sup2;/dof = 0.5.  Toggling
+                    <code>absolute_sigma</code> OFF multiplies \( \delta c \) by what factor?
+                    <br><br>
+                    Factor &asymp; <input type="text" class="fill-blank" placeholder="value">
                 </div>
                 <div class="question-actions">
                     <button class="btn-verify">Verify</button>
@@ -173,11 +161,12 @@
                 <div class="question-explanation" style="display: none;">
                     <div class="question-explanation-title">Explanation</div>
                     <div class="question-explanation-text">
-                        With <code>absolute_sigma=False</code>, <code>curve_fit</code>
-                        multiplies the covariance matrix by &chi;&sup2;/dof.  If your fit
-                        is good (&chi;&sup2;/dof &asymp; 1), the change is small.  But if
-                        your error bars are wrong, the uncertainties change significantly.
-                        The title shows "(rescaled)" to remind you.
+                        With <code>absolute_sigma=False</code>, <code>curve_fit</code> rescales the
+                        covariance matrix by &chi;&sup2;/dof, so every <em>variance</em> is
+                        multiplied by 0.5.  Uncertainties are the square roots of variances, so
+                        \( \delta c \) shrinks by \( \sqrt{0.5} \approx 0.71 \).  The subtle point:
+                        the toggle acts on variances, so its effect on the error bars you actually
+                        quote is the square root of what you might first expect.
                     </div>
                 </div>
             </div>
@@ -185,12 +174,12 @@
 
         <!-- Q3: Fill -->
         <div class="tab-content">
-            <div class="question-container" data-type="fill" data-answer="1[0.5,1.5]">
+            <div class="question-container" data-type="fill" data-answer="-0.75[-0.85,-0.65]">
                 <div class="question-text">
-                    On the diagonal of the correlation matrix, every entry should
-                    equal:
+                    Given \( \text{Cov}(b,c) = -0.006 \), \( \sigma_b = 0.1 \),
+                    \( \sigma_c = 0.08 \), what is the correlation \( \rho(b,c) \)?
                     <br><br>
-                    \( \rho(x,x) = \) <input type="text" class="fill-blank" placeholder="value">
+                    \( \rho(b,c) = \) <input type="text" class="fill-blank" placeholder="value">
                 </div>
                 <div class="question-actions">
                     <button class="btn-verify">Verify</button>
@@ -198,11 +187,13 @@
                 <div class="question-explanation" style="display: none;">
                     <div class="question-explanation-title">Explanation</div>
                     <div class="question-explanation-text">
-                        By definition, \( \rho(x,x) = \text{Cov}(x,x) / (\sigma_x \cdot \sigma_x)
-                        = \sigma_x^2 / \sigma_x^2 = 1 \).  Every variable is perfectly
-                        correlated with itself.  The diagonal of the correlation matrix is
-                        always 1.000 &mdash; it's the off-diagonal entries that carry
-                        information.
+                        Correlation is covariance normalised by the two standard deviations:
+                        \( \rho(b,c) = \text{Cov}(b,c)/(\sigma_b\,\sigma_c)
+                        = -0.006/(0.1 \times 0.08) = -0.75 \).  The negative sign says \( b \) and
+                        \( c \) trade off &mdash; when the fit raises one it lowers the other &mdash;
+                        while the magnitude 0.75 says that trade-off is strong.  Normalising this way
+                        always lands \( \rho \) between \( -1 \) and \( +1 \), which is why the
+                        correlation matrix reads more easily than the raw covariance.
                     </div>
                 </div>
             </div>
@@ -290,21 +281,21 @@
         <div class="tab-content active">
             <div class="question-container" data-type="mcq" data-answer="1">
                 <div class="question-text">
-                    The confidence ellipse is tilted at an angle.  What does
-                    this tilt mean physically?
+                    The ellipse tilts from upper-left to lower-right.
+                    What is the sign of \( \rho(b,c) \)?
                 </div>
                 <div class="question-options">
                     <label class="option">
                         <input type="radio" name="fu-q4" value="0">
-                        <span>The parameters are independent</span>
+                        <span>Positive</span>
                     </label>
                     <label class="option">
                         <input type="radio" name="fu-q4" value="1">
-                        <span>The parameters are correlated &mdash; changing one affects the best value of the other</span>
+                        <span>Negative</span>
                     </label>
                     <label class="option">
                         <input type="radio" name="fu-q4" value="2">
-                        <span>The fit is poor</span>
+                        <span>Zero</span>
                     </label>
                 </div>
                 <div class="question-actions">
@@ -313,11 +304,12 @@
                 <div class="question-explanation" style="display: none;">
                     <div class="question-explanation-title">Explanation</div>
                     <div class="question-explanation-text">
-                        A tilted ellipse means the parameters are correlated.  If the ellipse
-                        axes were aligned with the coordinate axes, the parameters would be
-                        independent.  The tilt direction shows the correlation sign: a
-                        negatively-sloped tilt (upper-left to lower-right) means anti-correlation
-                        &mdash; one goes up as the other goes down.
+                        An upper-left-to-lower-right tilt has a <em>negative</em> slope: raising
+                        \( b \) pushes the best-fit \( c \) down, so \( \rho(b,c) < 0 \).  A tilt the
+                        other way (lower-left to upper-right) would signal positive correlation, and
+                        a perfectly upright ellipse would mean \( \rho = 0 \).  Reading the sign
+                        straight off the tilt is the quickest way to see how two parameters trade
+                        against each other.
                     </div>
                 </div>
             </div>
@@ -325,10 +317,10 @@
 
         <!-- Q5: Fill -->
         <div class="tab-content">
-            <div class="question-container" data-type="fill" data-answer="39[30,50]">
+            <div class="question-container" data-type="fill" data-answer="86[80,92]">
                 <div class="question-text">
-                    For a 2D Gaussian, what percentage of samples fall inside the
-                    1&sigma; ellipse?
+                    Using \( P(k) = 1 - e^{-k^2/2} \), what percentage of samples
+                    falls inside the 2&sigma; ellipse?
                     <br><br>
                     Approximately <input type="text" class="fill-blank" placeholder="%"> %
                 </div>
@@ -338,11 +330,12 @@
                 <div class="question-explanation" style="display: none;">
                     <div class="question-explanation-title">Explanation</div>
                     <div class="question-explanation-text">
-                        In 1D, the 1&sigma; interval contains 68% of the probability.
-                        In 2D, the 1&sigma; ellipse contains \( 1 - e^{-1/2} \approx 39\% \).
-                        For 68% coverage in 2D, you need the \( \sqrt{2.3} \approx 1.52\sigma \)
-                        ellipse.  This often surprises people &mdash; "1 sigma" means
-                        different things in different dimensions!
+                        Plug \( k = 2 \) into the 2D coverage formula:
+                        \( P(2) = 1 - e^{-2} \approx 0.865 \), about 86%.  Compare that with the
+                        familiar 95% for a 2&sigma; interval in 1D &mdash; the ellipse captures less
+                        because probability leaks out into the second dimension.  The same formula
+                        gives just 39% at \( k = 1 \), a reminder that "sigma" coverage always
+                        depends on how many dimensions you are counting.
                     </div>
                 </div>
             </div>
@@ -558,12 +551,12 @@
 
         <!-- Q9: Fill -->
         <div class="tab-content">
-            <div class="question-container" data-type="fill" data-answer="9.8[8.5,11.0]">
+            <div class="question-container" data-type="fill" data-answer="0[-2,2]">
                 <div class="question-text">
-                    Select parameter \( c \) and read the histogram.  From the fit,
-                    \( g = 2c \).  What value does \( g \) converge to?
+                    Switch the histogram to parameter \( b \).  Around what value is it
+                    centred, and why?
                     <br><br>
-                    \( g \approx \) <input type="text" class="fill-blank" placeholder="value">
+                    \( b \approx \) <input type="text" class="fill-blank" placeholder="value">
                 </div>
                 <div class="question-actions">
                     <button class="btn-verify">Verify</button>
@@ -571,11 +564,12 @@
                 <div class="question-explanation" style="display: none;">
                     <div class="question-explanation-title">Explanation</div>
                     <div class="question-explanation-text">
-                        The bootstrap histogram for \( c \) is centred near 4.9, so
-                        \( g = 2c \approx 9.8 \).  The width of the histogram gives
-                        \( \delta c \), and propagation gives \( \delta g = 2\delta c \).
-                        This is exactly the error propagation rule for a simple
-                        multiplicative factor.
+                        In the model \( d = bt + ct^2 \), the coefficient \( b \) is the initial
+                        velocity.  The ball is dropped from rest, so the true \( b = 0 \) and the
+                        bootstrap histogram centres near 0, scattering a little to either side
+                        because of noise.  A parameter whose histogram straddles zero is the fit's
+                        way of hinting that its term may not be needed at all &mdash; here it
+                        confirms there was no launch velocity.
                     </div>
                 </div>
             </div>

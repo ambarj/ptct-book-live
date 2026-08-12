@@ -1,4 +1,4 @@
-# Physics through Computational Thinking (PTCT) Book
+# Python Tools for Computational Thinking (PTCT) Book
 
 Interactive web-based physics textbook with visual learning approach.
 

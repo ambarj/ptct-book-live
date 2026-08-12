@@ -127,11 +127,13 @@
 
         <!-- Q1: Fill -->
         <div class="tab-content active">
-            <div class="question-container" data-type="fill" data-answer="2[1.8,2.2]">
+            <div class="question-container" data-type="fill" data-answer="5.2[5.15,5.25]">
                 <div class="question-text">
-                    Set f<sub>1</sub> = 5 Hz and f<sub>2</sub> = 7 Hz.  The beat frequency is:
+                    With f<sub>1</sub> fixed at 5 Hz, you want the amplitude to swell exactly
+                    once every 5 seconds.  What f<sub>2</sub> &gt; f<sub>1</sub> do you need?
+                    Predict, then set it and count the swells.
                     <br><br>
-                    f<sub>beat</sub> = <input type="text" class="fill-blank" placeholder="Hz"> Hz
+                    f<sub>2</sub> = <input type="text" class="fill-blank" placeholder="Hz"> Hz
                 </div>
                 <div class="question-actions">
                     <button class="btn-verify">Verify</button>
@@ -139,9 +141,12 @@
                 <div class="question-explanation" style="display: none;">
                     <div class="question-explanation-title">Explanation</div>
                     <div class="question-explanation-text">
-                        \( f_{\text{beat}} = |f_1 - f_2| = |5 - 7| = 2 \) Hz.  The amplitude
-                        oscillates twice per second.  You can count the peaks in the envelope
-                        on the plot: there should be 2 per second.
+                        One swell every 5 seconds means \( f_{\text{beat}} = 1/5 = 0.2 \) Hz.
+                        Since \( f_{\text{beat}} = |f_1 - f_2| \), you need
+                        \( f_2 = 5 + 0.2 = 5.2 \) Hz.  Set it and watch: the envelope should
+                        peak once every 5 seconds, and the f<sub>beat</sub> readout in the
+                        stats bar now <em>verifies</em> your design instead of handing you
+                        the answer.
                     </div>
                 </div>
             </div>
@@ -151,25 +156,25 @@
         <div class="tab-content">
             <div class="question-container" data-type="mcq" data-answer="2">
                 <div class="question-text">
-                    With f<sub>1</sub> = 5 Hz and f<sub>2</sub> = 5.5 Hz, what is the beat period
-                    (time between successive amplitude maxima)?
+                    Keeping f<sub>1</sub> = 5 Hz, which f<sub>2</sub> setting(s) give a beat
+                    period of 2.5 s?
                 </div>
                 <div class="question-options">
                     <label class="option">
                         <input type="radio" name="bt-q2" value="0">
-                        <span>0.5 s</span>
+                        <span>5.4 Hz only</span>
                     </label>
                     <label class="option">
                         <input type="radio" name="bt-q2" value="1">
-                        <span>1 s</span>
+                        <span>4.6 Hz only</span>
                     </label>
                     <label class="option">
                         <input type="radio" name="bt-q2" value="2">
-                        <span>2 s</span>
+                        <span>either 5.4 Hz or 4.6 Hz</span>
                     </label>
                     <label class="option">
                         <input type="radio" name="bt-q2" value="3">
-                        <span>5 s</span>
+                        <span>7.5 Hz</span>
                     </label>
                 </div>
                 <div class="question-actions">
@@ -178,10 +183,12 @@
                 <div class="question-explanation" style="display: none;">
                     <div class="question-explanation-title">Explanation</div>
                     <div class="question-explanation-text">
-                        \( T_{\text{beat}} = 1/f_{\text{beat}} = 1/|5.0 - 5.5| = 1/0.5 = 2 \) seconds.
-                        Look at the plot: the envelope peaks are spaced 2 seconds apart.
-                        Don't confuse the beat period with the carrier period
-                        (\( T_{\text{carrier}} \approx 1/5.25 \approx 0.19 \) s).
+                        A beat period of 2.5 s means \( f_{\text{beat}} = 1/2.5 = 0.4 \) Hz,
+                        so \( |f_1 - f_2| = 0.4 \) Hz &mdash; and that can happen on
+                        <em>either side</em> of f<sub>1</sub>: 5.4 Hz or 4.6 Hz.  Beats only
+                        care about the <em>magnitude</em> of the frequency difference, not
+                        its sign.  Verify both settings on the slider: the envelope peaks
+                        are spaced 2.5 s apart in each case.
                     </div>
                 </div>
             </div>
@@ -291,8 +298,9 @@
     <p>
         The red &times; markers on the right panel show the <strong>beat nodes</strong>
         &mdash; instants where the envelope passes through zero and the sum momentarily
-        vanishes.  Count the distance between successive nodes: that's half the beat
-        period, because the envelope goes positive-zero-negative-zero in one full cycle.
+        vanishes.  Count the distance between successive nodes: that's exactly one
+        full beat period &mdash; and half the <em>envelope's</em> period, because the
+        envelope goes positive-zero-negative-zero in one full cycle.
         This is why \( f_{\text{beat}} = 2 \times f_{\text{envelope}} = |f_1 - f_2| \).
         Try widening the frequency gap and watch the nodes crowd together.
     </p>
@@ -315,11 +323,12 @@
 
         <!-- Q4: Fill -->
         <div class="tab-content active">
-            <div class="question-container" data-type="fill" data-answer="5.25[5.15,5.35]">
+            <div class="question-container" data-type="fill" data-answer="7[6.8,7.2]">
                 <div class="question-text">
-                    With f<sub>1</sub> = 5.0 Hz and f<sub>2</sub> = 5.5 Hz, the carrier frequency is:
+                    You want the pitch you'd hear (the carrier) at exactly 6.0 Hz while
+                    keeping f<sub>1</sub> = 5.0 Hz.  What f<sub>2</sub> do you need?
                     <br><br>
-                    f<sub>carrier</sub> = <input type="text" class="fill-blank" placeholder="Hz"> Hz
+                    f<sub>2</sub> = <input type="text" class="fill-blank" placeholder="Hz"> Hz
                 </div>
                 <div class="question-actions">
                     <button class="btn-verify">Verify</button>
@@ -327,10 +336,12 @@
                 <div class="question-explanation" style="display: none;">
                     <div class="question-explanation-title">Explanation</div>
                     <div class="question-explanation-text">
-                        \( f_{\text{carrier}} = (f_1 + f_2)/2 = (5.0 + 5.5)/2 = 5.25 \) Hz.
-                        This is the frequency of the fast oscillation you see in the left
-                        panel.  It's the average of the two input frequencies &mdash; the
-                        pitch you'd hear is approximately 5.25 Hz.
+                        The carrier is the <em>average</em> of the two input frequencies:
+                        \( f_{\text{carrier}} = (f_1 + f_2)/2 \).  Setting
+                        \( (5 + f_2)/2 = 6 \) gives \( f_2 = 7 \) Hz.  Dial it in and check
+                        the f<sub>carrier</sub> readout &mdash; the fast oscillation in the
+                        left panel now wiggles 6 times per second, even though neither
+                        input is at 6 Hz.
                     </div>
                 </div>
             </div>
@@ -505,11 +516,12 @@
 
         <!-- Q7: Fill -->
         <div class="tab-content active">
-            <div class="question-container" data-type="fill" data-answer="0.25[0.2,0.3]">
+            <div class="question-container" data-type="fill" data-answer="6[5.9,6.1]">
                 <div class="question-text">
-                    The envelope frequency for f<sub>1</sub> = 5 Hz, f<sub>2</sub> = 5.5 Hz is:
+                    With f<sub>1</sub> = 5 Hz, choose f<sub>2</sub> &gt; f<sub>1</sub> so the
+                    envelope completes one full cycle every 2 seconds.
                     <br><br>
-                    f<sub>envelope</sub> = <input type="text" class="fill-blank" placeholder="Hz"> Hz
+                    f<sub>2</sub> = <input type="text" class="fill-blank" placeholder="Hz"> Hz
                 </div>
                 <div class="question-actions">
                     <button class="btn-verify">Verify</button>
@@ -517,11 +529,13 @@
                 <div class="question-explanation" style="display: none;">
                     <div class="question-explanation-title">Explanation</div>
                     <div class="question-explanation-text">
-                        \( f_{\text{envelope}} = |f_1 - f_2|/2 = 0.5/2 = 0.25 \) Hz.
-                        The envelope makes one full cycle every 4 seconds.  But the
-                        <em>beat</em> frequency is 0.5 Hz (two loudness peaks per envelope
-                        cycle), so the beat period is 2 s.  Always be clear about which
-                        frequency you mean!
+                        Careful &mdash; this asks about the <em>envelope</em>, not the beats.
+                        \( f_{\text{envelope}} = |f_1 - f_2|/2 \), so an envelope period of
+                        2 s means \( f_{\text{envelope}} = 0.5 \) Hz, hence
+                        \( |f_1 - f_2| = 1 \) Hz and \( f_2 = 6 \) Hz.  If you confused
+                        the envelope with the beat frequency you'd answer 5.5 Hz &mdash;
+                        set both and watch the plot catch the mistake: at 5.5 Hz the
+                        envelope takes 4 s per cycle, twice too slow.
                     </div>
                 </div>
             </div>

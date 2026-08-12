@@ -117,21 +117,25 @@
 
         <!-- Q2: Fill -->
         <div class="tab-content">
-            <div class="question-container" data-type="fill" data-answer="16[15,17]">
+            <div class="question-container" data-type="fill" data-answer="0.08[0.078,0.082]">
                 <div class="question-text">
-                    If you want to solve from \(t = 0\) to \(t = 4\) with step size \(h = 0.25\),
-                    how many loop iterations \(N\) do you need?
+                    Your solver ran 50 iterations to march from \(t = 0\) to \(t = 4\).
+                    What step size \(h\) was it using?
                     <br><br>
-                    \(N = t_{\max} / h = \) <input type="text" class="fill-blank" placeholder="?">
+                    \(h = \) <input type="text" class="fill-blank" placeholder="?">
                 </div>
                 <div class="question-actions">
                     <button class="btn-verify">Verify</button>
                 </div>
                 <div class="question-explanation" style="display:none;">
                     <strong>Explanation:</strong>
-                    \(N = 4 / 0.25 = 16\). Each step advances time by \(h\), so you need
-                    \(t_{\max}/h\) steps to reach the end. The solution array will have
-                    \(N + 1 = 17\) entries (including the initial value).
+                    Each iteration advances time by \(h\), so \(N = t_{\max}/h\) &mdash;
+                    inverted, \(h = t_{\max}/N = 4/50 = 0.08\). Being able to run this
+                    relation both ways is a practical debugging skill: when a simulation
+                    ends at the wrong time or takes far more iterations than expected,
+                    checking \(N \times h\) against \(t_{\max}\) is the first thing to
+                    do. (And remember the solution array holds \(N + 1 = 51\) entries,
+                    counting the initial value.)
                 </div>
             </div>
         </div>

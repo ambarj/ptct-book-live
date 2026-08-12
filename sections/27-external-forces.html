@@ -211,11 +211,13 @@
 
         <!-- Q3: Fill -->
         <div class="tab-content">
-            <div class="question-container" data-type="fill" data-answer="3.33[3.0,3.7]">
+            <div class="question-container" data-type="fill" data-answer="0.5[0.45,0.55]">
                 <div class="question-text">
-                    With \( \gamma = 0.30 \), the decay time \( \tau = 1/\gamma \) is:
+                    You want the transient essentially gone (&asymp; \( 3\tau \)) by
+                    t = 6 s.  What \( \gamma \) do you need?  Verify that the cyan and
+                    green curves merge by t = 6.
                     <br><br>
-                    &tau; = <input type="text" class="fill-blank" placeholder="seconds"> s
+                    &gamma; = <input type="text" class="fill-blank" placeholder="?">
                 </div>
                 <div class="question-actions">
                     <button class="btn-verify">Verify</button>
@@ -223,10 +225,14 @@
                 <div class="question-explanation" style="display: none;">
                     <div class="question-explanation-title">Explanation</div>
                     <div class="question-explanation-text">
-                        \( \tau = 1/\gamma = 1/0.30 = 3.33 \) s.  This is the time for
-                        the transient amplitude to drop by a factor of \( e \approx 2.718 \).
-                        The total time to effectively reach steady state is about
-                        \( 3\tau \approx 10 \) s.
+                        "Essentially gone" means three decay times, so you need
+                        \( 3\tau = 6 \) s, i.e. \( \tau = 2 \) s and
+                        \( \gamma = 1/\tau = 0.5 \).  Set the slider there and watch the
+                        cyan (full solution) and green (steady state) curves become
+                        indistinguishable by t = 6 s &mdash; the transient has shrunk to
+                        \( e^{-3} \approx 5\% \).  This is the knob engineers turn when a
+                        system takes too long to "settle": settling time is set by
+                        \( 1/\gamma \), not by the drive.
                     </div>
                 </div>
             </div>
@@ -407,12 +413,11 @@
 
         <!-- Q6: Fill -->
         <div class="tab-content">
-            <div class="question-container" data-type="fill" data-answer="1.11[1.0,1.2]">
+            <div class="question-container" data-type="fill" data-answer="0.56[0.50,0.62]">
                 <div class="question-text">
-                    At \( \gamma = 0.30, \omega_d = 3.00 \) (exactly at \( \omega_0 \)),
-                    the steady-state amplitude formula gives
-                    \( A = \frac{F_0/m}{\sqrt{0 + (2 \times 0.3 \times 3)^2}} = \frac{2}{1.8} \).
-                    Calculate \( A \):
+                    At resonance \( A = \frac{F_0/m}{2\gamma\omega_d} \).  Predict the
+                    new resonant amplitude if you double \( \gamma \) from 0.30 to 0.60,
+                    then verify with the star marker.
                     <br><br>
                     A = <input type="text" class="fill-blank" placeholder="value">
                     <span style="color: var(--text-secondary); font-size: 0.9rem;">
@@ -425,10 +430,13 @@
                 <div class="question-explanation" style="display: none;">
                     <div class="question-explanation-title">Explanation</div>
                     <div class="question-explanation-text">
-                        At \( \omega_d = \omega_0 \), the term \( (\omega_0^2 - \omega_d^2)^2 = 0 \),
-                        so \( A = \frac{F_0/m}{2\gamma\omega_d} = \frac{2}{2 \times 0.3 \times 3} = \frac{2}{1.8} \approx 1.11 \).
-                        Verify by setting \( \omega_d = 3.00 \) in the explorer and
-                        reading the amplitude from the star marker on the response curve.
+                        Since \( A \propto 1/\gamma \) at resonance, doubling \( \gamma \)
+                        halves the peak: \( A = \frac{2}{2 \times 0.6 \times 3} = \frac{2}{3.6} \approx 0.56 \),
+                        down from 1.11.  Set \( \gamma = 0.60, \omega_d = 3.00 \) and check
+                        the star marker on the response curve.  This inverse relationship
+                        is the whole story of damping at resonance &mdash; far from
+                        resonance the curve barely moves, but the peak itself is entirely
+                        at damping's mercy.
                     </div>
                 </div>
             </div>

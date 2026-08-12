@@ -166,22 +166,24 @@
         </div>
 
         <div class="tab-content">
-            <div class="question-container" data-type="fill" data-answer="4[3.8,4.2]">
+            <div class="question-container" data-type="fill" data-answer="1[0.9,1.1]">
                 <div class="question-text">
-                    With \( m = 1 \) and \( k = 4 \), the critical damping value is
-                    \( b_{\text{crit}} = \sqrt{4mk} = \)
+                    You need the system <strong>exactly critically damped</strong> at \( b = 2 \).
+                    Keeping \( m = 1 \), what spring constant \( k \) do you need?
                     <input type="text" class="fill-blank" style="width: 60px">.
-                    (Set b to this value and watch the portrait transition.)
+                    (Set it and confirm the portrait sits right on the parabola.)
                 </div>
                 <div class="question-actions">
                     <button class="btn-verify">Verify</button>
                 </div>
                 <div class="question-explanation" style="display:none;">
                     <strong>Explanation:</strong>
-                    \( b_{\text{crit}} = \sqrt{4mk} = \sqrt{4 \cdot 1 \cdot 4} = \sqrt{16} = 4 \).
-                    At \( b = 4 \), the discriminant \( \tau^2 - 4\Delta = 16/1 - 16/1 = 0 \).
-                    The eigenvalue is repeated: \( \lambda = -b/(2m) = -2 \). Try setting \( b = 4 \)
-                    and watch the portrait shift from spiral to degenerate node.
+                    Critical damping is the boundary where the discriminant vanishes:
+                    \( b^2 = 4mk \). Solving for \( k \) with \( b = 2 \) and \( m = 1 \) gives
+                    \( k = b^2 / (4m) = 4/4 = 1 \). At \( k = 1 \) the repeated eigenvalue is
+                    \( \lambda = -b/(2m) = -1 \), and the point lands exactly on the
+                    \( \tau^2 = 4\Delta \) parabola &mdash; the knife-edge between spiralling
+                    (underdamped) and non-oscillating (overdamped) decay.
                 </div>
             </div>
         </div>
@@ -540,29 +542,23 @@
         </div>
 
         <div class="tab-content">
-            <div class="question-container" data-type="fill" data-answer="exponential">
+            <div class="question-container" data-type="fill" data-answer="0.87[0.6,1.1]">
                 <div class="question-text">
-                    The energy \( E(t) \) of the underdamped oscillator decays
-                    <select class="fill-blank-select">
-                        <option value=""></option>
-                        <option value="linearly">linearly</option>
-                        <option value="exponential">exponentially</option>
-                        <option value="quadratically">quadratically</option>
-                        <option value="instantly">instantly</option>
-                    </select>
-                    (on average), consistent with the amplitude decaying as \( e^{-\gamma t} \)
-                    where \( \gamma = b/(2m) \).
+                    With \( b = 0.8 \) (and \( m = 1 \)), read off the energy plot: at roughly what
+                    time has \( E(t) \) fallen to half its initial value?
+                    <input type="text" class="fill-blank" style="width: 60px">.
                 </div>
                 <div class="question-actions">
                     <button class="btn-verify">Verify</button>
                 </div>
                 <div class="question-explanation" style="display:none;">
                     <strong>Explanation:</strong>
-                    The amplitude decays as \( A(t) = A_0 e^{-\gamma t} \) where
-                    \( \gamma = b/(2m) \). Since energy \( E \propto A^2 \), we get
-                    \( E(t) \propto e^{-2\gamma t} \) &mdash; <strong>exponential</strong> decay.
-                    The energy curve in the right panel shows this: a smooth exponential envelope
-                    with small oscillations from the KE ↔ PE exchange within each cycle.
+                    The amplitude decays as \( e^{-\gamma t} \) with \( \gamma = b/(2m) = 0.4 \),
+                    so the energy \( E \propto A^2 \) decays as \( e^{-2\gamma t} = e^{-0.8t} \).
+                    Setting \( e^{-0.8t} = \tfrac{1}{2} \) gives the half-life
+                    \( t = \ln 2 / 0.8 \approx 0.87 \). The energy curve in the right panel crosses
+                    half its starting height at just under one time unit &mdash; the small ripples
+                    from KE ↔ PE exchange don't move the envelope's half-way point.
                 </div>
             </div>
         </div>

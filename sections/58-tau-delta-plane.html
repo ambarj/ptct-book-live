@@ -537,22 +537,26 @@
         </div>
 
         <div class="tab-content">
-            <div class="question-container" data-type="fill" data-answer="-2|-1">
+            <div class="question-container" data-type="fill" data-answer="-1.5[-1.8,-1.1]">
                 <div class="question-text">
-                    Set the matrix to \( A = \begin{pmatrix} 1 & -1 \\ 2 & -3 \end{pmatrix} \).
-                    Compute: τ = <input type="text" class="fill-blank" style="width: 60px">
-                    and Δ = <input type="text" class="fill-blank" style="width: 60px">.
-                    (Hint: verify with the explorer)
+                    For \( A = \begin{pmatrix} 1 & -1 \\ 2 & d \end{pmatrix} \), find a value of
+                    \( d \) that makes the origin a <strong>stable spiral</strong>. Enter your
+                    \( d \) here and verify on the map:
+                    <input type="text" class="fill-blank" style="width: 60px">.
                 </div>
                 <div class="question-actions">
                     <button class="btn-verify">Verify</button>
                 </div>
                 <div class="question-explanation" style="display:none;">
                     <strong>Explanation:</strong>
-                    \( \tau = a + d = 1 + (-3) = -2 \).
-                    \( \Delta = ad - bc = (1)(-3) - (-1)(2) = -3 + 2 = -1 \).
-                    Since \( \Delta < 0 \), this is a <strong>saddle</strong> &mdash; regardless of
-                    the trace. Try entering these values in the explorer to confirm.
+                    A stable spiral needs three conditions at once. The trace
+                    \( \tau = a + d = 1 + d \) must be negative (decay), so \( d < -1 \). The
+                    determinant \( \Delta = ad - bc = d + 2 \) must be positive (rotation, not a
+                    saddle), so \( d > -2 \). And the discriminant
+                    \( \tau^2 - 4\Delta = d^2 - 2d - 7 \) must be negative (complex eigenvalues),
+                    which holds for \( d \in (1 - 2\sqrt{2},\, 1 + 2\sqrt{2}) \approx (-1.83,\, 3.83) \).
+                    Stacking all three leaves \( d \in (-1.83,\, -1) \); for instance \( d = -1.5 \)
+                    lands the point inside the parabola on its left side &mdash; a stable spiral.
                 </div>
             </div>
         </div>

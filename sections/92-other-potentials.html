@@ -191,14 +191,14 @@
                     <label class="option"><input type="checkbox" value="4"><span>Free particle  \( U = 0 \)</span></label>
                 </div>
                 <div class="question-actions"><button class="btn-verify">Verify</button></div>
-                <div class="question-explanation" style="display:none;"><strong>Explanation:</strong><ul><li><strong>Kepler:</strong> ✓ Bound for \( E_{\min} \le E < 0 \).</li><li><strong>Harmonic:</strong> ✓ All orbits bound (well rises to ∞).</li><li><strong>Coulomb-repulsive:</strong> ✗ No minimum; always escapes.</li><li><strong>Lennard-Jones:</strong> ✓ Has a minimum at the bond length; bound for E below the well depth (atomic/molecular bound state).</li><li><strong>Free particle:</strong> ✗ No force, no centrifugal-only barrier alone can produce a *minimum* in \( U_{\text{eff}} \), and even if it could, free particles drift forever in straight lines — never bound.</li></ul></div>
+                <div class="question-explanation" style="display:none;"><strong>Explanation:</strong><ul><li><strong>Kepler:</strong> ✓ Bound for \( E_{\min} \le E < 0 \).</li><li><strong>Harmonic:</strong> ✓ All orbits bound (well rises to ∞).</li><li><strong>Coulomb-repulsive:</strong> ✗ No minimum; always escapes.</li><li><strong>Lennard-Jones:</strong> ✓ Has a minimum at the bond length; bound for E below the well depth (atomic/molecular bound state).</li><li><strong>Free particle:</strong> ✗ With no attractive force, the centrifugal barrier alone cannot carve a <em>minimum</em> in \( U_{\text{eff}} \) — it only pushes outward. And even if one existed, free particles drift forever in straight lines, never bound.</li></ul></div>
             </div>
         </div>
         <div class="tab-content">
-            <div class="question-container" data-type="fill" data-answer="1[0.95,1.05]">
-                <div class="question-text">For the harmonic spring with \( K = \mu = \ell = 1 \), the circular-orbit radius from the U_eff minimum (Section 8.4 method) is \( \rho_{\text{circ}} = (\ell^2/(\mu K))^{1/4} = \) <input type="text" class="fill-blank" style="width: 50px">. (Verify with the explorer.)</div>
+            <div class="question-container" data-type="fill" data-answer="1.44[1.38,1.52]">
+                <div class="question-text">For the harmonic spring with \( K = \mu = 1 \), find the \( \ell \) that puts the circular orbit at \( \rho_{\text{circ}} = 1.2 \). \( \ell = \) <input type="text" class="fill-blank" style="width: 50px">. (Slide \( \ell \) in the explorer until the circular radius reads 1.2.)</div>
                 <div class="question-actions"><button class="btn-verify">Verify</button></div>
-                <div class="question-explanation" style="display:none;"><strong>Explanation:</strong> \( dU_{\text{eff}}/d\rho = K\rho - \ell^2/(\mu\rho^3) = 0 \) ⇒ \( K\rho^4 = \ell^2/\mu \) ⇒ \( \rho_{\text{circ}} = (\ell^2/(\mu K))^{1/4} \). With unit values, \( \rho_{\text{circ}} = 1 \). Compare to Kepler's \( \rho_{\text{circ}} = \ell^2/(\mu k) = 1 \) — both give 1 with our unit choice, but the underlying scaling is different (\( \ell^{1/2} \) for harmonic vs \( \ell^2 \) for Kepler).</div>
+                <div class="question-explanation" style="display:none;"><strong>Explanation:</strong> The harmonic circular radius obeys \( \rho_{\text{circ}} = (\ell^2/(\mu K))^{1/4} \), so with \( \mu = K = 1 \), \( \ell = \rho_{\text{circ}}^2 = 1.2^2 = 1.44 \). Contrast the two scalings: Kepler gives \( \rho_{\text{circ}} = \ell^2/(\mu k) \) (radius \( \propto \ell^2 \)), while the harmonic spring gives \( \rho_{\text{circ}} = (\ell^2/(\mu K))^{1/4} \) (radius \( \propto \ell^{1/2} \)). The spring's fourth-root response means its circular radius barely moves as you crank up the angular momentum — a much stiffer geometry than the Kepler well.</div>
             </div>
         </div>
     </div>
@@ -303,7 +303,7 @@
             <div class="question-container" data-type="msq" data-answer="0,1,2">
                 <div class="question-text">Which statements about Bertrand's theorem and physical systems are true? (Select all.)</div>
                 <div class="question-options">
-                    <label class="option"><input type="checkbox" value="0"><span>The Yukawa potential gives precessing orbits — closure requires the integer power \( -1 \) exactly</span></label>
+                    <label class="option"><input type="checkbox" value="0"><span>The Yukawa potential gives precessing orbits — closed orbits require exactly the Kepler \( -1/\rho \) or the harmonic \( \rho^2 \) potential (Bertrand's theorem)</span></label>
                     <label class="option"><input type="checkbox" value="1"><span>Lennard-Jones near its minimum is approximately harmonic — small molecular vibrations behave like SHO</span></label>
                     <label class="option"><input type="checkbox" value="2"><span>Bertrand's theorem says only \( -1/\rho \) and \( \rho^2 \) give closed orbits for <em>all</em> bound initial conditions</span></label>
                     <label class="option"><input type="checkbox" value="3"><span>Precessing orbits are chaotic</span></label>

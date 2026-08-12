@@ -159,12 +159,13 @@
 
         <!-- Q2: Fill -->
         <div class="tab-content">
-            <div class="question-container" data-type="fill" data-answer="0.1[0.05,0.15]">
+            <div class="question-container" data-type="fill" data-answer="45[35,60]">
                 <div class="question-text">
-                    Set &sigma;=1.0 and N=100. Read the error \( s/\sqrt{N-1} \) from the stats readout.
-                    It should be approximately:
+                    With &sigma; = 1.0 you need an error bar of about &plusmn;0.15.
+                    Roughly what N do you need? Predict, then verify by setting the sliders
+                    and reading \( s/\sqrt{N-1} \) from the stats readout.
                     <br><br>
-                    Error &asymp; <input type="text" class="fill-blank" placeholder="?">
+                    N &asymp; <input type="text" class="fill-blank" placeholder="?">
                 </div>
                 <div class="question-actions">
                     <button class="btn-verify">Verify</button>
@@ -172,12 +173,12 @@
                 <div class="question-explanation" style="display: none;">
                     <div class="question-explanation-title">Explanation</div>
                     <div class="question-explanation-text">
-                        With \( \sigma = 1.0 \) and \( N = 100 \):
-                        \( s/\sqrt{N-1} \approx 1.0/\sqrt{99} \approx 0.10 \).
-                        From a measurement with \( \sigma = 1 \) m/s&sup2;, averaging 100 measurements
-                        gives you a result precise to about \( \pm 0.1 \) m/s&sup2;. That's a 10&times;
-                        improvement over a single measurement, consistent with the \( 1/\sqrt{N} \) scaling
-                        you learned in Section 2.2.
+                        Invert the error formula: \( 0.15 = \sigma/\sqrt{N-1} \) gives
+                        \( N = (1.0/0.15)^2 + 1 \approx 45 \). Set &sigma;=1.0 and N&asymp;45
+                        and the readout should show an error near 0.15 (it fluctuates a little
+                        because \( s \) is itself a random estimate). The payoff of thinking
+                        in reverse: halving the error bar costs you four times the data, so
+                        precision gets expensive fast.
                     </div>
                 </div>
             </div>
@@ -304,27 +305,27 @@
 
         <!-- Q4: MCQ -->
         <div class="tab-content active">
-            <div class="question-container" data-type="mcq" data-answer="1">
+            <div class="question-container" data-type="mcq" data-answer="2">
                 <div class="question-text">
-                    Set N=3. Which variance estimate has its histogram centered on
-                    the true value \( \sigma^2 = 4 \)?
+                    Roughly what N makes the biased and unbiased histograms visually
+                    indistinguishable (bias under 5%)? Predict, then slide N to check.
                 </div>
                 <div class="question-options">
                     <label class="option">
                         <input type="radio" name="eb-q4" value="0">
-                        <span>Biased (&divide;N) &mdash; centered below 4</span>
+                        <span>N = 5</span>
                     </label>
                     <label class="option">
                         <input type="radio" name="eb-q4" value="1">
-                        <span>Unbiased (&divide;(N&minus;1)) &mdash; centered at 4</span>
+                        <span>N = 10</span>
                     </label>
                     <label class="option">
                         <input type="radio" name="eb-q4" value="2">
-                        <span>Both are equally accurate</span>
+                        <span>N = 20</span>
                     </label>
                     <label class="option">
                         <input type="radio" name="eb-q4" value="3">
-                        <span>Neither is close to 4</span>
+                        <span>N = 40</span>
                     </label>
                 </div>
                 <div class="question-actions">
@@ -333,10 +334,12 @@
                 <div class="question-explanation" style="display: none;">
                     <div class="question-explanation-title">Explanation</div>
                     <div class="question-explanation-text">
-                        With N=3, the biased estimate (&divide;N) averages to
-                        \( \sigma^2 \times (N-1)/N = 4 \times 2/3 \approx 2.67 \) &mdash; systematically
-                        too low. The unbiased estimate (&divide;(N-1)) averages to the true value 4.
-                        Check the stats readout to verify.
+                        The biased estimate averages to \( \sigma^2 \times (N-1)/N \), so the
+                        fractional bias is \( 1/N \). Bias under 5% means \( (N-1)/N \geq 0.95 \),
+                        which first holds at N = 20. Slide N up and watch the two histograms merge
+                        &mdash; by N = 20 their centres differ by less than the histograms' own
+                        width. The insight: Bessel's correction matters enormously for tiny samples
+                        but fades like \( 1/N \) as data accumulates.
                     </div>
                 </div>
             </div>
@@ -344,10 +347,10 @@
 
         <!-- Q5: Fill -->
         <div class="tab-content">
-            <div class="question-container" data-type="fill" data-answer="2.67[2.2,3.2]">
+            <div class="question-container" data-type="fill" data-answer="3.2[2.8,3.6]">
                 <div class="question-text">
-                    With N=3, the biased estimate systematically averages to
-                    \( \sigma^2 \times (N-1)/N = 4 \times 2/3 \). This equals approximately:
+                    Set N = 5. Before looking at the readout, predict where the biased (&divide;N)
+                    histogram will centre:
                     <br><br>
                     Mean biased estimate &asymp; <input type="text" class="fill-blank" placeholder="?">
                 </div>
@@ -357,10 +360,11 @@
                 <div class="question-explanation" style="display: none;">
                     <div class="question-explanation-title">Explanation</div>
                     <div class="question-explanation-text">
-                        \( 4 \times 2/3 = 8/3 \approx 2.67 \). The biased estimate misses the true variance
-                        by a factor of \( (N-1)/N = 2/3 \) on average. With only 3 samples, that's a 33% underestimate!
-                        Bessel's correction (multiplying by \( N/(N-1) \)) exactly fixes this bias.
-                        Verify by reading the "Mean biased" value in the stats readout.
+                        The biased estimate averages to \( \sigma^2 \times (N-1)/N = 4 \times 4/5 = 3.2 \).
+                        Now check the "Mean biased" value in the stats readout &mdash; it should hover
+                        near 3.2, a 20% underestimate of the true variance 4. The pattern to carry away:
+                        the shortfall factor is always \( (N-1)/N \), which is exactly why Bessel's
+                        correction divides by \( N-1 \) instead of \( N \).
                     </div>
                 </div>
             </div>
@@ -540,14 +544,12 @@
 
         <!-- Q8: Fill -->
         <div class="tab-content">
-            <div class="question-container" data-type="fill" data-answer="0.5[0.45,0.55]">
+            <div class="question-container" data-type="fill" data-answer="0.4[0.35,0.45]">
                 <div class="question-text">
-                    Lab A reports \( \bar{X}_A = 10.2 \pm 0.3 \).
-                    Lab B reports \( \bar{X}_B = 9.5 \pm 0.4 \).
-                    The combined uncertainty in the difference is
-                    \( \sqrt{0.3^2 + 0.4^2} \) = :
+                    Lab A's uncertainty is 0.3. How small must Lab B's uncertainty be
+                    so the combined uncertainty of the difference is at most 0.5?
                     <br><br>
-                    Combined uncertainty = <input type="text" class="fill-blank" placeholder="?">
+                    Lab B's uncertainty &le; <input type="text" class="fill-blank" placeholder="?">
                 </div>
                 <div class="question-actions">
                     <button class="btn-verify">Verify</button>
@@ -555,10 +557,14 @@
                 <div class="question-explanation" style="display: none;">
                     <div class="question-explanation-title">Explanation</div>
                     <div class="question-explanation-text">
-                        \( \sqrt{0.3^2 + 0.4^2} = \sqrt{0.09 + 0.16} = \sqrt{0.25} = 0.5 \).
-                        This is the famous 3-4-5 right triangle! The uncertainties add in quadrature
-                        (not linearly) because the errors are independent &mdash; the same rule as
-                        \( \text{Var}(A - B) = \text{Var}(A) + \text{Var}(B) \) from Section 2.2.
+                        Uncertainties add in quadrature, so solve
+                        \( \sqrt{0.3^2 + \sigma_B^2} = 0.5 \):
+                        \( \sigma_B = \sqrt{0.25 - 0.09} = \sqrt{0.16} = 0.4 \).
+                        That's the famous 3-4-5 right triangle in disguise! Notice the quadrature
+                        rule \( \text{Var}(A - B) = \text{Var}(A) + \text{Var}(B) \) from Section 2.2
+                        is forgiving: Lab B can be noticeably worse than Lab A (0.4 vs 0.3) and the
+                        combined error still only reaches 0.5, because squares dilute the larger term
+                        less than linear addition would.
                     </div>
                 </div>
             </div>

@@ -169,20 +169,23 @@
         </div>
 
         <div class="tab-content">
-            <div class="question-container" data-type="fill" data-answer="1.41[1.40,1.42]">
+            <div class="question-container" data-type="fill" data-answer="0.71[0.69,0.73]">
                 <div class="question-text">
-                    In dimensionless units, the escape threshold is \( V_0 = \sqrt{2} \approx \)
+                    Set the ratio slider so the dimensionless \( V_0 \) readout equals exactly 1.0.
+                    What \( v_0/v_{\text{esc}} \) ratio did you need?
                     <input type="text" class="fill-blank" placeholder="?">
-                    (Slide the ratio to 1.0 and read the dimensionless \( V_0 \).)
                 </div>
                 <div class="question-actions">
                     <button class="btn-verify">Verify</button>
                 </div>
                 <div class="question-explanation" style="display:none;">
                     <strong>Explanation:</strong>
-                    At ratio = 1.0, \( v_0 = v_{\text{esc}} = \sqrt{2gR} \). The dimensionless
-                    speed is \( V_0 = v_0/\sqrt{gR} = \sqrt{2gR}/\sqrt{gR} = \sqrt{2} \approx 1.414 \).
-                    This single number is the escape threshold for <em>any</em> planet.
+                    The dimensionless speed is \( V_0 = v_0/\sqrt{gR} \), while
+                    \( v_{\text{esc}} = \sqrt{2gR} \). So \( V_0 = 1 \) means
+                    \( v_0 = \sqrt{gR} = v_{\text{esc}}/\sqrt{2} \approx 0.71\, v_{\text{esc}} \).
+                    The factor \( \sqrt{2} \) between the natural velocity scale \( \sqrt{gR} \)
+                    and the escape speed is exactly why the dimensionless escape threshold sits at
+                    \( V_0 = \sqrt{2} \), not at 1.
                 </div>
             </div>
         </div>
@@ -318,19 +321,24 @@
         </div>
 
         <div class="tab-content active">
-            <div class="question-container" data-type="fill" data-answer="2.0[1.9,2.1]">
+            <div class="question-container" data-type="fill" data-answer="1.22[1.19,1.26]">
                 <div class="question-text">
-                    With \( V_0 = 1.0 \), the projectile reaches a maximum distance of
-                    \( X_{\max} = \) <input type="text" class="fill-blank" placeholder="?"> (in planet radii).
+                    Find the \( V_0 \) for which the projectile just reaches
+                    \( X_{\max} = 4 \) (three radii above the surface). Predict it from energy
+                    conservation, then verify with the \( X_{\max} \) readout:
+                    \( V_0 = \) <input type="text" class="fill-blank" placeholder="?">
                 </div>
                 <div class="question-actions">
                     <button class="btn-verify">Verify</button>
                 </div>
                 <div class="question-explanation" style="display:none;">
                     <strong>Explanation:</strong>
-                    Setting \( V = 0 \): \( 0 = V_0^2 - 2 + 2/X_{\max} \), so
-                    \( X_{\max} = 2/(2 - V_0^2) = 2/(2 - 1) = 2 \). The projectile reaches
-                    twice the planet's radius — one radius above the surface.
+                    Setting \( V = 0 \) at the turning point: \( 0 = V_0^2 - 2 + 2/X_{\max} \), so
+                    \( V_0 = \sqrt{2 - 2/X_{\max}} = \sqrt{2 - 0.5} = \sqrt{1.5} \approx 1.22 \).
+                    Notice how close this already is to the escape threshold
+                    \( \sqrt{2} \approx 1.41 \): going from \( X_{\max} = 4 \) to
+                    \( X_{\max} = \infty \) costs only about 16% more launch speed, because most of
+                    the potential well has been climbed in the first few radii.
                 </div>
             </div>
         </div>
@@ -514,20 +522,24 @@
         </div>
 
         <div class="tab-content active">
-            <div class="question-container" data-type="fill" data-answer="59.5[58.0,61.0]">
+            <div class="question-container" data-type="fill" data-answer="5.0[4.8,5.2]">
                 <div class="question-text">
-                    Jupiter's escape velocity is approximately
-                    <input type="text" class="fill-blank" placeholder="?"> km/s.
-                    (Set V₀ = √2 and select Jupiter.)
+                    A small body with \( R = 2.5 \times 10^6 \) m needs an escape velocity of
+                    5.0 km/s. What surface gravity \( g \) must it have? Predict it from the
+                    scaling law, then check your value with the translator:
+                    <input type="text" class="fill-blank" placeholder="?"> m/s²
                 </div>
                 <div class="question-actions">
                     <button class="btn-verify">Verify</button>
                 </div>
                 <div class="question-explanation" style="display:none;">
                     <strong>Explanation:</strong>
-                    \( v_{\text{esc}} = \sqrt{2gR} = \sqrt{2 \times 24.79 \times 7.15 \times 10^7}
-                    \approx 59{,}500 \) m/s ≈ 59.5 km/s. Jupiter's enormous mass and radius make
-                    escape extremely difficult — about 5× harder than Earth.
+                    Invert \( v_{\text{esc}} = \sqrt{2gR} \):
+                    \( g = v_{\text{esc}}^2 / 2R = (5000)^2 / (2 \times 2.5 \times 10^6) = 5.0 \) m/s².
+                    The dimensionless problem never changes — only the two scale factors \( g \) and
+                    \( R \) do. That's the power of non-dimensionalization: once you know the
+                    universal solution, designing a world with any desired escape speed is just
+                    algebra on the scales.
                 </div>
             </div>
         </div>

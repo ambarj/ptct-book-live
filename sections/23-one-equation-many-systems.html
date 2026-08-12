@@ -342,12 +342,12 @@
 
         <!-- Q4: Fill -->
         <div class="tab-content active">
-            <div class="question-container" data-type="fill" data-answer="2.45[2.3,2.6]">
+            <div class="question-container" data-type="fill" data-answer="16[15,17]">
                 <div class="question-text">
-                    A spring has k = 6 N/m and m = 1 kg.
-                    What is \( \omega \)?
+                    You need the spring-mass system to tick at \( \omega = 4.0 \) rad/s
+                    with m = 1 kg.  What k do you need?
                     <br><br>
-                    &omega; = <input type="text" class="fill-blank" placeholder="rad/s"> rad/s
+                    k = <input type="text" class="fill-blank" placeholder="N/m"> N/m
                 </div>
                 <div class="question-actions">
                     <button class="btn-verify">Verify</button>
@@ -355,8 +355,10 @@
                 <div class="question-explanation" style="display: none;">
                     <div class="question-explanation-title">Explanation</div>
                     <div class="question-explanation-text">
-                        \( \omega = \sqrt{k/m} = \sqrt{6/1} = \sqrt{6} \approx 2.449 \) rad/s.
-                        Set k = 6, m = 1 in the mapper to verify.
+                        Invert \( \omega = \sqrt{k/m} \): you need \( k = m\omega^2 = 1 \times 4^2 = 16 \) N/m.
+                        Set k = 16, m = 1 in the mapper and watch \( \omega \) land on 4.0.
+                        Notice the square: to double a spring's frequency you must make it
+                        <em>four</em> times stiffer &mdash; frequency is expensive in stiffness.
                     </div>
                 </div>
             </div>
@@ -364,12 +366,13 @@
 
         <!-- Q5: Fill -->
         <div class="tab-content">
-            <div class="question-container" data-type="fill" data-answer="2.01[1.9,2.1]">
+            <div class="question-container" data-type="fill" data-answer="0.99[0.95,1.05]">
                 <div class="question-text">
-                    A pendulum with L = 1 m has \( \omega = \sqrt{9.8} \approx 3.13 \) rad/s.
-                    What is the period?  <em>Hint:</em> \( T = 2\pi/\omega \).
+                    A grandfather-clock pendulum must complete one full swing in exactly
+                    T = 2.0 s.  What length L do you need?
+                    <em>Hint:</em> \( T = 2\pi/\omega \) and \( \omega = \sqrt{g/L} \).
                     <br><br>
-                    T = <input type="text" class="fill-blank" placeholder="seconds"> s
+                    L = <input type="text" class="fill-blank" placeholder="meters"> m
                 </div>
                 <div class="question-actions">
                     <button class="btn-verify">Verify</button>
@@ -377,9 +380,11 @@
                 <div class="question-explanation" style="display: none;">
                     <div class="question-explanation-title">Explanation</div>
                     <div class="question-explanation-text">
-                        \( T = 2\pi/3.13 \approx 2.01 \) s.
-                        A 1-meter pendulum takes about 2 seconds per full swing &mdash;
-                        that's why grandfather clocks are about 1 meter tall!
+                        You need \( \omega = 2\pi/T = \pi \) rad/s, and inverting
+                        \( \omega = \sqrt{g/L} \) gives \( L = g/\omega^2 = 9.8/\pi^2 \approx 0.99 \) m.
+                        Set L just under 1 m in the mapper and check that T reads 2.0 s.
+                        It's a lovely coincidence that \( g \approx \pi^2 \) in SI units &mdash;
+                        it's why grandfather clocks are about a meter tall.
                     </div>
                 </div>
             </div>
@@ -596,13 +601,13 @@
 
         <!-- Q9: Fill -->
         <div class="tab-content">
-            <div class="question-container" data-type="fill" data-answer="0.785[0.7,0.85]">
+            <div class="question-container" data-type="fill" data-answer="3.14[3.0,3.3]">
                 <div class="question-text">
-                    With \( \omega = 2 \) rad/s, the time delay between the primary
-                    variable peak and the derivative peak is \( \Delta t = \pi/(2\omega) \).
-                    Calculate this delay.
+                    The derivative peaks \( \Delta t = \pi/(2\omega) \) after the primary
+                    variable.  Using the explorer, find the \( \omega \) for which this
+                    delay is exactly 0.5 s.  Verify with the yellow dashed markers.
                     <br><br>
-                    &Delta;t = <input type="text" class="fill-blank" placeholder="seconds"> s
+                    &omega; = <input type="text" class="fill-blank" placeholder="rad/s"> rad/s
                 </div>
                 <div class="question-actions">
                     <button class="btn-verify">Verify</button>
@@ -610,10 +615,13 @@
                 <div class="question-explanation" style="display: none;">
                     <div class="question-explanation-title">Explanation</div>
                     <div class="question-explanation-text">
-                        \( \Delta t = \pi/(2 \times 2) = \pi/4 \approx 0.785 \) s.
-                        This is always one quarter of the period:
-                        \( T/4 = (2\pi/\omega)/4 = \pi/(2\omega) \).
-                        Check the yellow dashed markers on the time plot to verify!
+                        Invert \( \Delta t = \pi/(2\omega) \):
+                        \( \omega = \pi/(2 \times 0.5) = \pi \approx 3.14 \) rad/s.
+                        At that setting the yellow dashed markers sit exactly 0.5 s apart.
+                        The delay is always one quarter of the period
+                        (\( T/4 = \pi/(2\omega) \)), so asking for a 0.5 s lag is the same
+                        as asking for a 2-second period &mdash; the derivative always runs a
+                        quarter-cycle ahead, whatever the units.
                     </div>
                 </div>
             </div>

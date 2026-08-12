@@ -113,26 +113,23 @@
 
         <!-- Q1: MCQ -->
         <div class="tab-content active">
-            <div class="question-container" data-type="mcq" data-answer="2">
+            <div class="question-container" data-type="mcq" data-answer="1">
                 <div class="question-text">
-                    Switch between the three models.  What happens to &chi;&sup2;?
+                    The 1-param model gives &chi;&sup2; = 45; switching to the 3-param model
+                    gives &chi;&sup2; = 44.8.  What should you conclude?
                 </div>
                 <div class="question-options">
                     <label class="option">
                         <input type="radio" name="af-q1" value="0">
-                        <span>It increases as you add parameters</span>
+                        <span>Prefer the 3-param model &mdash; its &chi;&sup2; is lower</span>
                     </label>
                     <label class="option">
                         <input type="radio" name="af-q1" value="1">
-                        <span>It stays exactly the same</span>
+                        <span>The improvement is negligible &mdash; prefer the simpler 1-param model</span>
                     </label>
                     <label class="option">
                         <input type="radio" name="af-q1" value="2">
-                        <span>It decreases or stays the same</span>
-                    </label>
-                    <label class="option">
-                        <input type="radio" name="af-q1" value="3">
-                        <span>It first decreases, then increases</span>
+                        <span>The 3-param fit must be wrong</span>
                     </label>
                 </div>
                 <div class="question-actions">
@@ -141,10 +138,12 @@
                 <div class="question-explanation" style="display: none;">
                     <div class="question-explanation-title">Explanation</div>
                     <div class="question-explanation-text">
-                        More parameters means more freedom to fit the data, so &chi;&sup2;
-                        can only decrease or stay the same.  The 1-param model is a special
-                        case of the 3-param model (with \( a = 0, b = 0 \)).  The optimiser
-                        always does at least as well as this special case.
+                        Adding parameters can only lower &chi;&sup2; (the 1-param model is a
+                        special case of the 3-param model with \( a = 0, b = 0 \)), so a tiny
+                        drop like 45 &rarr; 44.8 is exactly what you'd get from fitting noise.
+                        The extra parameters bought essentially nothing, so Occam's razor says
+                        keep the simpler model.  Switch models in the explorer and watch how
+                        small the &chi;&sup2; change is when the extra terms aren't needed.
                     </div>
                 </div>
             </div>
@@ -295,26 +294,23 @@
 
         <!-- Q4: MCQ -->
         <div class="tab-content active">
-            <div class="question-container" data-type="mcq" data-answer="1">
+            <div class="question-container" data-type="mcq" data-answer="2">
                 <div class="question-text">
-                    What does the width of the \( g \) histogram represent?
+                    Increase the number of experiments from 20 to 200.
+                    Predict what happens to the histogram's width, then verify.
                 </div>
                 <div class="question-options">
                     <label class="option">
                         <input type="radio" name="af-q4" value="0">
-                        <span>The true value of \( g \)</span>
+                        <span>It gets narrower</span>
                     </label>
                     <label class="option">
                         <input type="radio" name="af-q4" value="1">
-                        <span>The typical uncertainty on \( g \) from a single experiment</span>
+                        <span>It gets wider</span>
                     </label>
                     <label class="option">
                         <input type="radio" name="af-q4" value="2">
-                        <span>The number of experiments</span>
-                    </label>
-                    <label class="option">
-                        <input type="radio" name="af-q4" value="3">
-                        <span>The noise level &sigma;</span>
+                        <span>It stays essentially unchanged</span>
                     </label>
                 </div>
                 <div class="question-actions">
@@ -323,10 +319,14 @@
                 <div class="question-explanation" style="display: none;">
                     <div class="question-explanation-title">Explanation</div>
                     <div class="question-explanation-text">
-                        Each bar in the histogram is the \( g \) extracted from one independent
-                        experiment.  The spread (standard deviation) of this histogram equals the
-                        typical single-experiment uncertainty \( \delta g \).  The centre is the
-                        true value.
+                        Each entry in the histogram is the \( g \) extracted from one independent
+                        experiment, so the width reflects the <em>single-experiment</em> precision
+                        \( \delta g \) &mdash; set by the noise level and points per experiment,
+                        not by how many experiments you run.  More experiments just fill in the
+                        same bell shape more smoothly.  What running more experiments <em>does</em>
+                        sharpen is your estimate of the histogram's centre &mdash; that's the
+                        difference between the spread of measurements and the standard error of
+                        their mean.
                     </div>
                 </div>
             </div>
@@ -334,12 +334,12 @@
 
         <!-- Q5: Fill -->
         <div class="tab-content">
-            <div class="question-container" data-type="fill" data-answer="9.8[8.5,11.0]">
+            <div class="question-container" data-type="fill" data-answer="2[1.6,2.5]">
                 <div class="question-text">
-                    With 15% noise and 100 experiments, the mean of extracted \( g \) values
-                    should be close to:
+                    Read std(\( g \)) from the readout at 15% noise, then set noise to 30%.
+                    By what factor does std(\( g \)) grow?  Predict, then verify.
                     <br><br>
-                    \( \langle g \rangle \approx \) <input type="text" class="fill-blank" placeholder="value">
+                    Factor &asymp; <input type="text" class="fill-blank" placeholder="value">
                 </div>
                 <div class="question-actions">
                     <button class="btn-verify">Verify</button>
@@ -347,9 +347,12 @@
                 <div class="question-explanation" style="display: none;">
                     <div class="question-explanation-title">Explanation</div>
                     <div class="question-explanation-text">
-                        The weighted least-squares estimator is unbiased, so the average of
-                        many experiments converges to the true value \( g = 9.8 \).  With 100
-                        experiments, \( \langle g \rangle \) should be within a few percent of 9.8.
+                        The fitted parameter's uncertainty is proportional to the noise level
+                        \( \sigma \), so doubling the noise from 15% to 30% doubles
+                        std(\( g \)) &mdash; a factor of about 2 (the readout will fluctuate a
+                        little around it).  This linear scaling is a signature of least squares:
+                        the estimator is a linear function of the data, so every error bar
+                        inherits &sigma; as an overall multiplier.
                     </div>
                 </div>
             </div>
@@ -463,11 +466,10 @@
 <div class="info-box">
     <div class="info-box-title">Key Insight</div>
     <p>
-        With offset = 0 and the 1-param model, residuals are random &mdash; the model is correct.
-        Now set offset = 15 and keep the 1-param model.  The residuals show a clear
-        systematic pattern (positive at early times, negative at late times) because
-        \( d = ct^2 \) can't capture a constant offset.  Switch to the 3-param model and
-        the pattern vanishes: the model now has \( a \) to absorb the offset.
+        Residuals are your model's lie detector: when the model matches reality they look
+        like pure noise, and any systematic shape means something in the physics is missing.
+        Try offset = 15 &mdash; does the residual pattern survive as you switch between the
+        three models?  Which model kills it, and why?
         <strong>Always check residuals before trusting a fit.</strong>
     </p>
 </div>
@@ -491,21 +493,21 @@
         <div class="tab-content active">
             <div class="question-container" data-type="mcq" data-answer="1">
                 <div class="question-text">
-                    Set offset = 0 and use the 1-param model (ct&sup2;).
-                    Do the residuals show a systematic pattern?
+                    Set offset = 15 with the 2-param model (bt + ct&sup2;).
+                    Predict: do the residuals show a pattern?  Then check.
                 </div>
                 <div class="question-options">
                     <label class="option">
                         <input type="radio" name="af-q7" value="0">
-                        <span>Yes &mdash; clear U-shape</span>
+                        <span>Random &mdash; the \( bt \) term absorbs the constant</span>
                     </label>
                     <label class="option">
                         <input type="radio" name="af-q7" value="1">
-                        <span>No &mdash; random scatter around zero</span>
+                        <span>Systematic &mdash; neither \( bt \) nor \( ct^2 \) can mimic a constant offset</span>
                     </label>
                     <label class="option">
                         <input type="radio" name="af-q7" value="2">
-                        <span>Yes &mdash; all positive</span>
+                        <span>All residuals become positive</span>
                     </label>
                 </div>
                 <div class="question-actions">
@@ -514,9 +516,12 @@
                 <div class="question-explanation" style="display: none;">
                     <div class="question-explanation-title">Explanation</div>
                     <div class="question-explanation-text">
-                        When offset = 0, the true model <em>is</em> \( d = ct^2 \), so
-                        the 1-param model is correct.  Residuals are just noise &mdash;
-                        randomly scattered around zero.  No systematic pattern.
+                        Both \( bt \) and \( ct^2 \) vanish at \( t = 0 \), so no combination of
+                        them can reproduce a constant 15 m &mdash; the model family simply doesn't
+                        contain the truth.  The optimiser bends \( b \) and \( c \) to compensate,
+                        leaving a systematic wave in the residuals.  The lesson: adding parameters
+                        only helps if they add the <em>right kind</em> of freedom; here only a
+                        constant term \( a \) can absorb a constant offset.
                     </div>
                 </div>
             </div>
@@ -566,12 +571,12 @@
 
         <!-- Q9: Fill -->
         <div class="tab-content">
-            <div class="question-container" data-type="fill" data-answer="1[0.5,2.0]">
+            <div class="question-container" data-type="fill" data-answer="7[5,10]">
                 <div class="question-text">
-                    For a good fit (correct model, correct error bars),
-                    &chi;&sup2;/dof should be approximately:
+                    You fit 10 data points with a 3-parameter model and the fit is good.
+                    Roughly what TOTAL &chi;&sup2; do you expect?
                     <br><br>
-                    &chi;&sup2;/dof &asymp; <input type="text" class="fill-blank" placeholder="value">
+                    &chi;&sup2; &asymp; <input type="text" class="fill-blank" placeholder="value">
                 </div>
                 <div class="question-actions">
                     <button class="btn-verify">Verify</button>
@@ -579,12 +584,12 @@
                 <div class="question-explanation" style="display: none;">
                     <div class="question-explanation-title">Explanation</div>
                     <div class="question-explanation-text">
-                        Each term \( (r_i/\sigma_i)^2 \) has an expected value of about 1 if
-                        the model is correct and errors are Gaussian.  Summing \( N \) terms
-                        and subtracting the number of fitted parameters gives
-                        \( \langle\chi^2\rangle = N_{\text{dof}} \), so
-                        \( \chi^2/N_{\text{dof}} \approx 1 \).  Values much larger than 1
-                        signal a bad fit or underestimated errors.
+                        For a good fit, \( \langle\chi^2\rangle = N_{\text{dof}} = N - p
+                        = 10 - 3 = 7 \).  Each term \( (r_i/\sigma_i)^2 \) contributes about 1,
+                        but the fit "spends" one unit per adjusted parameter pulling the curve
+                        toward the data, so you expect about 7 rather than 10.  This is why we
+                        quote &chi;&sup2;/dof &asymp; 1, not &chi;&sup2;/N: with few points and
+                        many parameters the difference is far from negligible.
                     </div>
                 </div>
             </div>

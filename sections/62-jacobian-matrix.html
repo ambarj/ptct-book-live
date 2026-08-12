@@ -194,22 +194,44 @@
         </div>
 
         <div class="tab-content">
-            <div class="question-container" data-type="fill" data-answer="4">
+            <div class="question-container" data-type="mcq" data-answer="1">
                 <div class="question-text">
-                    The Jacobian is a 2&times;2 matrix, so it has
-                    <input type="text" class="fill-blank" style="width: 50px">
-                    partial derivatives to compute.
+                    For the Lotka&ndash;Volterra system \( \dot{x} = x(2 - y) \),
+                    \( \dot{y} = y(-1 + x) \), which Jacobian entries vanish at the coexistence
+                    point \( (1, 2) \)?
+                </div>
+                <div class="question-options">
+                    <label class="option">
+                        <input type="radio" name="jc-q3" value="0">
+                        <span>The off-diagonal (interaction) entries</span>
+                    </label>
+                    <label class="option">
+                        <input type="radio" name="jc-q3" value="1">
+                        <span>The diagonal (self-feedback) entries</span>
+                    </label>
+                    <label class="option">
+                        <input type="radio" name="jc-q3" value="2">
+                        <span>All four</span>
+                    </label>
+                    <label class="option">
+                        <input type="radio" name="jc-q3" value="3">
+                        <span>None</span>
+                    </label>
                 </div>
                 <div class="question-actions">
                     <button class="btn-verify">Verify</button>
                 </div>
                 <div class="question-explanation" style="display:none;">
                     <strong>Explanation:</strong>
-                    A 2&times;2 matrix has <strong>4</strong> entries:
-                    \( \partial f/\partial x \), \( \partial f/\partial y \),
-                    \( \partial g/\partial x \), \( \partial g/\partial y \).
-                    Each is a partial derivative of one of the two velocity functions
-                    with respect to one of the two state variables.
+                    The Jacobian is
+                    \( J = \begin{pmatrix} 2 - y & -x \\ y & -1 + x \end{pmatrix} \). At
+                    \( (1, 2) \) the diagonal entries \( 2 - y = 0 \) and \( -1 + x = 0 \) both
+                    vanish &mdash; the self-feedback terms &mdash; while the off-diagonals stay
+                    \( -x = -1 \) and \( y = 2 \). So
+                    \( J = \begin{pmatrix} 0 & -1 \\ 2 & 0 \end{pmatrix} \), giving \( \tau = 0 \)
+                    and \( \Delta = 2 > 0 \). That zero trace is exactly why the linearization
+                    predicts a <strong>center</strong> &mdash; the undamped oscillation of predator
+                    and prey.
                 </div>
             </div>
         </div>
@@ -499,32 +521,30 @@
         </div>
 
         <div class="tab-content">
-            <div class="question-container" data-type="fill" data-answer="unstable spiral">
+            <div class="question-container" data-type="fill" data-answer="negative">
                 <div class="question-text">
-                    Select <strong>Van der Pol</strong> at the origin. The Jacobian shows
-                    \( \tau = \mu = 0.5 > 0 \) and the eigenvalues are complex with positive
-                    real part. The fixed point is a
+                    Select <strong>Van der Pol</strong> at the origin. For what sign of \( \mu \)
+                    would the origin become a <strong>stable spiral</strong> instead of an
+                    unstable one?
                     <select class="fill-blank-select">
                         <option value=""></option>
-                        <option value="center">center</option>
-                        <option value="stable spiral">stable spiral</option>
-                        <option value="unstable spiral">unstable spiral</option>
-                        <option value="stable node">stable node</option>
-                    </select>.
+                        <option value="negative">negative</option>
+                        <option value="positive">positive</option>
+                        <option value="zero">zero</option>
+                    </select>
                 </div>
                 <div class="question-actions">
                     <button class="btn-verify">Verify</button>
                 </div>
                 <div class="question-explanation" style="display:none;">
                     <strong>Explanation:</strong>
-                    With \( \mu = 0.5 \), the Jacobian at the origin is
-                    \( \begin{pmatrix} 0 & 1 \\ -1 & 0.5 \end{pmatrix} \):
-                    \( \tau = 0.5 > 0 \), \( \Delta = 1 \), \( \tau^2 - 4\Delta < 0 \) —
-                    complex eigenvalues with positive real part, an
-                    <strong>unstable spiral</strong>. Trajectories wind outward from the origin
-                    toward the famous Van der Pol limit cycle. (For \( \mu < 0 \) the real part
-                    flips negative and the spiral becomes stable — the sign of &mu; controls
-                    stability.)
+                    The Jacobian at the origin is
+                    \( \begin{pmatrix} 0 & 1 \\ -1 & \mu \end{pmatrix} \), so the trace is
+                    \( \tau = \mu \) and the determinant is \( \Delta = 1 \). The eigenvalues&rsquo;
+                    real part is \( \tau/2 = \mu/2 \). Making \( \mu \) <strong>negative</strong>
+                    pushes that real part below zero, reversing the outward spiral into a
+                    <strong>stable spiral</strong> that winds inward. The sign of \( \mu \) alone
+                    flips the origin&rsquo;s stability; at \( \mu = 0 \) it is a center.
                 </div>
             </div>
         </div>
@@ -550,7 +570,7 @@
                     </label>
                     <label class="option">
                         <input type="radio" name="jc-q9" value="3">
-                        <span>Three &mdash; one stable spiral and two saddles (or vice versa)</span>
+                        <span>Three &mdash; one stable spiral and two saddles</span>
                     </label>
                 </div>
                 <div class="question-actions">

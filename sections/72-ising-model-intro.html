@@ -109,36 +109,21 @@
         </div>
 
         <div class="tab-content active">
-            <div class="question-container" data-type="mcq" data-answer="0">
+            <div class="question-container" data-type="fill" data-answer="20">
                 <div class="question-text">
-                    Click <strong>All Up</strong> for N = 10. What is the energy?
-                </div>
-                <div class="question-options">
-                    <label class="option">
-                        <input type="radio" name="im-q1" value="0">
-                        <span>\( E = -9J \) (all 9 pairs aligned)</span>
-                    </label>
-                    <label class="option">
-                        <input type="radio" name="im-q1" value="1">
-                        <span>\( E = -10J \)</span>
-                    </label>
-                    <label class="option">
-                        <input type="radio" name="im-q1" value="2">
-                        <span>\( E = 0 \)</span>
-                    </label>
-                    <label class="option">
-                        <input type="radio" name="im-q1" value="3">
-                        <span>\( E = +9J \)</span>
-                    </label>
+                    A chain in its ground state has \( E = -19J \). How many spins does it have?
+                    \( N = \) <input type="text" class="fill-blank" style="width: 60px">.
                 </div>
                 <div class="question-actions">
                     <button class="btn-verify">Verify</button>
                 </div>
                 <div class="question-explanation" style="display:none;">
                     <strong>Explanation:</strong>
-                    10 spins have 9 neighbor pairs. All aligned: each pair contributes \( -J \).
-                    Total: \( E = -9J \). This is the <strong>ground state</strong> (minimum energy).
-                    Note: all-down also gives \( E = -9J \) &mdash; the ground state is twofold degenerate.
+                    In the ground state every neighboring pair is aligned, each contributing
+                    \( -J \). An open chain of \( N \) spins has \( N - 1 \) neighbor pairs, so
+                    \( E = -(N-1)J \). Setting \( -(N-1)J = -19J \) gives \( N - 1 = 19 \), hence
+                    \( N = 20 \). The trick is to count <strong>bonds, not spins</strong> &mdash; an
+                    open chain always has one fewer bond than it has sites.
                 </div>
             </div>
         </div>
@@ -433,20 +418,24 @@
         </div>
 
         <div class="tab-content active">
-            <div class="question-container" data-type="fill" data-answer="1024">
+            <div class="question-container" data-type="fill" data-answer="365[100,1500]">
                 <div class="question-text">
-                    For N = 10 spins, the total number of configurations is
-                    \( 2^{10} = \) <input type="text" class="fill-blank" style="width: 70px">.
+                    Your laptop checks \( 10^8 \) configurations per second. Roughly how many
+                    <strong>years</strong> would it take to enumerate all configurations of
+                    N = 60 spins? &asymp; <input type="text" class="fill-blank" style="width: 70px">
+                    years.
                 </div>
                 <div class="question-actions">
                     <button class="btn-verify">Verify</button>
                 </div>
                 <div class="question-explanation" style="display:none;">
                     <strong>Explanation:</strong>
-                    Each of 10 spins can be +1 or &minus;1 independently, giving
-                    \( 2^{10} = 1{,}024 \) configurations. Brute-force enumeration is easy here.
-                    But at N = 30: \( 2^{30} \approx 10^9 \) &mdash; already a billion. At N = 100:
-                    \( 2^{100} \approx 10^{30} \) &mdash; totally impossible.
+                    There are \( 2^{60} \approx 1.15 \times 10^{18} \) configurations. At
+                    \( 10^8 \) per second that is \( \approx 1.15 \times 10^{10} \) seconds;
+                    dividing by \( 3.16 \times 10^7 \) seconds per year gives about
+                    <strong>365 years</strong> &mdash; for a modest 60-spin chain. Every extra spin
+                    <em>doubles</em> the wait. This exponential wall is exactly why we abandon brute
+                    force and turn to Monte Carlo sampling.
                 </div>
             </div>
         </div>

@@ -197,7 +197,7 @@
         </div>
         <div class="tab-content">
             <div class="question-container" data-type="fill" data-answer="4.9[4.0,5.8]">
-                <div class="question-text">O₂ in air (\( D = 2 \times 10^{-5} \) m²/s). How far does it diffuse in 1 minute? Set the sliders and read: \( \ell \approx \) <input type="text" class="fill-blank" style="width: 60px"> cm.</div>
+                <div class="question-text">O₂ in air (\( D = 2 \times 10^{-5} \) m²/s). Compute \( \sqrt{2Dt} \) for \( t = 60 \) s: \( \ell \approx \) <input type="text" class="fill-blank" style="width: 60px"> cm.</div>
                 <div class="question-actions"><button class="btn-verify">Verify</button></div>
                 <div class="question-explanation" style="display:none;"><strong>Explanation:</strong> \( \ell = \sqrt{2 \times 2 \times 10^{-5} \times 60} = \sqrt{2.4 \times 10^{-3}} \approx 0.049 \) m = 4.9 cm. Even gas-phase diffusion only reaches a few centimeters in a minute — that is why you can smell dinner from the kitchen but not from across the street (convection carries most of it).</div>
             </div>
@@ -276,10 +276,10 @@
             </div>
         </div>
         <div class="tab-content">
-            <div class="question-container" data-type="fill" data-answer="20000[10000,30000]">
-                <div class="question-text">The ratio \( \kappa_\text{iron}/D_\text{ink} \approx 2.3 \times 10^{-5} / 10^{-9} = \) <input type="text" class="fill-blank" style="width: 80px">. This is how many times faster heat spreads compared to ink.</div>
+            <div class="question-container" data-type="fill" data-answer="2[1,3]">
+                <div class="question-text">Using \( t = \ell^2/(2\kappa) \), how long does heat in iron take to spread 1 cm (\( \kappa = 2.3 \times 10^{-5} \) m²/s)? \( \approx \) <input type="text" class="fill-blank" style="width: 80px"> seconds.</div>
                 <div class="question-actions"><button class="btn-verify">Verify</button></div>
-                <div class="question-explanation" style="display:none;"><strong>Explanation:</strong> \( 2.3 \times 10^{-5} / 10^{-9} = 2.3 \times 10^{4} = 23{,}000 \). Heat reaches 1 cm in ~1 s; ink takes ~\( 10^{4} \) s (about 3 hours). The <em>ratio of timescales</em> for the same distance equals the <em>ratio of diffusion coefficients</em>.</div>
+                <div class="question-explanation" style="display:none;"><strong>Explanation:</strong> \( t = \ell^2/(2\kappa) = (0.01)^2/(2 \times 2.3 \times 10^{-5}) = 10^{-4}/(4.6 \times 10^{-5}) \approx 2.2 \) s. Heat crosses a centimeter of iron in about two seconds &mdash; while ink (\( D \sim 10^{-9} \) m²/s) needs hours for the same distance. Same equation, wildly different \( D \).</div>
             </div>
         </div>
         <div class="tab-content">

@@ -214,13 +214,13 @@
 
         <!-- Q3: Fill -->
         <div class="tab-content">
-            <div class="question-container" data-type="fill" data-answer="2.83[2.7,3.0]">
+            <div class="question-container" data-type="fill" data-answer="2.24[2.1,2.4]">
                 <div class="question-text">
-                    For \( \omega_0 = 3.0, \gamma = 1.0 \) (underdamped), the
-                    damped frequency is \( \omega_d = \sqrt{\omega_0^2 - \gamma^2} \).
-                    Calculate \( \omega_d \).
+                    With \( \omega_0 = 3.0 \), find the \( \gamma \) that drags the
+                    damped frequency down to \( \omega_d = 2.0 \) rad/s.
+                    Check the imaginary part of the roots readout.
                     <br><br>
-                    &omega;<sub>d</sub> = <input type="text" class="fill-blank" placeholder="rad/s"> rad/s
+                    &gamma; = <input type="text" class="fill-blank" placeholder="?">
                 </div>
                 <div class="question-actions">
                     <button class="btn-verify">Verify</button>
@@ -228,10 +228,13 @@
                 <div class="question-explanation" style="display: none;">
                     <div class="question-explanation-title">Explanation</div>
                     <div class="question-explanation-text">
-                        \( \omega_d = \sqrt{9 - 1} = \sqrt{8} = 2\sqrt{2} \approx 2.83 \) rad/s.
-                        Check the root plot: the imaginary part of the complex roots
-                        should read \( \pm 2.83 \).  The frequency has dropped slightly
-                        from \( \omega_0 = 3.0 \) due to damping.
+                        Invert \( \omega_d = \sqrt{\omega_0^2 - \gamma^2} \):
+                        \( \gamma = \sqrt{\omega_0^2 - \omega_d^2} = \sqrt{9 - 4} = \sqrt{5} \approx 2.24 \).
+                        At that setting the imaginary part of the complex roots reads
+                        \( \pm 2.0 \).  Notice how hard you had to push: dragging the
+                        frequency down by a third took \( \gamma \) three quarters of the
+                        way to critical damping (\( \gamma = 3.0 \)) &mdash; for light
+                        damping, \( \omega_d \) barely budges from \( \omega_0 \).
                     </div>
                 </div>
             </div>
@@ -611,13 +614,29 @@
 
         <!-- Q9: Fill -->
         <div class="tab-content">
-            <div class="question-container" data-type="fill" data-answer="-1.35[-1.5,-1.2]">
+            <div class="question-container" data-type="mcq" data-answer="1">
                 <div class="question-text">
-                    For \( \omega_0 = 3.0, \gamma = 4.0 \) (overdamped), the two
-                    roots are \( r = -\gamma \pm \sqrt{\gamma^2 - \omega_0^2} \).
-                    The <em>less negative</em> root (slower decay) is:
-                    <br><br>
-                    r<sub>1</sub> = -4 + &radic;7 &approx; <input type="text" class="fill-blank" placeholder="value">
+                    Keep \( \omega_0 = 3.0 \) and increase \( \gamma \) from 4.0 to 6.0.
+                    Does the long-time decay get faster or slower?
+                    Verify with the slow root's position.
+                </div>
+                <div class="question-options">
+                    <label class="option">
+                        <input type="radio" name="rg-q9" value="0">
+                        <span>Faster &mdash; more damping always means faster decay</span>
+                    </label>
+                    <label class="option">
+                        <input type="radio" name="rg-q9" value="1">
+                        <span>Slower &mdash; the slow root moves toward zero; overdamping is sluggish</span>
+                    </label>
+                    <label class="option">
+                        <input type="radio" name="rg-q9" value="2">
+                        <span>Unchanged</span>
+                    </label>
+                    <label class="option">
+                        <input type="radio" name="rg-q9" value="3">
+                        <span>It starts oscillating</span>
+                    </label>
                 </div>
                 <div class="question-actions">
                     <button class="btn-verify">Verify</button>
@@ -625,12 +644,16 @@
                 <div class="question-explanation" style="display: none;">
                     <div class="question-explanation-title">Explanation</div>
                     <div class="question-explanation-text">
-                        \( r_1 = -4 + \sqrt{16 - 9} = -4 + \sqrt{7} \approx -4 + 2.65 = -1.35 \).
-                        This is the "slow" root &mdash; it decays the slowest, so it
-                        dominates at long times.  The other root
-                        \( r_2 = -4 - \sqrt{7} \approx -6.65 \) decays much faster and
-                        becomes negligible quickly.  The long-time behavior is
-                        \( x(t) \sim e^{-1.35t} \).
+                        Surprisingly, the decay gets <em>slower</em>.  The long-time
+                        behavior is set by the less negative "slow" root
+                        \( r_1 = -\gamma + \sqrt{\gamma^2 - \omega_0^2} \).
+                        At \( \gamma = 4.0 \): \( r_1 = -4 + \sqrt{7} \approx -1.35 \).
+                        At \( \gamma = 6.0 \): \( r_1 = -6 + \sqrt{27} \approx -0.80 \)
+                        &mdash; closer to zero, so \( e^{r_1 t} \) dies more slowly.
+                        Watch the slow root creep toward the origin as you push \( \gamma \)
+                        up.  Extra damping past critical makes the system sluggish, not
+                        snappy &mdash; which is exactly why engineers aim for critical
+                        damping rather than "as much as possible."
                     </div>
                 </div>
             </div>

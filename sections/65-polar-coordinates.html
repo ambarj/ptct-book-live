@@ -157,28 +157,42 @@
         </div>
 
         <div class="tab-content">
-            <div class="question-container" data-type="fill" data-answer="unstable spiral">
+            <div class="question-container" data-type="mcq" data-answer="0">
                 <div class="question-text">
-                    Select <strong>Broken center</strong> and set \( \epsilon = 0.1 \).
-                    The polar equation is \( \dot{r} = 0.1 r^3 > 0 \), so \( r \) is
-                    always increasing. This means the origin is a(n)
-                    <select class="fill-blank-select">
-                        <option value=""></option>
-                        <option value="center">center</option>
-                        <option value="stable spiral">stable spiral</option>
-                        <option value="unstable spiral">unstable spiral</option>
-                        <option value="saddle">saddle</option>
-                    </select>.
+                    Select <strong>Broken center</strong> with \( \epsilon = 0.1 \). The radius
+                    barely moves at first and then explodes outward. Why?
+                </div>
+                <div class="question-options">
+                    <label class="option">
+                        <input type="radio" name="pc-q2" value="0">
+                        <span>\( \dot{r} \propto r^3 \) is tiny at small \( r \), so growth self-accelerates as \( r \) increases</span>
+                    </label>
+                    <label class="option">
+                        <input type="radio" name="pc-q2" value="1">
+                        <span>The angular speed \( \omega \) pumps energy into the radius</span>
+                    </label>
+                    <label class="option">
+                        <input type="radio" name="pc-q2" value="2">
+                        <span>Numerical error accumulates</span>
+                    </label>
+                    <label class="option">
+                        <input type="radio" name="pc-q2" value="3">
+                        <span>The origin repels only distant points</span>
+                    </label>
                 </div>
                 <div class="question-actions">
                     <button class="btn-verify">Verify</button>
                 </div>
                 <div class="question-explanation" style="display:none;">
                     <strong>Explanation:</strong>
-                    \( \dot{r} = \epsilon r^3 > 0 \) for any \( r > 0 \) when \( \epsilon > 0 \).
-                    The radius grows monotonically &mdash; trajectories spiral outward. The origin
-                    is an <strong>unstable spiral</strong>. The Jacobian at the origin gives
-                    \( \lambda = \pm i \) (center), but polar analysis reveals the truth.
+                    The radial drift is \( \dot{r} = \epsilon r^3 \). Being cubic in \( r \), it is
+                    minuscule near the origin &mdash; at \( r = 0.1 \) it is only
+                    \( 0.1 \times 0.001 = 10^{-4} \) &mdash; so escape looks glacial at first. But as
+                    \( r \) grows, \( r^3 \) grows far faster, feeding back an ever-larger outward
+                    speed: the growth <strong>self-accelerates</strong> and the trajectory blows
+                    outward. The angular speed only sets how fast it circles, not how fast it
+                    escapes, and the effect is real, not numerical &mdash; a genuine
+                    <strong>unstable spiral</strong> that the Jacobian (\( \lambda = \pm i \)) misses.
                 </div>
             </div>
         </div>

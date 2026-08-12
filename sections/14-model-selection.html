@@ -157,22 +157,27 @@
 
         <!-- Q2: MCQ -->
         <div class="tab-content">
-            <div class="question-container" data-type="mcq" data-answer="0">
+            <div class="question-container" data-type="mcq" data-answer="1">
                 <div class="question-text">
-                    When you go from 3 to 5 parameters, what happens to &chi;&sup2;?
+                    Going from 3 to 5 parameters, &chi;&sup2; decreases slightly &mdash;
+                    yet &chi;&sup2;/dof can <em>increase</em>.  Why?
                 </div>
                 <div class="question-options">
                     <label class="option">
                         <input type="radio" name="ms-q2" value="0">
-                        <span>It decreases slightly (or stays the same)</span>
+                        <span>Because &chi;&sup2; itself secretly increases with more parameters</span>
                     </label>
                     <label class="option">
                         <input type="radio" name="ms-q2" value="1">
-                        <span>It increases significantly</span>
+                        <span>The denominator dof shrinks faster (by 2) than the tiny drop in &chi;&sup2;</span>
                     </label>
                     <label class="option">
                         <input type="radio" name="ms-q2" value="2">
-                        <span>It drops to zero</span>
+                        <span>The extra parameters add noise to the data, inflating the residuals</span>
+                    </label>
+                    <label class="option">
+                        <input type="radio" name="ms-q2" value="3">
+                        <span>It can't &mdash; &chi;&sup2;/dof always moves the same way as &chi;&sup2;</span>
                     </label>
                 </div>
                 <div class="question-actions">
@@ -181,12 +186,13 @@
                 <div class="question-explanation" style="display: none;">
                     <div class="question-explanation-title">Explanation</div>
                     <div class="question-explanation-text">
-                        Adding parameters can only decrease &chi;&sup2; (or leave it unchanged),
-                        because the simpler model is a special case of the more complex one.
-                        But the decrease from 3 to 5 parameters is tiny &mdash; those extra
-                        terms are fitting noise, not signal.  And &chi;&sup2;/dof may actually
-                        <em>increase</em> because you lose 2 degrees of freedom for negligible
-                        improvement in &chi;&sup2;.
+                        &chi;&sup2; can only fall (the 3-param model is a special case of the
+                        5-param one), but the ratio &chi;&sup2;/dof has a denominator too:
+                        dof drops by 2, from \( N-3 \) to \( N-5 \).  If the extra parameters
+                        are only fitting noise, &chi;&sup2; barely moves while the denominator
+                        shrinks, so the ratio goes <em>up</em>.  That's the quiet genius of
+                        &chi;&sup2;/dof &mdash; it has a built-in complexity penalty that charges
+                        one degree of freedom per parameter.
                     </div>
                 </div>
             </div>
@@ -194,12 +200,12 @@
 
         <!-- Q3: Fill -->
         <div class="tab-content">
-            <div class="question-container" data-type="fill" data-answer="7">
+            <div class="question-container" data-type="fill" data-answer="12">
                 <div class="question-text">
-                    For the 3-parameter model with 10 data points, how many
-                    degrees of freedom are there?
+                    How many data points would you need for the 5-parameter quartic
+                    to have the same dof (7) as the 3-parameter fit of 10 points?
                     <br><br>
-                    dof = N &minus; k = <input type="text" class="fill-blank" placeholder="value">
+                    N = <input type="text" class="fill-blank" placeholder="value">
                 </div>
                 <div class="question-actions">
                     <button class="btn-verify">Verify</button>
@@ -207,12 +213,12 @@
                 <div class="question-explanation" style="display: none;">
                     <div class="question-explanation-title">Explanation</div>
                     <div class="question-explanation-text">
-                        With \( N = 10 \) data points and \( k = 3 \) fitted parameters,
-                        the degrees of freedom are \( \text{dof} = 10 - 3 = 7 \).
-                        Each fitted parameter "uses up" one degree of freedom.
-                        If you had 10 parameters for 10 data points, dof = 0 and
-                        &chi;&sup2; would be exactly zero &mdash; a perfect fit that
-                        means nothing.
+                        Invert \( \text{dof} = N - k \): to get dof = 7 with \( k = 5 \)
+                        parameters you need \( N = 7 + 5 = 12 \) points.  Each fitted
+                        parameter "uses up" one degree of freedom, so a more complex model
+                        needs extra data just to break even.  At the extreme, 10 parameters
+                        for 10 data points gives dof = 0 and &chi;&sup2; exactly zero
+                        &mdash; a perfect fit that means nothing.
                     </div>
                 </div>
             </div>
@@ -581,14 +587,26 @@
             </div>
         </div>
 
-        <!-- Q9: Fill -->
+        <!-- Q9: MCQ -->
         <div class="tab-content">
-            <div class="question-container" data-type="fill" data-answer="2.3[1.5,3.0]">
+            <div class="question-container" data-type="mcq" data-answer="0">
                 <div class="question-text">
-                    For \( N = 10 \) data points, what is the BIC penalty per
-                    extra parameter?
-                    <br><br>
-                    ln(10) &asymp; <input type="text" class="fill-blank" placeholder="value">
+                    Model B has one more parameter than A and lowers &chi;&sup2; by 1.5
+                    (\( N = 10 \) points).  Which does BIC prefer?
+                </div>
+                <div class="question-options">
+                    <label class="option">
+                        <input type="radio" name="ms-q9" value="0">
+                        <span>A &mdash; the penalty \( \ln 10 \approx 2.3 \) exceeds the gain of 1.5</span>
+                    </label>
+                    <label class="option">
+                        <input type="radio" name="ms-q9" value="1">
+                        <span>B &mdash; lower &chi;&sup2; always wins BIC</span>
+                    </label>
+                    <label class="option">
+                        <input type="radio" name="ms-q9" value="2">
+                        <span>BIC can't decide</span>
+                    </label>
                 </div>
                 <div class="question-actions">
                     <button class="btn-verify">Verify</button>
@@ -596,11 +614,12 @@
                 <div class="question-explanation" style="display: none;">
                     <div class="question-explanation-title">Explanation</div>
                     <div class="question-explanation-text">
-                        \( \ln(10) \approx 2.30 \).  So adding one parameter to BIC costs
-                        about 2.3 units.  The model must reduce &chi;&sup2; by at least 2.3
-                        for BIC to consider the extra parameter worthwhile.  With more data
-                        points (larger \( N \)), the penalty grows &mdash; you need even
-                        stronger evidence to justify complexity.
+                        BIC charges a penalty of \( \ln N \approx \ln 10 \approx 2.3 \) for each
+                        extra parameter and only credits the drop in &chi;&sup2;.  Here the gain is
+                        1.5 but the toll is 2.3, so B's net BIC is <em>higher</em> (worse) than A's
+                        &mdash; BIC keeps the simpler model A.  The takeaway: a lower &chi;&sup2;
+                        alone never settles a comparison; the improvement first has to clear the
+                        complexity penalty.
                     </div>
                 </div>
             </div>

@@ -178,14 +178,13 @@
 
         <!-- Q2: Fill -->
         <div class="tab-content">
-            <div class="question-container" data-type="fill" data-answer="5[4.5,5.5]">
+            <div class="question-container" data-type="fill" data-answer="0.4[0.35,0.45]">
                 <div class="question-text">
-                    Set \( \gamma = 0.2 \) and \( \omega_0 = 3.0 \).
-                    The damping time scale is \( \tau = 1/\gamma \).
-                    How many seconds does it take for the amplitude to drop to
-                    \( A/e \approx 37\% \)?
+                    Keeping \( \omega_0 = 3.0 \), find the \( \gamma \) for which the
+                    envelope crosses \( A/e \approx 37\% \) of its starting value at
+                    exactly t = 2.5 s.  Confirm against the red dashed envelope.
                     <br><br>
-                    &tau; = <input type="text" class="fill-blank" placeholder="seconds"> s
+                    &gamma; = <input type="text" class="fill-blank" placeholder="?">
                 </div>
                 <div class="question-actions">
                     <button class="btn-verify">Verify</button>
@@ -193,10 +192,12 @@
                 <div class="question-explanation" style="display: none;">
                     <div class="question-explanation-title">Explanation</div>
                     <div class="question-explanation-text">
-                        \( \tau = 1/\gamma = 1/0.2 = 5 \) seconds.
-                        Look at the envelope on the plot: at t = 5 s, the red dashed line
-                        should be at about 37% of the initial amplitude (roughly 0.74 if A = 2).
-                        The energy at this time has dropped to \( 1/e^2 \approx 13.5\% \).
+                        The envelope reaches 37% at the damping time \( \tau = 1/\gamma \),
+                        so you need \( \gamma = 1/\tau = 1/2.5 = 0.4 \).
+                        Set the slider there and check the red dashed line: at t = 2.5 s it
+                        sits at about 37% of the initial amplitude (roughly 0.74 if A = 2).
+                        One bonus: the <em>energy</em> decays twice as fast, so at that same
+                        moment it has already fallen to \( 1/e^2 \approx 13.5\% \).
                     </div>
                 </div>
             </div>
@@ -313,8 +314,10 @@
         system complete before the motion dies out?</em>  A tuning fork has
         Q&nbsp;&asymp;&nbsp;1000 (it rings for a long time).  A car suspension
         has Q&nbsp;&asymp;&nbsp;5 (it&rsquo;s designed to stop bouncing quickly).
-        You can read Q directly from the explorer: count how many full
-        oscillations are visible before the envelope drops below ~37%.
+        You can estimate Q from the explorer: count the full oscillations before
+        the envelope drops below ~37% &mdash; that count is \( \tau/T = Q/\pi \),
+        so multiply it by \( \pi \) to get Q.  (Or count out to the ~4% point,
+        three damping times, where the count is \( 3Q/\pi \approx Q \).)
     </p>
 </div>
 
@@ -335,12 +338,12 @@
 
         <!-- Q4: Fill -->
         <div class="tab-content active">
-            <div class="question-container" data-type="fill" data-answer="10[9,11]">
+            <div class="question-container" data-type="fill" data-answer="0.05[0.045,0.055]">
                 <div class="question-text">
-                    Set \( \omega_0 = 3.0 \) and \( \gamma = 0.15 \).
-                    What is the quality factor \( Q = \omega_0/(2\gamma) \)?
+                    Give this oscillator a guitar-string-like \( Q = 30 \)
+                    (with \( \omega_0 = 3.0 \)).  What \( \gamma \) do you need?
                     <br><br>
-                    Q = <input type="text" class="fill-blank" placeholder="number">
+                    &gamma; = <input type="text" class="fill-blank" placeholder="?">
                 </div>
                 <div class="question-actions">
                     <button class="btn-verify">Verify</button>
@@ -348,12 +351,13 @@
                 <div class="question-explanation" style="display: none;">
                     <div class="question-explanation-title">Explanation</div>
                     <div class="question-explanation-text">
-                        \( Q = 3.0/(2 \times 0.15) = 3.0/0.3 = 10 \).
-                        A Q of 10 means the system completes roughly 10 oscillations before
-                        the amplitude drops significantly.  Check the bar chart:
-                        \( \tau/T \) should be around 3, meaning about 3 full oscillations
-                        within one damping time (and about \( \frac{Q \ln 100}{2\pi} \approx 7 \) oscillations
-                        total before the energy drops to 1%).
+                        Invert \( Q = \omega_0/(2\gamma) \):
+                        \( \gamma = \omega_0/(2Q) = 3.0/60 = 0.05 \).
+                        Dial the slider down to 0.05 and watch how long the ringing lasts
+                        &mdash; the bar chart shows \( \tau/T \approx 9.5 \), nearly ten full
+                        oscillations within one damping time.  High Q means <em>weak</em>
+                        damping: to make something ring longer, you shrink \( \gamma \),
+                        and Q grows in inverse proportion.
                     </div>
                 </div>
             </div>

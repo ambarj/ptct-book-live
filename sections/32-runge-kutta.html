@@ -158,19 +158,23 @@
         </div>
 
         <div class="tab-content">
-            <div class="question-container" data-type="fill" data-answer="2">
+            <div class="question-container" data-type="fill" data-answer="0.02[0.019,0.021]">
                 <div class="question-text">
-                    The midpoint method evaluates the derivative
-                    <input type="text" class="fill-blank" placeholder="?"> times per step.
-                    (Hint: count \( \mathbf{k}_1 \) and \( \mathbf{k}_2 \) in the recipe.)
+                    You have a budget of 1000 derivative evaluations for a 10 s
+                    simulation.  What is the smallest step size RK2 can afford?
+                    h = <input type="text" class="fill-blank" placeholder="?"> s
                 </div>
                 <div class="question-actions"><button class="btn-verify">Verify</button></div>
                 <div class="question-explanation" style="display:none;">
                     <strong>Explanation:</strong>
                     RK2 computes \( \mathbf{k}_1 \) (slope at the start) and
                     \( \mathbf{k}_2 \) (slope at the midpoint) &mdash; two derivative
-                    evaluations per step.  Euler uses just one.  That extra evaluation
-                    is the price you pay for the jump from O(h) to O(h&sup2;) accuracy.
+                    evaluations per step.  A budget of 1000 evaluations therefore buys
+                    only 500 steps, so \( h = 10\,\text{s} / 500 = 0.02 \) s.  (Euler,
+                    at one evaluation per step, could afford h = 0.01.)  This
+                    cost-accounting skill &mdash; counting evaluations, not steps &mdash;
+                    is exactly what you&rsquo;ll need to judge whether RK2&rsquo;s extra
+                    accuracy is worth its extra price, a question we settle below.
                 </div>
             </div>
         </div>
@@ -255,19 +259,22 @@
         </div>
 
         <div class="tab-content active">
-            <div class="question-container" data-type="fill" data-answer="4[3,6]">
+            <div class="question-container" data-type="fill" data-answer="64[55,70]">
                 <div class="question-text">
-                    When you halve h, how much does RK2&rsquo;s error decrease?
-                    Read from the bar chart: RK2 improvement factor &asymp;
+                    If you shrink h by a factor of 8, RK2&rsquo;s error shrinks by
+                    approximately what factor?
                     <input type="text" class="fill-blank" placeholder="?"> &times;
                 </div>
                 <div class="question-actions"><button class="btn-verify">Verify</button></div>
                 <div class="question-explanation" style="display:none;">
                     <strong>Explanation:</strong>
-                    RK2 is second-order: error &prop; h&sup2;.  Halving h:
-                    \( (h/2)^2 = h^2/4 \), so the error decreases by a factor of 4.
-                    The bar chart should show the RK2 bar near the 4&times; reference
-                    line.  Compare with Euler, whose bar should be near 2&times;.
+                    RK2 is second-order: error &prop; h&sup2;.  Shrinking h by 8 shrinks
+                    the error by \( 8^2 = 64 \).  You can check the pattern in the
+                    explorer&rsquo;s bar chart: each halving of h gives RK2 a factor
+                    near 4, so three halvings compound to \( 4^3 = 64 \).  The thing
+                    to remember is the exponent, not the number 4 &mdash;
+                    &ldquo;second-order&rdquo; means the improvement factor is
+                    (refinement factor)&sup2;, whatever the refinement factor is.
                 </div>
             </div>
         </div>

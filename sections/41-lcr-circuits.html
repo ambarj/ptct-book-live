@@ -325,10 +325,10 @@
         </div>
 
         <div class="tab-content">
-            <div class="question-container" data-type="fill" data-answer="0.25[0.20,0.30]">
+            <div class="question-container" data-type="fill" data-answer="20[19,21]">
                 <div class="question-text">
-                    The critical damping condition in terms of circuit components is \( R^2 = 4L/C \).
-                    In the non-dimensional parameter, the critical value is \( w = \)
+                    A circuit has \( L = 10 \) mH and \( C = 100 \) &mu;F. What \( R \)
+                    (in &Omega;) gives critical damping?
                     <input type="text" class="fill-blank" placeholder="?">.
                 </div>
                 <div class="question-actions">
@@ -336,10 +336,12 @@
                 </div>
                 <div class="question-explanation" style="display:none;">
                     <strong>Explanation:</strong>
-                    From \( R^2 = 4L/C \), divide both sides by \( R^2C \):
-                    \( 1 = 4L/(R^2C) = 4w \), so \( w = 1/4 = 0.25 \). The discriminant
-                    of the characteristic equation \( \lambda^2 + \lambda + w = 0 \) vanishes
-                    when \( 1 - 4w = 0 \).
+                    Critical damping requires \( R^2 = 4L/C \), so
+                    \( R = \sqrt{4L/C} = \sqrt{4 \times 0.01 / 10^{-4}} = \sqrt{400} = 20 \) &Omega;.
+                    Equivalently, in the non-dimensional parameter this is exactly
+                    \( w = L/(R^2C) = 1/4 \) &mdash; the discriminant of
+                    \( \lambda^2 + \lambda + w = 0 \) vanishes. Notice the design freedom:
+                    any \( L, C \) pair with the same ratio \( L/C \) demands the same \( R \).
                 </div>
             </div>
         </div>
@@ -489,19 +491,25 @@
         </div>
 
         <div class="tab-content">
-            <div class="question-container" data-type="fill" data-answer="2.5[2.0,3.0]">
+            <div class="question-container" data-type="fill" data-answer="0.55[0.45,0.62]">
                 <div class="question-text">
-                    With \( w = 5 \), the initial capacitor energy is \( E_C(0) = \frac{1}{2}w \cdot 1^2 \).
-                    What is \( E_C(0) \)? <input type="text" class="fill-blank" placeholder="?">.
+                    With \( w = 5 \) the circuit starts with \( E = 2.5 \), all in the capacitor.
+                    Read Peak \( E_L \) from the stats bar &mdash; what fraction of the initial
+                    energy does the inductor capture at its first peak?
+                    <input type="text" class="fill-blank" placeholder="?">.
                 </div>
                 <div class="question-actions">
                     <button class="btn-verify">Verify</button>
                 </div>
                 <div class="question-explanation" style="display:none;">
                     <strong>Explanation:</strong>
-                    \( E_C(0) = \frac{1}{2}wQ_0^2 = \frac{1}{2}(5)(1)^2 = 2.5 \). This is the total
-                    energy available for oscillation and eventual dissipation. The initial energy shown
-                    in the stats bar should match this value.
+                    The stats bar reports Peak \( E_L \approx 1.39 \), and
+                    \( 1.39 / 2.5 \approx 0.55 \) &mdash; only about 55% of the initial energy
+                    makes it into the inductor. In an ideal LC circuit the transfer would be
+                    complete (fraction 1), but here the resistor dissipates energy during the
+                    quarter-cycle it takes the current to build up, so the inductor's first
+                    peak already reflects that loss. The larger \( w \) is (weaker damping),
+                    the closer this fraction climbs toward 1.
                 </div>
             </div>
         </div>

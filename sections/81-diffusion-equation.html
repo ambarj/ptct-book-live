@@ -127,9 +127,10 @@
         </div>
 
         <div class="tab-content">
-            <div class="question-container" data-type="fill" data-answer="2[1.8,2.2]">
+            <div class="question-container" data-type="fill" data-answer="4.5[4.2,4.8]">
                 <div class="question-text">
-                    At t = 2, D = 1: the width is \( \sigma = \sqrt{2Dt} = \sqrt{4} = \)
+                    With D = 1, find the time at which the profile&rsquo;s width reaches
+                    &sigma; = 3; check the plot width.
                     <input type="text" class="fill-blank" style="width: 50px">.
                 </div>
                 <div class="question-actions">
@@ -137,10 +138,10 @@
                 </div>
                 <div class="question-explanation" style="display:none;">
                     <strong>Explanation:</strong>
-                    \( \sigma = \sqrt{2 \times 1 \times 2} = \sqrt{4} = 2 \). At t = 2, about
-                    68% of the probability lies within &plusmn;2 of the origin. At t = 8:
-                    &sigma; = 4, so the cloud has doubled in width &mdash; but it took 4&times;
-                    the time (diffusion is slow!).
+                    From \( \sigma = \sqrt{2Dt} \), set \( 3 = \sqrt{2t} \), so \( 9 = 2t \) and
+                    \( t = 4.5 \). Slide the time to 4.5 and the Gaussian width readout hits 3.
+                    Reaching width 3 takes longer than reaching width 2 (t = 2) &mdash; the
+                    \( \sqrt{t} \) law means later gains come slower.
                 </div>
             </div>
         </div>
@@ -273,21 +274,21 @@
         </div>
 
         <div class="tab-content">
-            <div class="question-container" data-type="fill" data-answer="4[3.5,4.5]">
+            <div class="question-container" data-type="fill" data-answer="9[8.5,9.5]">
                 <div class="question-text">
-                    To double the width from &sigma; = 2 to &sigma; = 4, you must wait
+                    To <strong>triple</strong> the width, how many times longer must you wait?
                     <input type="text" class="fill-blank" style="width: 50px">&times;
-                    as long (since &sigma; &propto; &radic;t, doubling &sigma; requires 4&times; t).
+                    as long.
                 </div>
                 <div class="question-actions">
                     <button class="btn-verify">Verify</button>
                 </div>
                 <div class="question-explanation" style="display:none;">
                     <strong>Explanation:</strong>
-                    \( \sigma \propto \sqrt{t} \), so \( 2\sigma \propto \sqrt{4t} \). Doubling
-                    the width requires <strong>4 times</strong> the time. This is why diffusion
-                    is practical at small scales (nanometers in microseconds) but impractical at
-                    large scales (a room takes hours to fill with perfume).
+                    Since \( \sigma \propto \sqrt{t} \), tripling the width means \( 3\sigma \propto
+                    \sqrt{9t} \) &mdash; you must wait <strong>9 times</strong> as long. The cost
+                    grows as the <em>square</em> of the width factor, which is why diffusion is
+                    quick at small scales but hopeless over large ones.
                 </div>
             </div>
         </div>
@@ -461,27 +462,35 @@
         </div>
 
         <div class="tab-content">
-            <div class="question-container" data-type="fill" data-answer="erases|destroys|smooths">
+            <div class="question-container" data-type="mcq" data-answer="0">
                 <div class="question-text">
-                    Diffusion
-                    <select class="fill-blank-select">
-                        <option value=""></option>
-                        <option value="erases">erases</option>
-                        <option value="sharpens">sharpens</option>
-                        <option value="preserves">preserves</option>
-                    </select>
-                    spatial structure over time. Sharp features are
-                    destroyed first; broad features persist longer.
+                    Two profiles have equal area: one tall and narrow, one low and broad.
+                    Which loses its shape first?
+                </div>
+                <div class="question-options">
+                    <label class="option">
+                        <input type="radio" name="de-q9" value="0">
+                        <span>The tall narrow one &mdash; sharp features decay fastest</span>
+                    </label>
+                    <label class="option">
+                        <input type="radio" name="de-q9" value="1">
+                        <span>The low broad one</span>
+                    </label>
+                    <label class="option">
+                        <input type="radio" name="de-q9" value="2">
+                        <span>Both at the same rate</span>
+                    </label>
                 </div>
                 <div class="question-actions">
                     <button class="btn-verify">Verify</button>
                 </div>
                 <div class="question-explanation" style="display:none;">
                     <strong>Explanation:</strong>
-                    Diffusion <strong>erases</strong> structure: it acts as a spatial low-pass
-                    filter, removing high-frequency (sharp) features first. The second derivative
-                    in the diffusion equation penalizes curvature &mdash; wherever the distribution
-                    is curved, diffusion smooths it out.
+                    The diffusion rate \( \partial\rho/\partial t = D\,\partial^2\rho/\partial x^2 \)
+                    is proportional to <em>curvature</em>. A tall narrow spike has enormous
+                    curvature, so it decays first; a low broad bump is nearly flat and barely
+                    changes. Try the Square pulse initial condition at small t: its sharp edges
+                    round off almost immediately while the interior lags behind.
                 </div>
             </div>
         </div>

@@ -141,10 +141,9 @@
         </div>
 
         <div class="tab-content">
-            <div class="question-container" data-type="fill" data-answer="100[80,120]">
+            <div class="question-container" data-type="fill" data-answer="0.6[0.58,0.62]">
                 <div class="question-text">
-                    With p = 0.55, the drift after 1000 steps is
-                    \( 1000 \times (2 \times 0.55 - 1) = \)
+                    Set Max steps = 1000. What bias p makes the drift line end at +200?
                     <input type="text" class="fill-blank" style="width: 60px">.
                 </div>
                 <div class="question-actions">
@@ -152,9 +151,10 @@
                 </div>
                 <div class="question-explanation" style="display:none;">
                     <strong>Explanation:</strong>
-                    Drift = \( N(2p-1) = 1000 \times 0.1 = 100 \). The spread is
-                    \( 2\sqrt{1000 \times 0.2475} \approx 31 \). SNR = 100/31 &asymp; 3.2 &mdash;
-                    the drift is now clearly visible (more than 3&sigma; above zero).
+                    The drift is \( N(2p-1) \), so \( 1000(2p-1) = 200 \) gives \( 2p-1 = 0.2 \)
+                    and \( p = 0.6 \). Nudge the slider to 0.6 and the drift line climbs to +200
+                    by step 1000 &mdash; a modest 0.1 bias per step accumulates into a large,
+                    unmistakable displacement.
                 </div>
             </div>
         </div>
@@ -272,7 +272,7 @@
                 </div>
                 <div class="question-explanation" style="display:none;">
                     <strong>Explanation:</strong>
-                    SNR = (p&minus;q)&radic;N / (2&radic;pq)). Larger (p&minus;q) gives faster SNR growth.
+                    SNR = (p&minus;q)&radic;N / (2&radic;pq). Larger (p&minus;q) gives faster SNR growth.
                     p = 0.7 has the steepest SNR curve and reaches SNR = 3 in fewest steps.
                     p = 0.51 needs thousands of steps to detect such a tiny bias.
                 </div>
@@ -280,10 +280,11 @@
         </div>
 
         <div class="tab-content">
-            <div class="question-container" data-type="fill" data-answer="2500[2000,3000]">
+            <div class="question-container" data-type="fill" data-answer="100[80,120]">
                 <div class="question-text">
-                    For p = 0.51 (very slight bias), the number of steps needed for
-                    SNR = 1 is approximately \( N \sim 4pq/(p-q)^2 \approx 4 \times 0.2499 / 0.0004 \approx \)
+                    Using \( N \sim 4pq/(p-q)^2 \), about how many steps until the drift beats
+                    the noise (SNR = 1) for p = 0.55? Confirm where the p = 0.55 curve crosses
+                    SNR = 1 on the plot.
                     <input type="text" class="fill-blank" style="width: 70px">.
                 </div>
                 <div class="question-actions">
@@ -291,9 +292,10 @@
                 </div>
                 <div class="question-explanation" style="display:none;">
                     <strong>Explanation:</strong>
-                    \( N_{\text{detect}} = 4pq/(p-q)^2 = 4 \times 0.51 \times 0.49 / 0.02^2 = 0.9996/0.0004 = 2499 \).
-                    About <strong>2500 steps</strong> just to tell the walk is biased! A 1% bias
-                    is very hard to detect without lots of data.
+                    \( N_{\text{detect}} = 4pq/(p-q)^2 = 4 \times 0.55 \times 0.45 / 0.1^2 =
+                    0.99/0.01 \approx 100 \). The p = 0.55 curve crosses SNR = 1 near N = 100.
+                    A 5% bias needs ~100 steps to become visible &mdash; twenty-five times fewer
+                    than the 1% bias, since the cost scales as \( 1/(p-q)^2 \).
                 </div>
             </div>
         </div>

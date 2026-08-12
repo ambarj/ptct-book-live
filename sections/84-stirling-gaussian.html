@@ -195,10 +195,10 @@
             </div>
         </div>
         <div class="tab-content">
-            <div class="question-container" data-type="fill" data-answer="0.04[0.035,0.045]">
-                <div class="question-text">At \( N = 100 \), the peak of the Gaussian is \( (2\pi \times 100)^{-1/2} \approx \) <input type="text" class="fill-blank" style="width: 60px">. Verify this matches the binomial peak in the explorer.</div>
+            <div class="question-container" data-type="fill" data-answer="178[160,200]">
+                <div class="question-text">At what N does the distribution&rsquo;s peak height drop to about 0.030? <input type="text" class="fill-blank" style="width: 60px">. Adjust N and read the peak in the explorer.</div>
                 <div class="question-actions"><button class="btn-verify">Verify</button></div>
-                <div class="question-explanation" style="display:none;"><strong>Explanation:</strong> \( (2\pi \times 100)^{-1/2} = (200\pi)^{-1/2} = 1/\sqrt{628.3} \approx 0.0399 \). The exact binomial peak \( P(0) = \binom{100}{50}/2^{100} \approx 0.0796 \) — but remember \( P(m) \) is defined on even integers spaced by 2, so as a <em>density</em> (dividing by bin width 2) it is \( \approx 0.0398 \), matching the Gaussian.</div>
+                <div class="question-explanation" style="display:none;"><strong>Explanation:</strong> The Gaussian peak (as a density) is \( (2\pi N)^{-1/2} \). Setting \( (2\pi N)^{-1/2} = 0.030 \) gives \( N = 1/(2\pi \times 0.030^2) \approx 177 \). Because the peak falls only as \( 1/\sqrt{N} \), dropping from 0.040 (at N = 100) to 0.030 requires nearly <em>doubling</em> N — the flattening slows dramatically as the walk grows.</div>
             </div>
         </div>
         <div class="tab-content">

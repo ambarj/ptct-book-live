@@ -134,27 +134,27 @@
         </div>
 
         <div class="tab-content active">
-            <div class="question-container" data-type="mcq" data-answer="2">
+            <div class="question-container" data-type="mcq" data-answer="1">
                 <div class="question-text">
-                    Select the <strong>Center (SHO)</strong> preset (\( a = 0, b = 1, c = -1, d = 0 \)).
-                    What are the eigenvalues?
+                    Starting from the <strong>Center</strong> preset (\( a = 0, b = 1, c = -1, d = 0 \)),
+                    lower \( d \) to \( -0.6 \). What does the portrait become, and why?
                 </div>
                 <div class="question-options">
                     <label class="option">
                         <input type="radio" name="ls-q1" value="0">
-                        <span>\( \lambda = 1, -1 \) (real, opposite sign)</span>
+                        <span>A stable node &mdash; the eigenvalues become real and negative</span>
                     </label>
                     <label class="option">
                         <input type="radio" name="ls-q1" value="1">
-                        <span>\( \lambda = -1, -1 \) (real, both negative)</span>
+                        <span>A stable spiral &mdash; the trace goes negative while the eigenvalues stay complex</span>
                     </label>
                     <label class="option">
                         <input type="radio" name="ls-q1" value="2">
-                        <span>\( \lambda = \pm i \) (pure imaginary)</span>
+                        <span>It stays a center &mdash; only \( b \) and \( c \) matter</span>
                     </label>
                     <label class="option">
                         <input type="radio" name="ls-q1" value="3">
-                        <span>\( \lambda = 0, 0 \) (both zero)</span>
+                        <span>A saddle &mdash; the determinant flips sign</span>
                     </label>
                 </div>
                 <div class="question-actions">
@@ -162,11 +162,13 @@
                 </div>
                 <div class="question-explanation" style="display:none;">
                     <strong>Explanation:</strong>
-                    For \( A = \begin{pmatrix} 0 & 1 \\ -1 & 0 \end{pmatrix} \):
-                    \( \tau = 0, \Delta = 1 \). The eigenvalue formula gives
-                    \( \lambda = \frac{0 \pm \sqrt{0 - 4}}{2} = \pm i \). Pure imaginary
-                    eigenvalues mean pure oscillation with no growth or decay &mdash; a
-                    <strong>center</strong>.
+                    Lowering \( d \) to \( -0.6 \) shifts the trace: \( \tau = a + d = -0.6 \),
+                    while the determinant stays \( \Delta = ad - bc = 0 - (1)(-1) = 1 \). The
+                    discriminant is \( \tau^2 - 4\Delta = 0.36 - 4 = -3.64 < 0 \), so the
+                    eigenvalues remain complex &mdash; still oscillating. But their real part is
+                    now \( \tau/2 = -0.3 < 0 \), so the oscillation decays: the center unwinds into
+                    a <strong>stable spiral</strong>. Verify on the map that the point has slid off
+                    the \( \tau = 0 \) axis into the stable-spiral region just left of it.
                 </div>
             </div>
         </div>
@@ -209,30 +211,29 @@
         </div>
 
         <div class="tab-content">
-            <div class="question-container" data-type="fill" data-answer="spiral">
+            <div class="question-container" data-type="fill" data-answer="real">
                 <div class="question-text">
-                    Select the <strong>Stable Spiral</strong> preset. The eigenvalues have a
-                    nonzero imaginary part, which causes oscillation, and a negative real part,
-                    which causes decay. This combination produces a
+                    A spiral turns into a center exactly when the
                     <select class="fill-blank-select">
                         <option value=""></option>
-                        <option value="center">center</option>
-                        <option value="node">node</option>
-                        <option value="spiral">spiral</option>
-                        <option value="saddle">saddle</option>
+                        <option value="real">real</option>
+                        <option value="imaginary">imaginary</option>
                     </select>
-                    in the phase portrait.
+                    part of the eigenvalues goes to zero. (Nudge the <strong>Stable Spiral</strong>
+                    preset toward the \( \tau = 0 \) axis and watch it happen.)
                 </div>
                 <div class="question-actions">
                     <button class="btn-verify">Verify</button>
                 </div>
                 <div class="question-explanation" style="display:none;">
                     <strong>Explanation:</strong>
-                    Complex eigenvalues \( \lambda = \sigma \pm i\omega \) produce oscillation
-                    (from \( \omega \)) with exponential envelope (from \( \sigma \)).
-                    When \( \sigma < 0 \), the envelope decays &mdash; giving a
-                    <strong>spiral</strong> that winds inward. When \( \sigma = 0 \), you get
-                    a center; when \( \sigma > 0 \), an outward spiral.
+                    Write the complex eigenvalues as \( \lambda = \sigma \pm i\omega \). The
+                    <strong>real</strong> part \( \sigma \) is the growth-or-decay rate; the
+                    imaginary part \( \omega \) sets the rotation frequency. A spiral has
+                    \( \sigma \neq 0 \), so it winds in or out as it turns. Send \( \sigma \to 0 \)
+                    and the envelope flattens, leaving \( \lambda = \pm i\omega \) &mdash; pure
+                    rotation, a center. Killing the imaginary part instead would stop the turning
+                    altogether and give a node, not a center.
                 </div>
             </div>
         </div>

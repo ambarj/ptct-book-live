@@ -196,28 +196,42 @@
         </div>
 
         <div class="tab-content">
-            <div class="question-container" data-type="fill" data-answer="hyperbolic">
+            <div class="question-container" data-type="mcq" data-answer="2">
                 <div class="question-text">
-                    A fixed point where all eigenvalues have nonzero real part is called
-                    <select class="fill-blank-select">
-                        <option value=""></option>
-                        <option value="hyperbolic">hyperbolic</option>
-                        <option value="elliptic">elliptic</option>
-                        <option value="parabolic">parabolic</option>
-                        <option value="degenerate">degenerate</option>
-                    </select>.
-                    At such points, linearization is guaranteed to give the correct
-                    qualitative behavior.
+                    Which eigenvalue pair belongs to a fixed point whose linearization you
+                    should <strong>NOT</strong> trust?
+                </div>
+                <div class="question-options">
+                    <label class="option">
+                        <input type="radio" name="sp-q3" value="0">
+                        <span>\( (\lambda_1, \lambda_2) = (-1, -2) \)</span>
+                    </label>
+                    <label class="option">
+                        <input type="radio" name="sp-q3" value="1">
+                        <span>\( (\lambda_1, \lambda_2) = (2, -1) \)</span>
+                    </label>
+                    <label class="option">
+                        <input type="radio" name="sp-q3" value="2">
+                        <span>\( \lambda = \pm 3i \)</span>
+                    </label>
+                    <label class="option">
+                        <input type="radio" name="sp-q3" value="3">
+                        <span>\( \lambda = -0.5 \pm 2i \)</span>
+                    </label>
                 </div>
                 <div class="question-actions">
                     <button class="btn-verify">Verify</button>
                 </div>
                 <div class="question-explanation" style="display:none;">
                     <strong>Explanation:</strong>
-                    <strong>Hyperbolic</strong> fixed points have \( \text{Re}(\lambda_i) \neq 0 \)
-                    for all eigenvalues. The Hartman-Grobman theorem says the nonlinear flow
-                    near a hyperbolic FP is topologically equivalent to the linear flow.
-                    Nodes, spirals, and saddles are hyperbolic. Centers are not.
+                    Linearization is trustworthy at <strong>hyperbolic</strong> fixed points &mdash;
+                    those where every eigenvalue has nonzero real part (Hartman&ndash;Grobman).
+                    The pairs \( (-1, -2) \) [stable node], \( (2, -1) \) [saddle], and
+                    \( -0.5 \pm 2i \) [stable spiral] all have nonzero real parts, so their
+                    linearizations are reliable. But \( \lambda = \pm 3i \) is
+                    <strong>pure imaginary</strong> &mdash; a non-hyperbolic center, where nonlinear
+                    terms can quietly turn the closed loops into an inward or outward spiral.
+                    That is the one you cannot trust.
                 </div>
             </div>
         </div>
@@ -232,9 +246,10 @@
 
     <p>
         The &tau;-&Delta; plane has a <strong>trust boundary</strong>: the \( \tau = 0 \)
-        axis (where centers live). Move a system across this boundary by adding
-        damping, and watch linearization go from unreliable to reliable. The
-        &ldquo;safe zones&rdquo; are everywhere except the axes.
+        axis where \( \Delta > 0 \) (centers) and the \( \Delta = 0 \) axis. Move a
+        system across this boundary by adding damping, and watch linearization go from
+        unreliable to reliable. The &ldquo;safe zones&rdquo; are everywhere else &mdash;
+        note that \( \tau = 0 \) with \( \Delta < 0 \) is still a saddle, hyperbolic and safe.
     </p>
 
     <div class="dual-panel">

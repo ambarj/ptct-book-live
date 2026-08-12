@@ -175,10 +175,10 @@
             </div>
         </div>
         <div class="tab-content">
-            <div class="question-container" data-type="fill" data-answer="1[0.95,1.05]|-0.5[-0.55,-0.45]">
-                <div class="question-text">For Kepler with \( k = 1, \ell = 1, \mu = 1 \): the circular-orbit radius is \( \rho_{\text{circ}} = \ell^2/(\mu k) = \) <input type="text" class="fill-blank" style="width: 60px"> and the minimum energy is \( E_{\text{min}} = U_{\text{eff}}(\rho_{\text{circ}}) = -\mu k^2/(2\ell^2) = \) <input type="text" class="fill-blank" style="width: 60px">. (Verify with the explorer's stats bar after clicking "E = E_min".)</div>
+            <div class="question-container" data-type="fill" data-answer="1.41[1.35,1.5]|-0.25[-0.27,-0.23]">
+                <div class="question-text">For Kepler with \( k = 1, \mu = 1 \): find the \( \ell \) that puts the circular orbit at \( \rho_{\text{circ}} = 2 \) — slide \( \ell \) until the diamond sits at \( \rho = 2 \). \( \ell = \) <input type="text" class="fill-blank" style="width: 60px">. What is \( E_{\text{min}} \) there? <input type="text" class="fill-blank" style="width: 60px">.</div>
                 <div class="question-actions"><button class="btn-verify">Verify</button></div>
-                <div class="question-explanation" style="display:none;"><strong>Explanation:</strong> Set \( dU_{\text{eff}}/d\rho = k/\rho^2 - \ell^2/(\mu\rho^3) = 0 \) ⇒ \( \rho_{\text{circ}} = \ell^2/(\mu k) = 1 \). Plug back into \( U_{\text{eff}} = -k/\rho + \ell^2/(2\mu\rho^2) \) at \( \rho = 1 \): \( U_{\text{eff}}(1) = -1 + 0.5 = -0.5 \). So \( E_{\text{min}} = -1/2 \). General formula: \( E_{\text{min}} = -\mu k^2/(2\ell^2) \).</div>
+                <div class="question-explanation" style="display:none;"><strong>Explanation:</strong> Circular radius obeys \( \rho_{\text{circ}} = \ell^2/(\mu k) = \ell^2 \), so \( \rho_{\text{circ}} = 2 \) needs \( \ell = \sqrt{2} \approx 1.41 \). The well then bottoms out at \( E_{\text{min}} = -\mu k^2/(2\ell^2) = -1/(2\cdot 2) = -0.25 \). Notice the pattern: pushing the circular orbit outward (larger \( \rho_{\text{circ}} \)) requires more angular momentum but leaves it <em>less</em> tightly bound — the well gets shallower as \( \ell \) grows. Slide \( \ell \) and watch the diamond climb the \( U_{\text{eff}} \) curve toward zero.</div>
             </div>
         </div>
         <div class="tab-content">

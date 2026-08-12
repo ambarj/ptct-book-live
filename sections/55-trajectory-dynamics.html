@@ -470,26 +470,36 @@
         </div>
 
         <div class="tab-content">
-            <div class="question-container" data-type="fill" data-answer="never">
+            <div class="question-container" data-type="mcq" data-answer="1">
                 <div class="question-text">
-                    The uniqueness theorem guarantees that two distinct trajectories can
-                    <select class="fill-blank-select">
-                        <option value=""></option>
-                        <option value="sometimes">sometimes cross</option>
-                        <option value="never">never cross</option>
-                        <option value="always">always cross eventually</option>
-                    </select>
-                    in an autonomous system.
+                    In the <strong>Center</strong> system, a trajectory starts <em>inside</em> one
+                    of the closed orbits. Can it ever get outside that orbit?
+                </div>
+                <div class="question-options">
+                    <label class="option">
+                        <input type="radio" name="td-q8" value="0">
+                        <span>Yes, if it moves fast enough</span>
+                    </label>
+                    <label class="option">
+                        <input type="radio" name="td-q8" value="1">
+                        <span>No &mdash; it would have to cross the closed orbit, violating uniqueness</span>
+                    </label>
+                    <label class="option">
+                        <input type="radio" name="td-q8" value="2">
+                        <span>Only if the orbit is large enough</span>
+                    </label>
                 </div>
                 <div class="question-actions">
                     <button class="btn-verify">Verify</button>
                 </div>
                 <div class="question-explanation" style="display:none;">
                     <strong>Explanation:</strong>
-                    If two trajectories crossed at a point \( P \), then \( P \) would be
-                    an initial condition with two different futures &mdash; violating uniqueness.
-                    Therefore trajectories can <strong>never cross</strong>. Watch the cloud: no
-                    matter how much it stretches, the points maintain their relative ordering.
+                    Each closed orbit in a center is itself a trajectory. To escape, the inside
+                    trajectory would have to touch or cross that orbit &mdash; but two distinct
+                    trajectories can never share a point without giving one initial condition two
+                    different futures, violating uniqueness. So a trajectory trapped inside a closed
+                    orbit stays trapped forever. Watch the cloud: points that begin inside a loop
+                    keep circling within it and never leak out.
                 </div>
             </div>
         </div>
@@ -511,7 +521,7 @@
                     </label>
                     <label class="option">
                         <input type="radio" name="td-q9" value="2">
-                        <span>It rotates and shears but returns to its original shape periodically</span>
+                        <span>It rotates rigidly and returns to its original position after one period</span>
                     </label>
                     <label class="option">
                         <input type="radio" name="td-q9" value="3">

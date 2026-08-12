@@ -301,20 +301,23 @@
         </div>
 
         <div class="tab-content">
-            <div class="question-container" data-type="fill" data-answer="200[190,210]">
+            <div class="question-container" data-type="fill" data-answer="0.079[0.07,0.09]">
                 <div class="question-text">
-                    If you want to simulate t = 10 s with step size h = 0.05,
-                    how many Euler steps do you need?
-                    N = t / h = 10 / 0.05 = <input type="text" class="fill-blank" placeholder="?">
+                    A rule of thumb says you need at least 40 Euler steps per
+                    oscillation period.  For our &omega;<sub>0</sub> = 2 rad/s oscillator,
+                    what is the largest step size h you should use?
+                    h = <input type="text" class="fill-blank" placeholder="?"> s
                 </div>
                 <div class="question-actions"><button class="btn-verify">Verify</button></div>
                 <div class="question-explanation" style="display:none;">
                     <strong>Explanation:</strong>
-                    \( N = t_{\text{max}} / h = 10 / 0.05 = 200 \) steps.  That&rsquo;s
-                    200 evaluations of the derivative.  Compare with h = 1.0: only 10 steps
-                    but much worse accuracy.  This is the fundamental trade-off: accuracy
-                    costs computation.  We&rsquo;ll see in the next section how smarter
-                    methods (Runge-Kutta) get much better accuracy per step.
+                    The period is \( T = 2\pi/\omega_0 = 2\pi/2 = \pi \approx 3.14 \) s.
+                    Forty steps per period means \( h = T/40 = \pi/40 \approx 0.079 \) s.
+                    Try dialing h to about 0.08 in the explorer and you&rsquo;ll see the
+                    orbit hold together reasonably well over a few periods, while h = 0.3
+                    (only ~10 steps per period) visibly spirals outward.  The insight:
+                    &ldquo;small enough h&rdquo; is not an absolute number &mdash; it&rsquo;s
+                    always measured relative to the fastest timescale in your problem.
                 </div>
             </div>
         </div>
@@ -427,22 +430,23 @@
         </div>
 
         <div class="tab-content">
-            <div class="question-container" data-type="fill" data-answer="1[0.95,1.05]">
+            <div class="question-container" data-type="fill" data-answer="0.01[0.008,0.012]">
                 <div class="question-text">
-                    On the log-log error vs h plot, the slope of the data points
-                    should be approximately
-                    <input type="text" class="fill-blank" placeholder="?">
-                    (A slope of 1 means first-order; a slope of 2 means second-order.)
+                    Suppose you switch to a second-order method (log-log slope 2).
+                    If its error at h = 0.4 is 0.16, predict its error at h = 0.1.
+                    error &approx; <input type="text" class="fill-blank" placeholder="?">
                 </div>
                 <div class="question-actions"><button class="btn-verify">Verify</button></div>
                 <div class="question-explanation" style="display:none;">
                     <strong>Explanation:</strong>
-                    On a log-log plot, if the error is proportional to h<sup>p</sup>,
-                    the data forms a line with slope p.  For Euler, p = 1 (first-order),
-                    so the data follows the dashed reference line with slope 1.
-                    This means that to cut the error in half, you must also halve h &mdash;
-                    doubling the number of steps.  That&rsquo;s a steep price for modest
-                    accuracy gains.
+                    A slope of 2 on the log-log plot means error &prop; h<sup>2</sup>.
+                    Shrinking h from 0.4 to 0.1 is a factor of 4, so the error shrinks
+                    by \( 4^2 = 16 \): from 0.16 down to 0.16/16 = 0.01.  Compare
+                    Euler&rsquo;s slope-1 line in the explorer: the same factor-of-4
+                    refinement only buys a factor of 4 in accuracy.  This is why the
+                    slope of the log-log line &mdash; the order of the method &mdash;
+                    matters far more than any single error value: it tells you what
+                    every future refinement will cost.
                 </div>
             </div>
         </div>

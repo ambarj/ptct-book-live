@@ -101,10 +101,10 @@
             </div>
         </div>
         <div class="tab-content">
-            <div class="question-container" data-type="fill" data-answer="2[1.8,2.2]">
-                <div class="question-text">In 2D with D = 1, t = 1: the RMS distance is \( \sqrt{2 \times 2 \times 1 \times 1} = \sqrt{4} = \) <input type="text" class="fill-blank" style="width: 50px">.</div>
+            <div class="question-container" data-type="fill" data-answer="2.25[2.0,2.5]">
+                <div class="question-text">In 2D with D = 1, at what time does the RMS distance reach 3? <input type="text" class="fill-blank" style="width: 50px">.</div>
                 <div class="question-actions"><button class="btn-verify">Verify</button></div>
-                <div class="question-explanation" style="display:none;"><strong>Explanation:</strong> \( \sqrt{\langle r^2 \rangle} = \sqrt{2dDt} = \sqrt{2 \times 2 \times 1 \times 1} = \sqrt{4} = 2 \). Compare with 1D: \( \sqrt{2 \times 1} \approx 1.41 \). Higher dimensions spread <em>farther</em> because there are more directions to explore.</div>
+                <div class="question-explanation" style="display:none;"><strong>Explanation:</strong> In 2D, \( \sqrt{\langle r^2 \rangle} = \sqrt{2dDt} = \sqrt{4t} \). Setting \( \sqrt{4t} = 3 \) gives \( 4t = 9 \), so \( t = 2.25 \). Because the radius grows only as \( \sqrt{t} \), reaching RMS 3 takes more than twice the time it took to reach RMS 2 (t = 1).</div>
             </div>
         </div>
         <div class="tab-content">
@@ -154,10 +154,10 @@
             <button class="tab-button">Question 6</button>
         </div>
         <div class="tab-content active">
-            <div class="question-container" data-type="fill" data-answer="6[5.5,6.5]">
-                <div class="question-text">In 3D with D = 1, t = 1: \( \langle r^2 \rangle = 2dDt = 2 \times 3 \times 1 \times 1 = \) <input type="text" class="fill-blank" style="width: 50px">.</div>
+            <div class="question-container" data-type="fill" data-answer="3[2.8,3.2]">
+                <div class="question-text">At what time does the 1D RMS equal the 3D RMS at t = 1 (i.e. when does \( 2Dt = 6 \), with D = 1)? <input type="text" class="fill-blank" style="width: 50px">.</div>
                 <div class="question-actions"><button class="btn-verify">Verify</button></div>
-                <div class="question-explanation" style="display:none;"><strong>Explanation:</strong> \( \langle r^2 \rangle = 2dDt = 6 \) in 3D. RMS = \( \sqrt{6} \approx 2.45 \). Each dimension contributes independently to the mean-squared displacement.</div>
+                <div class="question-explanation" style="display:none;"><strong>Explanation:</strong> In 3D at t = 1, \( \langle r^2 \rangle = 2dDt = 6 \). In 1D, \( \langle x^2 \rangle = 2Dt = 2t \). Setting \( 2t = 6 \) gives \( t = 3 \): a 1D walker needs three times as long to spread as far as a 3D walker does in one unit of time, because each extra dimension adds its own independent share of the mean-squared displacement.</div>
             </div>
         </div>
         <div class="tab-content">
@@ -234,10 +234,10 @@
             </div>
         </div>
         <div class="tab-content">
-            <div class="question-container" data-type="fill" data-answer="14[12,16]">
-                <div class="question-text">After 200 steps in 2D, the RMS distance is \( \sqrt{N} = \sqrt{200} \approx \) <input type="text" class="fill-blank" style="width: 50px"> (with step size a = 1, each step along one of 4 directions: \( \langle r^2 \rangle = N a^2 \) regardless of dimension).</div>
+            <div class="question-container" data-type="fill" data-answer="400[350,450]">
+                <div class="question-text">How many steps until the 2D cloud&rsquo;s RMS radius reaches ~20? Verify by launching. <input type="text" class="fill-blank" style="width: 50px">.</div>
                 <div class="question-actions"><button class="btn-verify">Verify</button></div>
-                <div class="question-explanation" style="display:none;"><strong>Explanation:</strong> For lattice walks with step size 1: each step adds 1 to one coordinate. After N steps, \( \langle x^2 \rangle = \langle y^2 \rangle = N/2 \), so \( \langle r^2 \rangle = N \) and RMS = \( \sqrt{200} \approx 14.1 \). For the 4-direction walk, RMS ≈ 14. The answer depends on the exact walk model.</div>
+                <div class="question-explanation" style="display:none;"><strong>Explanation:</strong> For the lattice walk \( \langle r^2 \rangle = N a^2 \) with a = 1, so RMS = \( \sqrt{N} \). Reaching RMS 20 needs \( N = 20^2 = 400 \) steps. Launch a run of 400 steps and the cloud&rsquo;s RMS radius readout lands near 20 &mdash; the same \( \sqrt{N} \) law as 1D, just measured radially.</div>
             </div>
         </div>
         <div class="tab-content">

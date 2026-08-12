@@ -191,28 +191,35 @@
         </div>
 
         <div class="tab-content">
-            <div class="question-container" data-type="fill" data-answer="f(x)">
+            <div class="question-container" data-type="mcq" data-answer="0">
                 <div class="question-text">
-                    The ideal proposal distribution \( p(x) \) should be proportional to
-                    <select class="fill-blank-select">
-                        <option value=""></option>
-                        <option value="1">1 (uniform)</option>
-                        <option value="f(x)">|f(x)| (the integrand)</option>
-                        <option value="1/f(x)">1/|f(x)| (inverse of integrand)</option>
-                        <option value="x">x (linear)</option>
-                    </select>
-                    to minimize variance.
+                    Why can&rsquo;t you use the optimal \( p(x) \propto |f(x)| \) in practice?
+                </div>
+                <div class="question-options">
+                    <label class="option">
+                        <input type="radio" name="is-q3" value="0">
+                        <span>Normalizing it requires knowing \( \int|f| \) &mdash; the very integral you&rsquo;re computing</span>
+                    </label>
+                    <label class="option">
+                        <input type="radio" name="is-q3" value="1">
+                        <span>It would make the variance infinite</span>
+                    </label>
+                    <label class="option">
+                        <input type="radio" name="is-q3" value="2">
+                        <span>Random numbers can&rsquo;t follow an arbitrary \( p(x) \)</span>
+                    </label>
                 </div>
                 <div class="question-actions">
                     <button class="btn-verify">Verify</button>
                 </div>
                 <div class="question-explanation" style="display:none;">
                     <strong>Explanation:</strong>
-                    When \( p(x) \propto |f(x)| \), the ratio \( f(x)/p(x) \) is a constant,
-                    so every sample gives exactly the same value &mdash; <strong>zero variance</strong>!
-                    In practice you can&rsquo;t achieve this perfectly (you&rsquo;d need to know
-                    the integral already), but matching the shape of \( p(x) \) to \( |f(x)| \)
-                    gets you close.
+                    To sample from \( p(x) \propto |f(x)| \) you must first <em>normalize</em> it,
+                    which means dividing by \( \int|f| \) &mdash; and that integral is exactly the
+                    quantity you set out to compute. It&rsquo;s a chicken-and-egg trap: the perfect
+                    proposal already contains the answer. So in practice you pick a proposal whose
+                    <em>shape</em> merely resembles \( |f(x)| \) (a Gaussian near the peak, say),
+                    which slashes the variance without needing the answer up front.
                 </div>
             </div>
         </div>
@@ -349,27 +356,23 @@
         </div>
 
         <div class="tab-content">
-            <div class="question-container" data-type="fill" data-answer="constant">
+            <div class="question-container" data-type="fill" data-answer="0.22[0.18,0.28]">
                 <div class="question-text">
-                    When p(x) ∝ |f(x)|, the ratio f(x)/p(x) becomes a
-                    <select class="fill-blank-select">
-                        <option value=""></option>
-                        <option value="constant">constant</option>
-                        <option value="random variable">random variable</option>
-                        <option value="zero">zero</option>
-                        <option value="infinity">infinity</option>
-                    </select>,
-                    giving zero variance.
+                    With &mu; = 0.7 fixed, sweep &sigma; and find the value minimizing the variance
+                    readout: &sigma; &asymp;
+                    <input type="text" class="fill-blank" style="width: 70px">.
                 </div>
                 <div class="question-actions">
                     <button class="btn-verify">Verify</button>
                 </div>
                 <div class="question-explanation" style="display:none;">
                     <strong>Explanation:</strong>
-                    If \( p(x) = |f(x)| / \int |f| \), then \( f(x)/p(x) = f(x) \cdot \int|f| / |f(x)| = \text{sign}(f) \cdot \int |f| \),
-                    a <strong>constant</strong> (for non-negative f, just the integral itself).
-                    Every sample gives the same value, so the variance is exactly zero. This is
-                    the theoretical optimum — but requires knowing the integral to construct p(x).
+                    The variance bottoms out when the proposal Gaussian mirrors the integrand&rsquo;s
+                    shape &mdash; here a width of \( \sigma \approx 0.22 \), matching the peak near
+                    \( x = 0.7 \). Too narrow and rare samples in the tails get huge weights
+                    \( f/p \); too wide and you drift back toward wasteful uniform sampling. The
+                    sweet spot is where \( p(x) \) tracks \( |f(x)| \) most closely, making the
+                    ratio \( f/p \) nearly constant.
                 </div>
             </div>
         </div>
@@ -438,8 +441,8 @@
         <div class="tab-content active">
             <div class="question-container" data-type="mcq" data-answer="0">
                 <div class="question-text">
-                    Set &mu; = 0.7, &sigma; = 0.22 (matching the integrand). What happens to
-                    the variance compared to uniform sampling?
+                    Set &mu; = 0.7 and tune &sigma; so the proposal Gaussian hugs the integrand&rsquo;s
+                    peak. What happens to the variance compared to uniform sampling?
                 </div>
                 <div class="question-options">
                     <label class="option">

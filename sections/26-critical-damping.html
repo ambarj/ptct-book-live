@@ -128,28 +128,12 @@
 
         <!-- Q1: MCQ -->
         <div class="tab-content active">
-            <div class="question-container" data-type="mcq" data-answer="2">
+            <div class="question-container" data-type="fill" data-answer="30[28,32]">
                 <div class="question-text">
-                    Set \( k = 20 \) N/m and try \( b = 10, 20, 40 \) Ns/m.
-                    Which value produces the "Smooth close" verdict?
-                </div>
-                <div class="question-options">
-                    <label class="option">
-                        <input type="radio" name="cd-q1" value="0">
-                        <span>\( b = 10 \) (the door bounces)</span>
-                    </label>
-                    <label class="option">
-                        <input type="radio" name="cd-q1" value="1">
-                        <span>\( b = 40 \) (sluggish but no bounce)</span>
-                    </label>
-                    <label class="option">
-                        <input type="radio" name="cd-q1" value="2">
-                        <span>\( b = 20 \) (matches \( b_{\text{crit}} = 2\sqrt{km} \))</span>
-                    </label>
-                    <label class="option">
-                        <input type="radio" name="cd-q1" value="3">
-                        <span>All three work equally well</span>
-                    </label>
+                    Set \( k = 45 \) N/m (\( m = 5 \) kg).  Find the \( b \) that
+                    earns the "Smooth close" verdict.
+                    <br><br>
+                    b = <input type="text" class="fill-blank" placeholder="Ns/m"> Ns/m
                 </div>
                 <div class="question-actions">
                     <button class="btn-verify">Verify</button>
@@ -157,11 +141,13 @@
                 <div class="question-explanation" style="display: none;">
                     <div class="question-explanation-title">Explanation</div>
                     <div class="question-explanation-text">
-                        With \( k = 20 \) and \( m = 5 \), the critical damping
-                        coefficient is \( b_{\text{crit}} = 2\sqrt{20 \times 5} = 20 \).
-                        At \( b = 10 \), \( \zeta = 0.5 \) (underdamped, bounces).
-                        At \( b = 40 \), \( \zeta = 2.0 \) (overdamped, sluggish).
-                        At \( b = 20 \), \( \zeta = 1.0 \) (critical, smooth).
+                        "Smooth close" means critical damping:
+                        \( b_{\text{crit}} = 2\sqrt{km} = 2\sqrt{45 \times 5} = 2\sqrt{225} = 30 \) Ns/m.
+                        Below 30 the door is underdamped (\( \zeta &lt; 1 \)) and bounces;
+                        above 30 it's overdamped and sluggish.  Only at \( b = 30 \) does
+                        \( \zeta = 1.0 \) &mdash; the fastest possible close with no
+                        overshoot.  Notice the design pattern: pick the spring first, then
+                        compute the damper from it.
                     </div>
                 </div>
             </div>
@@ -169,12 +155,12 @@
 
         <!-- Q2: Fill -->
         <div class="tab-content">
-            <div class="question-container" data-type="fill" data-answer="40[38,42]">
+            <div class="question-container" data-type="fill" data-answer="80[75,85]">
                 <div class="question-text">
-                    If you increase the spring to \( k = 80 \) N/m (four times
-                    stiffer), what is the new critical damping coefficient \( b_{\text{crit}} \)?
+                    Your damper maxes out at \( b = 40 \) Ns/m.  What is the stiffest
+                    spring \( k \) you can still critically damp (\( m = 5 \) kg)?
                     <br><br>
-                    b<sub>crit</sub> = 2&radic;(km) = <input type="text" class="fill-blank" placeholder="Ns/m"> Ns/m
+                    k = <input type="text" class="fill-blank" placeholder="N/m"> N/m
                 </div>
                 <div class="question-actions">
                     <button class="btn-verify">Verify</button>
@@ -182,10 +168,14 @@
                 <div class="question-explanation" style="display: none;">
                     <div class="question-explanation-title">Explanation</div>
                     <div class="question-explanation-text">
-                        \( b_{\text{crit}} = 2\sqrt{80 \times 5} = 2\sqrt{400} = 2 \times 20 = 40 \)
-                        Ns/m.  Quadrupling the spring stiffness (×4) only doubles the
-                        critical damping (×2) because of the square root.  Verify by
-                        setting \( k = 80, b = 40 \) &mdash; you should see \( \zeta = 1.0 \).
+                        Invert \( b_{\text{crit}} = 2\sqrt{km} \):
+                        \( k = b^2/(4m) = 1600/20 = 80 \) N/m.  Verify by setting
+                        \( k = 80, b = 40 \) &mdash; you should see \( \zeta = 1.0 \).
+                        The square root works against you here: doubling your damper
+                        budget lets you handle a spring <em>four</em> times stiffer, but
+                        equivalently, every bit of extra stiffness demands only
+                        \( \sqrt{k} \) more damping &mdash; stiffer springs are easier to
+                        tame than you might guess.
                     </div>
                 </div>
             </div>
@@ -329,12 +319,12 @@
 
         <!-- Q4: Fill -->
         <div class="tab-content active">
-            <div class="question-container" data-type="fill" data-answer="4899[4700,5100]">
+            <div class="question-container" data-type="fill" data-answer="7500[7000,8000]">
                 <div class="question-text">
-                    With \( m = 300 \) kg and \( k = 20000 \) N/m, what is the
-                    critical damping coefficient \( b_{\text{crit}} = 2\sqrt{km} \)?
+                    Your shocks max out at \( b = 3000 \) Ns/m.  With \( m = 300 \) kg,
+                    what is the largest \( k \) you can critically damp?
                     <br><br>
-                    b<sub>crit</sub> = <input type="text" class="fill-blank" placeholder="Ns/m"> Ns/m
+                    k = <input type="text" class="fill-blank" placeholder="N/m"> N/m
                 </div>
                 <div class="question-actions">
                     <button class="btn-verify">Verify</button>
@@ -342,10 +332,14 @@
                 <div class="question-explanation" style="display: none;">
                     <div class="question-explanation-title">Explanation</div>
                     <div class="question-explanation-text">
-                        \( b_{\text{crit}} = 2\sqrt{20000 \times 300} = 2\sqrt{6{,}000{,}000} \approx 2 \times 2449 = 4899 \)
-                        Ns/m.  Set the damper to this value and verify that the star
-                        marker on the overshoot plot sits exactly at \( \zeta = 1 \)
-                        with 0% overshoot.
+                        Invert \( b_{\text{crit}} = 2\sqrt{km} \):
+                        \( k = b^2/(4m) = 3000^2/1200 = 7500 \) N/m.  Set
+                        \( k = 7500, b = 3000 \) and verify that the star marker on the
+                        overshoot plot sits exactly at \( \zeta = 1 \) with 0% overshoot.
+                        Any stiffer spring would push \( \zeta \) below 1 and the car
+                        would bounce &mdash; real suspension design is exactly this
+                        budget problem: the damper you can afford caps the spring you
+                        can use.
                     </div>
                 </div>
             </div>

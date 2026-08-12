@@ -146,25 +146,27 @@
         </div>
 
         <div class="tab-content">
-            <div class="question-container" data-type="fill" data-answer="non-hyperbolic">
+            <div class="question-container" data-type="fill" data-answer="no">
                 <div class="question-text">
-                    A fixed point with pure imaginary eigenvalues is called
+                    The Jacobian at a fixed point has eigenvalues \( \lambda = 0 \) and
+                    \( \lambda = -2 \). Can linearization decide its stability?
                     <select class="fill-blank-select">
                         <option value=""></option>
-                        <option value="hyperbolic">hyperbolic</option>
-                        <option value="non-hyperbolic">non-hyperbolic</option>
-                        <option value="asymptotic">asymptotic</option>
+                        <option value="yes">yes</option>
+                        <option value="no">no</option>
                     </select>
-                    because Re(&lambda;) = 0.
                 </div>
                 <div class="question-actions">
                     <button class="btn-verify">Verify</button>
                 </div>
                 <div class="question-explanation" style="display:none;">
                     <strong>Explanation:</strong>
-                    <strong>Non-hyperbolic</strong>: at least one eigenvalue has zero real part.
-                    For centers, both eigenvalues are pure imaginary. The Hartman-Grobman theorem
-                    does not apply, so the linearized portrait may not match the true nonlinear one.
+                    <strong>No.</strong> One eigenvalue is exactly zero, so \( \text{Re}(\lambda) = 0 \)
+                    in that direction &mdash; the fixed point is <strong>non-hyperbolic</strong> and
+                    Hartman&ndash;Grobman does not apply. Along the \( \lambda = -2 \) direction
+                    disturbances decay, but along the \( \lambda = 0 \) direction the linear term
+                    gives no push at all: the neglected higher-order terms decide whether that
+                    direction drifts in, out, or sits still. Linearization alone cannot call it.
                 </div>
             </div>
         </div>
@@ -310,20 +312,15 @@
         </div>
 
         <div class="tab-content">
-            <div class="question-container" data-type="fill" data-answer="inward|stable spiral">
+            <div class="question-container" data-type="fill" data-answer="unchanged">
                 <div class="question-text">
-                    Set \( \epsilon = -0.2 \). The trajectories now spiral
+                    Set \( \epsilon = -0.2 \). Increasing \( \omega \) from 1 to 3 makes the
+                    radius shrink
                     <select class="fill-blank-select">
                         <option value=""></option>
-                        <option value="outward">outward</option>
-                        <option value="inward">inward</option>
-                    </select>,
-                    making the origin a
-                    <select class="fill-blank-select">
-                        <option value=""></option>
-                        <option value="stable spiral">stable spiral</option>
-                        <option value="unstable spiral">unstable spiral</option>
-                        <option value="center">center</option>
+                        <option value="faster">faster</option>
+                        <option value="slower">slower</option>
+                        <option value="unchanged">at the same rate</option>
                     </select>.
                 </div>
                 <div class="question-actions">
@@ -331,11 +328,13 @@
                 </div>
                 <div class="question-explanation" style="display:none;">
                     <strong>Explanation:</strong>
-                    With \( \epsilon = -0.2 \), the radial drift is \( \dot{r} \approx -0.2 r^3 < 0 \)
-                    (inward). Trajectories spiral <strong>inward</strong> toward the origin,
-                    making it a <strong>stable spiral</strong>. Negative \( \epsilon \) stabilizes;
-                    positive destabilizes. The sign of the nonlinear coefficient determines the
-                    fate that linearization cannot predict.
+                    In polar form the dynamics split cleanly: \( \dot{r} = \epsilon r^3 \) and
+                    \( \dot{\theta} = \omega \). The radius equation contains no \( \omega \) at
+                    all, so the inward drift rate depends only on \( \epsilon \). Turning up
+                    \( \omega \) merely makes the trajectory <em>circle faster</em> as it shrinks
+                    &mdash; the spiral looks tighter, but the radius decays
+                    <strong>at the same rate</strong>. Angular speed and radial fate are decoupled
+                    here.
                 </div>
             </div>
         </div>
@@ -457,9 +456,11 @@
                 <div class="question-explanation" style="display:none;">
                     <strong>Explanation:</strong>
                     The trust criterion is <strong>hyperbolicity</strong>: all eigenvalues must
-                    have nonzero real part. This excludes only the &tau; = 0 axis (centers) and
-                    the &Delta; = 0 axis (zero eigenvalues). Everywhere else &mdash; nodes, spirals,
-                    saddles &mdash; linearization is guaranteed correct by the Hartman-Grobman theorem.
+                    have nonzero real part. This excludes only the &tau; = 0 axis where
+                    &Delta; &gt; 0 (centers) and the &Delta; = 0 axis (zero eigenvalues).
+                    Everywhere else &mdash; nodes, spirals, saddles, and even &tau; = 0 with
+                    &Delta; &lt; 0 (a saddle) &mdash; linearization is guaranteed correct by the
+                    Hartman-Grobman theorem.
                 </div>
             </div>
         </div>

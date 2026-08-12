@@ -267,21 +267,42 @@
 
         <!-- Q2: Fill -->
         <div class="tab-content">
-            <div class="question-container" data-type="fill" data-answer="linear">
+            <div class="question-container" data-type="mcq" data-answer="2">
                 <div class="question-text">
-                    The property that makes the SHO equation \(\ddot{x} + \omega^2 x = 0\)
-                    solvable by the characteristic equation method is that it is
-                    <input type="text" class="fill-blank" placeholder="?"> in \(x\).
+                    Which ONE term, added to \(\ddot{x} + \omega^2 x = 0\), would make it
+                    unsolvable by your analytical toolkit?
+                </div>
+                <div class="question-options">
+                    <label class="option">
+                        <input type="radio" name="q-nm-2" value="0">
+                        <span>\(+3\dot{x}\)</span>
+                    </label>
+                    <label class="option">
+                        <input type="radio" name="q-nm-2" value="1">
+                        <span>\(+\cos(3t)\)</span>
+                    </label>
+                    <label class="option">
+                        <input type="radio" name="q-nm-2" value="2">
+                        <span>\(+\varepsilon x^3\)</span>
+                    </label>
+                    <label class="option">
+                        <input type="radio" name="q-nm-2" value="3">
+                        <span>\(+5x\)</span>
+                    </label>
                 </div>
                 <div class="question-actions">
                     <button class="btn-verify">Verify</button>
                 </div>
                 <div class="question-explanation" style="display:none;">
                     <strong>Explanation:</strong>
-                    The equation is <em>linear</em> in \(x\): the unknown and its derivatives
-                    appear only to the first power, never inside nonlinear functions.
-                    This linearity is exactly what lets us use the characteristic equation
-                    \(r^2 + \omega^2 = 0\) to find solutions.
+                    Only \(+\varepsilon x^3\) breaks linearity: the unknown \(x\) now
+                    appears to the third power, and no characteristic equation can
+                    handle that.  The other three all keep the equation linear &mdash;
+                    and you solved every one of them in Chapter 3: \(+3\dot{x}\) is
+                    damping, \(+\cos(3t)\) is a driving force, and \(+5x\) just shifts
+                    the frequency to \(\sqrt{\omega^2 + 5}\).  The cubic term turns the
+                    SHO into the Duffing oscillator, a classic example of an equation
+                    that forces you to go numerical.
                 </div>
             </div>
         </div>

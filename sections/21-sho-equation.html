@@ -151,9 +151,9 @@
 
             <!-- Q2: Fill -->
             <div class="tab-content">
-                <div class="question-container" data-type="fill" data-answer="4[3.5,4.5]">
+                <div class="question-container" data-type="fill" data-answer="3[2.9,3.1]">
                     <div class="question-text">
-                        Set \( A = 1.0 \) and \( \omega = 2.0 \). The maximum acceleration \( a_{\text{max}} = A\omega^2 \) equals: <input type="text" class="fill-blank" placeholder="?">
+                        Keeping \( A = 1.0 \), you want the \( a \)-vs-\( x \) line in the right panel to have slope \( -9 \). What \( \omega \) do you need? Set it and check the slope. \( \omega = \) <input type="text" class="fill-blank" placeholder="?">
                     </div>
                     <div class="question-actions">
                         <button class="btn-verify">Verify</button>
@@ -161,7 +161,7 @@
                     <div class="question-explanation" style="display:none;">
                         <div class="question-explanation-title">Explanation</div>
                         <div class="question-explanation-text">
-                            \( a_{\text{max}} = A\omega^2 = 1.0 \times 2.0^2 = 4.0 \). Notice that doubling \( \omega \) quadruples the maximum acceleration — frequency has a much bigger effect on acceleration than amplitude does.
+                            The defining equation \( a = -\omega^2 x \) says the \( a \)-vs-\( x \) line has slope \( -\omega^2 \). A slope of \( -9 \) needs \( \omega^2 = 9 \), so \( \omega = 3.0 \) — well within the slider's 0.5–5.0 range. Notice the slope grows with the <em>square</em> of \( \omega \): small frequency changes tilt the line dramatically.
                         </div>
                     </div>
                 </div>
@@ -296,9 +296,9 @@
 
             <!-- Q4: Fill -->
             <div class="tab-content active">
-                <div class="question-container" data-type="fill" data-answer="2.24[2.0,2.5]">
+                <div class="question-container" data-type="fill" data-answer="4[3.8,4.2]">
                     <div class="question-text">
-                        Set \( \omega = 2.0 \), \( x_0 = 2.0 \), and \( v_0 = 2.0 \). Read the computed amplitude \( A \) from the stats bar. \( A \approx \) <input type="text" class="fill-blank" placeholder="?">
+                        With \( \omega = 2.0 \) and \( x_0 = 1.5 \), find the \( v_0 \) that makes the amplitude exactly \( A = 2.50 \). Predict from \( A = \sqrt{x_0^2 + v_0^2/\omega^2} \), then verify with the stats bar. \( v_0 = \) <input type="text" class="fill-blank" placeholder="?">
                     </div>
                     <div class="question-actions">
                         <button class="btn-verify">Verify</button>
@@ -306,7 +306,7 @@
                     <div class="question-explanation" style="display:none;">
                         <div class="question-explanation-title">Explanation</div>
                         <div class="question-explanation-text">
-                            \( A = \sqrt{x_0^2 + (v_0/\omega)^2} = \sqrt{4 + (2/2)^2} = \sqrt{4 + 1} = \sqrt{5} \approx 2.24 \). The initial velocity adds to the amplitude because it represents kinetic energy that converts to additional displacement.
+                            Squaring the amplitude formula: \( A^2 = x_0^2 + v_0^2/\omega^2 \), so \( 6.25 = 2.25 + v_0^2/4 \), giving \( v_0^2 = 16 \) and \( v_0 = 4.0 \). Set it and the stats bar now <em>confirms</em> your algebra instead of answering for you. Physically, the extra initial velocity is kinetic energy that converts to additional displacement beyond \( x_0 \).
                         </div>
                     </div>
                 </div>
@@ -496,9 +496,9 @@
 
             <!-- Q8: Fill -->
             <div class="tab-content">
-                <div class="question-container" data-type="fill" data-answer="90[85,95]">
+                <div class="question-container" data-type="fill" data-answer="0.79[0.7,0.9]">
                     <div class="question-text">
-                        Use the Play button and watch the red dot. By how many degrees are the velocity and position peaks separated? (Answer in degrees) <input type="text" class="fill-blank" placeholder="?">°
+                        With \( \omega = 2.0 \), use the plot to measure the time delay between a velocity peak and the NEXT position peak, in seconds. \( \Delta t = \) <input type="text" class="fill-blank" placeholder="?"> s
                     </div>
                     <div class="question-actions">
                         <button class="btn-verify">Verify</button>
@@ -506,7 +506,7 @@
                     <div class="question-explanation" style="display:none;">
                         <div class="question-explanation-title">Explanation</div>
                         <div class="question-explanation-text">
-                            The separation is exactly 90° — and it is velocity that <em>leads</em>: \( v = -A\omega\sin(\omega t + \varphi) = A\omega\cos(\omega t + \varphi + \pi/2) \), a cosine shifted forward by \( \pi/2 \), so v peaks a quarter period <em>before</em> x does. When position peaks, velocity is zero; when velocity peaks, position is crossing zero.
+                            Velocity leads position by 90° of phase — a quarter period. With \( \omega = 2.0 \), the period is \( T = 2\pi/\omega = \pi \approx 3.14 \) s, so a quarter period is \( \pi/4 \approx 0.79 \) s. Converting a phase lead into an actual time delay is the skill here: the same 90° lead is a <em>different</em> number of seconds at every \( \omega \).
                         </div>
                     </div>
                 </div>
@@ -514,26 +514,26 @@
 
             <!-- Q9: MCQ -->
             <div class="tab-content">
-                <div class="question-container" data-type="mcq" data-answer="0">
+                <div class="question-container" data-type="mcq" data-answer="1">
                     <div class="question-text">
-                        Set \( \omega = 4.0 \) and \( A = 1.0 \). The maximum velocity is \( A\omega = 4.0 \) and the maximum acceleration is \( A\omega^2 = 16.0 \). Now set \( \omega = 1.0 \). What are the new maximum velocity and acceleration?
+                        With \( A = 1.0 \) and \( \omega = 4.0 \) you get \( v_{\text{max}} = 4 \) and \( a_{\text{max}} = 16 \). Keeping \( A \) fixed, you adjust \( \omega \) to halve \( v_{\text{max}} \). What happens to \( a_{\text{max}} \)?
                     </div>
                     <div class="question-options">
                         <label class="option">
                             <input type="radio" name="sh-q9" value="0">
-                            <span>\( v_{\text{max}} = 1.0 \), \( a_{\text{max}} = 1.0 \)</span>
+                            <span>It also halves, to 8</span>
                         </label>
                         <label class="option">
                             <input type="radio" name="sh-q9" value="1">
-                            <span>\( v_{\text{max}} = 4.0 \), \( a_{\text{max}} = 4.0 \)</span>
+                            <span>It drops by a factor of 4, to 4</span>
                         </label>
                         <label class="option">
                             <input type="radio" name="sh-q9" value="2">
-                            <span>\( v_{\text{max}} = 1.0 \), \( a_{\text{max}} = 4.0 \)</span>
+                            <span>It is unchanged</span>
                         </label>
                         <label class="option">
                             <input type="radio" name="sh-q9" value="3">
-                            <span>\( v_{\text{max}} = 0.25 \), \( a_{\text{max}} = 0.25 \)</span>
+                            <span>It doubles</span>
                         </label>
                     </div>
                     <div class="question-actions">
@@ -542,7 +542,7 @@
                     <div class="question-explanation" style="display:none;">
                         <div class="question-explanation-title">Explanation</div>
                         <div class="question-explanation-text">
-                            With \( A = 1.0 \) and \( \omega = 1.0 \): \( v_{\text{max}} = A\omega = 1.0 \times 1.0 = 1.0 \) and \( a_{\text{max}} = A\omega^2 = 1.0 \times 1.0 = 1.0 \). Reducing \( \omega \) from 4 to 1 reduced the max velocity by a factor of 4 and the max acceleration by a factor of 16. Frequency has a dramatic effect on how violently something oscillates!
+                            Halving \( v_{\text{max}} = A\omega \) at fixed \( A \) means halving \( \omega \) (from 4 to 2). But \( a_{\text{max}} = A\omega^2 \) is <em>quadratic</em> in \( \omega \), so it drops by a factor of \( 2^2 = 4 \): from 16 down to 4. One slider move, two different scalings — velocity responds linearly to frequency, acceleration quadratically. Try it: set \( \omega = 2.0 \) and watch both readouts.
                         </div>
                     </div>
                 </div>

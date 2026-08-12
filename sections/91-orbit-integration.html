@@ -200,17 +200,17 @@
             <button class="tab-button">Question 3</button>
         </div>
         <div class="tab-content active">
-            <div class="question-container" data-type="fill" data-answer="1[0.95,1.05]">
-                <div class="question-text">For Kepler with \( k = 1 \) and starting at \( r_0 = 1 \), what initial \( v_{y0} \) produces a perfect circular orbit? \( v_{y0} = \sqrt{k/r_0} = \) <input type="text" class="fill-blank" style="width: 50px"> (Click "Circle (v=1.0)" to confirm.)</div>
+            <div class="question-container" data-type="fill" data-answer="0.71[0.68,0.74]">
+                <div class="question-text">Set \( r_0 = 2 \) (with \( k = 1 \)). Predict the \( v_{y0} \) that gives a circular orbit, then launch to confirm. \( v_{y0} = \sqrt{k/r_0} = \) <input type="text" class="fill-blank" style="width: 50px">.</div>
                 <div class="question-actions"><button class="btn-verify">Verify</button></div>
-                <div class="question-explanation" style="display:none;"><strong>Explanation:</strong> Circular-orbit condition: centripetal acceleration \( v^2/r \) equals gravitational acceleration \( k/r^2 \). Solving: \( v_{\text{circ}} = \sqrt{k/r} \). With \( k = 1, r = 1 \), \( v_{\text{circ}} = 1 \). The orbit is a perfect circle of radius 1, period \( T = 2\pi \).</div>
+                <div class="question-explanation" style="display:none;"><strong>Explanation:</strong> The circular-orbit condition sets centripetal acceleration \( v^2/r \) equal to gravity \( k/r^2 \), giving \( v_{\text{circ}} = \sqrt{k/r} \). At \( r_0 = 2 \), \( v_{\text{circ}} = \sqrt{1/2} \approx 0.71 \). Notice it is <em>smaller</em> than the \( v = 1 \) needed at \( r_0 = 1 \): orbits farther out move more slowly (\( v \propto 1/\sqrt{r} \)), the same reason outer planets crawl while Mercury races. Launch with 0.71 and watch the orbit close into a circle of radius 2.</div>
             </div>
         </div>
         <div class="tab-content">
-            <div class="question-container" data-type="fill" data-answer="-0.5[-0.55,-0.45]|1[0.95,1.05]">
-                <div class="question-text">For \( r_0 = 1, v_{x0} = 0, v_{y0} = 1 \) (the circular-orbit launch): compute the conserved quantities. \( E = \tfrac{1}{2}v_0^2 - k/r_0 = \) <input type="text" class="fill-blank" style="width: 50px"> and \( \ell = r_0\,v_0 = \) <input type="text" class="fill-blank" style="width: 50px">. (These should match what Section 8.5 calls \( E_{\min} \) and the angular momentum that gives \( \rho_{\text{circ}} = 1 \).)</div>
+            <div class="question-container" data-type="fill" data-answer="2.57[2.4,2.7]">
+                <div class="question-text">Launch with \( r_0 = 1, v_{x0} = 0, v_{y0} = 1.2 \). Before launching, predict the farthest distance the planet will reach (aphelion \( = 2a - r_0 \) with \( a = k/2|E| \)), then confirm on the orbit plot: \( \rho_{\max} \approx \) <input type="text" class="fill-blank" style="width: 60px">.</div>
                 <div class="question-actions"><button class="btn-verify">Verify</button></div>
-                <div class="question-explanation" style="display:none;"><strong>Explanation:</strong> \( E = \tfrac{1}{2}(1)^2 - 1/1 = -1/2 \). \( \ell = (1)(1) = 1 \). Cross-check from Section 8.5: \( E_{\min} = -\mu k^2/(2\ell^2) = -1/2 \) ✓; \( \rho_{\text{circ}} = \ell^2/(\mu k) = 1 \) ✓. The launcher started us at exactly \( E_{\min} \), which is precisely the condition for a circular orbit at \( r_0 = 1 \).</div>
+                <div class="question-explanation" style="display:none;"><strong>Explanation:</strong> First the energy: \( E = \tfrac{1}{2}(1.2)^2 - 1/1 = 0.72 - 1 = -0.28 \), so \( a = k/(2|E|) = 1/0.56 \approx 1.786 \). Since \( v_{y0} = 1.2 \) exceeds the circular speed at \( r_0 = 1 \), the launch point is perihelion (\( \rho_{\min} = 1 \)), and the aphelion is \( \rho_{\max} = 2a - \rho_{\min} \approx 3.57 - 1 = 2.57 \). The energy alone fixes the semi-major axis and therefore how far out the orbit swings — the launcher just draws what conservation already told you.</div>
             </div>
         </div>
         <div class="tab-content">
@@ -326,23 +326,17 @@
             <button class="tab-button">Question 6</button>
         </div>
         <div class="tab-content active">
-            <div class="question-container" data-type="mcq" data-answer="2">
-                <div class="question-text">If you halve the step size \( h \) for an RK4 integration, the maximum integration error roughly …</div>
-                <div class="question-options">
-                    <label class="option"><input type="radio" name="oi-q4" value="0"><span>Stays the same — h doesn't matter for RK4</span></label>
-                    <label class="option"><input type="radio" name="oi-q4" value="1"><span>Halves — RK4 is first-order in h</span></label>
-                    <label class="option"><input type="radio" name="oi-q4" value="2"><span>Drops by ~16× — RK4 has accumulated error \( O(h^4) \)</span></label>
-                    <label class="option"><input type="radio" name="oi-q4" value="3"><span>Squares — error scales as \( h^2 \)</span></label>
-                </div>
+            <div class="question-container" data-type="fill" data-answer="4.8e-8[3e-8,8e-8]">
+                <div class="question-text">Your RK4 run at \( h = 0.02 \) shows max \( |\Delta E/E| \approx 3\times10^{-9} \). Estimate the drift if you rerun at \( h = 0.04 \): <input type="text" class="fill-blank" style="width: 80px">. (Enter in scientific notation, e.g. 4.8e-8.)</div>
                 <div class="question-actions"><button class="btn-verify">Verify</button></div>
-                <div class="question-explanation" style="display:none;"><strong>Explanation:</strong> RK4 has local (per-step) truncation error \( O(h^5) \) and global (accumulated over fixed time) error \( O(h^4) \). Halving \( h \) gives \( 1/2^4 = 1/16 \) the error. Plain Euler is \( O(h) \) — halving \( h \) just halves the error. This is a huge gap: to get the same accuracy as RK4 with \( h = 0.01 \), Euler would need \( h \sim 10^{-8} \) — a million times more steps.</div>
+                <div class="question-explanation" style="display:none;"><strong>Explanation:</strong> RK4 has global (accumulated) error \( O(h^4) \). Doubling the step from 0.02 to 0.04 multiplies the drift by \( 2^4 = 16 \): \( 3\times10^{-9} \times 16 \approx 4.8\times10^{-8} \). That steep fourth-power scaling cuts both ways — halving \( h \) would instead have shrunk the error 16-fold. It is exactly why RK4 crushes Euler (\( O(h) \)): to match RK4's accuracy Euler would need millions of times more steps.</div>
             </div>
         </div>
         <div class="tab-content">
-            <div class="question-container" data-type="fill" data-answer="75[70,80]">
-                <div class="question-text">Halley's comet has a semi-major axis \( a = 17.8 \) AU. Using Kepler's 3rd law (Section 8.5) in solar-system units (where \( T^2 = a^3 \) with \( T \) in years and \( a \) in AU), predict its orbital period: \( T = a^{3/2} = \) <input type="text" class="fill-blank" style="width: 60px"> yr. (RK4 in those units gives essentially the same answer if you integrate long enough.)</div>
+            <div class="question-container" data-type="fill" data-answer="60[55,65]">
+                <div class="question-text">Halley's comet has \( e \approx 0.967 \). Using angular-momentum conservation, how many times faster is it moving at perihelion than at aphelion? <input type="text" class="fill-blank" style="width: 60px"> ×.</div>
                 <div class="question-actions"><button class="btn-verify">Verify</button></div>
-                <div class="question-explanation" style="display:none;"><strong>Explanation:</strong> \( T = 17.8^{1.5} \approx 75.1 \) yr. Halley's comet returns roughly every 75–76 years (last seen 1986; next predicted 2061). For RK4, the high eccentricity (\( e \approx 0.967 \)) means the comet spends most of its time near aphelion (slow) and zips through perihelion (fast). Fixed-step RK4 has trouble at perihelion because of the rapid velocity change — adaptive step-size methods are preferred for high-eccentricity orbits.</div>
+                <div class="question-explanation" style="display:none;"><strong>Explanation:</strong> At both apsides the velocity is purely tangential, so \( \ell = \mu\rho v \) conserved gives \( v_{\text{per}}/v_{\text{aph}} = \rho_{\text{aph}}/\rho_{\text{per}} = (1+e)/(1-e) = 1.967/0.033 \approx 60 \). Halley whips through perihelion about 60× faster than it crawls through aphelion — and that violent speed swing is exactly why <em>fixed-step</em> RK4 (Question 6) struggles: a step size fine enough for the perihelion sprint is wildly wasteful near aphelion. Adaptive step-size integrators, which shrink \( h \) only where the motion is fast, are the right tool for such eccentric orbits.</div>
             </div>
         </div>
         <div class="tab-content">

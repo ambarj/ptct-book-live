@@ -151,21 +151,23 @@
         </div>
 
         <div class="tab-content">
-            <div class="question-container" data-type="fill" data-answer="0.693[0.6,0.8]">
+            <div class="question-container" data-type="fill" data-answer="0.003[0.001,0.006]">
                 <div class="question-text">
-                    Select <strong>1/(1+x)</strong> and sample 2,000 points. The sample mean
-                    estimate of \( \int_0^1 \frac{1}{1+x}\,dx \) is approximately
+                    Sample 2,000 points and read the half-width of the \( \pm 1\sigma \) band on
+                    the right panel at \( N = 2{,}000 \): &asymp;
                     <input type="text" class="fill-blank" style="width: 70px">.
-                    (The true value is ln(2) &asymp; 0.6931)
                 </div>
                 <div class="question-actions">
                     <button class="btn-verify">Verify</button>
                 </div>
                 <div class="question-explanation" style="display:none;">
                     <strong>Explanation:</strong>
-                    With 2,000 samples, the estimate should be within about 0.01&ndash;0.02 of the
-                    true value 0.6931. The exact number varies each run (randomness!), but
-                    it should be in the range 0.67&ndash;0.72 almost always.
+                    The \( \pm 1\sigma \) band is the estimate&rsquo;s standard error,
+                    \( \sigma_f / \sqrt{N} \). For \( 1/(1+x) \) on \( [0,1] \) the spread of
+                    function values is \( \sigma_f \approx 0.135 \), so at \( N = 2{,}000 \) the
+                    half-width is \( 0.135/\sqrt{2000} \approx 0.003 \). Think of this band as a
+                    live error bar: the true value sits inside it about 68% of the time, and it
+                    narrows like \( 1/\sqrt{N} \) as you add samples.
                 </div>
             </div>
         </div>
@@ -341,26 +343,26 @@
         </div>
 
         <div class="tab-content">
-            <div class="question-container" data-type="fill" data-answer="sample mean">
+            <div class="question-container" data-type="fill" data-answer="the maximum of f(x)">
                 <div class="question-text">
-                    In practice, you should almost always use the
+                    Hit-or-miss needs one extra piece of information that sample mean does not:
                     <select class="fill-blank-select">
                         <option value=""></option>
-                        <option value="hit-or-miss">hit-or-miss</option>
-                        <option value="sample mean">sample mean</option>
-                        <option value="trapezoidal rule">trapezoidal rule</option>
+                        <option value="the maximum of f(x)">the maximum of f(x)</option>
+                        <option value="the mean of f(x)">the mean of f(x)</option>
+                        <option value="the derivative of f(x)">the derivative of f(x)</option>
                     </select>
-                    method for Monte Carlo integration.
                 </div>
                 <div class="question-actions">
                     <button class="btn-verify">Verify</button>
                 </div>
                 <div class="question-explanation" style="display:none;">
                     <strong>Explanation:</strong>
-                    The <strong>sample mean</strong> method is always preferred: it&rsquo;s simpler
-                    (no bounding box needed), more efficient (lower variance), and more general
-                    (works for any function, including negative ones). Hit-or-miss is mainly
-                    useful as a teaching tool to build intuition.
+                    Hit-or-miss throws darts into a bounding box and counts how many land under the
+                    curve, so you must know (or safely over-estimate) <strong>the maximum of
+                    f(x)</strong> to set the box height. Sample mean never needs it: it simply
+                    averages the function values you already evaluate. That&rsquo;s one reason
+                    sample mean is both simpler and more general.
                 </div>
             </div>
         </div>
@@ -456,21 +458,24 @@
         </div>
 
         <div class="tab-content">
-            <div class="question-container" data-type="fill" data-answer="0.333[0.3,0.37]">
+            <div class="question-container" data-type="fill" data-answer="0.004[0.001,0.01]">
                 <div class="question-text">
-                    Run with N = 5,000. The MC estimate for \( \int_0^1 x^2\,dx \) is approximately
-                    <input type="text" class="fill-blank" style="width: 70px">.
-                    (True value = 1/3 &asymp; 0.333)
+                    Before running at \( N = 5{,}000 \), predict the typical
+                    \( |\text{estimate} - 1/3| \). (Hint: \( \sigma \) for \( x^2 \) on \( [0,1] \)
+                    is &asymp; 0.30.)
+                    <input type="text" class="fill-blank" style="width: 70px">
                 </div>
                 <div class="question-actions">
                     <button class="btn-verify">Verify</button>
                 </div>
                 <div class="question-explanation" style="display:none;">
                     <strong>Explanation:</strong>
-                    With 5,000 samples, the estimate should be within about 0.005&ndash;0.01 of
-                    1/3 = 0.3333. The sample mean computes \( \frac{1}{N}\sum x_i^2 \) where
-                    \( x_i \sim U(0,1) \), and since the interval length is 1, no extra factor
-                    is needed.
+                    The typical miss is the standard error \( \sigma/\sqrt{N} \). With
+                    \( \sigma \approx 0.30 \) and \( N = 5{,}000 \), that&rsquo;s
+                    \( 0.30/\sqrt{5000} \approx 0.004 \). Run it and watch
+                    \( |\text{estimate} - 1/3| \) land near this value: individual runs scatter,
+                    but the <strong>size</strong> of the error is set by \( \sigma/\sqrt{N} \),
+                    not luck.
                 </div>
             </div>
         </div>

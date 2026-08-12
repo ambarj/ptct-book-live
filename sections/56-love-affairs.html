@@ -515,54 +515,51 @@
         </div>
 
         <div class="tab-content">
-            <div class="question-container" data-type="fill" data-answer="equals">
+            <div class="question-container" data-type="fill" data-answer="1.5[1.45,1.55]">
                 <div class="question-text">
-                    The critical transition between a stable node and a saddle occurs
-                    when cautiousness
-                    <select class="fill-blank-select">
-                        <option value=""></option>
-                        <option value="equals">equals</option>
-                        <option value="exceeds">exceeds</option>
-                        <option value="is less than">is less than</option>
-                    </select>
-                    responsiveness (\( \alpha = \beta \)).
+                    With \( \alpha \) fixed at 1.5, find the value of \( \beta \) at which
+                    the portrait switches from all-feelings-decay to fate-depends-on-start.
+                    <input type="text" class="fill-blank" placeholder="&beta;">
                 </div>
                 <div class="question-actions">
                     <button class="btn-verify">Verify</button>
                 </div>
                 <div class="question-explanation" style="display:none;">
                     <strong>Explanation:</strong>
-                    When \( \alpha = \beta \), one eigenvalue \( \lambda_1 = \beta - \alpha = 0 \)
-                    becomes zero. This is the boundary: a <strong>degenerate</strong> case with a
-                    line of fixed points along \( R = J \). Below the diagonal (\( \beta < \alpha \))
-                    is a stable node; above (\( \beta > \alpha \)) is a saddle. The diagonal is
-                    the &ldquo;tipping point&rdquo; of the relationship.
+                    The eigenvalue \( \lambda_1 = \beta - \alpha \) controls the switch: for
+                    \( \beta < \alpha \) both eigenvalues are negative (stable node &mdash; all
+                    feelings decay), and for \( \beta > \alpha \) it turns positive (saddle &mdash;
+                    the outcome depends on where you start). So the transition sits exactly at
+                    \( \beta = \alpha = 1.5 \), where \( \lambda_1 = 0 \) and a whole
+                    <strong>line of fixed points</strong> appears along \( R = J \). The tipping
+                    point of the relationship is when responsiveness exactly matches cautiousness.
                 </div>
             </div>
         </div>
 
         <div class="tab-content">
-            <div class="question-container" data-type="mcq" data-answer="2">
+            <div class="question-container" data-type="mcq" data-answer="1">
                 <div class="question-text">
-                    In the saddle regime (\( \beta > \alpha \)), the <strong>unstable</strong>
-                    direction (growing eigenvalue) points along&hellip;
+                    In the saddle regime (\( \beta > \alpha \)), couple A starts at
+                    \( (R, J) = (1, 1) \) and couple B at \( (1, -1) \). Whose feelings
+                    fade to indifference?
                 </div>
                 <div class="question-options">
                     <label class="option">
                         <input type="radio" name="la-q9" value="0">
-                        <span>The R-axis (Romeo&rsquo;s feelings only)</span>
+                        <span>Couple A</span>
                     </label>
                     <label class="option">
                         <input type="radio" name="la-q9" value="1">
-                        <span>The \( R = -J \) line (opposite feelings)</span>
+                        <span>Couple B</span>
                     </label>
                     <label class="option">
                         <input type="radio" name="la-q9" value="2">
-                        <span>The \( R = J \) line (mutual feelings)</span>
+                        <span>Both couples</span>
                     </label>
                     <label class="option">
                         <input type="radio" name="la-q9" value="3">
-                        <span>A circle around the origin</span>
+                        <span>Neither couple</span>
                     </label>
                 </div>
                 <div class="question-actions">
@@ -570,12 +567,14 @@
                 </div>
                 <div class="question-explanation" style="display:none;">
                     <strong>Explanation:</strong>
-                    The unstable eigenvalue \( \lambda_1 = \beta - \alpha > 0 \) has
-                    eigenvector \( (1, 1) \) &mdash; the line \( R = J \). Along this direction,
-                    <strong>mutual</strong> feelings grow: if both start loving, love amplifies;
-                    if both start hating, hate amplifies. The stable direction \( (1, -1) \)
-                    (opposite feelings) always decays. Responsiveness amplifies whatever
-                    sentiment the couple shares.
+                    The saddle has eigenvector \( (1, 1) \) (the \( R = J \) line) for the
+                    <strong>unstable</strong> eigenvalue \( \lambda_1 = \beta - \alpha > 0 \),
+                    and eigenvector \( (1, -1) \) (the \( R = -J \) line) for the
+                    <strong>stable</strong> eigenvalue \( \lambda_2 = -(\alpha + \beta) < 0 \).
+                    Couple B starts at \( (1, -1) \), exactly on the stable eigenvector, so
+                    their opposite feelings decay to indifference. Couple A sits on the
+                    unstable eigenvector: their mutual feelings amplify without bound.
+                    A saddle&rsquo;s fate is all about <em>which eigenvector</em> you start on.
                 </div>
             </div>
         </div>

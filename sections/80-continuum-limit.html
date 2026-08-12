@@ -144,26 +144,27 @@
         </div>
 
         <div class="tab-content">
-            <div class="question-container" data-type="fill" data-answer="gaussian|normal">
+            <div class="question-container" data-type="fill" data-answer="delta">
                 <div class="question-text">
-                    In the continuum limit, the binomial distribution becomes a
+                    If instead you shrink a &rarr; 0 while holding &tau; <strong>fixed</strong>,
+                    \( D \to 0 \). The distribution becomes
                     <select class="fill-blank-select">
                         <option value=""></option>
+                        <option value="delta">a delta spike at the origin</option>
+                        <option value="gaussian">a Gaussian of the same width</option>
                         <option value="uniform">uniform</option>
-                        <option value="gaussian">Gaussian (normal)</option>
-                        <option value="exponential">exponential</option>
-                        <option value="poisson">Poisson</option>
-                    </select>
-                    distribution.
+                    </select>.
                 </div>
                 <div class="question-actions">
                     <button class="btn-verify">Verify</button>
                 </div>
                 <div class="question-explanation" style="display:none;">
                     <strong>Explanation:</strong>
-                    The CLT guarantees convergence to a <strong>Gaussian</strong>. The specific
-                    Gaussian is \( P(x,t) = \frac{1}{\sqrt{4\pi Dt}} e^{-x^2/(4Dt)} \) &mdash;
-                    the fundamental solution of the diffusion equation.
+                    With &tau; fixed, \( D = a^2/(2\tau) \to 0 \) as \( a \to 0 \), so the width
+                    \( \sigma = \sqrt{2DT} \to 0 \) too &mdash; the whole distribution collapses to
+                    a <strong>delta spike</strong> at the origin. Nothing spreads. This is exactly
+                    why the continuum limit holds \( a^2/\tau \) fixed instead: it keeps D finite
+                    so a genuine Gaussian survives.
                 </div>
             </div>
         </div>
@@ -267,10 +268,9 @@
         </div>
 
         <div class="tab-content active">
-            <div class="question-container" data-type="fill" data-answer="1[0.9,1.1]">
+            <div class="question-container" data-type="fill" data-answer="0.04[0.035,0.045]">
                 <div class="question-text">
-                    With a = 0.5 and &tau; = 0.125, the diffusion constant is
-                    \( D = a^2/(2\tau) = 0.25/0.25 = \)
+                    Set a = 0.4 and find the &tau; that gives D = 2. Verify with the readout.
                     <input type="text" class="fill-blank" style="width: 50px">.
                 </div>
                 <div class="question-actions">
@@ -278,8 +278,9 @@
                 </div>
                 <div class="question-explanation" style="display:none;">
                     <strong>Explanation:</strong>
-                    \( D = a^2/(2\tau) = 0.25 / 0.25 = 1 \). This means the width of the
-                    Gaussian at time T is \( \sigma = \sqrt{2DT} = \sqrt{2T} \).
+                    From \( D = a^2/(2\tau) \), solve for \( \tau = a^2/(2D) = 0.16/4 = 0.04 \).
+                    A small step size demands a very short step time to keep D as large as 2 &mdash;
+                    the readout confirms D = 2 once &tau; drops to 0.04.
                 </div>
             </div>
         </div>
@@ -446,15 +447,15 @@
         </div>
 
         <div class="tab-content">
-            <div class="question-container" data-type="fill" data-answer="diffusion">
+            <div class="question-container" data-type="fill" data-answer="wave">
                 <div class="question-text">
-                    The PDE \( \partial P/\partial t = D\,\partial^2 P/\partial x^2 \) is called the
+                    Which of these equations has a <strong>second</strong> time derivative and
+                    produces propagating pulses instead of irreversible spreading?
                     <select class="fill-blank-select">
                         <option value=""></option>
-                        <option value="wave">wave equation</option>
-                        <option value="diffusion">diffusion equation</option>
-                        <option value="laplace">Laplace equation</option>
-                        <option value="schrodinger">Schr&ouml;dinger equation</option>
+                        <option value="wave">the wave equation</option>
+                        <option value="diffusion">the diffusion equation</option>
+                        <option value="laplace">the Laplace equation</option>
                     </select>.
                 </div>
                 <div class="question-actions">
@@ -462,10 +463,11 @@
                 </div>
                 <div class="question-explanation" style="display:none;">
                     <strong>Explanation:</strong>
-                    \( \partial P/\partial t = D\,\partial^2 P/\partial x^2 \) is the
-                    <strong>diffusion equation</strong> (also called the heat equation in
-                    thermodynamics). It describes how a probability distribution (or temperature,
-                    or concentration) spreads over time due to random motion.
+                    The <strong>wave equation</strong> \( \partial^2 P/\partial t^2 = c^2\,
+                    \partial^2 P/\partial x^2 \) is second order in <em>time</em>, so it is
+                    time-reversible and carries pulses that travel without decaying. The diffusion
+                    equation has only a <em>first</em> time derivative &mdash; that single
+                    difference is what makes spreading irreversible.
                 </div>
             </div>
         </div>

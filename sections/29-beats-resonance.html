@@ -126,12 +126,13 @@
 
         <!-- Q1: Fill -->
         <div class="tab-content active">
-            <div class="question-container" data-type="fill" data-answer="0.30[0.25,0.35]">
+            <div class="question-container" data-type="fill" data-answer="2.84[2.80,2.88]">
                 <div class="question-text">
-                    Set \( \omega_d = 2.70 \) with \( \omega_0 = 3.0 \).
-                    The beat frequency \( \Delta\omega = |\omega_0 - \omega_d| \) is:
+                    Adjust \( \omega_d \) (below \( \omega_0 = 3.0 \)) until you see
+                    exactly 2 complete beats in the 80-second window.
+                    What \( \omega_d \) did you set?
                     <br><br>
-                    &Delta;&omega; = <input type="text" class="fill-blank" placeholder="rad/s"> rad/s
+                    &omega;<sub>d</sub> = <input type="text" class="fill-blank" placeholder="rad/s"> rad/s
                 </div>
                 <div class="question-actions">
                     <button class="btn-verify">Verify</button>
@@ -139,10 +140,14 @@
                 <div class="question-explanation" style="display: none;">
                     <div class="question-explanation-title">Explanation</div>
                     <div class="question-explanation-text">
-                        \( \Delta\omega = |3.0 - 2.70| = 0.30 \) rad/s.  The beat period
-                        is \( T_{\text{beat}} = 2\pi / 0.30 \approx 20.9 \) s.  Count
-                        the envelope cycles in the plot: you should see about 4 complete
-                        beats in the 80-second window, consistent with \( T_{\text{beat}} \approx 21 \) s.
+                        Two beats in 80 s means each beat lasts \( T_{\text{beat}} = 40 \) s.
+                        Invert \( T_{\text{beat}} = 2\pi/\Delta\omega \):
+                        \( \Delta\omega = 2\pi/40 \approx 0.157 \) rad/s, so
+                        \( \omega_d = \omega_0 - \Delta\omega = 3.0 - 0.157 \approx 2.84 \).
+                        Set it there and count the envelope nulls &mdash; exactly 2 in the
+                        window.  Working backwards from the beat count is the trick:
+                        the closer \( \omega_d \) creeps toward \( \omega_0 \), the fewer,
+                        slower beats you get.
                     </div>
                 </div>
             </div>
@@ -309,12 +314,12 @@
 
         <!-- Q4: Fill -->
         <div class="tab-content active">
-            <div class="question-container" data-type="fill" data-answer="12.6[11,14]">
+            <div class="question-container" data-type="fill" data-answer="2.21[2.15,2.28]">
                 <div class="question-text">
-                    At \( \omega_d = 2.50 \), the detuning is \( \Delta\omega = 0.50 \).
-                    The beat period is \( T_{\text{beat}} = 2\pi / \Delta\omega \):
+                    Find the \( \omega_d \) that gives a beat period of exactly
+                    \( T_{\text{beat}} = 8.0 \) s.  Verify by counting envelope peaks.
                     <br><br>
-                    T<sub>beat</sub> = <input type="text" class="fill-blank" placeholder="seconds"> s
+                    &omega;<sub>d</sub> = <input type="text" class="fill-blank" placeholder="rad/s"> rad/s
                 </div>
                 <div class="question-actions">
                     <button class="btn-verify">Verify</button>
@@ -322,9 +327,13 @@
                 <div class="question-explanation" style="display: none;">
                     <div class="question-explanation-title">Explanation</div>
                     <div class="question-explanation-text">
-                        \( T_{\text{beat}} = 2\pi / 0.50 = 4\pi \approx 12.6 \) s.
-                        Count the envelope peaks in the plot: in 60 seconds you should
-                        see about \( 60/12.6 \approx 4.8 \) complete beat cycles.
+                        Invert \( T_{\text{beat}} = 2\pi/\Delta\omega \):
+                        \( \Delta\omega = 2\pi/8.0 = \pi/4 \approx 0.785 \) rad/s, so
+                        \( \omega_d = \omega_0 - \Delta\omega = 3.0 - 0.785 \approx 2.21 \).
+                        Set it there and count the envelope peaks: in the 60-second window
+                        you should see about \( 60/8.0 \approx 7.5 \) beat cycles.  A fixed
+                        beat period pins the detuning exactly &mdash; the beat clock runs
+                        purely on \( |\omega_0 - \omega_d| \).
                     </div>
                 </div>
             </div>

@@ -282,21 +282,23 @@
         </div>
 
         <div class="tab-content active">
-            <div class="question-container" data-type="fill" data-answer="10[9,11]">
+            <div class="question-container" data-type="fill" data-answer="20[19,21]">
                 <div class="question-text">
-                    After 10 bisection steps, the bracket width is approximately \( 1/2^{10} \approx \)
-                    <input type="text" class="fill-blank" placeholder="?"> × 10⁻⁴.
-                    (The initial bracket is [1, 2], width = 1.)
+                    You want the escape velocity pinned down to within 10⁻⁶. Starting from the
+                    bracket [1, 2] (width = 1), how many bisection steps do you need?
+                    <input type="text" class="fill-blank" placeholder="?"> steps
                 </div>
                 <div class="question-actions">
                     <button class="btn-verify">Verify</button>
                 </div>
                 <div class="question-explanation" style="display:none;">
                     <strong>Explanation:</strong>
-                    \( 1/2^{10} = 1/1024 \approx 9.77 \times 10^{-4} \approx 10 \times 10^{-4} \).
-                    Each bisection step halves the uncertainty. After 10 steps, we know the escape
-                    velocity to about 3 decimal places — purely from running RK4 simulations, with
-                    no analytical formula!
+                    Each step halves the bracket, so after \( n \) steps the width is \( 1/2^n \).
+                    You need \( 1/2^n < 10^{-6} \): since \( 1/2^{19} \approx 1.9 \times 10^{-6} \)
+                    is still too wide and \( 1/2^{20} \approx 9.5 \times 10^{-7} \) just fits,
+                    the answer is 20 — exactly why the explorer's "Auto" button runs 20 steps.
+                    This is bisection's superpower: guaranteed convergence at one binary digit of
+                    accuracy per step, no matter how complicated the simulation inside the loop.
                 </div>
             </div>
         </div>

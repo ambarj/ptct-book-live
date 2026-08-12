@@ -132,35 +132,24 @@
         </div>
 
         <div class="tab-content active">
-            <div class="question-container" data-type="mcq" data-answer="1">
+            <div class="question-container" data-type="fill" data-answer="4[3.4,4.6]">
                 <div class="question-text">
-                    When you halve the step size \( h \) for Euler's method, what happens to the truncation error?
-                </div>
-                <div class="question-options">
-                    <label class="option">
-                        <input type="radio" name="practErr-q1" value="0">
-                        <span>It roughly doubles</span>
-                    </label>
-                    <label class="option">
-                        <input type="radio" name="practErr-q1" value="1">
-                        <span>It roughly halves</span>
-                    </label>
-                    <label class="option">
-                        <input type="radio" name="practErr-q1" value="2">
-                        <span>It roughly quarters</span>
-                    </label>
-                    <label class="option">
-                        <input type="radio" name="practErr-q1" value="3">
-                        <span>It stays the same</span>
-                    </label>
+                    At \( T = 5 \), \( h = 0.1 \), note the max error in the readout. Predict the
+                    ratio by which the error shrinks when you drop to \( h = 0.025 \), then verify.
+                    Ratio &asymp; <input type="text" class="fill-blank" placeholder="?">.
                 </div>
                 <div class="question-actions">
                     <button class="btn-verify">Verify</button>
                 </div>
                 <div class="question-explanation" style="display:none;">
                     <strong>Explanation:</strong>
-                    Euler's method has first-order convergence: global error \( \propto O(h) \).
-                    So halving \( h \) halves the truncation error. (RK4 would quarter it — that's fourth-order.)
+                    Euler's method has first-order convergence: global error \( \propto h \).
+                    Dropping \( h \) from 0.1 to 0.025 is a factor of 4 in step size, so the error
+                    shrinks by roughly a factor of 4 as well &mdash; and the readout confirms it.
+                    But notice the price: you also did 4&times; the work. That linear
+                    error-vs-effort trade is exactly why first-order methods become impractical
+                    for high accuracy (RK4 would repay the same 4&times; effort with a
+                    \( 4^4 = 256\times \) error reduction).
                 </div>
             </div>
         </div>
@@ -391,23 +380,25 @@
         </div>
 
         <div class="tab-content">
-            <div class="question-container" data-type="fill" data-answer="2|2">
+            <div class="question-container" data-type="fill" data-answer="0.00669[0.0064,0.0070]">
                 <div class="question-text">
-                    Richardson extrapolation for Euler uses: \( y_{\text{better}} = \)
-                    <input type="text" class="fill-blank" placeholder="?"> · y(h/2) −  y(h).
-                    This effectively gives order
-                    <input type="text" class="fill-blank" placeholder="?"> convergence
-                    (one better than Euler alone).
+                    Two Euler runs for \( dy/dt = -y \), \( y(0) = 1 \) give
+                    \( y(5) = 0.00515 \) (\( h = 0.1 \)) and \( 0.00592 \) (\( h = 0.05 \)).
+                    Compute the Richardson-extrapolated \( y_{\text{better}} = \)
+                    <input type="text" class="fill-blank" placeholder="?">.
                 </div>
                 <div class="question-actions">
                     <button class="btn-verify">Verify</button>
                 </div>
                 <div class="question-explanation" style="display:none;">
                     <strong>Explanation:</strong>
-                    For Euler (\( p = 1 \)): \( y_{\text{better}} = \frac{2^1 y(h/2) - y(h)}{2^1 - 1} = 2 y(h/2) - y(h) \).
-                    The leading \( O(h) \) term cancels, leaving \( O(h^2) \). But we wrote it without
-                    the denominator as \( 2 \cdot y(h/2) - y(h) \) since \( 2^1 - 1 = 1 \).
-                    This has second-order accuracy, but really order \( p+1 = 2 \).
+                    For a first-order method, Richardson extrapolation is
+                    \( y_{\text{better}} = 2\,y(h/2) - y(h) = 2(0.00592) - 0.00515 = 0.00669 \).
+                    Compare with the exact value \( e^{-5} = 0.00674 \): the \( h = 0.05 \) run was
+                    off by 0.00082, while the extrapolated value is off by only 0.00005 &mdash;
+                    the error drops by roughly a factor of 16. The doubled coefficient cancels the
+                    leading \( O(h) \) error term, promoting two cheap first-order runs to
+                    second-order accuracy for free.
                 </div>
             </div>
         </div>
@@ -570,21 +561,24 @@
         </div>
 
         <div class="tab-content">
-            <div class="question-container" data-type="fill" data-answer="16">
+            <div class="question-container" data-type="fill" data-answer="0.024[0.018,0.032]">
                 <div class="question-text">
-                    For an \( O(h^p) \) method, halving the step size reduces the error by a factor of \( 2^p \).
-                    For RK4 (\( p = 4 \)), halving \( h \) reduces error by a factor of
-                    <input type="text" class="fill-blank" placeholder="?"> × the previous error.
-                    (Just enter the reduction factor as a single number, i.e., \( 2^4 = \)?)
+                    RK4 at \( h = 0.1 \) gives error \( 3.2 \times 10^{-5} \) on your problem.
+                    You need error below \( 10^{-7} \). Using error \( \propto h^4 \), what step
+                    size \( h \) do you need?
+                    <input type="text" class="fill-blank" placeholder="?">.
                 </div>
                 <div class="question-actions">
                     <button class="btn-verify">Verify</button>
                 </div>
                 <div class="question-explanation" style="display:none;">
                     <strong>Explanation:</strong>
-                    For RK4 (\( p = 4 \)): error \( \propto h^4 \). Halving \( h \):
-                    \( (h/2)^4 = h^4/16 \). The error drops by a factor of 16.
-                    That's why RK4 converges so much faster than Euler (factor of 2 per halving).
+                    You need the error to drop by \( 3.2 \times 10^{-5} / 10^{-7} = 320\times \).
+                    Since error \( \propto h^4 \), the step must shrink by
+                    \( 320^{1/4} \approx 4.2 \), giving \( h \approx 0.1/4.2 \approx 0.024 \).
+                    This is the practical payoff of fourth order: a 320-fold accuracy gain costs
+                    only about 4&times; more steps. A first-order method would need 320&times;
+                    more steps for the same improvement.
                 </div>
             </div>
         </div>

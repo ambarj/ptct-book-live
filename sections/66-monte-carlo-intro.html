@@ -148,20 +148,24 @@
         </div>
 
         <div class="tab-content">
-            <div class="question-container" data-type="fill" data-answer="3.14[3.0,3.3]">
+            <div class="question-container" data-type="fill" data-answer="0.02[0.005,0.06]">
                 <div class="question-text">
-                    Throw 5,000 darts. Your estimate of &pi; is approximately
-                    <input type="text" class="fill-blank" style="width: 60px">.
-                    (Read from the convergence plot)
+                    Throw 5,000 darts several times. Typically, how far is the estimate from
+                    true &pi;? \( |\hat{\pi} - \pi| \approx \)
+                    <input type="text" class="fill-blank" style="width: 60px">
+                    (watch the Error readout across runs)
                 </div>
                 <div class="question-actions">
                     <button class="btn-verify">Verify</button>
                 </div>
                 <div class="question-explanation" style="display:none;">
                     <strong>Explanation:</strong>
-                    With 5,000 darts, the estimate should be roughly in the range 3.0&ndash;3.3,
-                    typically within 0.05 of the true value 3.14159. The exact answer varies each
-                    time (it&rsquo;s random!), but the convergence plot shows it settling near &pi;.
+                    Each run lands somewhere different &mdash; that&rsquo;s randomness &mdash; but
+                    the <em>typical</em> miss is remarkably consistent: around 0.02. The dart count
+                    inside the circle is binomial, so the estimate&rsquo;s spread is
+                    \( 4\sqrt{p(1-p)}/\sqrt{N} \approx 0.023 \) for \( N = 5{,}000 \). The key
+                    insight: individual estimates are random, but the <strong>size of the
+                    error</strong> is predictable &mdash; and shrinks like \( 1/\sqrt{N} \).
                 </div>
             </div>
         </div>
@@ -305,23 +309,23 @@
         </div>
 
         <div class="tab-content">
-            <div class="question-container" data-type="fill" data-answer="1000">
+            <div class="question-container" data-type="fill" data-answer="200[180,220]">
                 <div class="question-text">
-                    Monte Carlo needs how many random points to estimate a volume in
-                    10 dimensions with the same approach as in 2 dimensions?
-                    Answer: <input type="text" class="fill-blank" style="width: 70px">
-                    (the same number &mdash; MC doesn&rsquo;t care about dimension!)
+                    A 10-points-per-axis grid in 6 dimensions uses \( 10^6 \) points. If 5,000
+                    MC samples give similar accuracy, MC uses
+                    <input type="text" class="fill-blank" style="width: 70px">
+                    times fewer points.
                 </div>
                 <div class="question-actions">
                     <button class="btn-verify">Verify</button>
                 </div>
                 <div class="question-explanation" style="display:none;">
                     <strong>Explanation:</strong>
-                    Monte Carlo uses the <strong>same number of samples</strong> regardless of
-                    dimension. If 1,000 samples give a reasonable estimate in 2D, you can use
-                    1,000 samples in 10D too. The convergence rate is \( 1/\sqrt{N} \), which
-                    depends only on \( N \), <strong>not on dimension</strong>. This is Monte
-                    Carlo&rsquo;s superpower.
+                    The grid needs \( 10^6 = 1{,}000{,}000 \) points; MC needs only 5,000. The
+                    ratio is \( 10^6 / 5{,}000 = 200 \). And this gap explodes with dimension:
+                    in 10D the grid would need \( 10^{10} \) points while MC still uses a few
+                    thousand, because its \( 1/\sqrt{N} \) convergence depends only on \( N \),
+                    <strong>not on dimension</strong>. This is Monte Carlo&rsquo;s superpower.
                 </div>
             </div>
         </div>

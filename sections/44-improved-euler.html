@@ -169,32 +169,24 @@
         </div>
 
         <div class="tab-content">
-            <div class="question-container" data-type="mcq" data-answer="1">
+            <div class="question-container" data-type="fill" data-answer="0.82[0.8195,0.8205]">
                 <div class="question-text">
-                    How many evaluations of \( f \) does RK2 require per step, compared to Euler's one?
-                </div>
-                <div class="question-options">
-                    <label class="option">
-                        <input type="radio" name="impEuler-q2" value="0">
-                        <span>1 (same as Euler)</span>
-                    </label>
-                    <label class="option">
-                        <input type="radio" name="impEuler-q2" value="1">
-                        <span>2 (\( k_1 \) and \( k_2 \))</span>
-                    </label>
-                    <label class="option">
-                        <input type="radio" name="impEuler-q2" value="2">
-                        <span>4 (like RK4)</span>
-                    </label>
+                    For \( dy/dt = -y \), \( y(0) = 1 \), \( h = 0.2 \): compute one RK2 step by
+                    hand (\( k_1 \) at the start, \( k_2 \) at the midpoint). What is \( y_1 \)?
+                    <input type="text" class="fill-blank" placeholder="?">.
                 </div>
                 <div class="question-actions">
                     <button class="btn-verify">Verify</button>
                 </div>
                 <div class="question-explanation" style="display:none;">
                     <strong>Explanation:</strong>
-                    RK2 evaluates \( f \) twice per step: once at the start (\( k_1 \)) and once at the
-                    midpoint (\( k_2 \)). This doubles the cost per step compared to Euler, but the
-                    error drops from \( O(h) \) to \( O(h^2) \) — a huge net win.
+                    \( k_1 = f(y_0) = -1 \). Step to the midpoint:
+                    \( y_{\text{mid}} = y_0 + \tfrac{h}{2}k_1 = 1 - 0.1 = 0.9 \), so
+                    \( k_2 = -0.9 \). Then \( y_1 = y_0 + h\,k_2 = 1 - 0.2(0.9) = 0.82 \).
+                    Compare: plain Euler gives \( 1 - 0.2 = 0.80 \), while the exact answer is
+                    \( e^{-0.2} = 0.8187 \). RK2's midpoint slope cuts the error from about 0.019
+                    (Euler) down to 0.001 — sampling the slope halfway through the step captures the
+                    curve's bend that Euler ignores.
                 </div>
             </div>
         </div>

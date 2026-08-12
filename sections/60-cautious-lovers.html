@@ -156,29 +156,24 @@
         </div>
 
         <div class="tab-content">
-            <div class="question-container" data-type="fill" data-answer="saddle">
+            <div class="question-container" data-type="fill" data-answer="1.1">
                 <div class="question-text">
-                    Now set \( a = -1, b = 2 \), so \( \lambda_1 = 1, \lambda_2 = -3 \).
-                    Since the eigenvalues have <strong>opposite signs</strong>, the fixed
-                    point is a
-                    <select class="fill-blank-select">
-                        <option value=""></option>
-                        <option value="stable node">stable node</option>
-                        <option value="center">center</option>
-                        <option value="saddle">saddle</option>
-                        <option value="unstable node">unstable node</option>
-                    </select>.
+                    With \( a = -1 \), what is the smallest slider value of \( b \) (step 0.1)
+                    that makes the couple&rsquo;s fate depend on their starting point?
+                    <input type="text" class="fill-blank" style="width: 60px">.
                 </div>
                 <div class="question-actions">
                     <button class="btn-verify">Verify</button>
                 </div>
                 <div class="question-explanation" style="display:none;">
                     <strong>Explanation:</strong>
-                    \( \lambda_1 = 1 > 0 \) and \( \lambda_2 = -3 < 0 \) &mdash; opposite signs mean
-                    <strong>saddle</strong>. Responsiveness (\( b = 2 \)) exceeds cautiousness
-                    (\( |a| = 1 \)), so mutual feelings grow while opposite feelings decay.
-                    The couple either falls deeply in love or sinks into mutual hate,
-                    depending on initial conditions.
+                    The fate depends on the starting point only when the origin is a
+                    <strong>saddle</strong> &mdash; eigenvalues of opposite sign. With \( a = -1 \),
+                    the eigenvalues are \( \lambda_1 = a + b = b - 1 \) and
+                    \( \lambda_2 = a - b = -1 - b \). The second stays negative for any \( b > 0 \),
+                    so a saddle needs \( \lambda_1 > 0 \), i.e. \( b > 1 \). At exactly
+                    \( b = 1.0 \) the eigenvalue is zero &mdash; the borderline, where a whole line
+                    of fixed points appears. The first slider notch past it is \( b = 1.1 \).
                 </div>
             </div>
         </div>

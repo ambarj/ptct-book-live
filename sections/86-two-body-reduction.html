@@ -139,10 +139,10 @@
             </div>
         </div>
         <div class="tab-content">
-            <div class="question-container" data-type="fill" data-answer="4670[4500,4900]">
-                <div class="question-text">For the real Earth-Moon system, \( m_E = 81.3\,m_M \) and the Earth–Moon separation is 384,400 km. The center of mass sits a distance \( d = m_M \cdot 384{,}400 / (m_E + m_M) \approx \) <input type="text" class="fill-blank" style="width: 70px"> km from Earth's center. (Earth's radius is 6371 km — what does that tell you?)</div>
+            <div class="question-container" data-type="fill" data-answer="59.3[57,62]">
+                <div class="question-text">The Earth–Moon barycenter sits ~1700 km <em>below</em> Earth's surface. How low would the mass ratio \( m_E/m_M \) have to drop for the barycenter to emerge <em>above</em> the surface (separation 384,400 km, \( R_\oplus = 6371 \) km)? \( m_E/m_M \approx \) <input type="text" class="fill-blank" style="width: 70px">.</div>
                 <div class="question-actions"><button class="btn-verify">Verify</button></div>
-                <div class="question-explanation" style="display:none;"><strong>Explanation:</strong> \( d = 384{,}400 / (81.3 + 1) \approx 4670 \) km — about 1700 km <em>below Earth's surface</em>. The Earth-Moon CM (called the <em>barycenter</em>) lies <strong>inside the Earth</strong>. Earth doesn't quite "orbit" the Moon, but it does wobble around a point inside itself as the Moon goes around. This wobble is exactly what astronomers detect when they search for exoplanets via radial velocity.</div>
+                <div class="question-explanation" style="display:none;"><strong>Explanation:</strong> The barycenter sits a distance \( d = m_M \cdot L / (m_E + m_M) = L/(m_E/m_M + 1) \) from Earth's center. Setting \( d = R_\oplus \) gives \( m_E/m_M + 1 = L/R_\oplus = 384{,}400/6371 = 60.3 \), so \( m_E/m_M \approx 59.3 \). The real ratio is 81.3, so a Moon just \( 81.3/59.3 \approx 1.4\times \) heavier would push the barycenter (the <em>barycenter</em>) out into open space — and Earth would visibly orbit a point in the sky, making Earth-Moon a genuine double planet.</div>
             </div>
         </div>
         <div class="tab-content">
@@ -267,10 +267,10 @@
             <button class="tab-button">Question 6</button>
         </div>
         <div class="tab-content active">
-            <div class="question-container" data-type="fill" data-answer="3[1,5]">
-                <div class="question-text">For the Sun (M_☉ = 1.99×10³⁰ kg) and the Earth (M_⊕ = 5.97×10²⁴ kg): the reduced mass μ is essentially equal to M_⊕, differing by only about <input type="text" class="fill-blank" style="width: 50px"> parts per million. (Hint: μ/m_2 = m_1/(m_1+m_2) ≈ 1 − m_2/m_1.)</div>
+            <div class="question-container" data-type="fill" data-answer="0.01[0.008,0.013]">
+                <div class="question-text">At what mass ratio \( m_2/m_1 \) does the reduced mass differ from the lighter mass by 1%? Use the right panel or the sliders. \( m_2/m_1 \approx \) <input type="text" class="fill-blank" style="width: 60px">.</div>
                 <div class="question-actions"><button class="btn-verify">Verify</button></div>
-                <div class="question-explanation" style="display:none;"><strong>Explanation:</strong> \( m_2/m_1 = 5.97 \times 10^{24}/1.99 \times 10^{30} = 3.0 \times 10^{-6} \) ≈ 3 ppm. So \( \mu = m_2 \cdot (1 - m_2/m_1) \approx m_2 - 3 \) ppm. For practical purposes, in any planet-Sun system, \( \mu \approx \text{(planet mass)} \) and we often just call it "the planet's mass." But the correction matters for high-precision ephemerides and for spectroscopy of light atoms.</div>
+                <div class="question-explanation" style="display:none;"><strong>Explanation:</strong> With \( m_2 \) the lighter body, \( \mu/m_2 = m_1/(m_1+m_2) = 1/(1 + m_2/m_1) \approx 1 - m_2/m_1 \). A 1% deficit means \( m_2/m_1 \approx 0.01 \) — the lighter body is about a hundredth of the heavier one. So μ ≈ (lighter mass) to better than 1% for anything from a planet-Sun pair down to a comet: the "one-body problem" approximation is astonishingly forgiving, and only really breaks when the two masses become comparable.</div>
             </div>
         </div>
         <div class="tab-content">

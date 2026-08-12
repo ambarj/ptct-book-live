@@ -431,10 +431,11 @@
 
         <!-- Q7: Fill -->
         <div class="tab-content active">
-            <div class="question-container" data-type="fill" data-answer="1[0.8,1.2]">
+            <div class="question-container" data-type="fill" data-answer="3[2.8,3.2]">
                 <div class="question-text">
-                    For the <strong>decay</strong> ODE at \(t = 2.0\), read the slope of the
-                    log-log line from the right panel. The measured convergence order is approximately:
+                    A colleague&rsquo;s mystery solver gives error \(8.0 \times 10^{-3}\)
+                    at \(h = 0.2\) and \(1.0 \times 10^{-3}\) at \(h = 0.1\). What is its
+                    convergence order \(p\)?
                     <br><br>
                     \(p \approx\) <input type="text" class="fill-blank" placeholder="?">
                 </div>
@@ -443,9 +444,14 @@
                 </div>
                 <div class="question-explanation" style="display:none;">
                     <strong>Explanation:</strong>
-                    Euler&rsquo;s method is first-order: \(p = 1\). The log-log slope confirms
-                    this experimentally. This means error \(\propto h^1\) &mdash; a straight line
-                    with slope 1 on a log-log plot.
+                    Halving \(h\) shrank the error by a factor of
+                    \(8.0 \times 10^{-3} / 1.0 \times 10^{-3} = 8 = 2^3\), so
+                    \(p = \log_2 8 = 3\) &mdash; a third-order method. Measuring \(p\)
+                    from just two runs like this is exactly what the log-log panel in
+                    the explorer automates across many step sizes: the slope of that
+                    line is the same ratio-of-errors calculation, done graphically.
+                    Two runs at different \(h\) are enough to fingerprint any solver&rsquo;s
+                    order, even one you didn&rsquo;t write.
                 </div>
             </div>
         </div>

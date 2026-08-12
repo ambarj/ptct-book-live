@@ -93,7 +93,7 @@
         }), { responsive: true });
 
         document.getElementById('es-stats1').innerHTML =
-            '<span><strong>Log-log slope: ' + slope.toFixed(3) + '</strong> (expected: −0.500)</span>' +
+            '<span><strong>Log-log slope: ' + slope.toFixed(3) + '</strong></span>' +
             '<span>' + nTrials + ' trials per N  |  Function: ' + fn.label + '</span>';
     };
 

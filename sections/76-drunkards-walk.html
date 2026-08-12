@@ -166,10 +166,10 @@
         </div>
 
         <div class="tab-content">
-            <div class="question-container" data-type="fill" data-answer="10[8,12]">
+            <div class="question-container" data-type="fill" data-answer="20[15,25]">
                 <div class="question-text">
-                    After 100 unbiased steps, the typical distance from the origin is
-                    about \( \sqrt{N} = \)
+                    Click Walk 100 four times (400 steps total). About how far from the
+                    lamppost do you expect to be, typically?
                     <input type="text" class="fill-blank" style="width: 50px">.
                     (Check the spread of the histogram)
                 </div>
@@ -178,10 +178,11 @@
                 </div>
                 <div class="question-explanation" style="display:none;">
                     <strong>Explanation:</strong>
-                    The root-mean-square displacement is \( \sqrt{\langle x^2 \rangle} = \sqrt{N} = 10 \).
-                    Most walks end within about &plusmn;10 of the origin after 100 steps. Not
-                    &plusmn;100 (the walker doesn&rsquo;t keep going in one direction) and not 0
-                    (they don&rsquo;t return exactly). The \( \sqrt{N} \) law is universal.
+                    Four batches of 100 steps make one walk of \( N = 400 \). The typical
+                    distance is \( \sqrt{\langle x^2 \rangle} = \sqrt{N} = \sqrt{400} = 20 \)
+                    &mdash; not 40 (that would be \( N/10 \), a straight-line march) and not 10.
+                    Quadrupling the steps only <strong>doubles</strong> the spread, because
+                    distance grows like \( \sqrt{N} \), not \( N \).
                 </div>
             </div>
         </div>
@@ -456,10 +457,10 @@
         </div>
 
         <div class="tab-content">
-            <div class="question-container" data-type="fill" data-answer="0">
+            <div class="question-container" data-type="fill" data-answer="0.4[0.38,0.42]">
                 <div class="question-text">
-                    For an <strong>unbiased</strong> walk, the drift per step is
-                    \( 2p - 1 = 2(0.5) - 1 = \)
+                    Find the bias \( p \) that makes 300-step walkers drift to about
+                    &minus;60 on average.
                     <input type="text" class="fill-blank" style="width: 50px">.
                 </div>
                 <div class="question-actions">
@@ -467,9 +468,10 @@
                 </div>
                 <div class="question-explanation" style="display:none;">
                     <strong>Explanation:</strong>
-                    \( 2p - 1 = 2(0.5) - 1 = 0 \). Zero drift &mdash; no net movement on
-                    average. The walker&rsquo;s expected position stays at the origin. The
-                    spread grows, but the center doesn&rsquo;t move.
+                    The mean displacement is \( \langle x_N \rangle = N(2p - 1) \). We want
+                    \( 300(2p - 1) = -60 \), so \( 2p - 1 = -0.2 \) and \( p = 0.4 \). A
+                    leftward bias of just 0.1 below 0.5 is enough to pull the whole cloud to
+                    &minus;60 &mdash; small biases compound over many steps.
                 </div>
             </div>
         </div>

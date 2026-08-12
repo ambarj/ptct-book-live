@@ -481,33 +481,22 @@
         </div>
 
         <div class="tab-content active">
-            <div class="question-container" data-type="mcq" data-answer="0">
+            <div class="question-container" data-type="fill" data-answer="2000[1900,2100]">
                 <div class="question-text">
-                    For "quick exploration" (checking if your ODE setup is correct), which method is recommended and why?
-                </div>
-                <div class="question-options">
-                    <label class="option">
-                        <input type="radio" name="mc-q7" value="0">
-                        <span>Euler — fastest to code and run; accuracy doesn't matter yet</span>
-                    </label>
-                    <label class="option">
-                        <input type="radio" name="mc-q7" value="1">
-                        <span>RK4 — always use the best method available</span>
-                    </label>
-                    <label class="option">
-                        <input type="radio" name="mc-q7" value="2">
-                        <span>RK2 — it's the compromise between speed and accuracy</span>
-                    </label>
+                    Before selecting "Publication quality" at \( T = 20 \): the advisor uses RK4
+                    with \( h = 0.002\,T \). Predict how many function evaluations it will report,
+                    then verify. <input type="text" class="fill-blank" placeholder="?">.
                 </div>
                 <div class="question-actions">
                     <button class="btn-verify">Verify</button>
                 </div>
                 <div class="question-explanation" style="display:none;">
                     <strong>Explanation:</strong>
-                    When you're first setting up a problem — checking signs, initial conditions,
-                    boundary behavior — you don't need high accuracy. Euler with a moderate h lets
-                    you see the qualitative behavior instantly. If the solution looks reasonable, then
-                    switch to RK4 for the production run.
+                    First find the step size: \( h = 0.002 \times 20 = 0.04 \), so the run takes
+                    \( T/h = 20/0.04 = 500 \) steps. RK4 evaluates \( f \) four times per step, giving
+                    \( 500 \times 4 = 2000 \) evaluations. Function-evaluation count — not step count —
+                    is the honest measure of cost when comparing methods: RK4's 500 steps do the same
+                    work as 2000 Euler steps, but land far more accuracy for it.
                 </div>
             </div>
         </div>

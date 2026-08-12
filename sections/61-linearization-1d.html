@@ -161,27 +161,28 @@
         </div>
 
         <div class="tab-content">
-            <div class="question-container" data-type="fill" data-answer="stable">
+            <div class="question-container" data-type="fill" data-answer="faster">
                 <div class="question-text">
-                    Now select the fixed point at \( x_0 = K = 5 \) (the carrying capacity).
-                    The linearization gives \( f'(K) = -r \). Since \( -r < 0 \), this
-                    fixed point is
+                    If you double \( r \), does a small disturbance from the carrying capacity
+                    \( x_0 = K \) die out
                     <select class="fill-blank-select">
                         <option value=""></option>
-                        <option value="stable">stable</option>
-                        <option value="unstable">unstable</option>
-                        <option value="indeterminate">indeterminate</option>
-                    </select>.
+                        <option value="faster">faster</option>
+                        <option value="slower">slower</option>
+                        <option value="same">at the same rate</option>
+                    </select>?
                 </div>
                 <div class="question-actions">
                     <button class="btn-verify">Verify</button>
                 </div>
                 <div class="question-explanation" style="display:none;">
                     <strong>Explanation:</strong>
-                    \( f'(K) = -r = -2 < 0 \). The linearized equation is \( \dot{y} = -2y \),
-                    giving \( y(t) = y_0 e^{-2t} \to 0 \). The carrying capacity is
-                    <strong>stable</strong>: populations near K return to it. This is why the
-                    logistic equation has a well-defined steady state.
+                    At the carrying capacity the linearization is
+                    \( \dot{y} = f'(K)\,y = -r\,y \), so a disturbance decays as
+                    \( y(t) = y_0 e^{-rt} \). The decay rate is set by \( r \) itself: doubling
+                    \( r \) doubles the exponent, so the disturbance dies out
+                    <strong>faster</strong> &mdash; twice the rate, halving the settling time.
+                    A steeper slope \( f'(K) \) means a stiffer return to equilibrium.
                 </div>
             </div>
         </div>

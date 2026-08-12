@@ -126,21 +126,23 @@
         </div>
 
         <div class="tab-content active">
-            <div class="question-container" data-type="fill" data-answer="4[3.5,4.5]">
+            <div class="question-container" data-type="fill" data-answer="2[1.9,2.1]">
                 <div class="question-text">
-                    With defaults \( m = 1 \), \( k = 4 \), \( b = 1 \), the non-dimensional
-                    parameter is \( w = km/b^2 = \)
+                    With \( m = 1 \) and \( k = 4 \), adjust \( b \) until the stats bar shows
+                    \( w = 1.0 \). What \( b \) did you need?
                     <input type="text" class="fill-blank" placeholder="?">.
-                    What regime is this? (Check the stats bar.)
                 </div>
                 <div class="question-actions">
                     <button class="btn-verify">Verify</button>
                 </div>
                 <div class="question-explanation" style="display:none;">
                     <strong>Explanation:</strong>
-                    \( w = km/b^2 = (4)(1)/(1)^2 = 4 \). Since \( 4 \gg 0.25 \), this is
-                    deeply underdamped. The system oscillates many times before the amplitude
-                    decays significantly. In the phase portrait, you see a tight inward spiral.
+                    Since \( w = km/b^2 \), solving for the damping gives
+                    \( b = \sqrt{km/w} = \sqrt{4 \times 1 / 1} = 2 \). Notice the inverse-square
+                    sensitivity: doubling \( b \) from the default 1 to 2 cuts \( w \) by a factor
+                    of 4, from 4 down to 1. At \( w = 1 \) the system is still underdamped
+                    (\( w > 0.25 \)), but the spiral in the phase portrait is visibly looser than
+                    at the default settings.
                 </div>
             </div>
         </div>
@@ -291,38 +293,25 @@
         </div>
 
         <div class="tab-content active">
-            <div class="question-container" data-type="mcq" data-answer="0">
+            <div class="question-container" data-type="fill" data-answer="5[4.5,5.5]">
                 <div class="question-text">
-                    The mechanical and electrical curves are plotted with the <em>same</em>
-                    non-dimensional parameter \( w \). What do you observe?
-                </div>
-                <div class="question-options">
-                    <label class="option">
-                        <input type="radio" name="dampMech-q4" value="0">
-                        <span>The curves are identical &mdash; the physics is the same equation</span>
-                    </label>
-                    <label class="option">
-                        <input type="radio" name="dampMech-q4" value="1">
-                        <span>The mechanical curve oscillates faster</span>
-                    </label>
-                    <label class="option">
-                        <input type="radio" name="dampMech-q4" value="2">
-                        <span>The electrical curve has more damping</span>
-                    </label>
-                    <label class="option">
-                        <input type="radio" name="dampMech-q4" value="3">
-                        <span>They have different shapes entirely</span>
-                    </label>
+                    The mechanical system has \( m = 1 \) kg, \( k = 5 \) N/m, \( b = 1 \) Ns/m.
+                    Design its electrical twin using \( R = 1 \) &Omega; and \( C = 1 \) mF:
+                    what \( L \) (in mH) reproduces the identical curve?
+                    <input type="text" class="fill-blank" placeholder="?">.
                 </div>
                 <div class="question-actions">
                     <button class="btn-verify">Verify</button>
                 </div>
                 <div class="question-explanation" style="display:none;">
                     <strong>Explanation:</strong>
-                    After non-dimensionalization, both systems satisfy the same equation
-                    \( \ddot{y} + \dot{y} + wy = 0 \) with the same initial conditions.
-                    The solutions are mathematically identical. This is the power of
-                    non-dimensionalization: different physical systems, one universal equation.
+                    Two systems produce identical non-dimensional curves when they share the same
+                    \( w \). The mechanical side gives \( w = km/b^2 = 5 \times 1 / 1 = 5 \).
+                    Matching the electrical side, \( w = L/(R^2C) \) requires
+                    \( L = wR^2C = 5 \times 1 \times 0.001 = 5 \) mH. After
+                    non-dimensionalization both satisfy \( \ddot{y} + \dot{y} + wy = 0 \) with the
+                    same initial conditions &mdash; different hardware, one universal equation. This
+                    is exactly how analog computers once simulated mechanical systems with circuits.
                 </div>
             </div>
         </div>
@@ -367,21 +356,22 @@
         </div>
 
         <div class="tab-content">
-            <div class="question-container" data-type="fill" data-answer="0.25[0.20,0.30]">
+            <div class="question-container" data-type="fill" data-answer="1[0.9,1.1]">
                 <div class="question-text">
-                    For a circuit with \( L = 1 \) mH, \( R = 2 \) &Omega;, \( C = 1 \) mF,
-                    \( w = L/(R^2C) = \) <input type="text" class="fill-blank" placeholder="?">.
-                    A spring-mass system with \( m = 1 \) kg, \( k = 1 \) N/m, \( b = 2 \) Ns/m
-                    has \( w = km/b^2 = \) the same value. Both are critically damped.
+                    You have \( R = 2 \) &Omega; and \( C = 1 \) mF. What inductance \( L \)
+                    (in mH) makes the circuit critically damped?
+                    <input type="text" class="fill-blank" placeholder="?">.
                 </div>
                 <div class="question-actions">
                     <button class="btn-verify">Verify</button>
                 </div>
                 <div class="question-explanation" style="display:none;">
                     <strong>Explanation:</strong>
-                    \( w = L/(R^2C) = 0.001/(4 \times 0.001) = 0.25 \).
-                    \( w = km/b^2 = (1)(1)/(4) = 0.25 \). Both systems are at the critical
-                    damping boundary, and both produce identical non-dimensional decay curves.
+                    Critical damping is \( w = L/(R^2C) = 1/4 \), so
+                    \( L = 0.25\,R^2C = 0.25 \times 4 \times 0.001 = 0.001 \) H \( = 1 \) mH.
+                    A spring-mass system with \( m = 1 \) kg, \( k = 1 \) N/m, \( b = 2 \) Ns/m
+                    has the same \( w = km/b^2 = 0.25 \) &mdash; both sit exactly on the critical
+                    damping boundary and trace identical non-dimensional decay curves.
                 </div>
             </div>
         </div>
@@ -510,7 +500,7 @@
         </div>
 
         <div class="tab-content">
-            <div class="question-container" data-type="fill" data-answer="0.01[0.005,0.02]">
+            <div class="question-container" data-type="fill" data-answer="0.07[0.05,0.09]">
                 <div class="question-text">
                     With \( w = 10 \), find the largest step size where the energy drift at
                     \( t = 10 \) stays below 10%. Approximately \( h \leq \)
@@ -521,10 +511,12 @@
                 </div>
                 <div class="question-explanation" style="display:none;">
                     <strong>Explanation:</strong>
-                    For \( w = 10 \), the oscillation frequency \( \beta \approx 3.12 \) requires
-                    many steps per period (\( T \approx 2 \)) to track accurately. You need roughly
-                    \( h \lesssim 0.01 \) (about 200 steps per period) to keep energy drift below
-                    10%. Higher-order methods like Runge-Kutta can use much larger steps.
+                    Trying values in the explorer: at \( h = 0.05 \) the drift is about 0.7%, at
+                    \( h = 0.07 \) about 5.4%, and at \( h = 0.08 \) it jumps to roughly 15% &mdash;
+                    so \( h \approx 0.07 \) is the largest step that stays under 10%. Notice how
+                    steeply the drift grows near the threshold: a 14% increase in \( h \) nearly
+                    tripled the drift. Euler's error compounds exponentially for oscillatory systems,
+                    which is why higher-order methods like Runge-Kutta can afford much larger steps.
                 </div>
             </div>
         </div>

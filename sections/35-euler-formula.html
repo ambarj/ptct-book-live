@@ -140,22 +140,29 @@
 
         <!-- Q2: Fill — compute x1 -->
         <div class="tab-content">
-            <div class="question-container" data-type="fill" data-answer="0[-.01,.01]">
+            <div class="question-container" data-type="fill" data-answer="0.5[0.49,0.51]">
                 <div class="question-text">
-                    Continuing: \(x_1 = x_0 + h \cdot f = 1 + 0.5 \times (-2) = \)
-                    <input type="text" class="fill-blank" placeholder="?">
+                    For \(dx/dt = -2x\) starting at \(x_0 = 1\), there is a special
+                    step size at which a single Euler step lands exactly on
+                    \(x_1 = 0\).  Find it.
+                    h = <input type="text" class="fill-blank" placeholder="?">
                     <br><br>
-                    (Click &ldquo;Next Step&rdquo; in Explorer&nbsp;1 to check your answer.)
+                    (Set this h in Explorer&nbsp;1 and click &ldquo;Next Step&rdquo;
+                    to check your answer.)
                 </div>
                 <div class="question-actions">
                     <button class="btn-verify">Verify</button>
                 </div>
                 <div class="question-explanation" style="display:none;">
                     <strong>Explanation:</strong>
-                    \(x_1 = 1 + 0.5 \times (-2) = 1 - 1 = 0\).  The Euler method
-                    predicts the function hits zero after one step.  But the true
-                    solution \(e^{-2 \times 0.5} = e^{-1} \approx 0.368\) is still
-                    positive &mdash; so this step overshot significantly.
+                    One Euler step gives \(x_1 = x_0 + h f(x_0) = 1 + h \times (-2)\).
+                    Setting this to zero: \(1 - 2h = 0\), so \(h = 0.5\).  This is
+                    exactly the h = 0.5 &ldquo;fluke&rdquo; discussed later in this
+                    section: Euler lands on zero not because it is accurate &mdash;
+                    the true solution \(e^{-1} \approx 0.368\) is still well above
+                    zero &mdash; but because the straight-line step overshoots by
+                    just the right amount.  A single lucky value is never evidence
+                    that a method works.
                 </div>
             </div>
         </div>
@@ -353,24 +360,24 @@
         <div class="tab-content">
             <div class="question-container" data-type="fill" data-answer="10000[9500,10500]">
                 <div class="question-text">
-                    If you want the Euler solution to have 1000&times; smaller error,
-                    you need to reduce \(h\) by a factor of 1000.  If the original
-                    run took 10 steps, the refined run will take approximately
-                    <input type="text" class="fill-blank" placeholder="?"> steps.
-                    <br><br>
-                    <em>Hint: If \(h\) shrinks by 1000&times;, how many more steps
-                    does the same time interval require?</em>
+                    Euler&rsquo;s global error is O(h).  A 10-step run has error 0.2,
+                    but you need error \(2 \times 10^{-4}\).  How many steps will the
+                    refined run take?
+                    N &approx; <input type="text" class="fill-blank" placeholder="?"> steps
                 </div>
                 <div class="question-actions">
                     <button class="btn-verify">Verify</button>
                 </div>
                 <div class="question-explanation" style="display:none;">
                     <strong>Explanation:</strong>
-                    The number of steps is \(N = T / h\).  Shrinking \(h\) by
-                    1000&times; multiplies \(N\) by 1000: from 10 to
-                    <strong>10,000</strong> steps.  The key takeaway:
-                    <em>first-order methods are expensive</em> &mdash;
-                    1000&times; better accuracy costs 1000&times; more work.
+                    Going from 0.2 to \(2 \times 10^{-4}\) is a 1000&times; reduction
+                    in error.  Because Euler is first-order (error &prop; h), that
+                    demands \(h\) be 1000&times; smaller &mdash; and since
+                    \(N = T/h\), the same time interval now needs 1000&times; more
+                    steps: from 10 to <strong>10,000</strong>.  The key takeaway:
+                    <em>first-order methods are expensive</em> &mdash; every
+                    factor of accuracy costs the same factor in work, which is why
+                    higher-order methods are worth learning.
                 </div>
             </div>
         </div>

@@ -316,22 +316,22 @@
         </div>
 
         <div class="tab-content">
-            <div class="question-container" data-type="fill" data-answer="0">
+            <div class="question-container" data-type="fill" data-answer="900[800,1000]">
                 <div class="question-text">
-                    The <em>average</em> displacement \( \langle x \rangle \) of a symmetric
-                    random walk is
-                    <input type="text" class="fill-blank" style="width: 50px">
-                    (the walk is unbiased &mdash; equally likely to go left or right).
+                    You want walkers to end up ~30 units from the origin (RMS). How many steps do
+                    you need?
+                    <input type="text" class="fill-blank" style="width: 70px">
                 </div>
                 <div class="question-actions">
                     <button class="btn-verify">Verify</button>
                 </div>
                 <div class="question-explanation" style="display:none;">
                     <strong>Explanation:</strong>
-                    A symmetric random walk has \( \langle x \rangle = 0 \) by symmetry. The
-                    walker is equally likely to be at +x as at &minus;x. But the <em>spread</em>
-                    \( \sqrt{\langle x^2 \rangle} \) grows as \( \sqrt{N} \). Zero mean, growing
-                    variance &mdash; this is diffusion.
+                    Diffusion says the RMS distance grows as \( \sqrt{N} \), so
+                    \( \sqrt{N} = 30 \) means \( N = 30^2 = 900 \) steps. Notice the steep price of
+                    distance: to wander twice as far (60 units) you would need
+                    \( 60^2 = 3{,}600 \) steps &mdash; four times as many. That quadratic cost is
+                    the flip side of the same \( 1/\sqrt{N} \) law that governs Monte Carlo error.
                 </div>
             </div>
         </div>
@@ -554,7 +554,11 @@ colors = ['#00f3ff','#ff006e','#ffbe0b','#00ff88','#bb86fc']
 all_r2 = np.zeros(n_steps + 1)
 
 for w in range(n_walkers):
-    steps = np.random.choice([-1, 1], (n_steps, 2))
+    # 4-direction unit steps: pick an axis each step, move +/-1 along it
+    axis = np.random.randint(0, 2, n_steps)      # 0 = x-axis, 1 = y-axis
+    sign = np.random.choice([-1, 1], n_steps)
+    steps = np.zeros((n_steps, 2), dtype=int)
+    steps[np.arange(n_steps), axis] = sign
     pos = np.cumsum(steps, axis=0)
     pos = np.vstack([[0, 0], pos])
     all_r2 += pos[:, 0]**2 + pos[:, 1]**2

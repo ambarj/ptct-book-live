@@ -104,10 +104,10 @@
             </div>
         </div>
         <div class="tab-content">
-            <div class="question-container" data-type="fill" data-answer="10[8,12]">
-                <div class="question-text">With \( N = 100 \) steps, the theoretical standard deviation is \( \sqrt{N} = \) <input type="text" class="fill-blank" style="width: 50px">. Verify this matches the measured width of the histogram.</div>
+            <div class="question-container" data-type="fill" data-answer="225[200,250]">
+                <div class="question-text">Find the N that makes the histogram width \( \sigma \approx 15 \). <input type="text" class="fill-blank" style="width: 50px">. Set the step slider, then read the measured width.</div>
                 <div class="question-actions"><button class="btn-verify">Verify</button></div>
-                <div class="question-explanation" style="display:none;"><strong>Explanation:</strong> For \( N = 100 \), \( \sigma = \sqrt{100} = 10 \). The histogram should have about \( 68\% \) of walkers within \( \pm 10 \) of zero, and \( 95\% \) within \( \pm 20 \). The stats bar shows the measured \( \sigma \) from data — it should be very close to 10.</div>
+                <div class="question-explanation" style="display:none;"><strong>Explanation:</strong> The width is \( \sigma = \sqrt{N} \), so \( \sigma \approx 15 \) requires \( N = 15^2 = 225 \). Dial the step count to about 225 and the measured \( \sigma \) in the stats bar lands near 15. Because \( \sigma \) grows as \( \sqrt{N} \), widening the histogram by 50% (from 10 to 15) more than doubles the steps needed (from 100 to 225).</div>
             </div>
         </div>
         <div class="tab-content">
@@ -355,10 +355,10 @@
             <button class="tab-button">Question 12</button>
         </div>
         <div class="tab-content active">
-            <div class="question-container" data-type="fill" data-answer="40[35,45]">
-                <div class="question-text">With \( p = 0.6 \) and \( N = 200 \), the mean drift is \( N(2p - 1) = 200 \times 0.2 = \) <input type="text" class="fill-blank" style="width: 50px">. Verify this matches the histogram center.</div>
+            <div class="question-container" data-type="fill" data-answer="0.4[0.38,0.42]">
+                <div class="question-text">Set \( N = 400 \). Find the p that centers the histogram near \( m = -80 \). <input type="text" class="fill-blank" style="width: 50px">.</div>
                 <div class="question-actions"><button class="btn-verify">Verify</button></div>
-                <div class="question-explanation" style="display:none;"><strong>Explanation:</strong> \( \langle m \rangle = N(2p-1) = 200 \times 0.2 = 40 \). The histogram should be centered around \( m = 40 \), not zero. Bias breaks the symmetry — the walker drifts in the favored direction at average speed \( 2p - 1 \) per step.</div>
+                <div class="question-explanation" style="display:none;"><strong>Explanation:</strong> The center is \( \langle m \rangle = N(2p-1) \), so \( 400(2p-1) = -80 \) gives \( 2p-1 = -0.2 \) and \( p = 0.4 \). A leftward bias of just 0.1 below 0.5 shifts the whole histogram to \( m = -80 \). Nudge the bias slider to 0.4 and watch the peak land there.</div>
             </div>
         </div>
         <div class="tab-content">
